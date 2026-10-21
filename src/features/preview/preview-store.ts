@@ -1,0 +1,50 @@
+'use client'
+
+import { create } from 'zustand'
+import type { UploadItem } from '@/core/types'
+
+export interface PreviewActions {
+  insert?: (item: UploadItem) => void
+  replace?: (item: UploadItem) => void
+  remove?: (item: UploadItem) => void
+  select?: (item: UploadItem) => void
+  deselect?: (item: UploadItem) => void
+  useAsStart?: (item: UploadItem) => void
+  addAsReference?: (item: UploadItem) => void
+  available?: (item: UploadItem) => (keyof Omit<PreviewActions, 'available' | 'label'>)[]
+  label?: (item: UploadItem) => string | null
+}
+
+export interface PreviewRequest {
+  items: UploadItem[]
+  index: number
+  actions?: PreviewActions
+}
+
+interface PreviewState {
+  request: PreviewRequest | null
+  open: (request: PreviewRequest) => void
+  close: () => void
+}
+
+export const usePreviewStore = create<PreviewState>((set) => ({
+  request: null,
+  open: (request) =>
+    set({
+      request: {
+        ...request,
+        index: Math.min(Math.max(0, request.index), Math.max(0, request.items.length - 1)),
+      },
+    }),
+  close: () => set({ request: null }),
+}))
+
+/** Opens the media preview, replacing any current request. */
+export function openPreview(request: PreviewRequest): void {
+  usePreviewStore.getState().open(request)
+}
+
+/** Closes the media preview. */
+export function closePreview(): void {
+  usePreviewStore.getState().close()
+}
