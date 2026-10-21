@@ -6,8 +6,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=versions.env
 source "$SCRIPT_DIR/versions.env"
 
-BUILD_SOURCES_URL=${BUILD_SOURCES_URL:-https://github.com/your-name/not-higgsfield/releases/download/build-sources}
-BUILD_SOURCES_URL=${BUILD_SOURCES_URL%/}
+# Optional mirror. CI sets BUILD_SOURCES_URL; local builds go straight upstream.
+BUILD_SOURCES_URL=${BUILD_SOURCES_URL:-}
+if [[ -n "$BUILD_SOURCES_URL" ]]; then
+  BUILD_SOURCES_URL=${BUILD_SOURCES_URL%/}
+fi
 
 PROFILE=full
 TARGET=x86_64-pc-windows-msvc
@@ -131,19 +134,21 @@ check_imports() {
 }
 
 FFMPEG_URLS=(
-  "$BUILD_SOURCES_URL/ffmpeg-$FFMPEG_VERSION.tar.xz"
   "https://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.xz"
 )
 X264_URLS=(
-  "$BUILD_SOURCES_URL/x264-$X264_COMMIT.tar.bz2"
   "https://code.videolan.org/videolan/x264/-/archive/$X264_COMMIT/x264-$X264_COMMIT.tar.bz2"
 )
 # zlib.net only serves the current release, older ones live under fossils.
 ZLIB_URLS=(
-  "$BUILD_SOURCES_URL/zlib-$ZLIB_VERSION.tar.gz"
   "https://zlib.net/fossils/zlib-$ZLIB_VERSION.tar.gz"
   "https://github.com/madler/zlib/releases/download/v$ZLIB_VERSION/zlib-$ZLIB_VERSION.tar.gz"
 )
+if [[ -n "$BUILD_SOURCES_URL" ]]; then
+  FFMPEG_URLS=("$BUILD_SOURCES_URL/ffmpeg-$FFMPEG_VERSION.tar.xz" "${FFMPEG_URLS[@]}")
+  X264_URLS=("$BUILD_SOURCES_URL/x264-$X264_COMMIT.tar.bz2" "${X264_URLS[@]}")
+  ZLIB_URLS=("$BUILD_SOURCES_URL/zlib-$ZLIB_VERSION.tar.gz" "${ZLIB_URLS[@]}")
+fi
 
 download_verify "$FFMPEG_SHA256" "$SRC/ffmpeg-$FFMPEG_VERSION.tar.xz" "${FFMPEG_URLS[@]}"
 download_verify "$X264_SHA256" "$SRC/x264-$X264_COMMIT.tar.bz2" "${X264_URLS[@]}"
