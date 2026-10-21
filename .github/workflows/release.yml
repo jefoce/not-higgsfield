@@ -57,14 +57,14 @@ jobs:
           fi
           bash "${{ matrix.script }}" "${args[@]}"
       - name: Upload ffmpeg sidecar
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: ffmpeg-${{ matrix.target }}
           path: ffmpeg-out/ffmpeg-${{ matrix.target }}*
           if-no-files-found: error
       - name: Upload ffmpeg sources
         if: matrix.target == 'x86_64-unknown-linux-gnu'
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: ffmpeg-sources
           path: ffmpeg-sources/*
@@ -164,7 +164,7 @@ jobs:
                 fi | sed 's#  .*/#  #'
               done > "$out"
           cat "$out"
-      - uses: actions/upload-artifact@v4.6.2
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: sha256-${{ matrix.target }}
           path: sha256-${{ matrix.target }}.txt
