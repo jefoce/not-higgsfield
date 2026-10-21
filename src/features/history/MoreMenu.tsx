@@ -130,6 +130,7 @@ export function MoreMenu(props: MoreMenuProps) {
           <button
             type="button"
             aria-label="More actions"
+            data-card-menu
             className={cn(
               variant === 'panel'
                 ? 'inline-flex h-8 w-8 items-center justify-center rounded-lg border border-line text-fg-2 transition hover:bg-hover'

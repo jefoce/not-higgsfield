@@ -24,7 +24,7 @@ export function FavoriteBadge(props: FavoriteBadgeProps) {
         event.stopPropagation()
         void toggleFavorite(record)
       }}
-      className="absolute right-3 top-3 inline-flex h-6 items-center gap-1 rounded-2xl border border-white/10 bg-black/25 bg-linear-[180deg] from-favorite/[0.22] to-favorite/[0.08] px-2 py-1 text-white backdrop-blur transition-opacity group-hover/card:pointer-events-none group-hover/card:invisible group-hover/card:opacity-0 group-has-[:focus-visible]/card:pointer-events-none group-has-[:focus-visible]/card:invisible group-has-[:focus-visible]/card:opacity-0 group-has-[[data-state=open]]/card:pointer-events-none group-has-[[data-state=open]]/card:invisible group-has-[[data-state=open]]/card:opacity-0"
+      className="absolute right-3 top-3 inline-flex h-6 items-center gap-1 rounded-2xl border border-white/10 bg-black/25 bg-linear-[180deg] from-favorite/[0.22] to-favorite/[0.08] px-2 py-1 text-white backdrop-blur transition-opacity group-hover/card:pointer-events-none group-hover/card:invisible group-hover/card:opacity-0 group-has-[:focus-visible]/card:pointer-events-none group-has-[:focus-visible]/card:invisible group-has-[:focus-visible]/card:opacity-0 group-has-[[data-card-menu][data-state=open]]/card:pointer-events-none group-has-[[data-card-menu][data-state=open]]/card:invisible group-has-[[data-card-menu][data-state=open]]/card:opacity-0"
     >
       <Heart size={16} className="text-favorite" fill="currentColor" aria-hidden />
       <span className="text-xs font-medium tabular-nums text-white">{count}</span>

@@ -251,6 +251,21 @@ describe('C5 portal clicks', () => {
     await waitFor(() => expect(apiDelete).toHaveBeenCalledWith('/api/generations/b'))
     expect(ids()).toEqual(['a'])
   })
+
+  it('keeps heart, download and more interactive after the pointer leaves', async () => {
+    const { container } = render(<HistoryGrid records={[record('a')]} onOpen={() => {}} />)
+    const card = tile(container, 'a')
+    const menu = within(card).getByRole('button', { name: 'More actions' })
+
+    fireEvent.pointerDown(menu, { button: 0, ctrlKey: false })
+    await screen.findByRole('menuitem', { name: 'Copy prompt' })
+    fireEvent.pointerLeave(card)
+
+    const open = 'group-has-[[data-card-menu][data-state=open]]/card:pointer-events-auto'
+    for (const name of ['Favorite', 'Download', 'More actions']) {
+      expect(within(card).getByRole('button', { name, hidden: true }).className).toContain(open)
+    }
+  })
 })
 
 describe('C6 liked list row', () => {

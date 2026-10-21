@@ -11,7 +11,7 @@ const ROUND =
   'inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-black/50 text-white backdrop-blur transition-colors hover:bg-black/70'
 
 const HIDDEN =
-  'pointer-events-none opacity-0 transition-opacity group-hover/card:pointer-events-auto group-hover/card:opacity-100 group-has-[:focus-visible]/card:pointer-events-auto group-has-[:focus-visible]/card:opacity-100 has-[[data-state=open]]:pointer-events-auto has-[[data-state=open]]:opacity-100'
+  'pointer-events-none opacity-0 transition-opacity group-hover/card:pointer-events-auto group-hover/card:opacity-100 group-has-[:focus-visible]/card:pointer-events-auto group-has-[:focus-visible]/card:opacity-100 group-has-[[data-card-menu][data-state=open]]/card:pointer-events-auto group-has-[[data-card-menu][data-state=open]]/card:opacity-100'
 
 interface CardActionsProps {
   record: GenerationRecord
