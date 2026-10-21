@@ -168,7 +168,7 @@ export function GeneratorPanel() {
               className="relative inline-flex h-7 w-7 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.02] text-fg-2 hover:bg-hover hover:text-fg"
             >
               <Settings size={14} aria-hidden />
-              {!!keyMissing && (
+              {keyMissing && (
                 <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-danger" />
               )}
             </button>

@@ -58,7 +58,7 @@ export function HistoryTile(props: HistoryTileProps) {
         containIntrinsicSize: `auto ${tileWidth}px`,
       }}
     >
-      {!!completed && <SelectionCheckbox id={record.id} />}
+      {completed && <SelectionCheckbox id={record.id} />}
 
       {completed ? (
         <LazyVideo
@@ -81,16 +81,16 @@ export function HistoryTile(props: HistoryTileProps) {
         </div>
       )}
 
-      {!!selected && (
+      {selected && (
         <span
           aria-hidden
           className="pointer-events-none absolute inset-0 z-20 rounded-[inherit] border-2 border-white"
         />
       )}
 
-      {!!completed && !selecting && <>
+      {completed && !selecting && <>
           <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(0,0,0,0.55)_100%)] opacity-0 transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-has-[:focus-visible]/card:opacity-100" />
-          {!!record.favorite && <FavoriteBadge record={record} />}
+          {record.favorite && <FavoriteBadge record={record} />}
           <CardActions record={record} className="top-3 z-20" />
         </>}
     </div>

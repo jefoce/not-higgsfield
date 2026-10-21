@@ -19,10 +19,8 @@ export function ModeTabs() {
     if (refsDisabled && tab === 'references') setTab('frames')
   }, [refsDisabled, tab, setTab])
 
-  const tooltip = refsDisabled ? `Not supported by ${preset.title}` : null
-
   return (
-    <Tooltip content={tooltip}>
+    <Tooltip content={refsDisabled ? `Not supported by ${preset.title}` : null}>
       <span className="mb-4 block">
         <SegmentedTabs
           options={[

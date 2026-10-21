@@ -69,7 +69,7 @@ export function HistoryRow(props: HistoryRowProps) {
           aspectRatio: MEDIA_ASPECT,
         }}
       >
-        {!!completed && <SelectionCheckbox id={record.id} />}
+        {completed && <SelectionCheckbox id={record.id} />}
 
         {completed ? (
           <LazyVideo
@@ -89,14 +89,14 @@ export function HistoryRow(props: HistoryRowProps) {
           />
         )}
 
-        {!!selected && (
+        {selected && (
           <span
             aria-hidden
             className="pointer-events-none absolute inset-0 z-20 rounded-[inherit] border-2 border-white"
           />
         )}
 
-        {!!completed && !selecting && <CardActions record={record} className="top-3" pinHeart />}
+        {completed && !selecting && <CardActions record={record} className="top-3" pinHeart />}
       </div>
 
       <div

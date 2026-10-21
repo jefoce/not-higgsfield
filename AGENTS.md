@@ -85,7 +85,7 @@ async function copyUnique(params: CopyUniqueParams): Promise<string> {
 {record.favorite && <HeartButton record={record} />}
 ```
 
-- The left side must be a real boolean. Numbers and strings render `0` or `""` otherwise. Compare or coerce:
+- `&&` needs a boolean on the left. A number or string uses `> 0` or `Boolean(x)`. Never `!!`.
 
 ```tsx
 {selected.length > 0 && <SelectionBar records={records} />}
@@ -93,7 +93,6 @@ async function copyUnique(params: CopyUniqueParams): Promise<string> {
 ```
 
 - A ternary only when both branches render something: `{completed ? <LazyVideo /> : <StatusOverlay />}`.
-- ESLint `react/jsx-no-leaked-render` with `validStrategies: ['coerce']` enforces the boolean left side.
 
 ## UI building blocks
 

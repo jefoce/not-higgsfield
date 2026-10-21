@@ -36,7 +36,6 @@ export function AspectRatioPopover() {
 
   const autoAllowed = tab === 'frames' && Boolean(start) && preset.autoAspectWithFrames
   const options: AspectChoice[] = autoAllowed ? ['auto', ...preset.aspectRatios] : [...preset.aspectRatios]
-  const ratioLabel = aspectRatio === 'auto' ? 'Auto' : aspectRatio
 
   return (
     <Popover
@@ -50,7 +49,7 @@ export function AspectRatioPopover() {
           className="flex h-10 flex-1 items-center gap-1 rounded-md bg-surface px-3 text-sm font-medium text-fg hover:bg-white/[0.06]"
         >
           <Ratio size={16} />
-          {ratioLabel}
+          {aspectRatio === 'auto' ? 'Auto' : aspectRatio}
         </button>
       </PopoverTrigger>
       <PopoverContent align="center" className="w-40 space-y-1">
@@ -60,7 +59,6 @@ export function AspectRatioPopover() {
             ? []
             : preset.resolutions.filter((candidate) => preset.outputSizes?.[candidate]?.[option])
           const reason = allowed || !onlyAt.length ? null : `Only at ${onlyAt.join(', ')}`
-          const optionLabel = option === 'auto' ? 'Auto' : option
           return (
             <Tooltip key={option} content={reason}>
               <span className="inline-flex w-full">
@@ -77,7 +75,7 @@ export function AspectRatioPopover() {
                     )}
                   >
                     {option === 'auto' ? <Ratio size={14} /> : <RatioIcon ratio={option} />}
-                    {optionLabel}
+                    {option === 'auto' ? 'Auto' : option}
                     {option === aspectRatio && <Check size={14} className="ml-auto" />}
                   </button>
                 </PopoverClose>

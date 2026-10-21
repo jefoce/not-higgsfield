@@ -64,9 +64,6 @@ export function FrameSlot(props: FrameSlotProps) {
     })
   }
 
-  const onActivate = previewable ? preview : pick
-  const label = previewable ? `Preview ${LABELS[slot].toLowerCase()}` : LABELS[slot]
-
   const card = (
     <div
       className={cn(
@@ -78,8 +75,8 @@ export function FrameSlot(props: FrameSlotProps) {
         <button
           type="button"
           disabled={disabled}
-          onClick={onActivate}
-          aria-label={label}
+          onClick={previewable ? preview : pick}
+          aria-label={previewable ? `Preview ${LABELS[slot].toLowerCase()}` : LABELS[slot]}
           className="absolute inset-0 z-0 h-full w-full cursor-pointer disabled:cursor-not-allowed"
         />
 
@@ -93,14 +90,14 @@ export function FrameSlot(props: FrameSlotProps) {
           />
         )}
 
-        {!!broken && (
+        {broken && (
           <span className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-1 bg-danger/15 text-xs font-medium text-danger">
             <AlertTriangle size={20} aria-hidden />
             File missing
           </span>
         )}
 
-        {!!previewable && (
+        {previewable && (
           <span className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-fg backdrop-blur">
               <Maximize2 size={12} aria-hidden />
@@ -123,7 +120,7 @@ export function FrameSlot(props: FrameSlotProps) {
         )}
       </div>
 
-      {!!hasFrame && (
+      {hasFrame && (
         <button
           type="button"
           onClick={(event) => {

@@ -22,9 +22,8 @@ export function GenerateButton(props: GenerateButtonProps) {
     error,
     price,
   } = props
-  const tooltip = disabled ? error : null
   return (
-    <Tooltip content={tooltip}>
+    <Tooltip content={disabled ? error : null}>
       <span className="block w-full">
         <button
           type="button"

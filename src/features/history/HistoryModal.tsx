@@ -26,7 +26,7 @@ export function HistoryModal(props: HistoryModalProps) {
       label="Video details"
       className="h-[min(80vh,820px)] w-[min(1100px,92vw)] overflow-hidden bg-surface p-3"
     >
-      {!!record && (
+      {record != null && (
         <div className="flex h-full min-h-0 gap-3">
           <div className="relative aspect-video w-full min-w-0 flex-1 self-center overflow-hidden rounded-2xl bg-black">
             {record.status === 'completed' ? (

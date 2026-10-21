@@ -196,7 +196,7 @@ export function PickerBody(props: PickerBodyProps) {
           )}
         </div>
 
-        {!!dragging && (
+        {dragging && (
           <div className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center rounded-xl border-2 border-dashed border-lime bg-black/60 text-sm font-medium text-lime backdrop-blur-sm">
             Drop to upload
           </div>

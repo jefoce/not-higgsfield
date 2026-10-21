@@ -124,36 +124,6 @@ export function UploadsTab(props: UploadsTabProps) {
     }
   }
 
-  const grid = isLoading
-    ? SKELETON.map((key) => (
-        <div key={key} className="aspect-square animate-pulse rounded-lg bg-surface-2" />
-      ))
-    : items.map((item, previewIndex) => {
-        const index = selectedIds.indexOf(item.id)
-        const disabled = index < 0 && atMax
-        const stamp = new Date(item.createdAt).getTime()
-        const version = Number.isNaN(stamp) ? item.id : stamp
-        const onPreview = item.missing
-          ? undefined
-          : () => openPreview({ items, index: previewIndex, actions })
-        const selectIndex = index >= 0 ? index : undefined
-        return (
-          <MediaTile
-            key={item.id}
-            item={item}
-            mediaRef={`uploads/${item.id}`}
-            thumbVersion={version}
-            selected={index >= 0}
-            selectIndex={selectIndex}
-            disabled={disabled}
-            missing={item.missing}
-            onDelete={() => setPending(item)}
-            onSelect={() => onSelect(item)}
-            onPreview={onPreview}
-          />
-        )
-      })
-
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex h-14 shrink-0 items-center px-4 text-sm font-medium text-fg-2">
@@ -173,7 +143,35 @@ export function UploadsTab(props: UploadsTabProps) {
           ) : (
             <UploadTile kinds={kinds} max={max} extensions={extensions} onUploaded={onUploaded} />
           )}
-          {grid}
+          {isLoading
+            ? SKELETON.map((key) => (
+                <div key={key} className="aspect-square animate-pulse rounded-lg bg-surface-2" />
+              ))
+            : items.map((item, previewIndex) => {
+                const index = selectedIds.indexOf(item.id)
+                const disabled = index < 0 && atMax
+                const stamp = new Date(item.createdAt).getTime()
+                const version = Number.isNaN(stamp) ? item.id : stamp
+                const onPreview = item.missing
+                  ? undefined
+                  : () => openPreview({ items, index: previewIndex, actions })
+                const selectIndex = index >= 0 ? index : undefined
+                return (
+                  <MediaTile
+                    key={item.id}
+                    item={item}
+                    mediaRef={`uploads/${item.id}`}
+                    thumbVersion={version}
+                    selected={index >= 0}
+                    selectIndex={selectIndex}
+                    disabled={disabled}
+                    missing={item.missing}
+                    onDelete={() => setPending(item)}
+                    onSelect={() => onSelect(item)}
+                    onPreview={onPreview}
+                  />
+                )
+              })}
           {!isLoading && items.length === 0 && (
             <p className="col-span-full py-8 text-center text-sm text-fg-2">No uploads yet</p>
           )}

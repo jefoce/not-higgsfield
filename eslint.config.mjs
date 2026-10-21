@@ -12,7 +12,6 @@ const eslintConfig = defineConfig([
       "no-restricted-imports": ["error", { patterns: ["@tauri-apps/*"] }],
       "@typescript-eslint/no-explicit-any": "error",
       "no-nested-ternary": "error",
-      "react/jsx-no-leaked-render": ["error", { validStrategies: ["coerce"] }],
     },
   },
   {

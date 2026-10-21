@@ -33,23 +33,22 @@ export function ReferenceCounters(props: ReferenceCountersProps) {
               hint ? 'font-semibold text-info' : 'text-fg-2',
             )}
           >
-            {!!hint && <Minimize2 size={12} className="shrink-0" aria-hidden />}
+            {hint && <Minimize2 size={12} className="shrink-0" aria-hidden />}
             {count}
           </span>
-        )
-        const body = hint && plan ? (
-          <Tooltip
-            content={`Images will be sent at up to ${plan.maxSide} px to fit the request size. Remove some images to send them at 4K.`}
-          >
-            {counter}
-          </Tooltip>
-        ) : (
-          counter
         )
         return (
           <span key={kind} className="flex min-w-0 flex-1 items-center justify-center gap-1">
             <Icon size={12} className="shrink-0 text-fg-2" aria-hidden />
-            {body}
+            {hint && plan ? (
+              <Tooltip
+                content={`Images will be sent at up to ${plan.maxSide} px to fit the request size. Remove some images to send them at 4K.`}
+              >
+                {counter}
+              </Tooltip>
+            ) : (
+              counter
+            )}
           </span>
         )
       })}

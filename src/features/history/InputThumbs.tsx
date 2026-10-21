@@ -39,14 +39,11 @@ function Thumb(props: ThumbProps) {
   }
 
   const title = `${item.label} \u00b7 ${item.name}`
-  const tooltip = item.sent ? `${title} \u00b7 ${item.sent}` : title
-  const role = onOpen ? 'button' : undefined
-  const tabIndex = onOpen ? 0 : undefined
   return (
-    <Tooltip content={tooltip}>
+    <Tooltip content={item.sent ? `${title} \u00b7 ${item.sent}` : title}>
       <div
-        role={role}
-        tabIndex={tabIndex}
+        role={onOpen ? 'button' : undefined}
+        tabIndex={onOpen ? 0 : undefined}
         onClick={onOpen}
         onKeyDown={onKeyDown}
         className={cn(

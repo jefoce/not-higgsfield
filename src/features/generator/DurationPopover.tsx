@@ -85,28 +85,25 @@ export function DurationPopover() {
           name="duration"
           onValueChange={(value) => setDuration(clamp(value, min, limit))}
         />
-        {!!capped && <p className="text-xs text-fg-2">{limitText}</p>}
-        {!!floored && <p className="text-xs text-fg-2">Minimum billed duration is {min}s</p>}
+        {capped && <p className="text-xs text-fg-2">{limitText}</p>}
+        {floored && <p className="text-xs text-fg-2">Minimum billed duration is {min}s</p>}
         <div className="flex flex-wrap gap-1.5">
-          {chips.map((value) => {
-            const tooltip = value > limit ? limitText : null
-            return (
-              <Tooltip key={value} content={tooltip}>
-                <span className="inline-flex">
-                  <PopoverClose asChild>
-                    <button
-                      type="button"
-                      disabled={value > limit}
-                      onClick={() => setDuration(value)}
-                      className={chipClass({ value, duration: draft.duration, limit })}
-                    >
-                      {value}s
-                    </button>
-                  </PopoverClose>
-                </span>
-              </Tooltip>
-            )
-          })}
+          {chips.map((value) => (
+            <Tooltip key={value} content={value > limit ? limitText : null}>
+              <span className="inline-flex">
+                <PopoverClose asChild>
+                  <button
+                    type="button"
+                    disabled={value > limit}
+                    onClick={() => setDuration(value)}
+                    className={chipClass({ value, duration: draft.duration, limit })}
+                  >
+                    {value}s
+                  </button>
+                </PopoverClose>
+              </span>
+            </Tooltip>
+          ))}
         </div>
       </PopoverContent>
     </Popover>

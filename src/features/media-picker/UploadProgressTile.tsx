@@ -52,7 +52,7 @@ export function UploadProgressTile(props: UploadProgressTileProps) {
       <span className="line-clamp-2 break-all text-xxs text-danger">{item.file.name}</span>
       <span className="text-xxs text-danger">Failed</span>
       <div className="flex items-center gap-1">
-        {!!onRetry && (
+        {onRetry != null && (
           <button
             type="button"
             onClick={onRetry}
@@ -61,7 +61,7 @@ export function UploadProgressTile(props: UploadProgressTileProps) {
             Retry
           </button>
         )}
-        {!!onDismiss && (
+        {onDismiss != null && (
           <button
             type="button"
             onClick={onDismiss}

@@ -83,7 +83,7 @@ function SecretField(props: SecretFieldProps) {
         error={schemaError}
         description={description}
         trailing={
-          !!status.set &&
+          status.set &&
           !readOnly && (
             <button
               type="button"

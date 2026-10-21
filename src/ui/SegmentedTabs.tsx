@@ -46,7 +46,7 @@ export function SegmentedTabs(props: SegmentedTabsProps) {
               active ? 'text-fg' : 'text-fg-2 hover:text-fg',
             )}
           >
-            {!!active && (
+            {active && (
               <span className="absolute inset-0.5 rounded-[10px] bg-white/10" aria-hidden />
             )}
             <span className="relative">{option.label}</span>

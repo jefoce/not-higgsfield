@@ -86,14 +86,14 @@ export function HistorySection() {
     <section id="history-section" className="relative flex h-full flex-col overflow-hidden">
       <HistoryToolbar />
       <div className={cn('flex-1 overflow-y-auto px-4', selecting ? 'pb-28' : 'pb-14')}>
-        {!!isLoading && records.length === 0 && <SkeletonRows />}
+        {isLoading && records.length === 0 && <SkeletonRows />}
         {!isLoading && records.length === 0 && <EmptyState />}
         {view === 'list' ? (
           <HistoryList records={records} />
         ) : (
           <HistoryGrid records={records} onOpen={(record) => setSelectedId(record.id)} />
         )}
-        {!!hasMore && <div ref={sentinel} className="h-8" />}
+        {hasMore && <div ref={sentinel} className="h-8" />}
       </div>
       <SelectionBar records={records} />
       <HistoryModal

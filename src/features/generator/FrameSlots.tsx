@@ -15,7 +15,7 @@ export function FrameSlots() {
     <div className="rounded-[20px] border border-line p-1 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
       <div className="grid grid-cols-2 gap-1">
         <FrameSlot slot="start" />
-        {!!preset.frames.end && (
+        {preset.frames.end && (
           <FrameSlot slot="end" disabled={!startId} disabledReason="Add start frame first" />
         )}
       </div>

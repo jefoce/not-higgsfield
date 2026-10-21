@@ -68,13 +68,13 @@ export function MediaTile(props: MediaTileProps) {
         selected && 'ring-2 ring-lime ring-offset-2 ring-offset-surface',
       )}
     >
-      {!!previewable && !!broken && (
+      {previewable && broken && (
         <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/5 text-fg-2">
           {item.kind === 'video' ? <Film size={24} aria-hidden /> : <ImageIcon size={24} aria-hidden />}
         </span>
       )}
 
-      {!!previewable && !broken && (
+      {previewable && !broken && (
         // eslint-disable-next-line @next/next/no-img-element -- pre-sized thumbs
         <img
           src={thumbSrc}
@@ -97,7 +97,7 @@ export function MediaTile(props: MediaTileProps) {
         </span>
       )}
 
-      {!!isAudio && (
+      {isAudio && (
         <>
           <span
             className={cn(
@@ -134,7 +134,7 @@ export function MediaTile(props: MediaTileProps) {
         )}
       />
 
-      {!!onPreview && !missing && !isAudio && (
+      {onPreview != null && !missing && !isAudio && (
         <button
           type="button"
           onClick={(event) => {
@@ -148,7 +148,7 @@ export function MediaTile(props: MediaTileProps) {
         </button>
       )}
 
-      {!!isAudio && (
+      {isAudio && (
         <button
           type="button"
           onClick={(event) => {
@@ -168,7 +168,7 @@ export function MediaTile(props: MediaTileProps) {
         </button>
       )}
 
-      {!!onDelete && (
+      {onDelete != null && (
         <button
           type="button"
           onClick={(event) => {
@@ -183,7 +183,7 @@ export function MediaTile(props: MediaTileProps) {
         </button>
       )}
 
-      {!!missing && (
+      {Boolean(missing) && (
         <span className="pointer-events-none absolute left-1.5 top-1.5 z-20 rounded bg-danger/20 px-1.5 py-0.5 text-xxs font-medium text-danger">
           Missing
         </span>
@@ -195,7 +195,7 @@ export function MediaTile(props: MediaTileProps) {
         </span>
       )}
 
-      {!!selected && (
+      {Boolean(selected) && (
         <span className="pointer-events-none absolute bottom-1.5 left-1.5 z-20 flex h-5 w-5 items-center justify-center rounded-full bg-lime text-xxs font-semibold text-on-lime">
           {(selectIndex ?? 0) + 1}
         </span>

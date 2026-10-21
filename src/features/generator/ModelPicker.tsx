@@ -80,7 +80,6 @@ function ModelRow(props: ModelRowProps) {
   const discount = pricing?.discount ?? 0
   const from = fromRate(option, pricing?.skus)
   const Icon = PRESET_ICONS[option.icon]
-  const rateClass = discount > 0 ? 'text-lime' : undefined
 
   return (
     <button
@@ -99,7 +98,7 @@ function ModelRow(props: ModelRowProps) {
           <span className="min-w-0 flex-1 truncate text-sm font-medium">{option.title}</span>
           {from !== null && (
             <span className="ml-2 shrink-0 text-xxs text-fg-3">
-              from <span className={rateClass}>{formatRate(from)}</span>
+              from <span className={discount > 0 ? 'text-lime' : undefined}>{formatRate(from)}</span>
             </span>
           )}
           {discount > 0 && (
@@ -112,7 +111,7 @@ function ModelRow(props: ModelRowProps) {
         <span className="mt-1 flex flex-wrap gap-1">
           <Badge icon={Diamond} text={quality(option)} />
           <Badge icon={Clock} text={duration(option)} />
-          {!!option.audio.supported && <Badge icon={Volume2} label="Audio" />}
+          {option.audio.supported && <Badge icon={Volume2} label="Audio" />}
         </span>
       </span>
       <span className="flex w-3.5 h-3.5 shrink-0 items-center justify-center">

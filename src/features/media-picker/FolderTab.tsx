@@ -62,7 +62,7 @@ export function FolderTab(props: FolderTabProps) {
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="grid grid-cols-4 content-start gap-3 p-3">
-          {!!isLoading &&
+          {isLoading &&
             SKELETON.map((key) => (
               <div key={key} className="aspect-square animate-pulse rounded-lg bg-surface-2" />
             ))}
@@ -97,14 +97,14 @@ export function FolderTab(props: FolderTabProps) {
                   className="absolute inset-0 z-0 h-full w-full cursor-pointer"
                 />
 
-                {!!isAudio && (
+                {isAudio && (
                   <span className="flex h-full w-full flex-col justify-between bg-white/5 p-2">
                     <span className="truncate text-sm font-medium">{file.name}</span>
                     <span className="text-xs capitalize text-fg-2">{file.kind}</span>
                   </span>
                 )}
 
-                {!isAudio && !!failed && (
+                {!isAudio && failed && (
                   <span className="flex h-full w-full items-center justify-center bg-white/5 text-fg-2">
                     {file.kind === 'video' ? (
                       <Film size={24} aria-hidden />
@@ -159,7 +159,7 @@ export function FolderTab(props: FolderTabProps) {
             )
           })}
 
-          {!!empty && (
+          {empty && (
             <p className="col-span-full py-8 text-center text-sm text-fg-2">No media in this folder</p>
           )}
         </div>

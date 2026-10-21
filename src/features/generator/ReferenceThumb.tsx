@@ -104,10 +104,8 @@ export function ReferenceThumb(props: ReferenceThumbProps) {
   let overlayClass = 'hidden group-hover:flex'
   if (broken) overlayClass = 'flex'
   if (lifted) overlayClass = 'hidden'
-  const tooltip = note ? `${title} \u00b7 ${note}` : title
-
   return (
-    <Tooltip content={tooltip}>
+    <Tooltip content={note ? `${title} \u00b7 ${note}` : title}>
       <div
         className={cn(
           'group relative cursor-grab rounded-xl active:cursor-grabbing',
@@ -132,17 +130,17 @@ export function ReferenceThumb(props: ReferenceThumbProps) {
             />
           )}
 
-          {upload != null && !!isAudio && (
+          {upload != null && Boolean(isAudio) && (
             <AudioReference upload={upload} src={audioSrc} name={name} />
           )}
 
-          {upload != null && !!isVideo && upload.durationSec != null && (
+          {upload != null && Boolean(isVideo) && upload.durationSec != null && (
             <span className="pointer-events-none absolute bottom-1 left-1 rounded bg-black/60 px-1 text-xxs font-medium tabular-nums text-fg">
               {formatMediaDuration(upload.durationSec)}
             </span>
           )}
 
-          {!!broken && (
+          {broken && (
             <span
               aria-label={isMissing ? 'File missing' : 'File deleted'}
               className={cn(
@@ -154,7 +152,7 @@ export function ReferenceThumb(props: ReferenceThumbProps) {
             </span>
           )}
 
-          {!!openable && (
+          {openable && (
             <button
               type="button"
               onClick={onOpenPreview}
@@ -163,7 +161,7 @@ export function ReferenceThumb(props: ReferenceThumbProps) {
             />
           )}
 
-          {!!openable && !lifted && (
+          {openable && !lifted && (
             <span className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-fg backdrop-blur">
                 <Maximize2 size={12} aria-hidden />

@@ -18,8 +18,6 @@ export function SeedChip() {
 
   if (!preset.seed) return null
 
-  const seedLabel = random ? 'Random' : seed
-
   return (
     <Popover>
       <Tooltip content="Provider may not guarantee identical results">
@@ -29,7 +27,7 @@ export function SeedChip() {
             className="inline-flex items-center gap-1.5 rounded-lg bg-page-2 px-[6px] py-1 text-xs font-medium leading-4 text-fg hover:bg-white/5"
           >
             {random ? <Dices size={14} /> : <Lock size={14} />}
-            {seedLabel}
+            {random ? 'Random' : seed}
           </button>
         </PopoverTrigger>
       </Tooltip>

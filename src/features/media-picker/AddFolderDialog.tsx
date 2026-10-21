@@ -173,7 +173,7 @@ export function AddFolderDialog(props: AddFolderDialogProps) {
 
       <div className="mt-3 flex shrink-0 items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          {!!capabilities?.chooseFolder && (
+          {capabilities != null && capabilities.chooseFolder && (
             <Button
               size="sm"
               variant="outline"
