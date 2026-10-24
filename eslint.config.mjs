@@ -9,7 +9,11 @@ import sonarjs from 'eslint-plugin-sonarjs'
 import unicorn from 'eslint-plugin-unicorn'
 import tseslint from 'typescript-eslint'
 
+import paddingAroundFunctions from './eslint-rules/padding-around-functions.mjs'
+
 const PRESET_IDS = /^(wan-3\.0|wan-3\.0-prime|seedance-2\.0|seedance-2\.5)$/
+
+const restrict = (...groups) => ['error', ...groups.flat()]
 
 // Shared so the secrets, route and component blocks keep these checks.
 const SHARED_SELECTORS = [
@@ -59,6 +63,24 @@ const OBJECT_FUNCTION_SELECTOR = {
   selector: 'ObjectExpression > Property > :matches(ArrowFunctionExpression, FunctionExpression)',
   message: 'Name the function (handle<Action>) and pass it by reference.',
 }
+
+// Reserved for B6: no re-exports.
+const MODULE_SELECTORS = [
+  {
+    selector: 'ExportAllDeclaration, ExportNamedDeclaration[source]',
+    message: 'No re-exports. Import from the module that defines it.',
+  },
+]
+
+// Reserved for B2: dependencies are wired in src/server/boot.ts.
+const SERVER_SELECTORS = [
+  {
+    selector: 'ImportExpression',
+    message: 'No dynamic imports in server code. Wire dependencies in src/server/boot.ts.',
+  },
+]
+
+const localPlugin = { rules: { 'padding-around-functions': paddingAroundFunctions } }
 
 export default defineConfig([
   ...nextVitals,
@@ -199,7 +221,6 @@ export default defineConfig([
       complexity: ['error', 10],
       'max-lines-per-function': ['error', { max: 80, skipBlankLines: true, skipComments: true }],
       'max-lines': ['error', { max: 250, skipBlankLines: true, skipComments: true }],
-      curly: ['error', 'multi-line', 'consistent'],
 
       // React
       'react/function-component-definition': [
@@ -238,8 +259,7 @@ export default defineConfig([
         },
       ],
 
-      // Project rules from AGENTS.md
-      'no-restricted-syntax': ['error', ...SHARED_SELECTORS, PROPS_SELECTOR],
+      // Project rules from AGENTS.md live in the per-layer blocks below.
 
       // Unicorn, selected rules only
       'unicorn/consistent-function-scoping': 'error',
@@ -297,12 +317,58 @@ export default defineConfig([
     },
   },
 
-  // Secrets and preset literals (kept from today, plus the props rule above)
+  // Project rules compose per layer. Later blocks override earlier ones for the same files.
   {
     files: ['src/**/*.{ts,tsx}'],
-    ignores: ['src/server/secrets/**', 'src/core/presets/**'],
     rules: {
-      'no-restricted-syntax': ['error', ...SHARED_SELECTORS, PROPS_SELECTOR, ...SECRET_SELECTORS],
+      'no-restricted-syntax': restrict(SHARED_SELECTORS, PROPS_SELECTOR, SECRET_SELECTORS),
+    },
+  },
+  {
+    // Preset literal checks would flag the data files themselves.
+    files: ['src/core/presets/**'],
+    rules: {
+      'no-restricted-syntax': restrict(SHARED_SELECTORS, PROPS_SELECTOR),
+    },
+  },
+  {
+    files: ['src/server/**/*.ts'],
+    rules: {
+      'no-restricted-syntax': restrict(SHARED_SELECTORS, PROPS_SELECTOR, SECRET_SELECTORS),
+    },
+  },
+  {
+    // Secrets code reads process.env directly.
+    files: ['src/server/secrets/**'],
+    rules: {
+      'no-restricted-syntax': restrict(SHARED_SELECTORS, PROPS_SELECTOR),
+    },
+  },
+  {
+    // Reserved for the dynamic-import exception in B2.
+    files: ['src/server/secrets/keychain.ts'],
+    rules: {
+      'no-restricted-syntax': restrict(SHARED_SELECTORS, PROPS_SELECTOR),
+    },
+  },
+  {
+    // Next route handlers take { params }, so drop only the props selector.
+    // SECRET_SELECTORS stays: the old block dropped it by accident.
+    files: ['src/app/api/**/route.ts'],
+    rules: {
+      'no-restricted-syntax': restrict(SHARED_SELECTORS, SECRET_SELECTORS),
+    },
+  },
+  {
+    // No functions as object properties inside components.
+    files: ['src/features/**/*.tsx', 'src/ui/**/*.tsx'],
+    rules: {
+      'no-restricted-syntax': restrict(
+        SHARED_SELECTORS,
+        PROPS_SELECTOR,
+        SECRET_SELECTORS,
+        OBJECT_FUNCTION_SELECTOR,
+      ),
     },
   },
 
@@ -314,24 +380,6 @@ export default defineConfig([
   {
     files: ['src/features/**', 'src/ui/**', 'src/lib/**', 'src/core/**'],
     rules: { 'no-console': 'error' },
-  },
-  {
-    // Next route handlers take { params }, so drop only the props selector.
-    files: ['src/app/api/**/route.ts'],
-    rules: { 'no-restricted-syntax': ['error', ...SHARED_SELECTORS] },
-  },
-  {
-    // No functions as object properties inside components.
-    files: ['src/features/**/*.tsx', 'src/ui/**/*.tsx'],
-    rules: {
-      'no-restricted-syntax': [
-        'error',
-        ...SHARED_SELECTORS,
-        PROPS_SELECTOR,
-        ...SECRET_SELECTORS,
-        OBJECT_FUNCTION_SELECTOR,
-      ],
-    },
   },
   {
     // Exported functions declare their return type outside components.
@@ -356,38 +404,54 @@ export default defineConfig([
   // Blank-line grouping. After prettier, which turns some of these off.
   {
     files: ['src/**/*.{ts,tsx}', 'tests/**/*.{ts,tsx}'],
+    plugins: { local: localPlugin },
     rules: {
+      'local/padding-around-functions': 'error',
+      curly: ['error', 'all'],
       '@stylistic/padding-line-between-statements': [
         'error',
         { blankLine: 'always', prev: 'directive', next: '*' },
-        {
-          blankLine: 'always',
-          prev: 'import',
-          next: ['const', 'let', 'function', 'class', 'export', 'expression', 'type', 'interface'],
-        },
+        { blankLine: 'always', prev: 'import', next: '*' },
+        { blankLine: 'any', prev: 'import', next: 'import' },
         { blankLine: 'always', prev: ['const', 'let'], next: '*' },
-        { blankLine: 'any', prev: ['const', 'let'], next: ['const', 'let'] },
+        {
+          blankLine: 'any',
+          prev: ['singleline-const', 'singleline-let'],
+          next: ['singleline-const', 'singleline-let'],
+        },
+        { blankLine: 'any', prev: 'singleline-export', next: 'singleline-export' },
         {
           blankLine: 'always',
           prev: '*',
-          next: ['if', 'for', 'while', 'do', 'switch', 'try', 'throw'],
-        },
-        {
-          blankLine: 'any',
-          prev: ['if', 'for', 'while', 'do', 'switch', 'try'],
-          next: ['if', 'for', 'while', 'do', 'switch', 'try'],
-        },
-        {
-          blankLine: 'any',
-          prev: ['if', 'for', 'while', 'do', 'switch', 'try'],
-          next: 'throw',
+          next: ['if', 'for', 'while', 'do', 'switch', 'try', 'throw', 'return'],
         },
         {
           blankLine: 'always',
           prev: '*',
-          next: ['function', 'class', 'export', 'type', 'interface'],
+          next: [
+            'function',
+            'class',
+            'type',
+            'interface',
+            'multiline-const',
+            'multiline-let',
+            'multiline-expression',
+            'multiline-export',
+          ],
         },
-        { blankLine: 'any', prev: 'export', next: 'export' },
+        {
+          blankLine: 'always',
+          prev: [
+            'block-like',
+            'multiline-const',
+            'multiline-let',
+            'multiline-expression',
+            'multiline-export',
+            'type',
+            'interface',
+          ],
+          next: '*',
+        },
       ],
       '@stylistic/padded-blocks': ['error', 'never'],
       '@stylistic/lines-between-class-members': [
