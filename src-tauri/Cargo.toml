@@ -1,6 +1,6 @@
 [package]
 name = "not-higgsfield"
-version = "0.1.0"
+version = "0.2.0"
 description = "Not Higgsfield desktop shell"
 authors = ["jefoce"]
 edition = "2021"
