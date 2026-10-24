@@ -16,8 +16,12 @@ pnpm typecheck && pnpm lint && pnpm deps && pnpm format:check && pnpm knip && pn
 
 - Work on the branch named after the next version, without `v` (`0.1.1`). Create it locally if it does not exist. Never commit to `releases`.
 - The first commit on a new branch bumps the version in `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml` and `Cargo.lock`, and opens `## X.Y.Z - unreleased` in `CHANGELOG.md`.
-- The pull request and its squash commit are titled `X.Y.Z`, where `X.Y.Z` matches `package.json`. The release workflow creates `vX.Y.Z` when the squash merge reaches `releases`.
-- Commit messages: `X.Y.Z: <what>`. One commit per item. Bulk tool runs (`lint --fix`, `prettier --write`, codemods) get their own commit.
+- Commit message: `TYPE: X.Y.Z Message`, where X.Y.Z is the version of the current branch. Optional description after a blank line. No task ids or review ids.
+- Message completes "If applied, this commit will ...", imperative mood, no trailing period.
+- Types: CRITICAL (critical fix), FIX (bug fix), HACKFIX (workaround until a proper fix), FEAT (user-facing feature added or removed), CODE (internal feature invisible to users), PERF (performance), SECURITY (security improvement), DOCS (documentation), STYLE (formatting only), REFACTOR (no behavior change), TEST (tests), CHORE (tiny fixes, config, deps), TEXT (user-facing text only).
+- Examples: `FEAT: 0.2.0 Show unavailable models as disabled`, `REFACTOR: 0.2.0 Move lock to server/sync`, `STYLE: 0.2.0 Add braces and blank lines`.
+- One commit per item. Bulk tool runs get their own commit, usually STYLE.
+- The pull request and its squash commit stay titled `X.Y.Z` (the release workflow depends on it).
 - Before 1.0: patch for fixes only, minor for features, behavior changes or file format changes. Propose the bump in the report.
 - Never push, force push, tag, create releases, open pull requests or change remotes unless the user asks for that exact action in the current message.
 - Before saying done: `git status` is clean except untracked review files, and the report lists the branch and commit hashes.
