@@ -195,7 +195,15 @@ async function copyUnique(params: CopyUniqueParams): Promise<string> {
 - Terse. Short sentences. No hype, no filler, no em dashes in prose or comments.
 - Comments explain why, not what. JSDoc for block docs, inline notes only inside a function.
 - Early returns over nested branches. Lookup tables over if/else chains that only return.
-- Blank lines group code: declarations together, one blank line before and after every block, before `return`, and before functions, types and exports. No blank line at the start or end of a block.
+- Every `if`, `else` and loop body has braces, single-line bodies included.
+- Blank line before `return`, `if`, `throw` and loops.
+- Blank line after every block: after the closing `}` of `if`, loop, `switch` and `try`.
+- Blank line around every multi-line statement.
+- Blank line before and after every function constant, single-line ones included (`const handleX = () => ...`, `useCallback(...)`, `memo(...)`, `forwardRef(...)`).
+- Blank line before functions, types and exports.
+- Value constants may group with no blank line between them.
+- Do not convert between arrow constants and `function` declarations.
+- No blank line at the start or end of a block.
 - Formatting is Prettier's. Never hand-format or work around it. Import order is ESLint's (`simple-import-sort`).
 - Smallest diff that solves the problem. No drive-by refactors outside the files you touch.
 - Fix every rule violation in the files you touch in one pass, not only the line you changed.
