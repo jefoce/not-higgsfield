@@ -27,6 +27,7 @@
 *.pem
 project.txt
 review_v*.md
+diff.txt
 
 # debug
 npm-debug.log*
