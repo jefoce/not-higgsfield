@@ -251,6 +251,8 @@ Only `src/lib/platform/desktop.ts` imports Tauri packages. Features call the `Pl
 | `FETCH_TIMEOUTS.meta` | 15000 | Metadata and test timeout |
 | `REMOTE_LINK_TTL_SEC` | 7200 | Presigned R2 link lifetime |
 | `REMOTE_UNUSED_DAYS` | 30 | R2 retention after last use |
+| `REMOTE_FREE_GB` | 10 | Cloudflare free R2 storage |
+| `REMOTE_MAX_GB` | 8 | Tracked R2 storage cap, evicts older keys before a put |
 | `UPLOAD_CLEANUP_MS` | 3600000 | Age before stale temp files are deleted |
 | `THUMB_WIDTH` | 320 | Thumbnail width |
 | `PREVIEW_WIDTH` | 640 | Preview frame width |

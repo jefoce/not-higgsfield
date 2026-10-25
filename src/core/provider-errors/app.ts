@@ -1,3 +1,4 @@
+import { REMOTE_LINK_TTL_SEC } from '../constants'
 import type { Rule } from './types'
 
 export const INTERRUPT_SENDING_TEXT =
@@ -77,5 +78,11 @@ export const APP_RULES: readonly Rule[] = [
     title: 'The references are too large together.',
     hint: 'Use fewer or smaller files.',
     kind: 'input',
+  },
+  {
+    match: "R2 is at the app's",
+    title: 'Cloud storage is full.',
+    hint: `References used in the last ${REMOTE_LINK_TTL_SEC / 3600} hours cannot be removed yet. Try again later, or use shorter clips.`,
+    kind: 'app',
   },
 ]

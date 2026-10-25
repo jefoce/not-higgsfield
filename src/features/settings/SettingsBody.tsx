@@ -3,8 +3,11 @@
 import { type RefObject } from 'react'
 import { isEmpty } from 'lodash-es'
 
+import { REMOTE_MAX_GB } from '@/core/constants'
 import { STORAGE_PROVIDERS, VIDEO_PROVIDERS } from '@/core/providers/registry'
 import type { SecretStatus } from '@/core/types'
+import { type RemoteStatus, useRemoteStatusData } from '@/lib/api/remote'
+import { formatBytes } from '@/lib/format'
 import { Button } from '@/ui/Button'
 
 import { SecretSection } from './SecretSection'
@@ -23,9 +26,18 @@ interface SettingsBodyProps {
   sectionRefs: Record<SettingsSection, RefObject<HTMLElement | null>>
 }
 
+function storedNote(remote: RemoteStatus | undefined): string | undefined {
+  if (remote?.configured !== true) {
+    return undefined
+  }
+
+  return `Stored ${formatBytes(remote.storedBytes)} of ${REMOTE_MAX_GB} GB`
+}
+
 /** Loading, error and key sections inside the settings modal. */
 export function SettingsBody(props: SettingsBodyProps) {
   const { status, draft, sectionRefs } = props
+  const remote = useRemoteStatusData()
 
   const {
     edits,
@@ -96,6 +108,7 @@ export function SettingsBody(props: SettingsBodyProps) {
             ready={ready[descriptor.id]}
             testing={testing === descriptor.id}
             result={results[descriptor.id]}
+            note={storedNote(remote)}
             warning={
               !valid[descriptor.id] && (
                 <p className="text-xxs text-danger">

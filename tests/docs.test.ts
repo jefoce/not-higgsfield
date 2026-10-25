@@ -91,6 +91,8 @@ describe('bounds table', () => {
       'FETCH_TIMEOUTS.meta': bounds.FETCH_TIMEOUTS.meta,
       REMOTE_LINK_TTL_SEC: bounds.REMOTE_LINK_TTL_SEC,
       REMOTE_UNUSED_DAYS: bounds.REMOTE_UNUSED_DAYS,
+      REMOTE_FREE_GB: bounds.REMOTE_FREE_GB,
+      REMOTE_MAX_GB: bounds.REMOTE_MAX_GB,
       UPLOAD_CLEANUP_MS: bounds.UPLOAD_CLEANUP_MS,
       THUMB_WIDTH: bounds.THUMB_WIDTH,
       PREVIEW_WIDTH: bounds.PREVIEW_WIDTH,

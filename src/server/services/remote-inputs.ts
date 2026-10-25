@@ -2,7 +2,7 @@ import 'server-only'
 
 import fs from 'node:fs/promises'
 
-import { groupBy, isNil } from 'lodash-es'
+import { isNil } from 'lodash-es'
 
 import { REMOTE_LINK_TTL_SEC, REMOTE_UNUSED_DAYS } from '@/core/constants'
 import type { UploadItem, UploadRemote } from '@/core/schemas/upload-item'
@@ -15,10 +15,7 @@ import { secretsReady } from '../secrets'
 import { type FileHash, hashFile } from '../storage/hash'
 import { getObjectStore } from '../storage/registry'
 import type { ObjectInfo, ObjectStore, ProgressCallback } from '../storage/types'
-
-interface RemoteUpload extends UploadItem {
-  remote: UploadRemote
-}
+import { deleteRemoteGroup, makeRoom, remoteKeyGroups } from './remote-cap'
 
 interface SweepResult {
   deleted: number
@@ -81,6 +78,8 @@ export async function ensureRemote(params: EnsureRemoteParams): Promise<UploadIt
     })
   }
 
+  await makeRoom({ store: remoteStore, bytes: digest.size, keepKey: key })
+
   const stored = await putOnce({
     store: remoteStore,
     key,
@@ -126,14 +125,7 @@ export async function sweepRemote(store?: ObjectStore): Promise<SweepResult> {
   }
 
   const uploads = await listUploads()
-
-  const withRemote = uploads.filter((item): item is RemoteUpload => {
-    return Boolean(item.remote)
-  })
-
-  const groups = groupBy(withRemote, (item) => {
-    return item.remote.key
-  })
+  const groups = remoteKeyGroups(uploads)
 
   const cutoff = Date.now() - REMOTE_UNUSED_DAYS * 86_400_000
   let deleted = 0
@@ -151,18 +143,10 @@ export async function sweepRemote(store?: ObjectStore): Promise<SweepResult> {
       continue
     }
 
-    await remoteStore.delete(first.remote.key)
-    deleted += 1
+    const result = await deleteRemoteGroup(remoteStore, items)
 
-    for (const item of items) {
-      const saved = await updateUpload(item.id, (current) => {
-        return { ...current, remote: undefined }
-      })
-
-      if (saved) {
-        cleared += 1
-      }
-    }
+    deleted += result.deleted
+    cleared += result.cleared
   }
 
   return { deleted, cleared }

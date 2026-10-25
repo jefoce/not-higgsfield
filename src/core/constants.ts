@@ -100,6 +100,12 @@ export const REMOTE_LINK_TTL_SEC = 7200
 export const REMOTE_UNUSED_DAYS = 30
 export const REMOTE_MOCK_MBPS = 20
 
+/** Cloudflare free R2 storage in GB-month. */
+export const REMOTE_FREE_GB = 10
+
+/** Tracked refs/ cap, leaving 2 GB of headroom inside the free tier. */
+export const REMOTE_MAX_GB = 8
+
 export const GRID_TILE_ASPECT = '1 / 1'
 export const ZOOM_MIN = 0
 export const ZOOM_MAX = 5
