@@ -51,6 +51,7 @@ pnpm typecheck && pnpm lint && pnpm deps && pnpm format:check && pnpm knip && pn
 
 - No `any`. Use `unknown` plus a zod schema or a type guard.
 - Data from outside (OpenRouter responses, request bodies, JSON files on disk, localStorage) is parsed with zod. Types come from `z.infer`, never hand-written next to a schema.
+- Stored JSON changes are additive: new fields are optional or have a zod default. No version fields. The first breaking change adds `schemaVersion: 2` (files without it are version 1) and a migration next to the schema.
 - One type per API shape, in `src/core`, imported by both the route and the client. No copies of a response type in a component.
 - Flat object types. One level per object type. Every nested shape gets a name. Owner-prefixed when the part belongs to one owner (`RecordJob`, `RecordOutput`), shared when the shape repeats (`PixelSize`, `FrameSlots`, `MediaKindCounts`). Width and height pairs use `PixelSize`. No inline `z.object` inside another schema. Tests are exempt.
 - `satisfies` for literal config objects (presets, tables). `as const` for fixed lists.
