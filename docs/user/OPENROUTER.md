@@ -29,7 +29,7 @@ Press **Create** and copy the key. It starts with `sk-or-v1-`.
 
 ## 3. Optional: a management key for your balance
 
-The wallet pill in the app shows your remaining credit only with a management key.
+Without it the wallet pill shows what is left of the key's credit limit. With it, the pill shows your whole account balance.
 
 Open **Account → [Management Keys](https://openrouter.ai/settings/management-keys) → New Key**, give it a name and an expiration, and press **Create**.
 

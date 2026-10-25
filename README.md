@@ -51,7 +51,7 @@ Download the file for your computer from the [Releases page](https://github.com/
 2. Before the first launch, run this in Terminal: `xattr -dr com.apple.quarantine "/Applications/Not Higgsfield.app"`
 3. If macOS still blocks it, go to System Settings > Privacy & Security, press **Open Anyway** next to Not Higgsfield, and confirm.
 
-> The command is only for the file downloaded from this repo's. It removes Apple's quarantine flag from that copy. Do not run it on an app you got from anywhere else.
+> The command is only for the file downloaded from this repo. It removes Apple's quarantine flag from that copy. Do not run it on an app you got from anywhere else.
 
 ### Windows
 
@@ -77,7 +77,7 @@ Each release has a `SHA256SUMS.txt` if you want to check your download.
 
 ## Updates
 
-The app checks once a day and shows a notice when a new version exists. Settings → **App** has the switch for that check and **Check now**.
+The app checks 15 seconds after launch, then every 12 hours, and shows a notice when a new version exists. Settings → **App** has the switch for that check and **Check now**.
 
 - **macOS and Windows:** **Install and restart** downloads the new version and installs it in place.
 - **Linux AppImage:** the same button replaces the running AppImage.
@@ -99,7 +99,7 @@ The app is not signed with a paid certificate yet, so your system asks more ques
 | First video is ready                                                              | "…would like to send you notifications"                         | **Allow**. Change it later in System Settings > Notifications.                                                       |
 | You use a folder in Desktop, Documents, Downloads, a USB drive or a network share | "…would like to access files in…"                               | **Allow**. Otherwise turn it on in Privacy & Security > Files and Folders. Until then the folder looks empty.        |
 
-After an update, run the required `xattr` command again before the first launch, then Open Anyway if asked. Each unsigned version counts as a new app. The app never needs Full Disk Access, Accessibility, Screen Recording, Camera or Microphone.
+After installing a new version by hand from a `.dmg`, run the `xattr` command again before the first launch, then Open Anyway if asked. Updates installed from Settings do not need it. Each unsigned version counts as a new app. The app never needs Full Disk Access, Accessibility, Screen Recording, Camera or Microphone.
 
 ### Windows
 
@@ -162,7 +162,7 @@ To back up or move to a new computer, copy the whole folder, then enter your key
 
 ## Costs and privacy
 
-- Not Higgsfield is free and adds no fee. The wallet pill shows what is left on your key.
+- Not Higgsfield is free and adds no fee. The wallet pill shows what is left of your key's credit limit, or your account balance when you add a management key.
 - No account, no tracking, no server of ours. Keys stay in your system keychain.
 - Your text and pictures go to OpenRouter and the model's provider. Video and sound references go to your own R2 bucket as private links that expire after 2 hours.
 - R2 stays inside Cloudflare's free tier, see [the R2 guide](docs/user/CLOUDFLARE-R2.md).
@@ -193,7 +193,7 @@ Ideas, depending on how many people use the app: more video models, image genera
 
 ## For developers
 
-[DEVELOPMENT.md](docs/DEVELOPMENT.md) · [ARCHITECTURE.md](docs/ARCHITECTURE.md) · [SECURITY.md](docs/SECURITY.md)
+[DEVELOPMENT.md](docs/DEVELOPMENT.md) · [ARCHITECTURE.md](docs/ARCHITECTURE.md) · [SECURITY.md](docs/SECURITY.md) · [DECISIONS.md](docs/DECISIONS.md) · [OpenRouter guide](docs/user/OPENROUTER.md) · [Cloudflare R2 guide](docs/user/CLOUDFLARE-R2.md)
 
 ---
 
