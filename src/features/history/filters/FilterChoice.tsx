@@ -2,6 +2,7 @@
 
 import { type MouseEvent } from 'react'
 
+import { isOneOf } from '@/core/guards'
 import { cn } from '@/lib/cn'
 
 export interface FilterOption<T extends string> {
@@ -21,7 +22,17 @@ export function FilterChoice<T extends string>(props: FilterChoiceProps<T>) {
   const { label, value, options } = props
 
   const handleSelect = (event: MouseEvent<HTMLButtonElement>) => {
-    props.onChange(event.currentTarget.value as T)
+    const next = event.currentTarget.value
+
+    const allowed = options.map((option) => {
+      return option.value
+    })
+
+    if (!isOneOf(allowed, next)) {
+      return
+    }
+
+    props.onChange(next)
   }
 
   return (

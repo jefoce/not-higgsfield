@@ -3,9 +3,10 @@
 import { type MouseEvent } from 'react'
 import { Grid2x2, List } from 'lucide-react'
 
+import { isOneOf } from '@/core/guards'
 import { cn } from '@/lib/cn'
 
-import { type HistoryView, useHistoryViewStore } from './view-store'
+import { HISTORY_VIEWS, type HistoryView, useHistoryViewStore } from './view-store'
 
 interface ViewOption {
   value: HistoryView
@@ -30,7 +31,13 @@ export function ViewToggle() {
   })
 
   const handleSelect = (event: MouseEvent<HTMLButtonElement>) => {
-    setView(event.currentTarget.value as HistoryView)
+    const next = event.currentTarget.value
+
+    if (!isOneOf(HISTORY_VIEWS, next)) {
+      return
+    }
+
+    setView(next)
   }
 
   return (

@@ -2,8 +2,9 @@
 
 import { useEffect } from 'react'
 
+import { isOneOf } from '@/core/guards'
 import { getPreset } from '@/core/presets'
-import type { GeneratorTab } from '@/core/schemas/generation-record'
+import { GENERATOR_TABS } from '@/core/schemas/generation-record'
 import { SegmentedTabs } from '@/ui/SegmentedTabs'
 import { Tooltip } from '@/ui/Tooltip'
 
@@ -29,7 +30,11 @@ export function ModeTabs() {
   const isRefsDisabled = refs.image + refs.video + refs.audio === 0
 
   const handleValueChange = (value: string): void => {
-    setTab(value as GeneratorTab)
+    if (!isOneOf(GENERATOR_TABS, value)) {
+      return
+    }
+
+    setTab(value)
   }
 
   useEffect(() => {
