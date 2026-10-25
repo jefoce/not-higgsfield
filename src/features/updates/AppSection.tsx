@@ -9,6 +9,7 @@ import { Button } from '@/ui/Button'
 import { Switch } from '@/ui/form/Switch'
 
 import { AppNotes } from './AppNotes'
+import { progressText } from './progress-text'
 import { type UpdateStatus, useUpdateStore } from './update-store'
 import { useAppUpdateActions } from './use-app-update-actions'
 
@@ -39,14 +40,6 @@ function relativeTime(from: string, now: number): string {
   }
 
   return `${Math.floor(seconds / 86400)} d ago`
-}
-
-function progressText(progress: UpdateProgress): string {
-  if (isNil(progress.total) || progress.total <= 0) {
-    return 'Downloading...'
-  }
-
-  return `Downloading ${Math.round((progress.downloaded / progress.total) * 100)}%`
 }
 
 function availableText(update: AppUpdate | null): string {

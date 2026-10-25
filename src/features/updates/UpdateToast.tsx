@@ -9,6 +9,8 @@ import { platform } from '@/lib/platform'
 import { useUpdateStore } from './update-store'
 import { useInstallUpdate } from './use-install-update'
 
+const TOAST_DURATION_MS = 20_000
+
 /** Shows the update notice once while an update is available and not dismissed. */
 export function UpdateToast() {
   const status = useUpdateStore((state) => {
@@ -32,7 +34,6 @@ export function UpdateToast() {
   })
 
   const install = useInstallUpdate()
-  const { run } = install
   const isVisible = status === 'available' && !isNil(update) && !isDismissed
 
   useEffect(() => {
@@ -47,7 +48,7 @@ export function UpdateToast() {
     }
 
     const handleInstall = () => {
-      void run()
+      void install.run()
     }
 
     const handleLater = () => {
@@ -58,10 +59,12 @@ export function UpdateToast() {
     const actionLabel = isLinuxPackage ? 'Download' : 'Update'
 
     toast(`Version ${update.version} is available`, {
+      id: `update-${update.version}`,
+      duration: TOAST_DURATION_MS,
       action: { label: actionLabel, onClick: handlePrimary },
       cancel: { label: 'Later', onClick: handleLater },
     })
-  }, [isVisible, update, installKind, run, dismiss])
+  }, [isVisible, update, installKind, install, dismiss])
 
   return null
 }
