@@ -37,6 +37,18 @@ function disabledTooltip(isDisabled: boolean, error?: string): string | null {
   return null
 }
 
+interface SpinningParams {
+  isGenerating: boolean
+  isPriceLoading: boolean
+  isDisabled: boolean
+}
+
+function isSpinning(params: SpinningParams): boolean {
+  const { isGenerating, isPriceLoading, isDisabled } = params
+
+  return isGenerating || (isPriceLoading && !isDisabled)
+}
+
 /** Primary generate action with price, validation tooltip and in-flight spinner. */
 export function GenerateButton(props: GenerateButtonProps) {
   const {
@@ -49,7 +61,7 @@ export function GenerateButton(props: GenerateButtonProps) {
     discount,
   } = props
 
-  const isBusy = isGenerating || isPriceLoading
+  const isBusy = isSpinning({ isGenerating, isPriceLoading, isDisabled })
   const spinnerTone = isDisabled ? 'muted' : 'onAccent'
   const tooltip = disabledTooltip(isDisabled, error)
 

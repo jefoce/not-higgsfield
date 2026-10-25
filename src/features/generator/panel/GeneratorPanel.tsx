@@ -24,6 +24,14 @@ const emptySubscribe = () => {
   return noop
 }
 
+const getMounted = () => {
+  return true
+}
+
+const getUnmounted = () => {
+  return false
+}
+
 function handleOpenSettings(): void {
   openSettings()
 }
@@ -36,18 +44,11 @@ export function GeneratorPanel() {
 
   const { validation, isKeyMissing, isSecretsFailed } = usePanelDraft()
   const { handlePaste } = usePanelPaste()
-  const { price, listPrice, discount, isLoading: isPriceLoading } = usePanelPrice()
+  const isReady = validation.ok && !isSecretsFailed
+  const { price, listPrice, discount, isLoading: isPriceLoading } = usePanelPrice(isReady)
   const { generate, isGenerating } = useGenerate()
 
-  const isMounted = useSyncExternalStore(
-    emptySubscribe,
-    () => {
-      return true
-    },
-    () => {
-      return false
-    },
-  )
+  const isMounted = useSyncExternalStore(emptySubscribe, getMounted, getUnmounted)
 
   useUploadsRefresh()
 
@@ -106,7 +107,7 @@ export function GeneratorPanel() {
           onGenerate={handleSubmit}
           isGenerating={isGenerating}
           isPriceLoading={isPriceLoading}
-          disabled={!validation.ok || isSecretsFailed}
+          disabled={!isReady}
           error={validation.errors[0]}
           price={price}
           listPrice={listPrice}

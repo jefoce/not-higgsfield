@@ -25,7 +25,7 @@ function priceJson(draft: PriceDraft): string {
 }
 
 /** Server price for the current draft, with the list price when discounted. */
-export function usePanelPrice() {
+export function usePanelPrice(isEnabled: boolean) {
   const draft = useGeneratorStore(
     useShallow((state) => {
       return {
@@ -44,16 +44,15 @@ export function usePanelPrice() {
   const json = priceJson(draft)
   const debouncedJson = useDebouncedValue(json, DEBOUNCE_MS)
 
-  const { data, isLoading } = useSWR<GenerationEstimate>(
-    generationEstimateKey(debouncedJson),
-    fetchEstimate,
-    {
-      revalidateOnFocus: false,
-      revalidateIfStale: false,
-      keepPreviousData: true,
-      shouldRetryOnError: false,
-    },
-  )
+  const estimateKey = generationEstimateKey(debouncedJson)
+  const key = isEnabled ? estimateKey : null
+
+  const { data, isLoading } = useSWR<GenerationEstimate>(key, fetchEstimate, {
+    revalidateOnFocus: false,
+    revalidateIfStale: false,
+    keepPreviousData: true,
+    shouldRetryOnError: false,
+  })
 
   const isDebouncePending = json !== debouncedJson
 
@@ -61,6 +60,6 @@ export function usePanelPrice() {
     price: data?.estimatedUsd ?? null,
     listPrice: data?.listUsd ?? null,
     discount: data?.discount ?? 0,
-    isLoading: isDebouncePending || isLoading,
+    isLoading: isEnabled && (isDebouncePending || isLoading),
   }
 }
