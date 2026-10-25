@@ -3,8 +3,8 @@
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
+import { messageOf } from '@/core/errors'
 import { retrySecrets, testSecretTarget } from '@/lib/api/settings'
-import { errorMessage } from '@/lib/errors'
 import { useAsyncAction } from '@/lib/use-async-action'
 
 import { SETTINGS_SECTION_IDS, type SettingsSection } from './settings-store'
@@ -18,7 +18,7 @@ async function retrySecretsWithToast(): Promise<void> {
   try {
     await retrySecrets()
   } catch (error) {
-    toast.error(errorMessage(error, 'Retry failed'))
+    toast.error(messageOf(error, 'Retry failed'))
   }
 }
 
@@ -53,7 +53,7 @@ export function useSecretActions(params: UseSecretActionsParams) {
     } catch (error) {
       setResults((current) => ({
         ...current,
-        [target]: { tone: 'error', text: errorMessage(error, 'Test failed') },
+        [target]: { tone: 'error', text: messageOf(error, 'Test failed') },
       }))
     } finally {
       setTesting(null)

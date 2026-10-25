@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { messageOf } from '@/core/errors'
 import { inputForSubmit } from '@/core/normalize-input'
 import { getPreset } from '@/core/presets'
 import { friendlyError } from '@/core/provider-errors'
@@ -11,7 +12,6 @@ import { VIDEO_PROVIDER_IDS, type VideoProviderId } from '@/core/providers/types
 import { openSettings } from '@/features/settings/settings-store'
 import { refreshCredits } from '@/lib/api/credits'
 import { cancelGenerationRequest, createGeneration } from '@/lib/api/generations'
-import { errorMessage } from '@/lib/errors'
 import { ApiError } from '@/lib/fetcher'
 import { getPlatform } from '@/lib/platform'
 import { refreshHistory } from '@/lib/swr-keys'
@@ -40,7 +40,7 @@ async function cancelGeneration(id: string): Promise<void> {
       return
     }
 
-    toast.error(errorMessage(error))
+    toast.error(messageOf(error))
   }
 }
 

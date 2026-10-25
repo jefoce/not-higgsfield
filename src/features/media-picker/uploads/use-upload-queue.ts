@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Dispatch, RefObject, SetStateAction } from 'react'
 
+import { messageOf } from '@/core/errors'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { uploadFilesWithProgress } from '@/lib/api/uploads'
-import { errorMessage } from '@/lib/errors'
 
 import type { UploadProgressItem } from './UploadProgressTile'
 
@@ -72,12 +72,12 @@ async function runUpload(params: RunUploadParams): Promise<void> {
 
     if (onError) {
       setItems((previous) => previous.filter((item) => item.id !== entry.id))
-      onError(errorMessage(error))
+      onError(messageOf(error))
 
       return
     }
 
-    patch({ error: errorMessage(error) })
+    patch({ error: messageOf(error) })
   } finally {
     controllers.current.delete(entry.id)
   }

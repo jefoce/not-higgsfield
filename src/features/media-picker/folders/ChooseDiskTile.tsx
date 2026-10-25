@@ -4,10 +4,10 @@ import { isEmpty } from 'lodash-es'
 import { FolderOpen } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { messageOf } from '@/core/errors'
 import type { KindExtensions } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 import type { UploadItem } from '@/core/schemas/upload-item'
-import { errorMessage } from '@/lib/errors'
 import { getPlatform } from '@/lib/platform'
 import { useAsyncAction } from '@/lib/use-async-action'
 import { Spinner } from '@/ui/Spinner'
@@ -35,7 +35,7 @@ export function ChooseDiskTile(props: ChooseDiskTileProps) {
 
       props.onUploaded(items)
     } catch (error) {
-      toast.error(errorMessage(error))
+      toast.error(messageOf(error))
     }
   }
 

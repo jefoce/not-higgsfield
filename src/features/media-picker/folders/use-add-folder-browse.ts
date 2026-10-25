@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { messageOf } from '@/core/errors'
 import type { BrowseResult } from '@/core/media-types'
 import { browseDirs } from '@/lib/api/folders'
-import { errorMessage } from '@/lib/errors'
 import { useBoolean } from '@/lib/use-boolean'
 
 export interface AddFolderBrowse {
@@ -35,7 +35,7 @@ export function useAddFolderBrowse(isOpen: boolean): AddFolderBrowse {
 
     browseDirs(path ?? undefined, isHidden)
       .then((result) => isAlive && setData(result))
-      .catch((error) => isAlive && toast.error(errorMessage(error)))
+      .catch((error) => isAlive && toast.error(messageOf(error)))
 
     return () => {
       isAlive = false

@@ -4,11 +4,11 @@ import { isNil } from 'lodash-es'
 import { z } from 'zod'
 
 import { FETCH_TIMEOUTS } from '@/core/constants'
+import { messageOf } from '@/core/errors'
 import type { ModelPreset } from '@/core/presets/types'
 import { asJobStatus } from '@/core/submit-state'
 import type { PricingInfo, TestResult } from '@/core/types'
 
-import { messageOf } from '../../errors'
 import { getSecret, isNonEmptyString } from '../../secrets'
 import type {
   AccountLookupParams,

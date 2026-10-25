@@ -1,9 +1,9 @@
 import { chunk } from 'lodash-es'
 import { toast } from 'sonner'
 
+import { messageOf } from '@/core/errors'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { linkAbsPath } from '@/lib/api/uploads'
-import { errorMessage } from '@/lib/errors'
 
 /** Links paths 3 at a time. One toast per failure, the rest still reach the UI. */
 export async function linkPaths(paths: string[]): Promise<UploadItem[]> {
@@ -16,7 +16,7 @@ export async function linkPaths(paths: string[]): Promise<UploadItem[]> {
       if (result.status === 'fulfilled') {
         items.push(result.value)
       } else {
-        toast.error(errorMessage(result.reason))
+        toast.error(messageOf(result.reason))
       }
     }
   }

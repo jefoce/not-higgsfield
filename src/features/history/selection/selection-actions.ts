@@ -1,8 +1,8 @@
 import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
+import { messageOf } from '@/core/errors'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
-import { errorMessage } from '@/lib/errors'
 import { platform } from '@/lib/platform'
 
 import { revalidateHistory } from '../list/history-pages'
@@ -50,7 +50,7 @@ export async function downloadSelected(selected: GenerationRecord[]): Promise<vo
 
     toast.success(startedText)
   } catch (error) {
-    toast.error(errorMessage(error))
+    toast.error(messageOf(error))
   }
 }
 

@@ -3,8 +3,8 @@ import 'server-only'
 import { z } from 'zod'
 
 import { FETCH_TIMEOUTS } from '@/core/constants'
+import { messageOf } from '@/core/errors'
 
-import { messageOf } from '../../errors'
 import { globalState } from '../../global-state'
 import { getSecret, isNonEmptyString, onSecretsChange, secretsReady } from '../../secrets'
 import type { AccountLookupParams, ProviderAccount } from '../types'

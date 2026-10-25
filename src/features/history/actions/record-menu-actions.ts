@@ -1,12 +1,12 @@
 import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
+import { messageOf } from '@/core/errors'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { canCancelInGrace } from '@/core/submit-state'
 import { useGeneratorStore } from '@/features/generator/store/store'
 import { captureGenerationFrame, revealGeneration } from '@/lib/api/generations'
 import { linkGenerationFile } from '@/lib/api/uploads'
-import { errorMessage } from '@/lib/errors'
 
 import { cancelGeneration } from './record-actions'
 import { plainPrompt } from './record-view'
@@ -21,7 +21,7 @@ export async function captureFrame(record: GenerationRecord, at: 'first' | 'last
     store.setFrame('start', upload)
     toast.success('Start frame set')
   } catch (error) {
-    toast.error(errorMessage(error))
+    toast.error(messageOf(error))
   }
 }
 
@@ -40,7 +40,7 @@ export async function addReference(record: GenerationRecord): Promise<void> {
       toast.error('Reference limit reached')
     }
   } catch (error) {
-    toast.error(errorMessage(error))
+    toast.error(messageOf(error))
   }
 }
 
@@ -74,7 +74,7 @@ export async function revealRecord(record: GenerationRecord): Promise<void> {
   try {
     await revealGeneration(record.id)
   } catch (error) {
-    toast.error(errorMessage(error))
+    toast.error(messageOf(error))
   }
 }
 
