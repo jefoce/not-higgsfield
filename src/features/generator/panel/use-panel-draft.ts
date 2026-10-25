@@ -8,6 +8,7 @@ import { getPreset } from '@/core/presets'
 import type { GenerationInput } from '@/core/types'
 import { validateInput } from '@/core/validation'
 import { useSecrets } from '@/features/settings/use-secrets'
+import { useModelEntry } from '@/lib/api/models'
 import { useRemoteStatus } from '@/lib/api/remote'
 
 import { useGeneratorStore } from '../store/store'
@@ -44,6 +45,9 @@ export function usePanelDraft() {
   const activeCount = useGeneratorStore((state) => state.activeCount)
   const preset = getPreset(presetId)
   const isRemoteConfigured = useRemoteStatus()
+  const entry = useModelEntry(presetId)
+  const modelStatus = entry?.status ?? 'unverified'
+  const modelReason = entry?.reason ?? null
   const { status: secrets } = useSecrets()
   const isKeyMissing = !isNil(secrets) && !secrets.keys.OPENROUTER_API_KEY.set
   const isSecretsFailed = !isEmpty(secrets?.loadError)
@@ -70,9 +74,14 @@ export function usePanelDraft() {
         input,
         uploads: uploadsById,
         preset,
-        ctx: { activeCount, remoteConfigured: isRemoteConfigured },
+        ctx: {
+          activeCount,
+          remoteConfigured: isRemoteConfigured,
+          modelStatus,
+          modelReason,
+        },
       }),
-    [input, uploadsById, preset, activeCount, isRemoteConfigured],
+    [input, uploadsById, preset, activeCount, isRemoteConfigured, modelStatus, modelReason],
   )
 
   return { validation, isKeyMissing, isSecretsFailed }

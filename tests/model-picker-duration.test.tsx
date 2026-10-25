@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { formatRate } from '@/core/pricing'
 import type { PricingInfo } from '@/core/types'
 import { ModelPicker } from '@/features/generator/model/ModelPicker'
+import { useGeneratorStore } from '@/features/generator/store/store'
 import { useModelEntry } from '@/lib/api/models'
 import type { CatalogEntry } from '@/server/services/model-catalog'
 import { Price } from '@/ui/Price'
@@ -42,6 +43,10 @@ function entry(pricing: PricingInfo): CatalogEntry {
   }
 }
 
+function unavailable(status: 'missing' | 'no_provider', reason: string): CatalogEntry {
+  return { ...entry(PRICING), status, reason }
+}
+
 class Observer {
   observe() {}
   unobserve() {}
@@ -50,6 +55,7 @@ class Observer {
 
 beforeEach(() => {
   mockUseModelEntry.mockReturnValue(null)
+  useGeneratorStore.setState({ presetId: 'wan-3.0' })
   vi.stubGlobal('ResizeObserver', Observer)
 
   vi.stubGlobal('matchMedia', () => ({
@@ -98,6 +104,53 @@ describe('ModelPicker rows', () => {
     expect(within(row).getByText('$0.05/s').className).toContain('line-through')
     expect(within(row).getByText('$0.043/s').className).toContain('text-lime')
     expect(within(dialog).queryByText('Blocks realistic faces in references')).toBeNull()
+  })
+})
+
+describe('ModelPicker unavailable rows', () => {
+  it.each([
+    ['missing', 'Not available on OpenRouter right now.'],
+    ['no_provider', 'Add your OpenRouter key in Settings.'],
+  ] as const)('disables a %s row with the reason and no price', (status, reason) => {
+    mockUseModelEntry.mockReturnValue(unavailable(status, reason))
+    render(<ModelPicker />)
+    fireEvent.click(screen.getByRole('button', { name: /Model/ }))
+    const dialog = screen.getByRole('dialog')
+    const row = within(dialog).getByText('Wan 3.0').closest('button') as HTMLButtonElement
+
+    expect(row.disabled).toBe(true)
+    expect(within(row).getByText(reason)).toBeTruthy()
+    expect(within(row).queryByText('$0.05/s')).toBeNull()
+    expect(within(row).queryByText('$0.043/s')).toBeNull()
+  })
+
+  it('keeps the selection and the picker open when a disabled row is clicked', () => {
+    mockUseModelEntry.mockReturnValue(
+      unavailable('missing', 'Not available on OpenRouter right now.'),
+    )
+
+    render(<ModelPicker />)
+    fireEvent.click(screen.getByRole('button', { name: /Model/ }))
+    const dialog = screen.getByRole('dialog')
+    const row = within(dialog).getByText('Seedance 2.0').closest('button') as HTMLElement
+
+    fireEvent.click(row)
+
+    expect(useGeneratorStore.getState().presetId).toBe('wan-3.0')
+    expect(screen.getByRole('dialog')).toBe(dialog)
+  })
+
+  it('selects an unverified row normally', () => {
+    mockUseModelEntry.mockReturnValue({ ...entry(PRICING), status: 'unverified' })
+
+    render(<ModelPicker />)
+    fireEvent.click(screen.getByRole('button', { name: /Model/ }))
+    const dialog = screen.getByRole('dialog')
+    const row = within(dialog).getByText('Seedance 2.0').closest('button') as HTMLButtonElement
+
+    expect(row.disabled).toBe(false)
+    fireEvent.click(row)
+    expect(useGeneratorStore.getState().presetId).toBe('seedance-2.0')
   })
 })
 

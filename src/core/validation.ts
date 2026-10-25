@@ -9,7 +9,12 @@ import type { ModelPreset } from './presets/types'
 import { slotLabel } from './prompt-tokens'
 import type { GenerationInput } from './types'
 import { validateReferences } from './validation-references'
-import { validateFrames, validateLimits, validatePrompt } from './validation-rules'
+import {
+  validateFrames,
+  validateLimits,
+  validateModelStatus,
+  validatePrompt,
+} from './validation-rules'
 import type {
   RuleResult,
   ValidationContext,
@@ -76,6 +81,7 @@ interface ValidateInputParams {
 
 export function validateInput(params: ValidateInputParams): ValidationResult {
   const { input, uploads, preset, ctx = {} } = params
+  const status = validateModelStatus(ctx)
   const parsed = buildInputSchema(preset).safeParse(input)
 
   if (!parsed.success) {
@@ -84,10 +90,11 @@ export function validateInput(params: ValidateInputParams): ValidationResult {
         `${issue.path.join('.') === '' ? 'input' : issue.path.join('.')}: ${issue.message}`,
     )
 
-    return { ok: false, errors, warnings: [] }
+    return { ok: false, errors: [...status.errors, ...errors], warnings: [] }
   }
 
   const groups: RuleResult[] = [
+    status,
     validatePrompt(input, preset),
     validateFrames({ input, uploads, preset }),
     validateReferences({ input, uploads, preset, ctx }),

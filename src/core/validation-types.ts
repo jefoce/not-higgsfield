@@ -1,3 +1,5 @@
+import type { ModelStatus } from '@/server/services/model-catalog'
+
 import type { UploadItem } from './media-types'
 import type { ModelPreset } from './presets/types'
 import type { RefSlot } from './prompt-tokens'
@@ -21,6 +23,8 @@ export interface RuleResult {
 export interface ValidationContext {
   activeCount?: number
   remoteConfigured?: boolean
+  modelStatus?: ModelStatus
+  modelReason?: string | null
 }
 
 export interface ValidateFramesParams {

@@ -194,6 +194,40 @@ describe('validateInput resolution and aspect', () => {
   })
 })
 
+describe('validateInput model status', () => {
+  it.each([
+    ['missing', 'Not available on OpenRouter right now.'],
+    ['no_provider', 'Add your OpenRouter key in Settings.'],
+  ] as const)('puts the catalog reason first when the model is %s', (modelStatus, modelReason) => {
+    const result = validateInput({
+      input: input({ prompt: '' }),
+      uploads: {},
+      preset,
+      ctx: { modelStatus, modelReason },
+    })
+
+    expect(result.ok).toBe(false)
+    expect(result.errors[0]).toBe(modelReason)
+  })
+
+  it('does not block an unverified model', () => {
+    const result = validateInput({
+      input: input(),
+      uploads: {},
+      preset,
+      ctx: { modelStatus: 'unverified' },
+    })
+
+    expect(result).toEqual({ ok: true, errors: [], warnings: [] })
+  })
+
+  it('does not block while the catalog is undefined', () => {
+    const result = validateInput({ input: input(), uploads: {}, preset })
+
+    expect(result).toEqual({ ok: true, errors: [], warnings: [] })
+  })
+})
+
 describe('validateInput frames', () => {
   it('rejects an end frame without a start frame', () => {
     const result = validateInput({

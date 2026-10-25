@@ -61,6 +61,26 @@ function listRate(params: ListRateParams): number | null {
   return fromRate(preset, skus)
 }
 
+interface RowData {
+  discount: number
+  from: number | null
+  listFrom: number | null
+  reason: string | null
+}
+
+function isBlockedEntry(entry: ReturnType<typeof useModelEntry>): boolean {
+  return entry?.status === 'missing' || entry?.status === 'no_provider'
+}
+
+function rowData(preset: ModelPreset, entry: ReturnType<typeof useModelEntry>): RowData {
+  const pricing = entry?.pricing
+  const discount = pricing?.discount ?? 0
+  const from = fromRate(preset, pricing?.skus)
+  const listFrom = listRate({ preset, skus: pricing?.listSkus, discount })
+
+  return { discount, from, listFrom, reason: entry?.reason ?? null }
+}
+
 interface ModelRowProps {
   option: ModelPreset
   selected: boolean
@@ -70,21 +90,28 @@ interface ModelRowProps {
 /** One selectable row in the model picker. */
 export function ModelRow(props: ModelRowProps) {
   const { option, selected: isSelected, onSelect } = props
-  const pricing = useModelEntry(option.id)?.pricing
-  const discount = pricing?.discount ?? 0
-  const from = fromRate(option, pricing?.skus)
-  const listFrom = listRate({ preset: option, skus: pricing?.listSkus, discount })
+  const entry = useModelEntry(option.id)
+  const { discount, from, listFrom, reason } = rowData(option, entry)
+  const isBlocked = isBlockedEntry(entry)
 
   const Icon = PRESET_ICONS[option.icon]
 
-  const handleSelect = useCallback((): void => onSelect(option.id), [onSelect, option.id])
+  const handleSelect = useCallback((): void => {
+    if (isBlocked) {
+      return
+    }
+
+    onSelect(option.id)
+  }, [isBlocked, onSelect, option.id])
 
   return (
     <button
       type="button"
       onClick={handleSelect}
+      disabled={isBlocked}
       className={cn(
-        'flex w-full items-center gap-3 rounded-lg p-2 text-left hover:bg-white/6',
+        'flex w-full items-center gap-3 rounded-lg p-2 text-left',
+        !isBlocked && 'hover:bg-white/6',
         isSelected && 'bg-white/6',
       )}
     >
@@ -94,12 +121,15 @@ export function ModelRow(props: ModelRowProps) {
       <span className="min-w-0 flex-1">
         <span className="flex w-full items-baseline gap-2">
           <span className="shrink-0 text-sm font-medium">{option.title}</span>
-          {!isNil(from) && (
+          {!isBlocked && !isNil(from) && (
             <span className={cn('ml-auto shrink-0 text-xs whitespace-nowrap text-fg-2')}>
               from <Price current={from} list={listFrom} discount={discount} format={formatRate} />
             </span>
           )}
         </span>
+        {isBlocked && !isNil(reason) && (
+          <span className="mt-1 block text-xs text-fg-2">{reason}</span>
+        )}
         <span className="mt-1 flex flex-wrap gap-1">
           <ModelBadge icon={Diamond} text={quality(option)} />
           <ModelBadge icon={Clock} text={duration(option)} />

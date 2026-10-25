@@ -12,6 +12,7 @@ import type {
   RuleResult,
   ValidateFramesParams,
   ValidateWithContextParams,
+  ValidationContext,
   ValidationIssue,
 } from './validation-types'
 
@@ -71,6 +72,15 @@ const aspectErrors = (params: PromptErrorParams): string[] => {
   })
 
   return [`Aspect ${aspect} is only available at ${resolutions.join(' or ')}`]
+}
+
+/** Missing and unconfigured models block with the catalog reason first. */
+export function validateModelStatus(ctx: ValidationContext): RuleResult {
+  if (ctx.modelStatus !== 'missing' && ctx.modelStatus !== 'no_provider') {
+    return { errors: [], warnings: [] }
+  }
+
+  return { errors: [ctx.modelReason ?? 'Model unavailable'], warnings: [] }
 }
 
 export function validatePrompt(input: GenerationInput, preset: ModelPreset): RuleResult {
