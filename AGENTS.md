@@ -142,13 +142,15 @@ async function copyUnique(params: CopyUniqueParams): Promise<string> {
 
 ### Event handlers
 
-- A function defined in a component and passed to a prop or element event is named `handle<Action>`: `handleDownload`, `handleSelect`, `handleOpenChange`. Use the action, not the DOM event: `handleDelete`, not `handleClick`.
 - Props that take a callback are named `on<Action>`: `onOpen`, `onCancel`, `onDeleted`.
-- Pass through as `onDelete={handleDelete}`. A prop that receives a parent's callback unchanged can pass `onOpen={onOpen}`.
-- Never inline a function in JSX. Every `onX` gets a named `handle<Action>`. A row that needs the item receives it as a prop and defines `handleSelect` inside. Do not write curried `handleSelect(id)` factories.
+- A callback prop passed down stays `props.onAction` at the use site: `onClick={props.onClose}`. Never destructure it just to pass it along, never rename it.
+- A function created in the component (arrow, `function`, `useCallback`, `useEffectEvent`, `debounce`, `throttle`) and passed to an `on*` prop is named `handle<Action>`: `handleDownload`, `handleSelect`, `handleOpenChange`. Use the action, not the DOM event: `handleDelete`, not `handleClick`.
+- An existing function (setter, store action, `video.togglePlay`, `props.onX`, an import) is passed directly. No alias constant.
+- Destructure a callback only when every use sits inside a hook callback (`useCallback`, `useMemo`, `useEffect`, `useLayoutEffect`, `useInsertionEffect`, `useEffectEvent`, `useImperativeHandle`), where `props.onX()` would make the whole `props` object a dependency: `const { onSelect } = props`.
+- Name a store selection after the action: `const clearSelection = useSelectionStore((state) => state.clear)`, then `onClick={clearSelection}`.
+- Never inline a function in JSX. Every created `onX` gets a named `handle<Action>`. A row that needs the item receives it as a prop and defines `handleSelect` inside. Do not write curried `handleSelect(id)` factories.
 - No arrow or function values as object properties inside components. Name the function and pass it by reference. Arrows passed as call arguments (`useEffect`, `.map`) stay.
-- Store actions passed to an event get a handler name at the selector: `const handleClear = useSelectionStore((state) => state.clear)`.
-- `react/jsx-handler-names` enforces the `handle` and `on` prefixes and leaves inline arrows alone.
+- `react/jsx-handler-names` enforces the `handle` and `on` prefixes, `checkLocalVariables` off for `props.onX`, and leaves inline arrows alone.
 
 ### useCallback and useMemo
 
