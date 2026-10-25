@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 import { getPreset } from '@/core/presets'
 import type { GeneratorTab } from '@/core/schemas/generation-record'
@@ -17,10 +17,7 @@ export function ModeTabs() {
   const refs = preset.references
   const isRefsDisabled = refs.image + refs.video + refs.audio === 0
 
-  const handleValueChange = useCallback(
-    (value: string): void => setTab(value as GeneratorTab),
-    [setTab],
-  )
+  const handleValueChange = (value: string): void => setTab(value as GeneratorTab)
 
   useEffect(() => {
     if (isRefsDisabled && tab === 'references') {

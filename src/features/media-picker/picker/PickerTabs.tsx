@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { Plus, X } from 'lucide-react'
 
 import type { FolderItem } from '@/core/schemas/folder-item'
@@ -19,9 +18,9 @@ export interface PickerTabsProps {
 
 /** Scrollable pill tabs for uploads and connected folders. */
 export function PickerTabs(props: PickerTabsProps) {
-  const { folders, activeTab, onTabChange } = props
+  const { folders, activeTab } = props
 
-  const handleUploadsTab = useCallback(() => onTabChange('uploads'), [onTabChange])
+  const handleUploadsTab = () => props.onTabChange('uploads')
 
   return (
     <div className="flex h-12 shrink-0 items-center gap-2">

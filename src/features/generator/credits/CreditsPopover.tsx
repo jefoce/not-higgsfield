@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { isNil } from 'lodash-es'
 import { ExternalLink, RefreshCw } from 'lucide-react'
 
@@ -39,7 +38,7 @@ export function CreditsPopover() {
     ? 'No key limit'
     : `${money(credits.keyLimitRemaining)} / ${money(credits.keyLimit)}`
 
-  const handleRefresh = useCallback((): void => refresh(true), [refresh])
+  const handleRefresh = (): void => refresh(true)
 
   const balance = credits?.balance
 

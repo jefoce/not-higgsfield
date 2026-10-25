@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { isEmpty } from 'lodash-es'
 
 import { BreadcrumbSegment } from './BreadcrumbSegment'
@@ -13,10 +12,10 @@ export interface FolderBreadcrumbsProps {
 
 /** Folder name plus clickable sub-path segments. */
 export function FolderBreadcrumbs(props: FolderBreadcrumbsProps) {
-  const { folderName, sub, onNavigate } = props
+  const { folderName, sub } = props
   const segments = sub.split('/').filter(Boolean)
 
-  const handleRoot = useCallback(() => onNavigate(''), [onNavigate])
+  const handleRoot = () => props.onNavigate('')
 
   const isRoot = isEmpty(segments)
   const rootClass = isRoot ? 'shrink-0 text-fg' : 'shrink-0 transition hover:text-fg'

@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  type ComponentProps,
-  type CSSProperties,
-  type MouseEvent,
-  useCallback,
-  useRef,
-} from 'react'
+import { type ComponentProps, type CSSProperties, type MouseEvent, useRef } from 'react'
 import { isEmpty } from 'lodash-es'
 
 import { cn } from '@/lib/cn'
@@ -88,13 +82,10 @@ export function LazyVideo(props: LazyVideoProps) {
 
   useSlotLifecycle({ id, rootRef, videoRef, isSlotActive, isInteractive, release })
 
-  const handlePlay = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation()
-      acquire(id)
-    },
-    [acquire, id],
-  )
+  const handlePlay = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    acquire(id)
+  }
 
   const fit = fitClass(videoFit, video.fullscreen)
   const shouldShowControls = isInteractive && !isHoverPlay

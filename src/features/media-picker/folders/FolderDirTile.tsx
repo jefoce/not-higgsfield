@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { Folder } from 'lucide-react'
 
 import type { FolderDir } from '@/core/media-types'
@@ -12,9 +11,9 @@ interface FolderDirTileProps {
 
 /** Directory tile in the folder grid. */
 export function FolderDirTile(props: FolderDirTileProps) {
-  const { dir, onNavigate } = props
+  const { dir } = props
 
-  const handleSelect = useCallback(() => onNavigate(dir.rel), [dir.rel, onNavigate])
+  const handleSelect = () => props.onNavigate(dir.rel)
 
   return (
     <button

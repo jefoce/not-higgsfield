@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
@@ -52,7 +52,7 @@ export function SelectionBar(props: SelectionBarProps) {
   const isAllLiked = selected.every((record) => record.favorite)
   const isBusy = !isNil(busy)
 
-  const handleDownload = useCallback(async () => {
+  const handleDownload = async () => {
     if (!isAllCompleted) {
       return
     }
@@ -64,9 +64,9 @@ export function SelectionBar(props: SelectionBarProps) {
     } finally {
       setBusy(null)
     }
-  }, [isAllCompleted, selected])
+  }
 
-  const handleLike = useCallback(async () => {
+  const handleLike = async () => {
     setBusy('like')
 
     try {
@@ -76,9 +76,9 @@ export function SelectionBar(props: SelectionBarProps) {
     } finally {
       setBusy(null)
     }
-  }, [isAllLiked, selected])
+  }
 
-  const handleDelete = useCallback(async () => {
+  const handleDelete = async () => {
     const isConfirmed = await confirmDelete(selected)
 
     if (!isConfirmed) {
@@ -95,7 +95,7 @@ export function SelectionBar(props: SelectionBarProps) {
     } finally {
       setBusy(null)
     }
-  }, [selected, handleClear])
+  }
 
   return (
     <SelectionToolbar

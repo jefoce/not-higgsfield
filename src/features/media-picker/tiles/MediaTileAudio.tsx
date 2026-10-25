@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { isNil } from 'lodash-es'
 import { Pause, Play } from 'lucide-react'
 import type { MouseEvent } from 'react'
@@ -45,18 +44,15 @@ export function MediaTileAudio(props: MediaTileAudioProps) {
 
   const badgeOffset = isBadgeOffset ? 'pt-6' : ''
 
-  const handleAudioClick = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation()
+  const handleAudioClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
 
-      if (isAudioPlaying) {
-        pauseAudio()
-      } else {
-        playAudio(audioSrc)
-      }
-    },
-    [isAudioPlaying, audioSrc],
-  )
+    if (isAudioPlaying) {
+      pauseAudio()
+    } else {
+      playAudio(audioSrc)
+    }
+  }
 
   const PlayIcon = isAudioPlaying ? Pause : Play
   const playLabel = isAudioPlaying ? 'Pause' : 'Play'

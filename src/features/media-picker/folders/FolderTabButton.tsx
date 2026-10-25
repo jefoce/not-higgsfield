@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { X } from 'lucide-react'
 import type { MouseEvent } from 'react'
 
@@ -18,17 +17,14 @@ interface FolderTabButtonProps {
 
 /** Folder tab with its disconnect control. */
 export function FolderTabButton(props: FolderTabButtonProps) {
-  const { folder, isActive, onTabChange, onDisconnectFolder } = props
+  const { folder, isActive } = props
 
-  const handleSelect = useCallback(() => onTabChange(folder.id), [folder.id, onTabChange])
+  const handleSelect = () => props.onTabChange(folder.id)
 
-  const handleDisconnect = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation()
-      onDisconnectFolder(folder.id)
-    },
-    [folder.id, onDisconnectFolder],
-  )
+  const handleDisconnect = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    props.onDisconnectFolder(folder.id)
+  }
 
   return (
     <div className="group relative shrink-0">

@@ -1,6 +1,6 @@
 'use client'
 
-import { type ChangeEvent, type CSSProperties, type MouseEvent, useCallback } from 'react'
+import { type ChangeEvent, type CSSProperties, type MouseEvent } from 'react'
 import { Maximize, Minimize, Pause, Play, Volume2, VolumeX } from 'lucide-react'
 
 import { cn } from '@/lib/cn'
@@ -48,12 +48,9 @@ export function PlayerControls(props: PlayerControlsProps) {
   const rawProgress = duration > 0 ? (time / duration) * 100 : 0
   const progress = Math.min(100, rawProgress)
 
-  const handleSeek = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      video.seek(Number(event.currentTarget.value))
-    },
-    [video],
-  )
+  const handleSeek = (event: ChangeEvent<HTMLInputElement>) => {
+    video.seek(Number(event.currentTarget.value))
+  }
 
   const PlayIcon = isPaused ? Play : Pause
   const MuteIcon = isMuted ? VolumeX : Volume2

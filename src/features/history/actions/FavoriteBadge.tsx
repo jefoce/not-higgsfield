@@ -1,6 +1,6 @@
 'use client'
 
-import { type MouseEvent, useCallback } from 'react'
+import { type MouseEvent } from 'react'
 import { Heart } from 'lucide-react'
 
 import type { GenerationRecord } from '@/core/schemas/generation-record'
@@ -19,13 +19,10 @@ export function FavoriteBadge(props: FavoriteBadgeProps) {
   const { record } = props
   const count = record.favorite ? 1 : 0
 
-  const handleFavorite = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation()
-      void toggleFavorite(record)
-    },
-    [record],
-  )
+  const handleFavorite = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    void toggleFavorite(record)
+  }
 
   const label = record.favorite ? 'Remove favorite' : 'Favorite'
 

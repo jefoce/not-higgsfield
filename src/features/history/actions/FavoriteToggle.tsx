@@ -1,7 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
-
 import { cn } from '@/lib/cn'
 
 import { useHistoryViewStore } from '../list/view-store'
@@ -11,7 +9,7 @@ export function FavoriteToggle() {
   const filters = useHistoryViewStore((state) => state.filters)
   const setFilters = useHistoryViewStore((state) => state.setFilters)
 
-  const handleToggle = useCallback(() => {
+  const handleToggle = () => {
     if (filters.favorite === true) {
       setFilters({ favorite: undefined })
 
@@ -19,7 +17,7 @@ export function FavoriteToggle() {
     }
 
     setFilters({ favorite: true })
-  }, [filters.favorite, setFilters])
+  }
 
   return (
     <button

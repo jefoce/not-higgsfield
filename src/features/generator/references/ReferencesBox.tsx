@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { isEmpty, sumBy } from 'lodash-es'
 import { toast } from 'sonner'
 
@@ -28,13 +27,13 @@ export function ReferencesBox() {
   const kinds = MEDIA_KINDS.filter((kind) => counts[kind] < preset.references[kind])
   const max = sumBy(kinds, (kind) => preset.references[kind] - counts[kind])
 
-  const handlePick = useCallback((): void => {
+  const handlePick = (): void => {
     if (isEmpty(kinds)) {
       return
     }
 
     openMediaPicker({ target: 'references', kinds, max, extensions, onPick: addReferences })
-  }, [kinds, max, extensions, addReferences])
+  }
 
   const { dragging: isDragging, dropProps } = useDropUpload({
     id: 'references',

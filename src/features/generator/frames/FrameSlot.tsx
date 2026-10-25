@@ -1,6 +1,6 @@
 'use client'
 
-import { type MouseEvent, useCallback } from 'react'
+import { type MouseEvent } from 'react'
 import { isNil } from 'lodash-es'
 
 import { getPreset } from '@/core/presets'
@@ -112,7 +112,7 @@ export function FrameSlot(props: FrameSlotProps) {
       onPick: handleUploaded,
     })
 
-  const handleRemove = useCallback((): void => setFrame(slot, null), [setFrame, slot])
+  const handleRemove = (): void => setFrame(slot, null)
 
   const handlePreview = (): void => {
     if (!upload) {
@@ -131,13 +131,10 @@ export function FrameSlot(props: FrameSlotProps) {
 
   const handleSlotPress = isPreviewable ? handlePreview : handlePick
 
-  const handleRemoveClick = useCallback(
-    (event: MouseEvent<HTMLButtonElement>): void => {
-      event.stopPropagation()
-      handleRemove()
-    },
-    [handleRemove],
-  )
+  const handleRemoveClick = (event: MouseEvent<HTMLButtonElement>): void => {
+    event.stopPropagation()
+    handleRemove()
+  }
 
   return (
     <Tooltip content={slotTooltip({ isBroken, isDisabled, disabledReason })}>

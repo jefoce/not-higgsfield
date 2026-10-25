@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { Diamond } from 'lucide-react'
 
 import { getPreset } from '@/core/presets'
@@ -29,10 +28,7 @@ export function ResolutionPopover() {
   const pricing = useModelEntry(preset.id)?.pricing
   const discount = pricing?.discount ?? 0
 
-  const handleSelectResolution = useCallback(
-    (option: Resolution): void => setResolution(option),
-    [setResolution],
-  )
+  const handleSelectResolution = (option: Resolution): void => setResolution(option)
 
   return (
     <Popover>

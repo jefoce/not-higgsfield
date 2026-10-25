@@ -1,6 +1,6 @@
 'use client'
 
-import { type MouseEvent, useCallback } from 'react'
+import { type MouseEvent } from 'react'
 
 import { cn } from '@/lib/cn'
 
@@ -18,12 +18,10 @@ interface FilterChoiceProps<T extends string> {
 
 /** One labelled row of single-choice filter buttons. */
 export function FilterChoice<T extends string>(props: FilterChoiceProps<T>) {
-  const { label, value, options, onChange } = props
+  const { label, value, options } = props
 
-  const handleSelect = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => onChange(event.currentTarget.value as T),
-    [onChange],
-  )
+  const handleSelect = (event: MouseEvent<HTMLButtonElement>) =>
+    props.onChange(event.currentTarget.value as T)
 
   return (
     <div className="space-y-1.5">

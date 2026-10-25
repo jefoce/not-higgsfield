@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { Film, Image as ImageIcon, Link2, Maximize2, Play } from 'lucide-react'
 import type { MouseEvent } from 'react'
 
@@ -21,20 +20,17 @@ interface FolderFileTileProps {
 
 /** File tile in the read-only folder grid. */
 export function FolderFileTile(props: FolderFileTileProps) {
-  const { file, src, isBroken, isSelected, onPickFile, onExpand, onBroken } = props
+  const { file, src, isBroken, isSelected } = props
   const isAudio = file.kind === 'audio'
 
-  const handleSelect = useCallback(() => onPickFile(file.rel), [file.rel, onPickFile])
+  const handleSelect = () => props.onPickFile(file.rel)
 
-  const handleImageError = useCallback(() => onBroken(src), [onBroken, src])
+  const handleImageError = () => props.onBroken(src)
 
-  const handleExpandClick = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation()
-      onExpand(file)
-    },
-    [file, onExpand],
-  )
+  const handleExpandClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    props.onExpand(file)
+  }
 
   const BrokenIcon = file.kind === 'video' ? Film : ImageIcon
 

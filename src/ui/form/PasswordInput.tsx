@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useCallback, useState } from 'react'
+import { forwardRef, useState } from 'react'
 import { isNil } from 'lodash-es'
 import { Eye, EyeOff } from 'lucide-react'
 
@@ -15,7 +15,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
     const [isRevealed, setIsRevealed] = useState(false)
     const isValueEmpty = isNil(value) || value === ''
 
-    const handleToggleRevealed = useCallback(() => setIsRevealed((isCurrent) => !isCurrent), [])
+    const handleToggleRevealed = () => setIsRevealed((isCurrent) => !isCurrent)
 
     const canReveal = isRevealed && !isValueEmpty
     const inputType = canReveal ? 'text' : 'password'

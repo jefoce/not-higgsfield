@@ -1,13 +1,6 @@
 'use client'
 
-import {
-  type ChangeEvent,
-  type FocusEvent,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react'
+import { type ChangeEvent, type FocusEvent, forwardRef, useEffect, useState } from 'react'
 import { clamp, isNil, round } from 'lodash-es'
 
 import { Input, type InputProps } from './Input'
@@ -44,7 +37,7 @@ const parse = (text: string): number | null => {
 /** Number input that reports null when empty and rounds/clamps on blur. */
 export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
   function NumberInput(props, ref) {
-    const { value, onValueChange, min, max, onBlur, ...rest } = props
+    const { value, min, max, ...rest } = props
     const [draft, setDraft] = useState(format(value))
 
     useEffect(() => {
@@ -53,11 +46,11 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       }
     }, [value, draft])
 
-    const commit = useCallback(() => {
+    const commit = () => {
       const parsed = parse(draft)
 
       if (isNil(parsed)) {
-        onValueChange(null)
+        props.onValueChange(null)
         setDraft('')
 
         return
@@ -65,25 +58,19 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 
       const next = clamp(round(parsed), min ?? -Infinity, max ?? Infinity)
 
-      onValueChange(next)
+      props.onValueChange(next)
       setDraft(String(next))
-    }, [draft, max, min, onValueChange])
+    }
 
-    const handleChange = useCallback(
-      (event: ChangeEvent<HTMLInputElement>) => {
-        setDraft(event.target.value)
-        onValueChange(parse(event.target.value))
-      },
-      [onValueChange],
-    )
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+      setDraft(event.target.value)
+      props.onValueChange(parse(event.target.value))
+    }
 
-    const handleBlur = useCallback(
-      (event: FocusEvent<HTMLInputElement>) => {
-        commit()
-        onBlur?.(event)
-      },
-      [commit, onBlur],
-    )
+    const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
+      commit()
+      props.onBlur?.(event)
+    }
 
     return (
       <Input

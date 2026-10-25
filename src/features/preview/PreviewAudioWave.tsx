@@ -1,6 +1,6 @@
 'use client'
 
-import { type KeyboardEvent, type MouseEvent, useCallback } from 'react'
+import { type KeyboardEvent, type MouseEvent } from 'react'
 
 import { seekAudio } from '@/lib/audio-player'
 import { cn } from '@/lib/cn'
@@ -16,40 +16,34 @@ interface PreviewAudioWaveProps {
 
 /** Waveform bars that seek on click and keyboard, with play state coloring. */
 export function PreviewAudioWave(props: PreviewAudioWaveProps) {
-  const { bars, played, at, total, onToggle } = props
+  const { bars, played, at, total } = props
 
-  const handleSeek = useCallback(
-    (event: MouseEvent<HTMLDivElement>) => {
-      if (total === 0) {
-        return
-      }
+  const handleSeek = (event: MouseEvent<HTMLDivElement>) => {
+    if (total === 0) {
+      return
+    }
 
-      const rect = event.currentTarget.getBoundingClientRect()
+    const rect = event.currentTarget.getBoundingClientRect()
 
-      seekAudio(((event.clientX - rect.left) / rect.width) * total)
-    },
-    [total],
-  )
+    seekAudio(((event.clientX - rect.left) / rect.width) * total)
+  }
 
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLDivElement>) => {
-      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-        event.preventDefault()
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      event.preventDefault()
 
-        const delta = event.key === 'ArrowLeft' ? -5 : 5
+      const delta = event.key === 'ArrowLeft' ? -5 : 5
 
-        seekAudio(at + delta)
+      seekAudio(at + delta)
 
-        return
-      }
+      return
+    }
 
-      if (event.key === ' ') {
-        event.preventDefault()
-        onToggle()
-      }
-    },
-    [at, onToggle],
-  )
+    if (event.key === ' ') {
+      event.preventDefault()
+      props.onToggle()
+    }
+  }
 
   return (
     <div

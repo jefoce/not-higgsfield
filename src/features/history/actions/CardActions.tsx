@@ -1,6 +1,6 @@
 'use client'
 
-import { type MouseEvent, useCallback } from 'react'
+import { type MouseEvent } from 'react'
 import { Download } from 'lucide-react'
 
 import type { GenerationRecord } from '@/core/schemas/generation-record'
@@ -29,13 +29,10 @@ export function CardActions(props: CardActionsProps) {
   const { record, className, pinHeart: isPinHeart = false } = props
   const isPinned = isPinHeart && record.favorite
 
-  const handleDownload = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation()
-      void saveRecordVideo(record)
-    },
-    [record],
-  )
+  const handleDownload = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    void saveRecordVideo(record)
+  }
 
   return (
     <div className={cn('absolute right-3 flex flex-col gap-1.5', className)}>

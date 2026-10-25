@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { isNil } from 'lodash-es'
 import { Check } from 'lucide-react'
 
@@ -22,9 +21,9 @@ interface ResolutionOptionProps {
 
 /** One resolution row with its per-second rate. */
 export function ResolutionOption(props: ResolutionOptionProps) {
-  const { option, isSelected, rate, listRate, discount, onSelect } = props
+  const { option, isSelected, rate, listRate, discount } = props
 
-  const handleSelect = useCallback((): void => onSelect(option), [onSelect, option])
+  const handleSelect = (): void => props.onSelect(option)
 
   return (
     <PopoverClose asChild>

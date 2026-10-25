@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { MoreHorizontal } from 'lucide-react'
 import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui'
 
@@ -36,23 +36,23 @@ export function MoreMenu(props: MoreMenuProps) {
   const isCompleted = record.status === 'completed'
   const hasFullVideoRefs = getPreset(record.preset.id).references.video === 0
 
-  const handleCaptureLast = useCallback(() => void captureFrame(record, 'last'), [record])
+  const handleCaptureLast = () => void captureFrame(record, 'last')
 
-  const handleCaptureFirst = useCallback(() => void captureFrame(record, 'first'), [record])
+  const handleCaptureFirst = () => void captureFrame(record, 'first')
 
-  const handleAddReference = useCallback(() => void addReference(record), [record])
+  const handleAddReference = () => void addReference(record)
 
-  const handleCopyPrompt = useCallback(() => void copyPrompt(record), [record])
+  const handleCopyPrompt = () => void copyPrompt(record)
 
-  const handleCopySeed = useCallback(() => void copySeed(record), [record])
+  const handleCopySeed = () => void copySeed(record)
 
-  const handleReveal = useCallback(() => void revealRecord(record), [record])
+  const handleReveal = () => void revealRecord(record)
 
-  const handleRemove = useCallback(() => {
+  const handleRemove = () => {
     if (!cancelInGrace(record)) {
       setIsConfirmOpen(true)
     }
-  }, [record])
+  }
 
   const triggerClass =
     variant === 'panel'

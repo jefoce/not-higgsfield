@@ -1,7 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
-
 import { GRID_TILE_ASPECT } from '@/core/constants'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { LazyVideo } from '@/features/player/LazyVideo'
@@ -42,7 +40,7 @@ export function HistoryTile(props: HistoryTileProps) {
     onOpen: props.onOpen,
   })
 
-  const handleCancel = useCallback(() => void cancelGeneration(record.id), [record.id])
+  const handleCancel = () => void cancelGeneration(record.id)
 
   const selectLabel = isSelecting ? 'Toggle selection' : 'Open video details'
 

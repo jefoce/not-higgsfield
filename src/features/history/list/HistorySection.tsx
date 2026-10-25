@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { isEmpty, isNil } from 'lodash-es'
 
 import type { GenerationRecord } from '@/core/schemas/generation-record'
@@ -33,15 +33,15 @@ export function HistorySection() {
   const order = useMemo(() => records.filter(isSelectable).map((record) => record.id), [records])
   const paddingClass = isSelecting ? 'pb-28' : 'pb-14'
 
-  const handleOpen = useCallback((record: GenerationRecord) => setSelectedId(record.id), [])
+  const handleOpen = (record: GenerationRecord) => setSelectedId(record.id)
 
-  const handleDeleted = useCallback(() => setSelectedId(null), [])
+  const handleDeleted = () => setSelectedId(null)
 
-  const handleOpenChange = useCallback((isOpen: boolean) => {
+  const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
       setSelectedId(null)
     }
-  }, [])
+  }
 
   useJobNotifications({ records, activeCount, isLoading })
 

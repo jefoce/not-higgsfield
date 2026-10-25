@@ -1,6 +1,6 @@
 'use client'
 
-import { type RefObject, useCallback } from 'react'
+import { type RefObject } from 'react'
 import { isEmpty } from 'lodash-es'
 
 import { STORAGE_PROVIDERS, VIDEO_PROVIDERS } from '@/core/providers/registry'
@@ -39,7 +39,7 @@ export function SettingsBody(props: SettingsBodyProps) {
     onRetry,
   } = draft
 
-  const handleRetry = useCallback(() => void onRetry(), [onRetry])
+  const handleRetry = () => void onRetry()
 
   const loadError = status?.loadError
 

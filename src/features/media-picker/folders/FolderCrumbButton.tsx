@@ -1,7 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
-
 export interface FolderCrumbButtonProps {
   label: string
   path: string
@@ -10,9 +8,9 @@ export interface FolderCrumbButtonProps {
 
 /** One clickable segment in the folder path bar. */
 export function FolderCrumbButton(props: FolderCrumbButtonProps) {
-  const { label, path, onNavigate } = props
+  const { label, path } = props
 
-  const handleSelect = useCallback(() => onNavigate(path), [onNavigate, path])
+  const handleSelect = () => props.onNavigate(path)
 
   return (
     <span className="flex shrink-0 items-center gap-0.5">

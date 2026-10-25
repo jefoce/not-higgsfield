@@ -1,6 +1,6 @@
 'use client'
 
-import { type MouseEvent, useCallback } from 'react'
+import { type MouseEvent } from 'react'
 import { X } from 'lucide-react'
 
 import { currentSrc, pauseAudio } from '@/lib/audio-player'
@@ -16,20 +16,17 @@ interface ReferenceRemoveButtonProps {
 
 /** Remove control for a reference tile, pausing its audio when playing. */
 export function ReferenceRemoveButton(props: ReferenceRemoveButtonProps) {
-  const { label, audioSrc, isAudio, overlayClass, onRemove } = props
+  const { label, audioSrc, isAudio, overlayClass } = props
 
-  const handleRemoveClick = useCallback(
-    (event: MouseEvent<HTMLButtonElement>): void => {
-      event.stopPropagation()
+  const handleRemoveClick = (event: MouseEvent<HTMLButtonElement>): void => {
+    event.stopPropagation()
 
-      if (isAudio && currentSrc() === audioSrc) {
-        pauseAudio()
-      }
+    if (isAudio && currentSrc() === audioSrc) {
+      pauseAudio()
+    }
 
-      onRemove()
-    },
-    [isAudio, audioSrc, onRemove],
-  )
+    props.onRemove()
+  }
 
   return (
     <button

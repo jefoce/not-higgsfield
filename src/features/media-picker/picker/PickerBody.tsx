@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { isNil } from 'lodash-es'
 import useSWR from 'swr'
 
@@ -33,13 +33,10 @@ export function PickerBody(props: PickerBodyProps) {
   const { folderSub, selectedFolderRels, handleReset, handleNavigate, handleToggleFile } =
     folderBrowse
 
-  const handleTabChange = useCallback(
-    (tab: string) => {
-      setActiveTab(tab)
-      handleReset()
-    },
-    [handleReset],
-  )
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab)
+    handleReset()
+  }
 
   const selection = usePickerSelection(request)
   const { commit, confirm } = selection
@@ -55,9 +52,9 @@ export function PickerBody(props: PickerBodyProps) {
   const upload = usePickerUpload({ request, onCommit: commit })
   const [isAddOpen, setIsAddOpen] = useState(false)
 
-  const handleAddFolderOpen = useCallback(() => setIsAddOpen(true), [])
+  const handleAddFolderOpen = () => setIsAddOpen(true)
 
-  const handleSelectUpload = useCallback((item: UploadItem) => commit([item]), [commit])
+  const handleSelectUpload = (item: UploadItem) => commit([item])
 
   const activeFolder = foldersState.activeFolder
   const isFolderTab = !isNil(activeFolder) && activeTab !== 'uploads'

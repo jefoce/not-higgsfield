@@ -1,6 +1,6 @@
 'use client'
 
-import { type ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react'
+import { type ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { debounce } from 'lodash-es'
 
 import { SearchInput } from '@/ui/form/SearchInput'
@@ -29,19 +29,16 @@ export function FilterForm() {
 
   useEffect(() => () => commitQuery.cancel(), [commitQuery])
 
-  const handleReset = useCallback(() => {
+  const handleReset = () => {
     commitQuery.cancel()
     setQuery('')
     resetFilters()
-  }, [commitQuery, resetFilters])
+  }
 
-  const handleQueryChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      setQuery(event.target.value)
-      commitQuery(event.target.value)
-    },
-    [commitQuery],
-  )
+  const handleQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setQuery(event.target.value)
+    commitQuery(event.target.value)
+  }
 
   return (
     <>

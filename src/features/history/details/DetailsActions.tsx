@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { isNil } from 'lodash-es'
 import { Trash2 } from 'lucide-react'
 
@@ -36,13 +36,13 @@ export function DetailsActions(props: DetailsActionsProps) {
 
   const timeNow = isActive ? now : undefined
 
-  const handleReuse = useCallback(() => void rerunRecord(record), [record])
+  const handleReuse = () => void rerunRecord(record)
 
-  const handleDownload = useCallback(() => void saveRecordVideo(record), [record])
+  const handleDownload = () => void saveRecordVideo(record)
 
-  const handleFavorite = useCallback(() => void toggleFavorite(record), [record])
+  const handleFavorite = () => void toggleFavorite(record)
 
-  const handleOpenDelete = useCallback(() => setIsConfirmOpen(true), [])
+  const handleOpenDelete = () => setIsConfirmOpen(true)
 
   return (
     <>

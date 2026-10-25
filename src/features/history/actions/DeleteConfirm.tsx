@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import type { GenerationRecord } from '@/core/schemas/generation-record'
@@ -21,18 +21,18 @@ interface DeleteConfirmProps {
 
 /** Delete confirmation, refuses active jobs and refreshes every list page. */
 export function DeleteConfirm(props: DeleteConfirmProps) {
-  const { record, open: isOpen, onOpenChange, onDeleted } = props
+  const { record, open: isOpen } = props
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const handleDelete = useCallback(async () => {
+  const handleDelete = async () => {
     setIsDeleting(true)
 
     try {
       await deleteGeneration(record.id)
       toast.success('Deleted')
       await revalidateHistory()
-      onOpenChange(false)
-      onDeleted?.()
+      props.onOpenChange(false)
+      props.onDeleted?.()
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {
         toast.error('Cannot delete while generating')
@@ -44,9 +44,9 @@ export function DeleteConfirm(props: DeleteConfirmProps) {
     } finally {
       setIsDeleting(false)
     }
-  }, [record, onOpenChange, onDeleted])
+  }
 
-  const handleCancel = useCallback(() => onOpenChange(false), [onOpenChange])
+  const handleCancel = () => props.onOpenChange(false)
 
   return (
     <Modal open={isOpen} onOpenChange={props.onOpenChange} label="Delete video" className="w-100">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { TriangleAlert } from 'lucide-react'
 
 import type { RefSlot } from '@/core/prompt-tokens'
@@ -17,21 +17,18 @@ interface PromptWarningsProps {
 
 /** Warning counter chip with a clickable list. Hidden when there are none. */
 export function PromptWarnings(props: PromptWarningsProps) {
-  const { warnings, onFocus } = props
+  const { warnings } = props
   const [isOpen, setIsOpen] = useState(false)
   const occurrences = useRef<Record<string, number>>({})
 
-  const handleGo = useCallback(
-    (slot: RefSlot): void => {
-      const key = `${slot.kind}-${slot.n}`
-      const occurrence = occurrences.current[key] ?? 0
+  const handleGo = (slot: RefSlot): void => {
+    const key = `${slot.kind}-${slot.n}`
+    const occurrence = occurrences.current[key] ?? 0
 
-      occurrences.current[key] = occurrence + 1
-      onFocus?.(slot, occurrence)
-      setIsOpen(false)
-    },
-    [onFocus],
-  )
+    occurrences.current[key] = occurrence + 1
+    props.onFocus?.(slot, occurrence)
+    setIsOpen(false)
+  }
 
   if (warnings.length === 0) {
     return null

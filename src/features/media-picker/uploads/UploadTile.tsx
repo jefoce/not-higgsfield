@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useId, useRef, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import { isEmpty, isNil } from 'lodash-es'
 import { CloudUpload } from 'lucide-react'
 import type { ChangeEvent } from 'react'
@@ -38,56 +38,50 @@ function progressPercent(sent: number, total: number): number {
 
 /** Dashed upload tile backed by a hidden file input. */
 export function UploadTile(props: UploadTileProps) {
-  const { kinds, max, extensions, onUploaded } = props
+  const { kinds, max, extensions } = props
   const fileInputId = useId()
   const inputRef = useRef<HTMLInputElement>(null)
   const [progress, setProgress] = useState<number | null>(null)
   const [isOver, setIsOver] = useState(false)
   const isBusy = !isNil(progress)
 
-  const handleFiles = useCallback(
-    async (files: File[]) => {
-      if (isEmpty(files)) {
-        return
-      }
+  const handleFiles = async (files: File[]) => {
+    if (isEmpty(files)) {
+      return
+    }
 
-      setProgress(0)
+    setProgress(0)
 
-      const handleProgress = (sent: number, total: number) =>
-        setProgress(progressPercent(sent, total))
+    const handleProgress = (sent: number, total: number) =>
+      setProgress(progressPercent(sent, total))
 
-      try {
-        const items = await uploadFilesWithProgress({ files, onProgress: handleProgress })
+    try {
+      const items = await uploadFilesWithProgress({ files, onProgress: handleProgress })
 
-        onUploaded(items)
-      } catch (error) {
-        toast.error(errorMessage(error))
-      } finally {
-        setProgress(null)
-      }
-    },
-    [onUploaded],
-  )
+      props.onUploaded(items)
+    } catch (error) {
+      toast.error(errorMessage(error))
+    } finally {
+      setProgress(null)
+    }
+  }
 
-  const handleOpenFile = useCallback(() => inputRef.current?.click(), [])
+  const handleOpenFile = () => inputRef.current?.click()
 
-  const handleDragEnter = useCallback(() => setIsOver(true), [])
+  const handleDragEnter = () => setIsOver(true)
 
-  const handleDragOver = useCallback(() => setIsOver(true), [])
+  const handleDragOver = () => setIsOver(true)
 
-  const handleDragLeave = useCallback(() => setIsOver(false), [])
+  const handleDragLeave = () => setIsOver(false)
 
-  const handleDrop = useCallback(() => setIsOver(false), [])
+  const handleDrop = () => setIsOver(false)
 
-  const handleFileChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const files = Array.from(event.target.files ?? [])
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? [])
 
-      event.target.value = ''
-      void handleFiles(files)
-    },
-    [handleFiles],
-  )
+    event.target.value = ''
+    void handleFiles(files)
+  }
 
   const uploadLabel = uploadLabelFor(progress)
 

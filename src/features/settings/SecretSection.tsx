@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, type RefObject, useCallback } from 'react'
+import { type ReactNode, type RefObject } from 'react'
 import { isNil } from 'lodash-es'
 
 import type { StorageProviderDescriptor, VideoProviderDescriptor } from '@/core/providers/types'
@@ -43,26 +43,25 @@ export function SecretSection(props: SecretSectionProps) {
     testing: isTesting,
     result,
     warning,
-    onTest,
   } = props
 
   const creditsUrl = descriptor.links.credits
 
-  const handleTest = useCallback(() => onTest(descriptor.id), [descriptor.id, onTest])
+  const handleTest = () => props.onTest(descriptor.id)
 
   const keysUrl = descriptor.links.keys
 
-  const handleOpenKeys = useCallback(() => {
+  const handleOpenKeys = () => {
     void platform.openExternal(keysUrl).catch(() => {})
-  }, [keysUrl])
+  }
 
-  const handleOpenCredits = useCallback(() => {
+  const handleOpenCredits = () => {
     if (isNil(creditsUrl)) {
       return
     }
 
     void platform.openExternal(creditsUrl).catch(() => {})
-  }, [creditsUrl])
+  }
 
   const title = isReady ? undefined : 'Save a key first'
 

@@ -1,7 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
-
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { STATUS_HELP, statusHelpKey } from '@/core/status-help'
 import { graceDelayMs } from '@/core/submit-state'
@@ -53,7 +51,7 @@ export function StatusOverlay(props: StatusOverlayProps) {
   const aspectStyle = { aspectRatio: boxAspect ?? recordAspect(record), margin: '0 auto' }
   const boxStyle = isFill ? undefined : aspectStyle
 
-  const handleRerun = useCallback(() => void rerunRecord(record), [record])
+  const handleRerun = () => void rerunRecord(record)
 
   return (
     <div

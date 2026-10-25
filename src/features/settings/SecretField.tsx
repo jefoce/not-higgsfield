@@ -1,6 +1,6 @@
 'use client'
 
-import { type ChangeEvent, type ReactNode, useCallback } from 'react'
+import { type ChangeEvent, type ReactNode } from 'react'
 import { isEmpty } from 'lodash-es'
 
 import type { SecretName } from '@/core/secret-names'
@@ -73,7 +73,7 @@ function descriptionFor(params: DescriptionParams): ReactNode {
 
 /** One key input: masked, with reveal, remove and undo. */
 export function SecretField(props: SecretFieldProps) {
-  const { name, label, hint, status, value, remove: isRemoved, onChange } = props
+  const { name, label, hint, status, value, remove: isRemoved } = props
   const isReadOnly = status.source === 'env'
   let schemaError: string | null = null
 
@@ -94,15 +94,10 @@ export function SecretField(props: SecretFieldProps) {
     hint: status.hint,
   })
 
-  const handleRemove = useCallback(
-    () => onChange(name, { remove: !isRemoved }),
-    [name, onChange, isRemoved],
-  )
+  const handleRemove = () => props.onChange(name, { remove: !isRemoved })
 
-  const handleValueChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => onChange(name, { value: event.target.value.trim() }),
-    [name, onChange],
-  )
+  const handleValueChange = (event: ChangeEvent<HTMLInputElement>) =>
+    props.onChange(name, { value: event.target.value.trim() })
 
   const removeLabel = isRemoved ? 'Undo' : 'Remove'
 

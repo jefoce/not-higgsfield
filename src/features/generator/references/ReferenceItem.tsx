@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { isNil } from 'lodash-es'
 
 import { type RefSlot, slotLabel } from '@/core/prompt-tokens'
@@ -38,7 +37,7 @@ function referenceLabel(slots: Map<string, RefSlot>, item: UploadItem): string |
 
 /** One reference cell with preview, replace and remove handlers. */
 export function ReferenceItem(props: ReferenceItemProps) {
-  const { id, upload, label, note, isLifted, previewUploads, slots, extensions, onRemove } = props
+  const { id, upload, label, note, isLifted, previewUploads, slots, extensions } = props
 
   const handleInsert = (item: UploadItem): void => {
     const slot = slots.get(item.id)
@@ -70,7 +69,7 @@ export function ReferenceItem(props: ReferenceItemProps) {
 
   const handleLabel = (item: UploadItem): string | null => referenceLabel(slots, item)
 
-  const handleRemove = useCallback((): void => onRemove(id), [id, onRemove])
+  const handleRemove = (): void => props.onRemove(id)
 
   const handlePreview = (): void => {
     const index = previewUploads.findIndex((item) => item.id === id)

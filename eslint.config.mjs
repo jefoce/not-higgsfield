@@ -97,6 +97,14 @@ const OBJECT_FUNCTION_SELECTOR = {
   message: 'Name the function (handle<Action>) and pass it by reference.',
 }
 
+const INLINE_FUNCTION_SELECTORS = [
+  {
+    selector:
+      "JSXAttribute > JSXExpressionContainer > :matches(ArrowFunctionExpression, FunctionExpression), JSXAttribute > JSXExpressionContainer > CallExpression[callee.property.name='bind']",
+    message: 'No inline functions in JSX. Define handle<Action> above the return.',
+  },
+]
+
 // One level per object type. Bigger shapes are built from named parts.
 const TYPE_SELECTORS = [
   {
@@ -273,16 +281,8 @@ export default defineConfig([
       'react/jsx-boolean-value': 'error',
       'react/jsx-curly-brace-presence': ['error', { props: 'never', children: 'never' }],
       'react/no-array-index-key': 'warn',
-      'react/jsx-no-bind': [
-        'error',
-        {
-          allowArrowFunctions: false,
-          allowFunctions: false,
-          allowBind: false,
-          ignoreRefs: true,
-          ignoreDOMComponents: false,
-        },
-      ],
+      // Inline JSX functions are banned per layer by INLINE_FUNCTION_SELECTORS.
+      'react/jsx-no-bind': 'off',
       'react/no-multi-comp': ['error', { ignoreStateless: false }],
       'react/jsx-max-depth': ['error', { max: 6 }],
       'react/hook-use-state': 'error',
@@ -441,6 +441,7 @@ export default defineConfig([
         PROPS_SELECTOR,
         SECRET_SELECTORS,
         OBJECT_FUNCTION_SELECTOR,
+        INLINE_FUNCTION_SELECTORS,
         TYPE_SELECTORS,
       ),
     },

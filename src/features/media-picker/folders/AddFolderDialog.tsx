@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { X } from 'lucide-react'
 
 import type { FolderItem } from '@/core/schemas/folder-item'
@@ -19,22 +18,19 @@ export interface AddFolderDialogProps {
 
 /** Server directory browser used to connect a folder. */
 export function AddFolderDialog(props: AddFolderDialogProps) {
-  const { open: isOpen, onOpenChange } = props
+  const { open: isOpen } = props
   const browse = useAddFolderBrowse(isOpen)
   const { reset, navigate, navigateRoot, navigateParent, toggleHidden } = browse
 
-  const handleOpenChange = useCallback(
-    (isNext: boolean) => {
-      if (!isNext) {
-        reset()
-      }
+  const handleOpenChange = (isNext: boolean) => {
+    if (!isNext) {
+      reset()
+    }
 
-      onOpenChange(isNext)
-    },
-    [onOpenChange, reset],
-  )
+    props.onOpenChange(isNext)
+  }
 
-  const handleClose = useCallback(() => handleOpenChange(false), [handleOpenChange])
+  const handleClose = () => handleOpenChange(false)
 
   const connect = useFolderConnect({
     data: browse.data,

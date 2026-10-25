@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { mediaUrl, thumbUrl } from '@/lib/api/media-urls'
@@ -45,7 +45,7 @@ export function MediaTile(props: MediaTileProps) {
   const isBroken = brokenSrc === thumbSrc
   const mediaSrc = mediaUrl(mediaRef, item.mime)
 
-  const handleThumbError = useCallback(() => setBrokenSrc(thumbSrc), [thumbSrc])
+  const handleThumbError = () => setBrokenSrc(thumbSrc)
 
   return (
     <div

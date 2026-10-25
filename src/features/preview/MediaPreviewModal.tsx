@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { usePlayerSlot } from '@/features/player/use-player-slot'
 import { Modal } from '@/ui/Modal'
@@ -63,27 +63,24 @@ export function MediaPreviewModal() {
     return () => window.removeEventListener('keydown', onKey)
   }, [items.length, request])
 
-  const handleRun = useCallback(
-    (key: ActionKey) => {
-      const action = request?.actions?.[key]
+  const handleRun = (key: ActionKey) => {
+    const action = request?.actions?.[key]
 
-      if (!action || !item) {
-        return
-      }
+    if (!action || !item) {
+      return
+    }
 
-      closePreview() // close first so an opener action cannot stack modals
-      action(item)
-    },
-    [item, request],
-  )
+    closePreview() // close first so an opener action cannot stack modals
+    action(item)
+  }
 
-  const handlePrevious = useCallback(() => {
+  const handlePrevious = () => {
     setIndex((current) => Math.max(0, current - 1))
-  }, [])
+  }
 
-  const handleNext = useCallback(() => {
+  const handleNext = () => {
     setIndex((current) => Math.min(items.length - 1, current + 1))
-  }, [items.length])
+  }
 
   if (!request) {
     return null

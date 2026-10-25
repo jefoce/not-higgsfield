@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { Volume2, VolumeX } from 'lucide-react'
 
 import { getPreset } from '@/core/presets'
@@ -14,7 +13,7 @@ export function AudioChip() {
   const setAudio = useGeneratorStore((state) => state.setAudio)
   const preset = getPreset(useGeneratorStore((state) => state.presetId))
 
-  const handleToggle = useCallback((): void => setAudio(!isAudio), [isAudio, setAudio])
+  const handleToggle = (): void => setAudio(!isAudio)
 
   if (!preset.audio.supported) {
     return null

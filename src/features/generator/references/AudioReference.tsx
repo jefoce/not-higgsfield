@@ -1,6 +1,6 @@
 'use client'
 
-import { type MouseEvent, useCallback } from 'react'
+import { type MouseEvent } from 'react'
 import { isNil } from 'lodash-es'
 import { Pause, Play } from 'lucide-react'
 
@@ -41,18 +41,15 @@ export function AudioReference(props: AudioReferenceProps) {
   const played = isPlayed ? elapsed / total : 0
   const bars = waveBars(upload.originalName, AUDIO_BARS)
 
-  const handleTogglePlay = useCallback(
-    (event: MouseEvent<HTMLButtonElement>): void => {
-      event.stopPropagation()
+  const handleTogglePlay = (event: MouseEvent<HTMLButtonElement>): void => {
+    event.stopPropagation()
 
-      if (isPlaying) {
-        pauseAudio()
-      } else {
-        playAudio(src)
-      }
-    },
-    [isPlaying, src],
-  )
+    if (isPlaying) {
+      pauseAudio()
+    } else {
+      playAudio(src)
+    }
+  }
 
   const PlayIcon = isPlaying ? Pause : Play
   const playLabel = isPlaying ? 'Pause' : 'Play'

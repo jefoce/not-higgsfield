@@ -1,7 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
-
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { openPreview, type PreviewActions } from '@/features/preview/preview-store'
 
@@ -20,7 +18,7 @@ interface MediaRowProps {
 
 /** Upload grid row bridging selection state to the media tile. */
 export function MediaRow(props: MediaRowProps) {
-  const { item, items, previewIndex, actions, selectedIndex, isAtMax, onSelect, onDelete } = props
+  const { item, items, previewIndex, actions, selectedIndex, isAtMax } = props
   const stamp = new Date(item.createdAt).getTime()
   const isVersion = Number.isNaN(stamp)
 
@@ -28,14 +26,11 @@ export function MediaRow(props: MediaRowProps) {
   const isSelected = selectedIndex >= 0
   const isDisabled = !isSelected && isAtMax
 
-  const handlePreview = useCallback(
-    () => openPreview({ items, index: previewIndex, actions }),
-    [actions, items, previewIndex],
-  )
+  const handlePreview = () => openPreview({ items, index: previewIndex, actions })
 
-  const handleDelete = useCallback(() => onDelete(item), [item, onDelete])
+  const handleDelete = () => props.onDelete(item)
 
-  const handleSelect = useCallback(() => onSelect(item), [item, onSelect])
+  const handleSelect = () => props.onSelect(item)
 
   const handlePreviewAction = item.missing === true ? undefined : handlePreview
   const selectIndex = isSelected ? selectedIndex : undefined

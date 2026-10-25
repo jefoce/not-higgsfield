@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { isNil } from 'lodash-es'
 import { AudioLines, Check, Clock, Diamond, type LucideIcon, Sparkles, Volume2 } from 'lucide-react'
 
@@ -101,20 +100,20 @@ interface ModelRowProps {
 
 /** One selectable row in the model picker. */
 export function ModelRow(props: ModelRowProps) {
-  const { option, selected: isSelected, onSelect } = props
+  const { option, selected: isSelected } = props
   const entry = useModelEntry(option.id)
   const { discount, from, listFrom, reason } = rowData(option, entry)
   const isBlocked = isBlockedEntry(entry)
 
   const Icon = PRESET_ICONS[option.icon]
 
-  const handleSelect = useCallback((): void => {
+  const handleSelect = (): void => {
     if (isBlocked) {
       return
     }
 
-    onSelect(option.id)
-  }, [isBlocked, onSelect, option.id])
+    props.onSelect(option.id)
+  }
 
   return (
     <button

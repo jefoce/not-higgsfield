@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { Minimize2 } from 'lucide-react'
 
 import { ZOOM_DEFAULT, ZOOM_STEPS } from '@/core/constants'
@@ -13,7 +12,7 @@ export function ZoomSlider() {
   const zoom = useHistoryViewStore((state) => state.zoom)
   const handleZoomChange = useHistoryViewStore((state) => state.setZoom)
 
-  const handleReset = useCallback(() => handleZoomChange(ZOOM_DEFAULT), [handleZoomChange])
+  const handleReset = () => handleZoomChange(ZOOM_DEFAULT)
 
   return (
     <div className="flex items-center gap-1.5">

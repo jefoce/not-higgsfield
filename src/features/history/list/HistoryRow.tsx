@@ -1,6 +1,6 @@
 'use client'
 
-import { type MouseEvent, useCallback, useRef } from 'react'
+import { type MouseEvent, useRef } from 'react'
 
 import { DETAILS_MIN_WIDTH, ROW_MIN_HEIGHT } from '@/core/constants'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
@@ -35,31 +35,28 @@ export function HistoryRow(props: HistoryRowProps) {
   const { selected: isSelected, selecting: isSelecting, select } = useSelectionItem(record.id)
   const canSelect = isSelectable(record)
 
-  const handleSelect = useCallback(
-    (event: MouseEvent<HTMLDivElement>) => {
-      const isRowClick =
-        isOwnEvent(event) && !(event.target as HTMLElement).closest('button, a, input')
+  const handleSelect = (event: MouseEvent<HTMLDivElement>) => {
+    const isRowClick =
+      isOwnEvent(event) && !(event.target as HTMLElement).closest('button, a, input')
 
-      if (!isRowClick) {
-        return
+    if (!isRowClick) {
+      return
+    }
+
+    if (event.shiftKey) {
+      if (canSelect) {
+        select(true)
       }
 
-      if (event.shiftKey) {
-        if (canSelect) {
-          select(true)
-        }
+      return
+    }
 
-        return
-      }
+    if (isSelecting && !isSelected && canSelect) {
+      select(false)
+    }
+  }
 
-      if (isSelecting && !isSelected && canSelect) {
-        select(false)
-      }
-    },
-    [canSelect, isSelecting, isSelected, select],
-  )
-
-  const handleCancel = useCallback(() => void cancelGeneration(record.id), [record.id])
+  const handleCancel = () => void cancelGeneration(record.id)
 
   return (
     <div

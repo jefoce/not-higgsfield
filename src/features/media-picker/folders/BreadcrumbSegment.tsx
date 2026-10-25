@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useCallback } from 'react'
+import { Fragment } from 'react'
 
 interface BreadcrumbSegmentProps {
   label: string
@@ -11,9 +11,9 @@ interface BreadcrumbSegmentProps {
 
 /** One clickable sub-path segment. */
 export function BreadcrumbSegment(props: BreadcrumbSegmentProps) {
-  const { label, target, isCurrent, onNavigate } = props
+  const { label, target, isCurrent } = props
 
-  const handleSelect = useCallback(() => onNavigate(target), [onNavigate, target])
+  const handleSelect = () => props.onNavigate(target)
 
   const currentClass = isCurrent ? 'shrink-0 text-fg' : 'shrink-0 transition hover:text-fg'
 

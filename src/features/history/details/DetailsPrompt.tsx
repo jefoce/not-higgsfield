@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { Copy } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -26,7 +25,7 @@ async function copyText(text: string, label: string): Promise<void> {
 export function DetailsPrompt(props: DetailsPromptProps) {
   const { record, plain } = props
 
-  const handleCopyPrompt = useCallback(() => void copyText(plain, 'Prompt'), [plain])
+  const handleCopyPrompt = () => void copyText(plain, 'Prompt')
 
   return (
     <div className="flex min-h-0 shrink flex-col">

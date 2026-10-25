@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { isNil } from 'lodash-es'
 import { Dices, Lock } from 'lucide-react'
 
@@ -22,23 +21,17 @@ export function SeedChip() {
   const preset = getPreset(useGeneratorStore((state) => state.presetId))
   const isRandom = isNil(seed)
 
-  const handleRandomChange = useCallback(
-    (isChecked: boolean): void => {
-      if (isChecked) {
-        setSeed(null)
-      } else {
-        setSeed(randomSeed())
-      }
-    },
-    [setSeed],
-  )
+  const handleRandomChange = (isChecked: boolean): void => {
+    if (isChecked) {
+      setSeed(null)
+    } else {
+      setSeed(randomSeed())
+    }
+  }
 
-  const handleSeedChange = useCallback(
-    (value: number | null): void => setSeed(value ?? 0),
-    [setSeed],
-  )
+  const handleSeedChange = (value: number | null): void => setSeed(value ?? 0)
 
-  const handleRandomize = useCallback((): void => setSeed(randomSeed()), [setSeed])
+  const handleRandomize = (): void => setSeed(randomSeed())
 
   if (!preset.seed) {
     return null

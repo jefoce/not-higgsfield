@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { isEmpty } from 'lodash-es'
 import useSWR from 'swr'
 
@@ -56,20 +56,16 @@ function folderPreviewItem(params: FolderPreviewItemParams): PreviewItem {
 /** Folder browser. */
 export function FolderTab(props: FolderTabProps) {
   const { folderId, folderName, kinds, max, extensions, sub, selectedRels } = props
-  const { onPickFile, onToggleFile } = props
 
-  const handleSelectFile = useCallback(
-    (rel: string) => {
-      if (max === 1) {
-        onPickFile(rel)
+  const handleSelectFile = (rel: string) => {
+    if (max === 1) {
+      props.onPickFile(rel)
 
-        return
-      }
+      return
+    }
 
-      onToggleFile(rel)
-    },
-    [max, onPickFile, onToggleFile],
-  )
+    props.onToggleFile(rel)
+  }
 
   const [broken, setBroken] = useState<string[]>([])
 
@@ -83,20 +79,17 @@ export function FolderTab(props: FolderTabProps) {
     extensionAllowed({ kind: file.kind, ext: extWithDot(file.name), extensions }),
   )
 
-  const handleExpand = useCallback(
-    (file: FolderFile) => {
-      const handleSelect = () => handleSelectFile(file.rel)
+  const handleExpand = (file: FolderFile) => {
+    const handleSelect = () => handleSelectFile(file.rel)
 
-      openPreview({
-        items: [folderPreviewItem({ folderId, file })],
-        index: 0,
-        actions: { select: handleSelect },
-      })
-    },
-    [folderId, handleSelectFile],
-  )
+    openPreview({
+      items: [folderPreviewItem({ folderId, file })],
+      index: 0,
+      actions: { select: handleSelect },
+    })
+  }
 
-  const handleBroken = useCallback((src: string) => setBroken((previous) => [...previous, src]), [])
+  const handleBroken = (src: string) => setBroken((previous) => [...previous, src])
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">

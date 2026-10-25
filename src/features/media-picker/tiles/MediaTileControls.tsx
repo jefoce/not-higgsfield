@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { isNil } from 'lodash-es'
 import { Maximize2, Trash2 } from 'lucide-react'
 import type { MouseEvent } from 'react'
@@ -18,30 +17,23 @@ interface MediaTileControlsProps {
   onDelete?: () => void
 }
 
+function handleDeleteMouseDown(event: MouseEvent<HTMLButtonElement>): void {
+  event.stopPropagation()
+}
+
 /** Selection, preview and delete controls for a media tile. */
 export function MediaTileControls(props: MediaTileControlsProps) {
-  const { label, isPreviewable, isBlocked, isSelected, isMissing, onPreview, onDelete } = props
+  const { label, isPreviewable, isBlocked, isSelected, isMissing } = props
 
-  const handlePreviewClick = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation()
-      onPreview?.()
-    },
-    [onPreview],
-  )
+  const handlePreviewClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    props.onPreview?.()
+  }
 
-  const handleDeleteClick = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation()
-      onDelete?.()
-    },
-    [onDelete],
-  )
-
-  const handleDeleteMouseDown = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => event.stopPropagation(),
-    [],
-  )
+  const handleDeleteClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    props.onDelete?.()
+  }
 
   return (
     <>

@@ -1,6 +1,6 @@
 'use client'
 
-import { type KeyboardEvent, type MouseEvent, useCallback } from 'react'
+import { type KeyboardEvent, type MouseEvent } from 'react'
 import { Check } from 'lucide-react'
 
 import { cn } from '@/lib/cn'
@@ -27,25 +27,19 @@ export function SelectionCheckbox(props: SelectionCheckboxProps) {
     select,
   } = useSelectionItem(id)
 
-  const handleClick = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation()
-      select(event.shiftKey)
-    },
-    [select],
-  )
+  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation()
+    select(event.shiftKey)
+  }
 
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLButtonElement>) => {
-      if (event.key !== ' ') {
-        return
-      }
+  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key !== ' ') {
+      return
+    }
 
-      event.preventDefault()
-      select(event.shiftKey)
-    },
-    [select],
-  )
+    event.preventDefault()
+    select(event.shiftKey)
+  }
 
   if (!canSelect) {
     return null

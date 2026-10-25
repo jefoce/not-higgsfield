@@ -1,7 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
-
 import { type RefSlot, slotLabel } from '@/core/prompt-tokens'
 import { issueText } from '@/core/validation'
 import type { ValidationIssue } from '@/core/validation-types'
@@ -13,13 +11,13 @@ interface PromptWarningRowProps {
 
 /** One warning row: plain text or a button that focuses its slot. */
 export function PromptWarningRow(props: PromptWarningRowProps) {
-  const { issue, onSelect } = props
+  const { issue } = props
 
-  const handleSelect = useCallback((): void => {
+  const handleSelect = (): void => {
     if (issue.type !== 'text') {
-      onSelect(issue.slot)
+      props.onSelect(issue.slot)
     }
-  }, [issue, onSelect])
+  }
 
   if (issue.type === 'text') {
     return <p className="px-2 py-1.5 text-xs text-fg">{issue.text}</p>

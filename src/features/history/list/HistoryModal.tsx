@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { isNil } from 'lodash-es'
 
 import { DETAILS_MIN_WIDTH } from '@/core/constants'
@@ -22,20 +21,20 @@ interface HistoryModalProps {
 
 /** Centered grid preview: 16:9 player left, details panel right. */
 export function HistoryModal(props: HistoryModalProps) {
-  const { record, open: isOpen, onOpenChange, onDeleted } = props
+  const { record, open: isOpen } = props
 
-  const handleCancel = useCallback(() => {
+  const handleCancel = () => {
     if (isNil(record)) {
       return
     }
 
     void cancelGeneration(record.id)
-  }, [record])
+  }
 
-  const handleDeleted = useCallback(() => {
-    onOpenChange(false)
-    onDeleted?.()
-  }, [onOpenChange, onDeleted])
+  const handleDeleted = () => {
+    props.onOpenChange(false)
+    props.onDeleted?.()
+  }
 
   return (
     <Modal

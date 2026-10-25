@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { uniq } from 'lodash-es'
 
 import { MODEL_PRESETS } from '@/core/presets'
@@ -49,40 +48,23 @@ export function FilterChoices() {
   const filters = useHistoryViewStore((state) => state.filters)
   const setFilters = useHistoryViewStore((state) => state.setFilters)
 
-  const handleStatusChange = useCallback(
-    (status: NonNullable<ViewFilters['status']>) => setFilters({ status }),
-    [setFilters],
-  )
+  const handleStatusChange = (status: NonNullable<ViewFilters['status']>) => setFilters({ status })
 
-  const handleModeChange = useCallback(
-    (mode: NonNullable<ViewFilters['mode']>) => {
-      const isModeTab = mode === 'frames' || mode === 'references'
-      const tab = isModeTab ? mode : 'all'
+  const handleModeChange = (mode: NonNullable<ViewFilters['mode']>) => {
+    const isModeTab = mode === 'frames' || mode === 'references'
+    const tab = isModeTab ? mode : 'all'
 
-      setFilters({ mode, tab })
-    },
-    [setFilters],
-  )
+    setFilters({ mode, tab })
+  }
 
-  const handleModelChange = useCallback(
-    (model: NonNullable<ViewFilters['model']>) => setFilters({ model }),
-    [setFilters],
-  )
+  const handleModelChange = (model: NonNullable<ViewFilters['model']>) => setFilters({ model })
 
-  const handleResolutionChange = useCallback(
-    (resolution: NonNullable<ViewFilters['resolution']>) => setFilters({ resolution }),
-    [setFilters],
-  )
+  const handleResolutionChange = (resolution: NonNullable<ViewFilters['resolution']>) =>
+    setFilters({ resolution })
 
-  const handleAspectChange = useCallback(
-    (aspect: NonNullable<ViewFilters['aspect']>) => setFilters({ aspect }),
-    [setFilters],
-  )
+  const handleAspectChange = (aspect: NonNullable<ViewFilters['aspect']>) => setFilters({ aspect })
 
-  const handleAudioChange = useCallback(
-    (audio: NonNullable<ViewFilters['audio']>) => setFilters({ audio }),
-    [setFilters],
-  )
+  const handleAudioChange = (audio: NonNullable<ViewFilters['audio']>) => setFilters({ audio })
 
   return (
     <>

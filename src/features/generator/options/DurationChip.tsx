@@ -1,7 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
-
 import { PopoverClose } from '@/ui/Popover'
 import { Tooltip } from '@/ui/Tooltip'
 
@@ -36,10 +34,10 @@ interface DurationChipProps {
 
 /** One quick-duration chip, disabled when the reference video caps it. */
 export function DurationChip(props: DurationChipProps) {
-  const { value, duration, limit, limitText, onSelect } = props
+  const { value, duration, limit, limitText } = props
   const isOverLimit = value > limit
 
-  const handleSelect = useCallback((): void => onSelect(value), [onSelect, value])
+  const handleSelect = (): void => props.onSelect(value)
 
   const tooltip = isOverLimit ? limitText : null
 

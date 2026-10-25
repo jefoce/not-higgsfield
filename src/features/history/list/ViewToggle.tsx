@@ -1,6 +1,6 @@
 'use client'
 
-import { type MouseEvent, useCallback } from 'react'
+import { type MouseEvent } from 'react'
 import { Grid2x2, List } from 'lucide-react'
 
 import { cn } from '@/lib/cn'
@@ -24,10 +24,8 @@ export function ViewToggle() {
   const view = useHistoryViewStore((state) => state.view)
   const setView = useHistoryViewStore((state) => state.setView)
 
-  const handleSelect = useCallback(
-    (event: MouseEvent<HTMLButtonElement>) => setView(event.currentTarget.value as HistoryView),
-    [setView],
-  )
+  const handleSelect = (event: MouseEvent<HTMLButtonElement>) =>
+    setView(event.currentTarget.value as HistoryView)
 
   return (
     <div

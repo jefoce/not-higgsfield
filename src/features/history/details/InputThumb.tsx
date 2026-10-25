@@ -1,6 +1,6 @@
 'use client'
 
-import { type KeyboardEvent, useCallback, useState } from 'react'
+import { type KeyboardEvent, useState } from 'react'
 import { isNil } from 'lodash-es'
 
 import { cn } from '@/lib/cn'
@@ -21,21 +21,18 @@ export function InputThumb(props: InputThumbProps) {
   const firstChar = item.name.charAt(0).toUpperCase()
   const initial = firstChar === '' ? '?' : firstChar
 
-  const handleOpen = useCallback(() => void openThumb(item), [item])
+  const handleOpen = () => void openThumb(item)
 
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLDivElement>) => {
-      if (event.key !== 'Enter' && event.key !== ' ') {
-        return
-      }
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return
+    }
 
-      event.preventDefault()
-      handleOpen()
-    },
-    [handleOpen],
-  )
+    event.preventDefault()
+    handleOpen()
+  }
 
-  const handleError = useCallback(() => setIsBroken(true), [])
+  const handleError = () => setIsBroken(true)
 
   const title = `${item.label} \u00b7 ${item.name}`
   const sent = item.sent

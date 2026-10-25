@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { isEmpty } from 'lodash-es'
 import { FolderOpen } from 'lucide-react'
 import { toast } from 'sonner'
@@ -22,10 +22,10 @@ interface ChooseDiskTileProps {
 
 /** Native file picker tile for desktop builds. */
 export function ChooseDiskTile(props: ChooseDiskTileProps) {
-  const { kinds, max, extensions, onUploaded } = props
+  const { kinds, max, extensions } = props
   const [isBusy, setIsBusy] = useState(false)
 
-  const pick = useCallback(async () => {
+  const pick = async () => {
     setIsBusy(true)
 
     try {
@@ -37,15 +37,15 @@ export function ChooseDiskTile(props: ChooseDiskTileProps) {
         return
       }
 
-      onUploaded(items)
+      props.onUploaded(items)
     } catch (error) {
       toast.error(errorMessage(error))
     } finally {
       setIsBusy(false)
     }
-  }, [extensions, kinds, max, onUploaded])
+  }
 
-  const handlePick = useCallback(() => void pick(), [pick])
+  const handlePick = () => void pick()
 
   const label = isBusy ? 'Choosing...' : 'Choose from disk'
 

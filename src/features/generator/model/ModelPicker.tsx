@@ -1,6 +1,6 @@
 'use client'
 
-import { type ChangeEvent, useCallback, useState } from 'react'
+import { type ChangeEvent, useState } from 'react'
 import { isEmpty } from 'lodash-es'
 import { ChevronRight } from 'lucide-react'
 
@@ -29,25 +29,22 @@ export function ModelPicker() {
     option.title.toLowerCase().includes(query.trim().toLowerCase()),
   )
 
-  const handleOpenChange = useCallback((isOpen: boolean): void => {
+  const handleOpenChange = (isOpen: boolean): void => {
     setIsOpen(isOpen)
 
     if (!isOpen) {
       setQuery('')
     }
-  }, [])
+  }
 
-  const handleQueryChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
+  const handleQueryChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setQuery(event.target.value)
-  }, [])
+  }
 
-  const handleSelectPreset = useCallback(
-    (id: string): void => {
-      setPreset(id)
-      setIsOpen(false)
-    },
-    [setPreset],
-  )
+  const handleSelectPreset = (id: string): void => {
+    setPreset(id)
+    setIsOpen(false)
+  }
 
   const side = isWide ? 'right' : 'bottom'
 

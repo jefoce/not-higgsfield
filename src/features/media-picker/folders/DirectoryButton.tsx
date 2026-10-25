@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { Folder } from 'lucide-react'
 
 import type { BrowseDir } from '@/core/media-types'
@@ -12,9 +11,9 @@ export interface DirectoryButtonProps {
 
 /** Directory row in the add-folder browser. */
 export function DirectoryButton(props: DirectoryButtonProps) {
-  const { dir, onNavigate } = props
+  const { dir } = props
 
-  const handleSelect = useCallback(() => onNavigate(dir.path), [dir.path, onNavigate])
+  const handleSelect = () => props.onNavigate(dir.path)
 
   return (
     <button

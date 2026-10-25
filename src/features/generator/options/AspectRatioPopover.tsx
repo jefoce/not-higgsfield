@@ -1,7 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
-
 import { getPreset } from '@/core/presets'
 import type { AspectChoice } from '@/core/presets/types'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
@@ -26,19 +24,13 @@ export function AspectRatioPopover() {
     options.unshift('auto')
   }
 
-  const handleOpenChange = useCallback(
-    (isOpen: boolean): void => {
-      if (isOpen && aspectRatio === 'auto' && !isAutoAllowed) {
-        setAspectRatio(preset.defaultAspectRatio)
-      }
-    },
-    [aspectRatio, isAutoAllowed, preset.defaultAspectRatio, setAspectRatio],
-  )
+  const handleOpenChange = (isOpen: boolean): void => {
+    if (isOpen && aspectRatio === 'auto' && !isAutoAllowed) {
+      setAspectRatio(preset.defaultAspectRatio)
+    }
+  }
 
-  const handleSelectAspect = useCallback(
-    (option: AspectChoice): void => setAspectRatio(option),
-    [setAspectRatio],
-  )
+  const handleSelectAspect = (option: AspectChoice): void => setAspectRatio(option)
 
   const label = aspectRatio === 'auto' ? 'Auto' : aspectRatio
 

@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { Copy } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -18,14 +17,14 @@ interface ErrorDetailsPopoverProps {
 export function ErrorDetailsPopover(props: ErrorDetailsPopoverProps) {
   const { error, className } = props
 
-  const handleCopy = useCallback(async () => {
+  const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(error.raw)
       toast.success('Details copied')
     } catch {
       toast.error('Copy failed')
     }
-  }, [error.raw])
+  }
 
   return (
     <Popover>

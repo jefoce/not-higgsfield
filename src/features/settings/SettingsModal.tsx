@@ -1,6 +1,6 @@
 'use client'
 
-import { createRef, type RefObject, useCallback, useEffect, useMemo } from 'react'
+import { createRef, type RefObject, useEffect, useMemo } from 'react'
 import { X } from 'lucide-react'
 import useSWR from 'swr'
 
@@ -43,9 +43,9 @@ export function SettingsModal() {
   const note = backendNote(status?.backend)
   const { onClose } = draft
 
-  const handleClose = useCallback(() => void onClose(false), [onClose])
+  const handleClose = () => void onClose(false)
 
-  const handleSave = useCallback(() => void draft.onSave(), [draft])
+  const handleSave = () => void draft.onSave()
 
   useEffect(() => {
     if (!isOpen) {

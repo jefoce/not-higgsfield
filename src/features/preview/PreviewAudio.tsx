@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { isNil } from 'lodash-es'
 import { Pause, Play } from 'lucide-react'
 
@@ -43,13 +43,13 @@ export function PreviewAudio(props: PreviewAudioProps) {
   const bars = waveBars(item.originalName, AUDIO_BARS)
   const at = elapsed ?? 0
 
-  const handleToggle = useCallback(() => {
+  const handleToggle = () => {
     if (isPlaying) {
       pauseAudio()
     } else {
       playAudio(src)
     }
-  }, [isPlaying, src])
+  }
 
   useEffect(() => {
     playAudio(src)
