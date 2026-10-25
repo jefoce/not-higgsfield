@@ -23,7 +23,7 @@ interface DeleteConfirmProps {
 export function DeleteConfirm(props: DeleteConfirmProps) {
   const { record, open: isOpen } = props
 
-  const deleteRecord = async (): Promise<void> => {
+  const deletion = useAsyncAction(async () => {
     try {
       await deleteGeneration(record.id)
       toast.success('Deleted')
@@ -39,13 +39,7 @@ export function DeleteConfirm(props: DeleteConfirmProps) {
 
       toastError(error)
     }
-  }
-
-  const { isRunning: isDeleting, run: runDelete } = useAsyncAction(deleteRecord)
-
-  const handleDelete = () => {
-    return void runDelete()
-  }
+  })
 
   const handleCancel = () => {
     return props.onOpenChange(false)
@@ -62,7 +56,7 @@ export function DeleteConfirm(props: DeleteConfirmProps) {
           <Button size="sm" variant="ghost" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button size="sm" variant="danger" loading={isDeleting} onClick={handleDelete}>
+          <Button size="sm" variant="danger" loading={deletion.isRunning} onClick={deletion.run}>
             Delete
           </Button>
         </div>

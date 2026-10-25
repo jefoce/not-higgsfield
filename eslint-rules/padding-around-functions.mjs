@@ -1,6 +1,7 @@
 const FUNCTION_TYPES = new Set(['ArrowFunctionExpression', 'FunctionExpression'])
 const WRAPPER_TYPES = new Set(['TSAsExpression', 'TSSatisfiesExpression', 'TSNonNullExpression'])
 const DEFAULT_WRAPPERS = [
+  'useAsyncAction',
   'useCallback',
   'useEffectEvent',
   'memo',

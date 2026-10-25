@@ -40,8 +40,6 @@ export function AddFolderDialog(props: AddFolderDialogProps) {
     onClose: handleClose,
   })
 
-  const { add, chooseNative } = connect
-
   return (
     <Modal
       open={isOpen}
@@ -74,8 +72,8 @@ export function AddFolderDialog(props: AddFolderDialogProps) {
         isHidden={browse.isHidden}
         isAdding={connect.isAdding}
         isChoosing={connect.isChoosing}
-        onAdd={add}
-        onChooseNative={chooseNative}
+        onAdd={connect.add}
+        onChooseNative={connect.chooseNative}
         onClose={handleClose}
         onShowHidden={toggleHidden}
       />

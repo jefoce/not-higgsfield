@@ -70,15 +70,13 @@ export function usePickerFolders(params: UsePickerFoldersParams): PickerFolders 
     [handleDisconnectSync],
   )
 
-  const linkFile = async (folderId: string, relPath: string): Promise<void> => {
+  const linking = useAsyncAction(async (folderId: string, relPath: string) => {
     try {
       onCommit([await linkFolderFile({ folderId, relPath })])
     } catch (error) {
       toastError(error)
     }
-  }
-
-  const { isRunning: isBusy, run: runLinkFile } = useAsyncAction(linkFile)
+  })
 
   const handlePickFile = useCallback(
     (rel: string) => {
@@ -86,10 +84,16 @@ export function usePickerFolders(params: UsePickerFoldersParams): PickerFolders 
         return
       }
 
-      void runLinkFile(activeFolder.id, rel)
+      void linking.run(activeFolder.id, rel)
     },
-    [activeFolder, runLinkFile],
+    [activeFolder, linking],
   )
 
-  return { activeFolder, isBusy, handleAdded, handleDisconnect, handlePickFile }
+  return {
+    activeFolder,
+    isBusy: linking.isRunning,
+    handleAdded,
+    handleDisconnect,
+    handlePickFile,
+  }
 }

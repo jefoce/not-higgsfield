@@ -19,7 +19,7 @@ export interface DeleteUpload {
   handleDeleteRequest: (item: UploadItem) => void
   handlePendingOpenChange: (isOpen: boolean) => void
   handleCancelDelete: () => void
-  handleConfirmDelete: () => void
+  handleConfirmDelete: () => Promise<void>
 }
 
 /** Delete confirmation state for the uploads grid. */
@@ -27,7 +27,7 @@ export function useDeleteUpload(params: UseDeleteUploadParams): DeleteUpload {
   const { mutate, onDeleted } = params
   const [pending, setPending] = useState<UploadItem | null>(null)
 
-  const deletePending = async (): Promise<void> => {
+  const deleting = useAsyncAction(async () => {
     if (!pending) {
       return
     }
@@ -41,9 +41,7 @@ export function useDeleteUpload(params: UseDeleteUploadParams): DeleteUpload {
     } catch (error) {
       toastError(error)
     }
-  }
-
-  const { isRunning: isDeleting, run: runDelete } = useAsyncAction(deletePending)
+  })
 
   const handleDeleteRequest = useCallback((item: UploadItem) => {
     return setPending(item)
@@ -59,16 +57,12 @@ export function useDeleteUpload(params: UseDeleteUploadParams): DeleteUpload {
     return setPending(null)
   }, [])
 
-  const handleConfirmDelete = useCallback(() => {
-    return void runDelete()
-  }, [runDelete])
-
   return {
     pending,
-    isDeleting,
+    isDeleting: deleting.isRunning,
     handleDeleteRequest,
     handlePendingOpenChange,
     handleCancelDelete,
-    handleConfirmDelete,
+    handleConfirmDelete: deleting.run,
   }
 }

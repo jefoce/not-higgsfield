@@ -22,7 +22,7 @@ interface ChooseDiskTileProps {
 export function ChooseDiskTile(props: ChooseDiskTileProps) {
   const { kinds, max, extensions } = props
 
-  const pickFiles = async (): Promise<void> => {
+  const chooser = useAsyncAction(async () => {
     try {
       const items = await (
         await getPlatform()
@@ -36,26 +36,20 @@ export function ChooseDiskTile(props: ChooseDiskTileProps) {
     } catch (error) {
       toastError(error)
     }
-  }
+  })
 
-  const { isRunning: isBusy, run } = useAsyncAction(pickFiles)
-
-  const handlePick = () => {
-    return void run()
-  }
-
-  const label = isBusy ? 'Choosing...' : 'Choose from disk'
+  const label = chooser.isRunning ? 'Choosing...' : 'Choose from disk'
 
   return (
     <button
       type="button"
-      disabled={isBusy}
-      onClick={handlePick}
+      disabled={chooser.isRunning}
+      onClick={chooser.run}
       className="flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-divider bg-white/2 text-xs font-medium text-fg-2 transition hover:bg-white/4 disabled:opacity-60"
     >
       <span className="flex size-10 items-center justify-center rounded-full bg-white/10">
-        {isBusy && <Spinner size={16} />}
-        {!isBusy && <FolderOpen className="size-5" aria-hidden />}
+        {chooser.isRunning && <Spinner size={16} />}
+        {!chooser.isRunning && <FolderOpen className="size-5" aria-hidden />}
       </span>
       <span>{label}</span>
     </button>

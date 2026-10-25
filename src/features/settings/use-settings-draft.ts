@@ -158,7 +158,7 @@ export function useSettingsDraft(params: UseSettingsDraftParams): SettingsDraft 
     isDirty,
   })
 
-  const saveDraft = async (): Promise<void> => {
+  const saving = useAsyncAction(async () => {
     try {
       await saveSecrets(edits)
       await Promise.all([refreshCredits(), refreshRemoteStatus(), refreshModels()])
@@ -168,15 +168,13 @@ export function useSettingsDraft(params: UseSettingsDraftParams): SettingsDraft 
     } catch (error) {
       toastError(error, 'Save failed')
     }
-  }
-
-  const { isRunning: isSaving, run: runSave } = useAsyncAction(saveDraft)
+  })
 
   const { canSave, sectionReady, storageValid } = getDraftFlags({
     edits,
     status,
     isMock,
-    isSaving,
+    isSaving: saving.isRunning,
   })
 
   const onFieldChange = (name: SecretName, change: SecretChange) => {
@@ -204,14 +202,14 @@ export function useSettingsDraft(params: UseSettingsDraftParams): SettingsDraft 
       return
     }
 
-    await runSave()
+    await saving.run()
   }
 
   return {
     edits,
     results,
     testing,
-    saving: isSaving,
+    saving: saving.isRunning,
     retrying: isRetrying,
     canSave,
     ready: sectionReady,

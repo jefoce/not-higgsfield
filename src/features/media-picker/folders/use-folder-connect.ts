@@ -1,6 +1,5 @@
 'use client'
 
-import { useCallback } from 'react'
 import { toast } from 'sonner'
 
 import type { BrowseResult } from '@/core/media-types'
@@ -19,15 +18,15 @@ interface UseFolderConnectParams {
 export interface FolderConnect {
   isAdding: boolean
   isChoosing: boolean
-  add: () => void
-  chooseNative: () => void
+  add: () => Promise<void>
+  chooseNative: () => Promise<void>
 }
 
 /** Connect actions for the add-folder dialog. */
 export function useFolderConnect(params: UseFolderConnectParams): FolderConnect {
   const { data, onAdded, onClose } = params
 
-  const addFolder = async (): Promise<void> => {
+  const adding = useAsyncAction(async () => {
     if (!data) {
       return
     }
@@ -41,9 +40,9 @@ export function useFolderConnect(params: UseFolderConnectParams): FolderConnect 
     } catch (error) {
       toastError(error)
     }
-  }
+  })
 
-  const chooseFolder = async (): Promise<void> => {
+  const choosing = useAsyncAction(async () => {
     try {
       const folder = await (await getPlatform()).chooseFolder()
 
@@ -57,18 +56,12 @@ export function useFolderConnect(params: UseFolderConnectParams): FolderConnect 
     } catch (error) {
       toastError(error)
     }
+  })
+
+  return {
+    isAdding: adding.isRunning,
+    isChoosing: choosing.isRunning,
+    add: adding.run,
+    chooseNative: choosing.run,
   }
-
-  const { isRunning: isAdding, run: runAdd } = useAsyncAction(addFolder)
-  const { isRunning: isChoosing, run: runChoose } = useAsyncAction(chooseFolder)
-
-  const add = useCallback(() => {
-    return void runAdd()
-  }, [runAdd])
-
-  const chooseNative = useCallback(() => {
-    return void runChoose()
-  }, [runChoose])
-
-  return { isAdding, isChoosing, add, chooseNative }
 }

@@ -10,6 +10,7 @@ import unicorn from 'eslint-plugin-unicorn'
 import tseslint from 'typescript-eslint'
 
 import callbackProps from './eslint-rules/callback-props.mjs'
+import inlineHookCallbacks from './eslint-rules/inline-hook-callbacks.mjs'
 import paddingAroundFunctions from './eslint-rules/padding-around-functions.mjs'
 import {
   INLINE_FUNCTION_SELECTORS,
@@ -26,6 +27,7 @@ import {
 const localPlugin = {
   rules: {
     'callback-props': callbackProps,
+    'inline-hook-callbacks': inlineHookCallbacks,
     'padding-around-functions': paddingAroundFunctions,
   },
 }
@@ -441,8 +443,12 @@ export default defineConfig([
 
   {
     // Callback props stay on props, or use a handle<Action> created in the component.
+    // A function used only by one hook call is written inline in that call.
     files: ['src/**/*.tsx', 'src/**/use-*.ts'],
-    rules: { 'local/callback-props': 'error' },
+    rules: {
+      'local/callback-props': 'error',
+      'local/inline-hook-callbacks': 'error',
+    },
   },
 
   globalIgnores([

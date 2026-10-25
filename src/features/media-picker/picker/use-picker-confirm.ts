@@ -22,7 +22,7 @@ interface UsePickerConfirmParams {
 export function usePickerConfirm(params: UsePickerConfirmParams) {
   const { request, activeFolder, activeTab, selectedFolderRels, onConfirmUploads } = params
 
-  const linkFolderFiles = async (folder: FolderItem): Promise<void> => {
+  const linking = useAsyncAction(async (folder: FolderItem) => {
     try {
       const rels = selectedFolderRels.slice(0, request.max)
 
@@ -37,9 +37,7 @@ export function usePickerConfirm(params: UsePickerConfirmParams) {
     } catch (error) {
       toastError(error)
     }
-  }
-
-  const { isRunning: isAddingFolderFiles, run } = useAsyncAction(linkFolderFiles)
+  })
 
   const handleConfirm = useCallback(() => {
     if (isNil(activeFolder) || activeTab === 'uploads') {
@@ -52,8 +50,8 @@ export function usePickerConfirm(params: UsePickerConfirmParams) {
       return
     }
 
-    void run(activeFolder)
-  }, [activeFolder, activeTab, onConfirmUploads, run, selectedFolderRels])
+    void linking.run(activeFolder)
+  }, [activeFolder, activeTab, linking, onConfirmUploads, selectedFolderRels])
 
-  return { isAddingFolderFiles, handleConfirm }
+  return { isAddingFolderFiles: linking.isRunning, handleConfirm }
 }

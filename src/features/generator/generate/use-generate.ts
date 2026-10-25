@@ -86,7 +86,7 @@ export function useGenerate() {
   const [error, setError] = useState<string | null>(null)
   const resultId = useRef<string | null>(null)
 
-  const submit = async (): Promise<void> => {
+  const generation = useAsyncAction(async () => {
     resultId.current = null
     requestNotifications()
     setError(null)
@@ -130,15 +130,13 @@ export function useGenerate() {
         provider: VIDEO_PROVIDER_IDS[0],
       })
     }
-  }
-
-  const { isRunning: isGenerating, run } = useAsyncAction(submit)
+  })
 
   const generate = useCallback(async (): Promise<string | null> => {
-    await run()
+    await generation.run()
 
     return resultId.current
-  }, [run])
+  }, [generation])
 
-  return { generate, isGenerating, error }
+  return { generate, isGenerating: generation.isRunning, error }
 }
