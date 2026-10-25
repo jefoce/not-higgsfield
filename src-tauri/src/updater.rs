@@ -117,6 +117,13 @@ pub(crate) async fn update_install(
         }
     };
 
+    let pending = pending_work(&app).await;
+    if pending.busy() && !confirm_quit(&app, &pending, "Update now?").await {
+        state.downloaded.lock().unwrap().replace((version, bytes));
+
+        return Ok(InstallOutcome { cancelled: true });
+    }
+
     send_progress(
         &channel,
         UpdateProgress {
@@ -125,13 +132,6 @@ pub(crate) async fn update_install(
             phase: UpdatePhase::Installing,
         },
     )?;
-
-    let pending = pending_work(&app).await;
-    if pending.busy() && !confirm_quit(&app, &pending, "Update now?").await {
-        state.downloaded.lock().unwrap().replace((version, bytes));
-
-        return Ok(InstallOutcome { cancelled: true });
-    }
 
     stop_server(&app, pending.is_sending()).await;
 
