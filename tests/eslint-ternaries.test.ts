@@ -2,7 +2,7 @@ import { Linter, RuleTester } from 'eslint'
 import tseslint from 'typescript-eslint'
 import { describe, it } from 'vitest'
 
-import { TERNARY_SELECTORS } from '../eslint.config.mjs'
+import { TERNARY_SELECTORS } from '../eslint-rules/selectors.mjs'
 
 RuleTester.describe = describe
 RuleTester.it = it
