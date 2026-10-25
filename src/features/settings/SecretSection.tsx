@@ -63,7 +63,7 @@ export function SecretSection(props: SecretSectionProps) {
           })}
         </div>
       </div>
-      {!isNil(description) && <p className="text-xxs text-fg-3 -mt-2.5">{description}</p>}
+      {!isNil(description) && <p className="-mt-2.5 text-xxs text-fg-3">{description}</p>}
       <SecretFields
         fields={descriptor.fields}
         keys={keys}
