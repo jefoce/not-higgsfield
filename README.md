@@ -62,8 +62,15 @@ No administrator rights needed. The app appears in the Start menu.
 
 ### Linux
 
-- **AppImage:** `chmod +x not-higgsfield-*-linux-x64.AppImage`, then run it. On Ubuntu 22.04+ you may need `sudo apt install libfuse2` once (`libfuse2t64` on 24.04).
-- **Debian or Ubuntu:** `sudo apt install ./not-higgsfield-*-linux-x64.deb`. This also installs the video playback libraries.
+- **AppImage:** `chmod +x not-higgsfield-*-linux-x64.AppImage`, then run it.
+  If it fails with a FUSE or `libfuse.so.2` error, install FUSE 2 once:
+  - Ubuntu 22.04 or Debian 12: `sudo apt install libfuse2`
+  - Ubuntu 24.04 or newer: `sudo apt install libfuse2t64`
+
+  Install exactly that package, not `fuse`, which replaces `fuse3` and can remove system packages.
+  No FUSE at all: `./not-higgsfield-*-linux-x64.AppImage --appimage-extract-and-run`.
+
+- **Debian or Ubuntu:** `sudo apt install ./not-higgsfield-*-linux-x64.deb`. This is the simplest option on Ubuntu, and it also installs the video playback libraries.
 - **Fedora or openSUSE:** `sudo dnf install ./not-higgsfield-*-linux-x64.rpm`.
 
 Each release has a `SHA256SUMS.txt` if you want to check your download.
