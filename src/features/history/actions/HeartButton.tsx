@@ -35,7 +35,7 @@ export function HeartButton(props: HeartButtonProps) {
       className={cn(
         ROUND_BUTTON_CLASSES,
         record.favorite &&
-          'bg-linear-[180deg] from-favorite/[0.22] to-favorite/[0.08] text-favorite',
+          'bg-linear-[180deg] from-favorite/[0.22] to-favorite/[0.08] text-favorite linux:bg-black/60',
         !record.favorite && 'bg-black/50 text-white hover:bg-black/70',
         className,
       )}
