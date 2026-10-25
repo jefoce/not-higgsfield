@@ -3,12 +3,14 @@
 import { isNil } from 'lodash-es'
 import { useShallow } from 'zustand/react/shallow'
 
+import { formatAgo } from '@/lib/format'
 import type { AppUpdate, UpdateProgress } from '@/lib/platform/update-schemas'
 import { useNow } from '@/lib/use-now'
 import { Button } from '@/ui/Button'
 import { Switch } from '@/ui/form/Switch'
 
 import { AppNotes } from './AppNotes'
+import { AppSectionHeader } from './AppSectionHeader'
 import { progressText } from './progress-text'
 import { type UpdateStatus, useUpdateStore } from './update-store'
 import { useAppUpdateActions } from './use-app-update-actions'
@@ -24,24 +26,6 @@ interface StatusTextParams {
   now: number
 }
 
-function relativeTime(from: string, now: number): string {
-  const seconds = Math.max(0, Math.round((now - Date.parse(from)) / 1000))
-
-  if (seconds < 60) {
-    return 'just now'
-  }
-
-  if (seconds < 3600) {
-    return `${Math.floor(seconds / 60)} min ago`
-  }
-
-  if (seconds < 86400) {
-    return `${Math.floor(seconds / 3600)} h ago`
-  }
-
-  return `${Math.floor(seconds / 86400)} d ago`
-}
-
 function availableText(update: AppUpdate | null): string {
   if (isNil(update)) {
     return 'An update is available'
@@ -55,7 +39,7 @@ function upToDateText(lastCheck: string | null, now: number): string {
     return 'Up to date'
   }
 
-  return `Up to date. Checked ${relativeTime(lastCheck, now)}`
+  return `Up to date. Checked ${formatAgo(lastCheck, now)}`
 }
 
 function notesText(update: AppUpdate | null): string {
@@ -127,8 +111,7 @@ export function AppSection() {
   if (installKind === 'browser') {
     return (
       <section className="space-y-1">
-        <h3 className="text-xs font-semibold tracking-wide text-fg-2 uppercase">App</h3>
-        <p className="text-xxs text-fg-2">Not Higgsfield {version}</p>
+        <AppSectionHeader version={version} />
       </section>
     )
   }
@@ -141,10 +124,7 @@ export function AppSection() {
 
   return (
     <section className="space-y-3">
-      <div className="space-y-1">
-        <h3 className="text-xs font-semibold tracking-wide text-fg-2 uppercase">App</h3>
-        <p className="text-xxs text-fg-2">Not Higgsfield {version}</p>
-      </div>
+      <AppSectionHeader version={version} />
 
       <AppNotes
         statusText={statusText}

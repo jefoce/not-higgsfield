@@ -1,3 +1,5 @@
+import { noop } from 'lodash-es'
+
 import { DOWNLOAD_STAGGER_MS } from '@/core/constants'
 import type { FolderItem } from '@/core/schemas/folder-item'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
@@ -35,8 +37,6 @@ function wait(ms: number): Promise<void> {
     setTimeout(resolve, ms)
   })
 }
-
-const noop = (): void => {}
 
 async function noFileDrop(): Promise<() => void> {
   return noop

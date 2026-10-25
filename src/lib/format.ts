@@ -78,6 +78,25 @@ export function formatBytes(bytes: number): string {
   return `${rounded} ${BYTE_UNITS[unit]}`
 }
 
+/** Short relative age, e.g. "just now", "5 min ago", "2 h ago", "3 d ago". */
+export function formatAgo(iso: string, now: number): string {
+  const seconds = Math.max(0, Math.round((now - Date.parse(iso)) / 1000))
+
+  if (seconds < 60) {
+    return 'just now'
+  }
+
+  if (seconds < 3600) {
+    return `${Math.floor(seconds / 60)} min ago`
+  }
+
+  if (seconds < 86400) {
+    return `${Math.floor(seconds / 3600)} h ago`
+  }
+
+  return `${Math.floor(seconds / 86400)} d ago`
+}
+
 /** Cuts text to `max` characters including a trailing "...". */
 export function truncate(text: string, max: number): string {
   if (text.length <= max) {
