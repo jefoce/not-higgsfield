@@ -1,5 +1,5 @@
 import { videoTokenPricing } from '../helpers'
-import type { ModelPreset, Resolution } from '../types'
+import type { ModelPreset } from '../types'
 import { SEEDANCE_FAMILY, SEEDANCE_UNKNOWN_LIMITS, seedanceImageLimits } from './family'
 
 const SIZES = {
@@ -38,22 +38,14 @@ const SIZES = {
   },
 } as const
 
-const RESOLUTION_TIER: Partial<Record<Resolution, string>> = { '1080p': '_1080p', '4K': '_4k' }
-
 const PRICING = videoTokenPricing({
-  key: ({ resolution, audio: hasAudio, hasVideoInput: hasVideo }) => {
-    const tier = RESOLUTION_TIER[resolution] ?? ''
-
-    if (hasVideo) {
-      return `video_tokens${tier}_with_video_input`
-    }
-
-    if (tier !== '') {
-      return `video_tokens${tier}`
-    }
-
-    return hasAudio ? 'video_tokens' : 'video_tokens_without_audio'
-  },
+  skuRules: [
+    { when: { hasVideoInput: true }, key: 'video_tokens{tier}_with_video_input' },
+    { when: { hasTier: true }, key: 'video_tokens{tier}' },
+    { when: { audio: true }, key: 'video_tokens' },
+    { when: {}, key: 'video_tokens_without_audio' },
+  ],
+  tiers: { '1080p': '_1080p', '4K': '_4k' },
   fallback: {
     video_tokens: 0.000007,
     video_tokens_without_audio: 0.000007,

@@ -21,4 +21,4 @@ export const getPreset = (id: string): ModelPreset => findPreset(id) ?? MODEL_PR
 
 /** Shortest duration to submit: the provider minimum raised to the billing floor. */
 export const minDuration = (preset: ModelPreset): number =>
-  Math.max(preset.duration.min, preset.minBillableSec ?? preset.duration.min)
+  Math.max(preset.duration.min, preset.pricing.minBillableSec)

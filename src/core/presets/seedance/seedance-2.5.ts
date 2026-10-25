@@ -22,13 +22,11 @@ const SIZES = {
 } as const
 
 const PRICING = videoTokenPricing({
-  key: ({ audio: hasAudio, hasVideoInput: hasVideo }) => {
-    if (hasVideo) {
-      return 'video_tokens_with_video_input'
-    }
-
-    return hasAudio ? 'video_tokens' : 'video_tokens_without_audio'
-  },
+  skuRules: [
+    { when: { hasVideoInput: true }, key: 'video_tokens_with_video_input' },
+    { when: { audio: true }, key: 'video_tokens' },
+    { when: {}, key: 'video_tokens_without_audio' },
+  ],
   fallback: {
     video_tokens: 0.0000107,
     video_tokens_without_audio: 0.0000107,

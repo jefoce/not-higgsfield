@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_PRESET_ID, findPreset, getPreset, MODEL_PRESETS } from '@/core/presets'
 import { ASPECT_RATIOS, RESOLUTIONS } from '@/core/presets/types'
+import { skuKey } from '@/core/pricing'
 
 describe('MODEL_PRESETS', () => {
   it('ships Wan and Seedance presets in order', () => {
@@ -63,7 +64,7 @@ describe('MODEL_PRESETS', () => {
 
     expect(pricing.unit).toBe('usd')
 
-    expect(pricing.key({ resolution: '1080p', audio: true, hasVideoInput: false })).toBe(
+    expect(skuKey(pricing, { resolution: '1080p', audio: true, hasVideoInput: false })).toBe(
       'duration_seconds_1080p',
     )
 
@@ -140,23 +141,23 @@ describe('preset pricing', () => {
 
     expect(pricing.fps).toBe(24)
 
-    expect(pricing.key({ resolution: '720p', audio: true, hasVideoInput: false })).toBe(
+    expect(skuKey(pricing, { resolution: '720p', audio: true, hasVideoInput: false })).toBe(
       'video_tokens',
     )
 
-    expect(pricing.key({ resolution: '1080p', audio: true, hasVideoInput: false })).toBe(
+    expect(skuKey(pricing, { resolution: '1080p', audio: true, hasVideoInput: false })).toBe(
       'video_tokens_1080p',
     )
 
-    expect(pricing.key({ resolution: '4K', audio: true, hasVideoInput: false })).toBe(
+    expect(skuKey(pricing, { resolution: '4K', audio: true, hasVideoInput: false })).toBe(
       'video_tokens_4k',
     )
 
-    expect(pricing.key({ resolution: '720p', audio: true, hasVideoInput: true })).toBe(
+    expect(skuKey(pricing, { resolution: '720p', audio: true, hasVideoInput: true })).toBe(
       'video_tokens_with_video_input',
     )
 
-    expect(pricing.key({ resolution: '1080p', audio: true, hasVideoInput: true })).toBe(
+    expect(skuKey(pricing, { resolution: '1080p', audio: true, hasVideoInput: true })).toBe(
       'video_tokens_1080p_with_video_input',
     )
 

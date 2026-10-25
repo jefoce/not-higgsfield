@@ -4,24 +4,17 @@ import { MEDIA_KINDS } from '@/core/media-kinds'
 import { aspectAllowed } from '@/core/output-size'
 import { minDuration, MODEL_PRESETS } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
+import { skuKey } from '@/core/pricing'
 
-/** Every key pricing.key can produce for the preset's allowed inputs. */
+/** Every key the preset can produce for its allowed inputs. */
 function pricingKeys(preset: ModelPreset): string[] {
-  return preset.resolutions.flatMap((resolution) => {
-    const { pricing } = preset
-
-    if (pricing.kind === 'perSecond') {
-      return [
-        pricing.key({ resolution, audio: true, hasVideoInput: false }),
-        pricing.key({ resolution, audio: false, hasVideoInput: false }),
-      ]
-    }
-
-    return [true, false].flatMap((isAudio) => [
-      pricing.key({ resolution, audio: isAudio, hasVideoInput: true }),
-      pricing.key({ resolution, audio: isAudio, hasVideoInput: false }),
-    ])
-  })
+  return preset.resolutions.flatMap((resolution) =>
+    [true, false].flatMap((isAudio) =>
+      [true, false].map((hasVideoInput) =>
+        skuKey(preset.pricing, { resolution, audio: isAudio, hasVideoInput }),
+      ),
+    ),
+  )
 }
 
 /** Per-family expectations the contract pins. */
@@ -100,13 +93,12 @@ describe('preset contract', () => {
     }
   })
 
-  it('sets family, icon and error table', () => {
+  it('sets family and icon', () => {
     for (const preset of MODEL_PRESETS) {
       const contract = FAMILY_CONTRACT[preset.family]
 
       expect(preset.id.startsWith(contract.idPrefix), preset.id).toBe(true)
       expect(preset.icon, preset.id).toBe(contract.icon)
-      expect(Array.isArray(preset.errors), preset.id).toBe(true)
     }
   })
 

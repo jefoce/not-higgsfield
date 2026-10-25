@@ -1,13 +1,49 @@
 import { isNil } from 'lodash-es'
 
 import { outputSize } from './output-size'
-import type { AspectChoice, ModelPreset, Resolution } from './presets/types'
+import type {
+  AspectChoice,
+  ModelPreset,
+  PresetPricing,
+  Resolution,
+  SkuCondition,
+  SkuContext,
+} from './presets/types'
 
 export interface PriceContext {
   resolution: Resolution
   aspect: AspectChoice
   audio: boolean
   hasVideoInput: boolean
+}
+
+/** First matching rule wins. An unmatched context returns an empty key. */
+export function skuKey(pricing: PresetPricing, ctx: SkuContext): string {
+  const tier = pricing.tiers[ctx.resolution] ?? ''
+
+  const isMatch = (condition: SkuCondition): boolean => {
+    if (!isNil(condition.hasVideoInput) && condition.hasVideoInput !== ctx.hasVideoInput) {
+      return false
+    }
+
+    if (!isNil(condition.audio) && condition.audio !== ctx.audio) {
+      return false
+    }
+
+    if (!isNil(condition.hasTier) && condition.hasTier !== (tier !== '')) {
+      return false
+    }
+
+    return true
+  }
+
+  const rule = pricing.skuRules.find((item) => isMatch(item.when))
+
+  if (isNil(rule)) {
+    return ''
+  }
+
+  return rule.key.replaceAll('{resolution}', ctx.resolution).replaceAll('{tier}', tier)
 }
 
 interface PricePerSecParams {
@@ -20,14 +56,13 @@ const rawRate = (params: PricePerSecParams): number | null => {
   const { preset, ctx, skus } = params
   const table = skus ?? preset.pricing.fallback
 
-  const raw =
-    table[
-      preset.pricing.key({
-        resolution: ctx.resolution,
-        audio: ctx.audio && preset.audio.supported,
-        hasVideoInput: ctx.hasVideoInput,
-      })
-    ]
+  const key = skuKey(preset.pricing, {
+    resolution: ctx.resolution,
+    audio: ctx.audio && preset.audio.supported,
+    hasVideoInput: ctx.hasVideoInput,
+  })
+
+  const raw = table[key]
 
   if (isNil(raw) || !Number.isFinite(raw)) {
     return null
@@ -61,7 +96,7 @@ export function pricePerSec(params: PricePerSecParams): number | null {
 
 /** Seconds the provider bills, honoring the preset floor. */
 export function billableSeconds(preset: ModelPreset, duration: number): number {
-  return Math.max(preset.minBillableSec ?? 0, duration)
+  return Math.max(preset.pricing.minBillableSec, duration)
 }
 
 function estimateUsd(rate: number, duration: number): number {

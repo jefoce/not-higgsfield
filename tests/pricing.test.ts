@@ -44,8 +44,10 @@ describe('pricePerSec Wan', () => {
     const pricing: PresetPricing = {
       kind: 'perSecond',
       unit: 'cents',
-      key: () => 'per_sec',
+      skuRules: [{ when: {}, key: 'per_sec' }],
+      tiers: {},
       fallback: { per_sec: 30 },
+      minBillableSec: 0,
       referenceVideoFactor: 0,
     }
 
@@ -58,8 +60,13 @@ describe('pricePerSec Wan', () => {
     const pricing: PresetPricing = {
       kind: 'perSecond',
       unit: 'usd',
-      key: ({ audio: isAudio }) => (isAudio ? 'with_audio' : 'without_audio'),
+      skuRules: [
+        { when: { audio: true }, key: 'with_audio' },
+        { when: {}, key: 'without_audio' },
+      ],
+      tiers: {},
       fallback: { with_audio: 0.3, without_audio: 0.2 },
+      minBillableSec: 0,
       referenceVideoFactor: 0,
     }
 
@@ -84,8 +91,10 @@ describe('pricePerSec Wan', () => {
     const pricing: PresetPricing = {
       kind: 'perSecond',
       unit: 'usd',
-      key: () => 'x',
+      skuRules: [{ when: {}, key: 'x' }],
+      tiers: {},
       fallback: { x: Number.NaN },
+      minBillableSec: 0,
       referenceVideoFactor: 0,
     }
 
@@ -140,8 +149,10 @@ describe('estimatePrice', () => {
     const pricing: PresetPricing = {
       kind: 'perSecond',
       unit: 'usd',
-      key: () => 'per_sec',
+      skuRules: [{ when: {}, key: 'per_sec' }],
+      tiers: {},
       fallback: { per_sec: 0.2 },
+      minBillableSec: 0,
       referenceVideoFactor: 0,
     }
 

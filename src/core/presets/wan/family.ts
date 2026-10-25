@@ -35,12 +35,10 @@ const LIMITS = {
 const WAN_FAMILY = {
   family: 'wan',
   icon: 'sparkles',
-  errors: [],
   // Any integer 2-30. With a video input, input plus output must stay within 30 s.
   // Source: https://www.alibabacloud.com/help/en/model-studio/wan3-video-generation-api-reference
   // OpenRouter supported_durations lists every integer in the range. Options are quick picks.
   duration: { min: 2, max: 30, default: 5, options: [5, 10, 15, 20, 30] },
-  minBillableSec: 5,
   aspectRatios: ['16:9', '4:3', '1:1', '3:4', '9:16'],
   defaultAspectRatio: '16:9',
   autoAspectWithFrames: true,

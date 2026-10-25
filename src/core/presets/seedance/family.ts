@@ -4,7 +4,6 @@ import type { ModelPreset, ReferenceLimits } from '../types'
 export const SEEDANCE_FAMILY = {
   family: 'seedance',
   icon: 'audio-lines',
-  errors: [],
   autoAspectWithFrames: true,
   promptOptional: false,
   audio: { supported: true, default: true },

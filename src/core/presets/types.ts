@@ -39,40 +39,52 @@ export interface ReferenceLimits {
   alpha?: boolean
 }
 
-export interface PricingKeyParams {
+export type SkuTable = Readonly<Record<string, number>>
+export type ResolutionTiers = Readonly<Partial<Record<Resolution, string>>>
+
+export interface SkuContext {
   resolution: Resolution
   audio: boolean
   hasVideoInput: boolean
 }
 
-export type PresetPricing =
-  | {
-      kind: 'perSecond'
-      unit: 'usd' | 'cents'
-      key: (params: PricingKeyParams) => string
-      fallback: Record<string, number>
-
-      /** Billed reference-video seconds per input second. */
-      referenceVideoFactor: number
-    }
-  | {
-      kind: 'videoTokens'
-      fps: number
-      key: (params: PricingKeyParams) => string
-      fallback: Record<string, number>
-
-      /** Billed reference-video seconds per input second. */
-      referenceVideoFactor: number
-    }
-
-/** Provider error mapping, filled per family when error handling lands. */
-interface ErrorRule {
-  match: string | RegExp
-  title: string
-  hint: string
-  kind: string
-  retry?: boolean
+export interface SkuCondition {
+  hasVideoInput?: boolean
+  audio?: boolean
+  hasTier?: boolean
 }
+
+/** First rule whose every set condition matches wins. `{resolution}` and `{tier}` are replaced. */
+export interface SkuRule {
+  when: SkuCondition
+  key: string
+}
+
+export interface PerSecondPricing {
+  kind: 'perSecond'
+  unit: 'usd' | 'cents'
+  skuRules: readonly SkuRule[]
+  tiers: ResolutionTiers
+  fallback: SkuTable
+  minBillableSec: number
+
+  /** Billed reference-video seconds per input second. */
+  referenceVideoFactor: number
+}
+
+export interface VideoTokenPricing {
+  kind: 'videoTokens'
+  fps: number
+  skuRules: readonly SkuRule[]
+  tiers: ResolutionTiers
+  fallback: SkuTable
+  minBillableSec: number
+
+  /** Billed reference-video seconds per input second. */
+  referenceVideoFactor: number
+}
+
+export type PresetPricing = PerSecondPricing | VideoTokenPricing
 
 export interface ModelPreset {
   id: string
@@ -82,11 +94,8 @@ export interface ModelPreset {
 
   /** Key the picker maps to a lucide icon. */
   icon: PresetIcon
-  errors: readonly ErrorRule[]
   duration: { min: number; max: number; default: number; options?: readonly number[] }
 
-  /** Provider-billed floor in seconds, independent of the requested duration. */
-  minBillableSec?: number
   aspectRatios: readonly AspectRatio[]
   defaultAspectRatio: AspectRatio
   autoAspectWithFrames: boolean
