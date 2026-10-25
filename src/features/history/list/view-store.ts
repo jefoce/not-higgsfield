@@ -1,16 +1,43 @@
 'use client'
 
 import { clamp, isNil } from 'lodash-es'
+import { z } from 'zod'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 import { ZOOM_DEFAULT, ZOOM_STEPS } from '@/core/constants'
 import { DEFAULT_FILTERS, FILTER_PARAMS } from '@/core/history-filters'
-import type { HistoryFilters, HistoryMode } from '@/core/types'
+import { ASPECT_RATIOS, RESOLUTIONS } from '@/core/presets/types'
+import { GENERATOR_TABS } from '@/core/schemas/generation-record'
+import {
+  AUDIO_FILTERS,
+  HISTORY_MODES,
+  type HistoryFilters,
+  type HistoryMode,
+  STATUS_FILTERS,
+} from '@/core/types'
 
 export const HISTORY_VIEWS = ['list', 'grid'] as const
 
 export type HistoryView = (typeof HISTORY_VIEWS)[number]
+
+const PersistedFiltersSchema = z.object({
+  q: z.string().optional(),
+  model: z.string().optional(),
+  favorite: z.boolean().optional(),
+  status: z.enum(STATUS_FILTERS).optional(),
+  tab: z.enum([...GENERATOR_TABS, 'all']).optional(),
+  mode: z.enum(HISTORY_MODES).optional(),
+  resolution: z.enum([...RESOLUTIONS, 'all']).optional(),
+  aspect: z.enum([...ASPECT_RATIOS, 'all']).optional(),
+  audio: z.enum(AUDIO_FILTERS).optional(),
+})
+
+const PersistedViewSchema = z.object({
+  view: z.enum(HISTORY_VIEWS),
+  zoom: z.number(),
+  filters: PersistedFiltersSchema.optional(),
+})
 
 interface ViewFilters extends HistoryFilters {
   mode?: HistoryMode
@@ -110,6 +137,19 @@ export const useHistoryViewStore = create<ViewState>()(
       version: 1,
       partialize: (state) => {
         return { view: state.view, zoom: state.zoom, filters: state.filters }
+      },
+      merge: (persisted, current) => {
+        const parsed = PersistedViewSchema.safeParse(persisted)
+
+        if (!parsed.success) {
+          return current
+        }
+
+        return {
+          ...current,
+          ...parsed.data,
+          filters: { ...current.filters, ...parsed.data.filters },
+        }
       },
     },
   ),

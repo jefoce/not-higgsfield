@@ -152,7 +152,7 @@ Search here before writing a helper. One of these covers the case. Extract a new
 - Props type is `interface <Component>Props`. Export it only when another file uses it.
 - zustand: always subscribe with a selector, `useStore((state) => state.x)`. Never `useStore()` for the whole store.
 - Server data goes through SWR with keys from `src/lib/swr-keys.ts`. No `fetch` inside `useEffect` for data SWR can own.
-- Browser storage only through `src/lib/local-store.ts` (try/catch plus zod). Never `localStorage` directly.
+- Browser storage only through `src/lib/local-store.ts` (try/catch plus zod). Never `localStorage` directly. zustand `persist` is the one allowed exception, and only with a zod `merge` that keeps the current state on parse failure.
 - Toasts (`sonner`) only in `src/features` and `src/lib/notify.ts`. `src/core` and `src/server` never show UI.
 - Icon-only buttons have `aria-label`. Decorative lucide icons have `aria-hidden`.
 - Card and row click handlers start with `isOwnEvent(event)`. Portal content (menus, popovers, dialogs) bubbles through React.
