@@ -125,6 +125,7 @@ async function copyUnique(params: CopyUniqueParams): Promise<string> {
 | `features/preview`      | `player`                                |
 | `features/settings`     | nothing in `features`                   |
 | `features/player`       | nothing in `features`                   |
+| `features/updates`      | nothing in `features`                   |
 | `features`, `ui`        | `lib`, `core`, `ui`                     |
 | `lib`                   | `core`                                  |
 | `core`                  | packages only                           |

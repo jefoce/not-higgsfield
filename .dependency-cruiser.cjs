@@ -83,6 +83,12 @@ module.exports = {
       to: { path: '^src/features/(?!settings/)' },
     },
     {
+      name: 'updates-is-leaf',
+      severity: 'error',
+      from: { path: '^src/features/updates/' },
+      to: { path: '^src/features/(?!updates/)' },
+    },
+    {
       name: 'preview-uses-player-only',
       severity: 'error',
       from: { path: '^src/features/preview/' },
