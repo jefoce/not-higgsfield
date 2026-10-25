@@ -5,6 +5,7 @@ import { isNil } from 'lodash-es'
 import useSWR from 'swr'
 import { z } from 'zod'
 
+import { STORAGE_PROVIDER_IDS } from '@/core/providers/types'
 import type { SecretStatus, TestResult } from '@/core/types'
 import { fetchSecrets } from '@/lib/api/settings'
 import { readLocal, writeLocal } from '@/lib/local-store'
@@ -56,7 +57,7 @@ export function testLine(target: SettingsSection, result: TestResult): TestMessa
     return { tone: 'error', text: result.error ?? 'Test failed' }
   }
 
-  if (target === 'r2') {
+  if ((STORAGE_PROVIDER_IDS as readonly string[]).includes(target)) {
     return {
       tone: 'ok',
       text: result.mock === true ? 'Upload, read, delete OK (mock)' : 'Upload, read, delete OK',

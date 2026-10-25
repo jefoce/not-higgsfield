@@ -6,10 +6,12 @@ import { toast } from 'sonner'
 import { retrySecrets, testSecretTarget } from '@/lib/api/settings'
 import { errorMessage } from '@/lib/errors'
 
-import type { SettingsSection } from './settings-store'
+import { SETTINGS_SECTION_IDS, type SettingsSection } from './settings-store'
 import { testLine, type TestMessage } from './use-secrets'
 
-const EMPTY_RESULTS: Record<SettingsSection, TestMessage | null> = { openrouter: null, r2: null }
+const EMPTY_RESULTS = Object.fromEntries(
+  SETTINGS_SECTION_IDS.map((section) => [section, null]),
+) as Record<SettingsSection, TestMessage | null>
 
 interface UseSecretActionsParams {
   isDirty: boolean

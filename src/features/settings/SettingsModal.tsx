@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { createRef, type RefObject, useCallback, useEffect, useMemo } from 'react'
 import { X } from 'lucide-react'
 import useSWR from 'swr'
 
@@ -10,10 +10,16 @@ import { CREDITS_KEY } from '@/lib/swr-keys'
 import { Button } from '@/ui/Button'
 import { Modal } from '@/ui/Modal'
 
-import { useSettingsStore } from './settings-store'
+import { SETTINGS_SECTION_IDS, type SettingsSection, useSettingsStore } from './settings-store'
 import { SettingsBody } from './SettingsBody'
 import { backendNote, useSecrets, useSettingsPrompt } from './use-secrets'
 import { useSettingsDraft } from './use-settings-draft'
+
+function createSectionRefs(): Record<SettingsSection, RefObject<HTMLElement | null>> {
+  return Object.fromEntries(
+    SETTINGS_SECTION_IDS.map((id) => [id, createRef<HTMLElement>()]),
+  ) as Record<SettingsSection, RefObject<HTMLElement | null>>
+}
 
 /** Stored key editor: status, save, remove and test. */
 export function SettingsModal() {
@@ -31,8 +37,9 @@ export function SettingsModal() {
   useSettingsPrompt(status, isMock)
 
   const draft = useSettingsDraft({ status, mock: isMock, closeSettings })
-  const openrouterRef = useRef<HTMLElement>(null)
-  const r2Ref = useRef<HTMLElement>(null)
+
+  const sectionRefs = useMemo(() => createSectionRefs(), [])
+
   const note = backendNote(status?.backend)
   const handleOpenChange = draft.onClose
 
@@ -45,10 +52,10 @@ export function SettingsModal() {
       return
     }
 
-    const target = section === 'r2' ? r2Ref.current : openrouterRef.current
+    const target = sectionRefs[section]
 
-    target?.scrollIntoView({ block: 'nearest' })
-  }, [isOpen, section, status])
+    target.current?.scrollIntoView({ block: 'nearest' })
+  }, [isOpen, section, sectionRefs, status])
 
   return (
     <Modal
@@ -70,7 +77,7 @@ export function SettingsModal() {
       </header>
 
       <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-5 py-3">
-        <SettingsBody status={status} draft={draft} openrouterRef={openrouterRef} r2Ref={r2Ref} />
+        <SettingsBody status={status} draft={draft} sectionRefs={sectionRefs} />
       </div>
 
       <footer className="flex items-center justify-between gap-3 border-t border-line px-5 py-3">

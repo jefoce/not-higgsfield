@@ -2,14 +2,15 @@
 
 import { isNull } from 'lodash-es'
 
+import type { ProviderSecretField } from '@/core/providers/types'
 import type { SecretName } from '@/core/secret-names'
 import type { SecretKeyStatus } from '@/core/types'
 
-import type { SecretChange, SecretFieldDef } from './secret-fields'
 import { SecretField } from './SecretField'
+import type { SecretChange } from './use-settings-draft'
 
 interface SecretFieldsProps {
-  fields: SecretFieldDef[]
+  fields: readonly ProviderSecretField[]
   keys: Record<SecretName, SecretKeyStatus>
   values: Partial<Record<SecretName, string | null>>
   onChange: (name: SecretName, change: SecretChange) => void

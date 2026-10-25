@@ -1,21 +1,26 @@
 'use client'
 
-import type { ReactNode, RefObject } from 'react'
+import { type ReactNode, type RefObject, useCallback } from 'react'
+import { isNil } from 'lodash-es'
 
+import type { StorageProviderDescriptor, VideoProviderDescriptor } from '@/core/providers/types'
 import type { SecretName } from '@/core/secret-names'
 import type { SecretKeyStatus } from '@/core/types'
+import { platform } from '@/lib/platform'
 import { Button } from '@/ui/Button'
 
-import type { SecretChange, SecretFieldDef } from './secret-fields'
 import { SecretFields } from './SecretFields'
+import type { SettingsSection } from './settings-store'
 import { TestMessageLine } from './TestMessageLine'
 import type { TestMessage } from './use-secrets'
+import type { SecretChange } from './use-settings-draft'
+
+const LINK_CLASSES = 'text-xxs text-fg-2 hover:text-fg hover:underline'
 
 interface SecretSectionProps {
   sectionRef: RefObject<HTMLElement | null>
-  title: string
+  descriptor: VideoProviderDescriptor | StorageProviderDescriptor
   description?: ReactNode
-  fields: SecretFieldDef[]
   keys: Record<SecretName, SecretKeyStatus>
   values: Partial<Record<SecretName, string | null>>
   onChange: (name: SecretName, change: SecretChange) => void
@@ -23,16 +28,15 @@ interface SecretSectionProps {
   testing: boolean
   result: TestMessage | null
   warning?: ReactNode
-  onTest: () => void
+  onTest: (target: SettingsSection) => void
 }
 
-/** One provider block: heading, key fields, Test button and result line. */
+/** One provider block: heading, links, key fields, Test button and result line. */
 export function SecretSection(props: SecretSectionProps) {
   const {
     sectionRef,
-    title,
+    descriptor,
     description,
-    fields,
     keys,
     values,
     onChange: handleChange,
@@ -40,16 +44,51 @@ export function SecretSection(props: SecretSectionProps) {
     testing: isTesting,
     result,
     warning,
-    onTest: handleTest,
+    onTest,
   } = props
+
+  const creditsUrl = descriptor.links.credits
+
+  const handleTest = useCallback(() => onTest(descriptor.id), [descriptor.id, onTest])
+
+  const keysUrl = descriptor.links.keys
+
+  const handleOpenKeys = useCallback(() => {
+    void platform.openExternal(keysUrl).catch(() => {})
+  }, [keysUrl])
+
+  const handleOpenCredits = useCallback(() => {
+    if (isNil(creditsUrl)) {
+      return
+    }
+
+    void platform.openExternal(creditsUrl).catch(() => {})
+  }, [creditsUrl])
 
   return (
     <section ref={sectionRef} className="space-y-3">
       <div className="flex items-baseline justify-between gap-2">
-        <h3 className="text-xs font-semibold tracking-wide text-fg-2 uppercase">{title}</h3>
-        {description}
+        <h3 className="text-xs font-semibold tracking-wide text-fg-2 uppercase">
+          {descriptor.label}
+        </h3>
+        <div className="flex items-baseline gap-3">
+          {description}
+          <button type="button" className={LINK_CLASSES} onClick={handleOpenKeys}>
+            Keys
+          </button>
+          {!isNil(creditsUrl) && (
+            <button type="button" className={LINK_CLASSES} onClick={handleOpenCredits}>
+              Credits
+            </button>
+          )}
+        </div>
       </div>
-      <SecretFields fields={fields} keys={keys} values={values} onChange={handleChange} />
+      <SecretFields
+        fields={descriptor.fields}
+        keys={keys}
+        values={values}
+        onChange={handleChange}
+      />
       {warning}
       <div className="flex items-center gap-3">
         <span title={isReady ? undefined : 'Save a key first'}>

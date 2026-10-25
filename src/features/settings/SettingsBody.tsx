@@ -3,42 +3,43 @@
 import { type RefObject, useCallback } from 'react'
 import { isEmpty } from 'lodash-es'
 
+import { STORAGE_PROVIDERS, VIDEO_PROVIDERS } from '@/core/providers/registry'
 import type { SecretStatus } from '@/core/types'
 import { Button } from '@/ui/Button'
 
-import { OPENROUTER_FIELDS, R2_FIELDS } from './secret-fields'
 import { SecretSection } from './SecretSection'
+import type { SettingsSection } from './settings-store'
 import type { SettingsDraft } from './use-settings-draft'
+
+const STORAGE_DESCRIPTION = (
+  <span className="text-right text-xxs text-fg-2">
+    optional, needed for video/audio refs on some models
+  </span>
+)
 
 interface SettingsBodyProps {
   status: SecretStatus | undefined
   draft: SettingsDraft
-  openrouterRef: RefObject<HTMLElement | null>
-  r2Ref: RefObject<HTMLElement | null>
+  sectionRefs: Record<SettingsSection, RefObject<HTMLElement | null>>
 }
 
 /** Loading, error and key sections inside the settings modal. */
 export function SettingsBody(props: SettingsBodyProps) {
-  const { status, draft, openrouterRef, r2Ref } = props
+  const { status, draft, sectionRefs } = props
 
   const {
     edits,
     results,
     testing,
     retrying: isRetrying,
-    r2Valid: isR2Valid,
-    openrouterReady: isOpenrouterReady,
-    r2Ready: isR2Ready,
+    ready,
+    valid,
     onFieldChange: handleFieldChange,
-    onTest,
+    onTest: handleTest,
     onRetry,
   } = draft
 
   const handleRetry = useCallback(() => void onRetry(), [onRetry])
-
-  const handleTestOpenRouter = useCallback(() => void onTest('openrouter'), [onTest])
-
-  const handleTestR2 = useCallback(() => void onTest('r2'), [onTest])
 
   const loadError = status?.loadError
 
@@ -63,37 +64,43 @@ export function SettingsBody(props: SettingsBodyProps) {
 
   return (
     <>
-      <SecretSection
-        sectionRef={openrouterRef}
-        title="OpenRouter"
-        fields={OPENROUTER_FIELDS}
-        keys={status.keys}
-        values={edits}
-        onChange={handleFieldChange}
-        ready={isOpenrouterReady}
-        testing={testing === 'openrouter'}
-        result={results.openrouter}
-        onTest={handleTestOpenRouter}
-      />
+      {VIDEO_PROVIDERS.map((descriptor) => (
+        <SecretSection
+          key={descriptor.id}
+          sectionRef={sectionRefs[descriptor.id]}
+          descriptor={descriptor}
+          keys={status.keys}
+          values={edits}
+          onChange={handleFieldChange}
+          ready={ready[descriptor.id]}
+          testing={testing === descriptor.id}
+          result={results[descriptor.id]}
+          onTest={handleTest}
+        />
+      ))}
 
-      <SecretSection
-        sectionRef={r2Ref}
-        title="Cloudflare R2"
-        description={
-          <span className="text-right text-xxs text-fg-2">
-            optional, needed for video/audio refs on some models
-          </span>
-        }
-        fields={R2_FIELDS}
-        keys={status.keys}
-        values={edits}
-        onChange={handleFieldChange}
-        ready={isR2Ready}
-        testing={testing === 'r2'}
-        result={results.r2}
-        warning={!isR2Valid && <p className="text-xxs text-danger">R2 needs all four fields</p>}
-        onTest={handleTestR2}
-      />
+      {STORAGE_PROVIDERS.map((descriptor) => (
+        <SecretSection
+          key={descriptor.id}
+          sectionRef={sectionRefs[descriptor.id]}
+          descriptor={descriptor}
+          description={STORAGE_DESCRIPTION}
+          keys={status.keys}
+          values={edits}
+          onChange={handleFieldChange}
+          ready={ready[descriptor.id]}
+          testing={testing === descriptor.id}
+          result={results[descriptor.id]}
+          warning={
+            !valid[descriptor.id] && (
+              <p className="text-xxs text-danger">
+                {descriptor.id.toUpperCase()} needs all four fields
+              </p>
+            )
+          }
+          onTest={handleTest}
+        />
+      ))}
     </>
   )
 }

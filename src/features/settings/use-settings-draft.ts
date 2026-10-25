@@ -4,8 +4,10 @@ import { useState } from 'react'
 import { isEmpty, isNull, isUndefined } from 'lodash-es'
 import { toast } from 'sonner'
 
+import { STORAGE_PROVIDERS, VIDEO_PROVIDERS } from '@/core/providers/registry'
+import type { StorageProviderId } from '@/core/providers/types'
 import type { SecretName } from '@/core/secret-names'
-import { R2_NAMES, secretError } from '@/core/secret-names'
+import { secretError } from '@/core/secret-names'
 import type { SecretStatus } from '@/core/types'
 import { refreshCredits } from '@/lib/api/credits'
 import { refreshRemoteStatus } from '@/lib/api/remote'
@@ -13,10 +15,15 @@ import { saveSecrets } from '@/lib/api/settings'
 import { errorMessage } from '@/lib/errors'
 import { platform } from '@/lib/platform'
 
-import type { SecretChange } from './secret-fields'
+import type { SettingsSection } from './settings-store'
 import { useSecretActions } from './use-secret-actions'
 
 type Edits = Partial<Record<SecretName, string | null>>
+
+export interface SecretChange {
+  value?: string
+  remove?: boolean
+}
 
 interface UseSettingsDraftParams {
   status: SecretStatus | undefined
@@ -34,15 +41,20 @@ interface DraftFlagsParams {
 interface DraftFlags {
   isDirty: boolean
   canSave: boolean
-  isR2Valid: boolean
-  isOpenrouterReady: boolean
-  isR2Ready: boolean
+  sectionReady: Record<SettingsSection, boolean>
+  storageValid: Record<StorageProviderId, boolean>
 }
 
 interface ApplyChangeParams {
   current: Edits
   name: SecretName
   change: SecretChange
+}
+
+interface CountSetSecretsParams {
+  requiredSecrets: readonly SecretName[]
+  edits: Edits
+  status: SecretStatus | undefined
 }
 
 function applyChange(params: ApplyChangeParams): Edits {
@@ -60,6 +72,20 @@ function applyChange(params: ApplyChangeParams): Edits {
   return next
 }
 
+function countSetSecrets(params: CountSetSecretsParams): number {
+  const { requiredSecrets, edits, status } = params
+
+  return requiredSecrets.filter((name) => {
+    const edit = edits[name]
+
+    if (isNull(edit)) {
+      return false
+    }
+
+    return isUndefined(edit) ? status?.keys[name].set === true : true
+  }).length
+}
+
 function getDraftFlags(params: DraftFlagsParams): DraftFlags {
   const { edits, status, isMock, isSaving } = params
   const changed = Object.keys(edits) as SecretName[]
@@ -69,22 +95,30 @@ function getDraftFlags(params: DraftFlagsParams): DraftFlags {
     (name) => isNull(edits[name]) || isNull(secretError(name, edits[name] ?? '')),
   )
 
-  const r2Set = R2_NAMES.filter((name) => {
-    const edit = edits[name]
+  const sectionReady = Object.fromEntries(
+    [...VIDEO_PROVIDERS, ...STORAGE_PROVIDERS].map((descriptor) => [
+      descriptor.id,
+      isMock === true ||
+        descriptor.requiredSecrets.every((name) => status?.keys[name].set === true),
+    ]),
+  ) as Record<SettingsSection, boolean>
 
-    if (isNull(edit)) {
-      return false
-    }
+  const storageValid = Object.fromEntries(
+    STORAGE_PROVIDERS.map((descriptor) => {
+      const setCount = countSetSecrets({
+        requiredSecrets: descriptor.requiredSecrets,
+        edits,
+        status,
+      })
 
-    return isUndefined(edit) ? status?.keys[name].set === true : true
-  }).length
+      return [descriptor.id, setCount === 0 || setCount === descriptor.requiredSecrets.length]
+    }),
+  ) as Record<StorageProviderId, boolean>
 
-  const isR2Valid = r2Set === 0 || r2Set === R2_NAMES.length
-  const canSave = isEmpty(status?.loadError) && isDirty && isAllValid && isR2Valid && !isSaving
-  const isOpenrouterReady = isMock === true || Boolean(status?.keys.OPENROUTER_API_KEY.set)
-  const isR2Ready = isMock === true || R2_NAMES.every((name) => status?.keys[name].set === true)
+  const isStorageValid = Object.values(storageValid).every(Boolean)
+  const canSave = isEmpty(status?.loadError) && isDirty && isAllValid && isStorageValid && !isSaving
 
-  return { isDirty, canSave, isR2Valid, isOpenrouterReady, isR2Ready }
+  return { isDirty, canSave, sectionReady, storageValid }
 }
 
 /** Draft edits, test results and save/close actions for the settings modal. */
@@ -93,7 +127,7 @@ export function useSettingsDraft(params: UseSettingsDraftParams) {
   const [edits, setEdits] = useState<Edits>({})
   const [isSaving, setIsSaving] = useState(false)
 
-  const { isDirty, canSave, isR2Valid, isOpenrouterReady, isR2Ready } = getDraftFlags({
+  const { isDirty, canSave, sectionReady, storageValid } = getDraftFlags({
     edits,
     status,
     isMock,
@@ -149,9 +183,8 @@ export function useSettingsDraft(params: UseSettingsDraftParams) {
     saving: isSaving,
     retrying: isRetrying,
     canSave,
-    r2Valid: isR2Valid,
-    openrouterReady: isOpenrouterReady,
-    r2Ready: isR2Ready,
+    ready: sectionReady,
+    valid: storageValid,
     onFieldChange,
     onClose,
     onTest,

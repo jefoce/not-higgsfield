@@ -2,7 +2,16 @@
 
 import { create } from 'zustand'
 
-export type SettingsSection = 'openrouter' | 'r2'
+import {
+  STORAGE_PROVIDER_IDS,
+  type StorageProviderId,
+  VIDEO_PROVIDER_IDS,
+  type VideoProviderId,
+} from '@/core/providers/types'
+
+export const SETTINGS_SECTION_IDS = [...VIDEO_PROVIDER_IDS, ...STORAGE_PROVIDER_IDS] as const
+
+export type SettingsSection = VideoProviderId | StorageProviderId
 
 interface SettingsState {
   open: boolean

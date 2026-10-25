@@ -9,12 +9,12 @@ import type { SecretKeyStatus } from '@/core/types'
 import { Field } from '@/ui/form/Field'
 import { PasswordInput } from '@/ui/form/PasswordInput'
 
-import type { SecretChange } from './secret-fields'
+import type { SecretChange } from './use-settings-draft'
 
 interface SecretFieldProps {
   name: SecretName
   label: string
-  hint?: string
+  hint?: string | null
   status: SecretKeyStatus
   value: string
   remove: boolean
@@ -27,14 +27,6 @@ interface DescriptionParams {
   isStored: boolean
   value: string
   hint?: string | null
-}
-
-function softHintFor(name: SecretName, value: string): string | null {
-  if (name !== 'OPENROUTER_API_KEY' || value === '' || value.startsWith('sk-or-')) {
-    return null
-  }
-
-  return 'OpenRouter keys usually start with sk-or-'
 }
 
 function noteFor(params: DescriptionParams): string | null {
@@ -87,7 +79,6 @@ export function SecretField(props: SecretFieldProps) {
     schemaError = secretError(name, value)
   }
 
-  const softHint = softHintFor(name, value)
   const hasHint = !isEmpty(status.hint)
   const placeholder = status.set && hasHint ? `•••• ${status.hint}` : 'Not set'
 
@@ -110,36 +101,33 @@ export function SecretField(props: SecretFieldProps) {
   )
 
   return (
-    <>
-      <Field
-        id={name}
-        label={label}
-        hint={hint}
-        error={schemaError}
-        description={description}
-        trailing={
-          status.set &&
-          !isReadOnly && (
-            <button
-              type="button"
-              aria-pressed={isRemoved}
-              onClick={handleRemove}
-              className="h-9 shrink-0 rounded-lg border border-line px-2.5 text-xs text-fg-2 hover:bg-hover hover:text-fg aria-pressed:border-danger/40 aria-pressed:text-danger"
-            >
-              {isRemoved ? 'Undo' : 'Remove'}
-            </button>
-          )
-        }
-      >
-        <PasswordInput
-          name={name}
-          disabled={isReadOnly}
-          value={value}
-          placeholder={placeholder}
-          onChange={handleValueChange}
-        />
-      </Field>
-      {Boolean(softHint) && <p className="text-xxs text-fg-2">{softHint}</p>}
-    </>
+    <Field
+      id={name}
+      label={label}
+      hint={hint}
+      error={schemaError}
+      description={description}
+      trailing={
+        status.set &&
+        !isReadOnly && (
+          <button
+            type="button"
+            aria-pressed={isRemoved}
+            onClick={handleRemove}
+            className="h-9 shrink-0 rounded-lg border border-line px-2.5 text-xs text-fg-2 hover:bg-hover hover:text-fg aria-pressed:border-danger/40 aria-pressed:text-danger"
+          >
+            {isRemoved ? 'Undo' : 'Remove'}
+          </button>
+        )
+      }
+    >
+      <PasswordInput
+        name={name}
+        disabled={isReadOnly}
+        value={value}
+        placeholder={placeholder}
+        onChange={handleValueChange}
+      />
+    </Field>
   )
 }

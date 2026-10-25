@@ -9,7 +9,7 @@ export const OPENROUTER_DESCRIPTOR = {
       label: 'API key',
       placeholder: 'sk-or-v1-...',
       isSecret: true,
-      hint: null,
+      hint: 'Keys usually start with sk-or-',
     },
     {
       name: 'OPENROUTER_MANAGEMENT_KEY',
