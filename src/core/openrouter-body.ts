@@ -5,7 +5,7 @@ import type { ModelPreset } from './presets/types'
 import { renderPromptForApi } from './prompt-tokens'
 import type { GenerationInput } from './types'
 
-export interface ResolvedMedia {
+interface MediaPayload {
   id: string
   kind: MediaKind
   url: string
@@ -35,7 +35,7 @@ export interface OpenRouterVideoBody {
 }
 
 const framePart = (
-  media: ResolvedMedia,
+  media: MediaPayload,
   frameType: 'first_frame' | 'last_frame',
 ): OpenRouterFramePart => ({
   type: 'image_url',
@@ -43,7 +43,7 @@ const framePart = (
   frame_type: frameType,
 })
 
-const referencePart = (media: ResolvedMedia): OpenRouterReferencePart => {
+const referencePart = (media: MediaPayload): OpenRouterReferencePart => {
   if (media.kind === 'image') {
     return { type: 'image_url', image_url: { url: media.url } }
   }
@@ -58,7 +58,7 @@ const referencePart = (media: ResolvedMedia): OpenRouterReferencePart => {
 export interface BuildOpenRouterBodyParams {
   input: GenerationInput
   preset: ModelPreset
-  media: Record<string, ResolvedMedia>
+  media: Record<string, MediaPayload>
 }
 
 const audioFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVideoBody> => {

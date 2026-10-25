@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildOpenRouterBody, type ResolvedMedia } from '@/core/openrouter-body'
+import { buildOpenRouterBody } from '@/core/openrouter-body'
 import { getPreset } from '@/core/presets'
 import type { GenerationInput } from '@/core/types'
+import type { ResolvedMedia } from '@/server/providers/types'
 
 const preset = getPreset('wan-3.0')
 

@@ -3,5 +3,9 @@
   "entry": ["src/app/**/*.{ts,tsx}", "scripts/*.mjs", "tests/**/*.test.ts"],
   "project": ["src/**/*.{ts,tsx}", "src/**/*.css", "scripts/*.mjs", "tests/**/*.ts"],
   "ignoreBinaries": ["rustc"],
-  "ignoreDependencies": ["ffmpeg-static"]
+  "ignoreDependencies": ["ffmpeg-static"],
+  "ignoreIssues": {
+    "src/server/providers/registry.ts": ["files"],
+    "src/server/providers/types.ts": ["types"]
+  }
 }
