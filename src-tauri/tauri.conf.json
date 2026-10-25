@@ -18,7 +18,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "untrusted comment: minisign public key: 89CF3DDB4BA85203\nRWQDUqhL2z3PiUvLnFUu5vQcJYRaqMqz8a2wgLbBRISzgzLmkeX/sRvK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDg5Q0YzRERCNEJBODUyMDMKUldRRFVxaEwyejNQaVV2TG5GVXU1dlFjSllSYXFNcXo4YTJ3Z0xiQlJJU3pnekxta2VYL3NSdksK",
       "endpoints": [
         "https://github.com/jefoce/not-higgsfield/releases/latest/download/latest.json"
       ],
