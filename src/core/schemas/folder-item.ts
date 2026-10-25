@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 /** One connected folder stored in `data/folders.json`. */
-export const FolderItemSchema = z.object({
+const FolderItemSchema = z.object({
   id: z.string(),
   name: z.string(),
   path: z.string(),

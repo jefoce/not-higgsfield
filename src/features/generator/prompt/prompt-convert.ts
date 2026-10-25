@@ -86,7 +86,7 @@ export function serializeEditor(state: EditorState): string {
   return state.read(() => $getRoot().getChildren().map(serializeNode).join('\n'))
 }
 
-export interface MentionItem {
+interface MentionItem {
   value: string
   kind: MediaKind
   n: number

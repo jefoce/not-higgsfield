@@ -4,13 +4,13 @@ import type { RefSlot } from './prompt-tokens'
 import type { GenerationInput } from './schemas/generation-record'
 import type { UploadItem } from './schemas/upload-item'
 
-export interface MissingSlotIssue {
+interface MissingSlotIssue {
   type: 'missing-slot'
   slot: RefSlot
   attached: number
 }
 
-export interface TextIssue {
+interface TextIssue {
   type: 'text'
   text: string
 }

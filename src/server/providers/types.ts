@@ -72,7 +72,7 @@ export interface ContentRequest {
   fallback: ContentFallback | null
 }
 
-export type AccountSource = 'management' | 'key' | 'mock' | 'none'
+type AccountSource = 'management' | 'key' | 'mock' | 'none'
 
 export interface ProviderAccount {
   balance: number | null

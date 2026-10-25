@@ -9,12 +9,12 @@ export interface RefSlot {
   n: number
 }
 
-export interface PromptTextPart {
+interface PromptTextPart {
   type: 'text'
   text: string
 }
 
-export interface PromptSlotPart {
+interface PromptSlotPart {
   type: 'slot'
   slot: RefSlot
 }

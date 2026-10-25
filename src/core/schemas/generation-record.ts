@@ -4,10 +4,11 @@ import { ASPECT_RATIOS, RESOLUTIONS } from '../presets/types'
 import { VIDEO_PROVIDER_IDS } from '../providers/types'
 import { MediaKindSchema, UploadSourceSchema } from './upload-item'
 
-export const GeneratorTabSchema = z.enum(['frames', 'references'])
+const GeneratorTabSchema = z.enum(['frames', 'references'])
+
 export type GeneratorTab = z.infer<typeof GeneratorTabSchema>
 
-export const JobStatusSchema = z.enum([
+const JobStatusSchema = z.enum([
   'submitting',
   'pending',
   'in_progress',
@@ -29,7 +30,7 @@ export const FrameSlotsSchema = z.object({
 const AspectChoiceSchema = z.enum([...ASPECT_RATIOS, 'auto'])
 const ResolutionSchema = z.enum(RESOLUTIONS)
 
-export const GenerationInputSchema = z.object({
+const GenerationInputSchema = z.object({
   presetId: z.string(),
   tab: GeneratorTabSchema,
   prompt: z.string(),
@@ -44,19 +45,19 @@ export const GenerationInputSchema = z.object({
 
 export type GenerationInput = z.infer<typeof GenerationInputSchema>
 
-export const RecordPresetSchema = z.object({
+const RecordPresetSchema = z.object({
   id: z.string(),
   title: z.string(),
   slug: z.string(),
 })
 
-export const RecordSubmitSchema = z.object({
+const RecordSubmitSchema = z.object({
   stage: z.enum(['grace', 'uploading', 'sending']),
   notBefore: z.string().optional(),
   progress: z.number().optional(),
 })
 
-export const RecordJobSchema = z.object({
+const RecordJobSchema = z.object({
   id: z.string(),
   generationId: z.string().optional(),
   submittedAt: z.string(),
@@ -65,11 +66,11 @@ export const RecordJobSchema = z.object({
   expiresAt: z.number().optional(),
 })
 
-export const RecordDownloadSchema = z.object({
+const RecordDownloadSchema = z.object({
   startedAt: z.string(),
 })
 
-export const RecordOutputSchema = z.object({
+const RecordOutputSchema = z.object({
   video: z.string(),
   preview: z.string().optional(),
   width: z.number().optional(),
@@ -93,9 +94,9 @@ const SnapshotItemSchema = z.object({
   flattened: z.enum(['#ffffff', '#1c1e20']).optional(),
 })
 
-export const InputSnapshotSchema = z.record(z.string(), SnapshotItemSchema)
+const InputSnapshotSchema = z.record(z.string(), SnapshotItemSchema)
 
-export const GenerationCostSchema = z.object({
+const GenerationCostSchema = z.object({
   currency: z.literal('USD'),
   pricePerSec: z.number(),
   priceSource: PriceSourceSchema,

@@ -5,7 +5,8 @@ export const MediaKindSchema = z.enum(['image', 'video', 'audio'])
 
 export const UploadSourceSchema = z.enum(['file', 'link'])
 
-export const LinkModeSchema = z.enum(['symlink', 'hardlink', 'copy'])
+const LinkModeSchema = z.enum(['symlink', 'hardlink', 'copy'])
+
 export type LinkMode = z.infer<typeof LinkModeSchema>
 
 const UploadRemoteSchema = z.object({

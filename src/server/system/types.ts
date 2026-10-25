@@ -1,12 +1,12 @@
 import type { MediaKind } from '@/core/media-types'
 
-export interface ChooseFilesOptions {
+interface ChooseFilesOptions {
   kinds: MediaKind[]
   multiple: boolean
   prompt: string
 }
 
-export interface ChooseFolderOptions {
+interface ChooseFolderOptions {
   prompt: string
 }
 

@@ -9,7 +9,7 @@ import type { MediaKind } from '@/core/media-types'
 import { HttpError, ValidationError } from './errors'
 import { ProviderError } from './providers/provider-error'
 
-export interface IdParams {
+interface IdParams {
   id: string
 }
 
@@ -17,7 +17,7 @@ export interface IdRouteContext {
   params: Promise<IdParams>
 }
 
-export interface PathParams {
+interface PathParams {
   ref: string[]
 }
 
@@ -25,7 +25,7 @@ export interface PathRouteContext {
   params: Promise<PathParams>
 }
 
-export interface KeyParams {
+interface KeyParams {
   key: string[]
 }
 

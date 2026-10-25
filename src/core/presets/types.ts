@@ -50,7 +50,8 @@ export interface ReferenceLimits {
 
 export type SkuTable = Readonly<Record<string, number>>
 export type ResolutionTiers = Readonly<Partial<Record<Resolution, string>>>
-export type SizeByAspect = Partial<Record<AspectRatio, `${number}x${number}`>>
+
+type SizeByAspect = Partial<Record<AspectRatio, `${number}x${number}`>>
 
 export interface SkuContext {
   resolution: Resolution
@@ -103,24 +104,24 @@ export interface ProviderBinding {
   transport: TransportByKind
 }
 
-export interface PresetDuration {
+interface PresetDuration {
   min: number
   max: number
   default: number
   options?: readonly number[]
 }
 
-export interface PresetAudio {
+interface PresetAudio {
   supported: boolean
   default: boolean
 }
 
-export interface PresetFrames {
+interface PresetFrames {
   start: boolean
   end: boolean
 }
 
-export interface PresetReferences extends MediaKindCounts {
+interface PresetReferences extends MediaKindCounts {
   videoTotalSec: number
   audioTotalSec: number
   videoMinSec?: number

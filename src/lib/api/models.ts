@@ -10,13 +10,13 @@ function fetchModelCatalog(): Promise<ModelCatalog> {
   return fetcher<ModelCatalog>(MODELS_KEY)
 }
 
-export interface ModelCatalogState {
+interface ModelCatalogState {
   catalog: ModelCatalog | undefined
   isLoading: boolean
 }
 
 /** Runtime model catalog. Refreshed after a settings save, never polled. */
-export function useModelCatalog(): ModelCatalogState {
+function useModelCatalog(): ModelCatalogState {
   const { data, isLoading } = useSWR<ModelCatalog>(MODELS_KEY, fetchModelCatalog, {
     revalidateOnFocus: false,
   })
