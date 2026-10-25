@@ -14,6 +14,7 @@
 - The Test button in Settings works in the packaged app.
 - Glass surfaces no longer render a broken blur on Linux.
 - R2 status refreshes after you save the settings.
+- Credits no longer show the previous key's numbers after a key change.
 
 ### Changed
 

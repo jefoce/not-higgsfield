@@ -155,7 +155,7 @@ Search here before writing a helper. One of these covers the case. Extract a new
 - Toasts (`sonner`) only in `src/features` and `src/lib/notify.ts`. `src/core` and `src/server` never show UI.
 - Icon-only buttons have `aria-label`. Decorative lucide icons have `aria-hidden`.
 - Card and row click handlers start with `isOwnEvent(event)`. Portal content (menus, popovers, dialogs) bubbles through React.
-- A function used by one hook is written inside the hook call: inline when one hook uses it once, module level when it captures nothing, keep the name when it is used twice. `local/inline-hook-callbacks` enforces it.
+- `local/inline-hook-callbacks` flags a `const` function used once by one hook. Moving a function that captures nothing to module level, and keeping the name when it is used twice, are conventions.
 
 ```tsx
 const deletion = useAsyncAction(async () => {
@@ -179,6 +179,7 @@ const deletion = useAsyncAction(async () => {
 - Never inline a function in JSX. Every created `onX` gets a named `handle<Action>`. A row that needs the item receives it as a prop and defines `handleSelect` inside. Do not write curried `handleSelect(id)` factories.
 - No arrow or function values as object properties inside components. Name the function and pass it by reference. Arrows passed as call arguments (`useEffect`, `.map`) stay.
 - `react/jsx-handler-names` is off. `local/callback-props` checks that a callback prop passed in JSX from `props` is named `on<Action>`.
+- A store selection named `handle*` fails `local/callback-props`.
 
 ### useCallback and useMemo
 
@@ -241,6 +242,8 @@ const deletion = useAsyncAction(async () => {
 - Long work never runs inside a route handler. Queue it in `src/server/jobs`.
 - Record writes go through the per-record lock (`withLock`). Never read-modify-write a record without it.
 - Provider error text is stored raw. Translation to plain words happens at render time (`core/provider-errors.ts`).
+- Concurrency caps use `createLimiter` from `server/sync/limiter.ts`.
+- `createTtlCache` loaders receive the previous value. `clear()` drops results of loads already running.
 
 ## Style
 
@@ -249,6 +252,7 @@ const deletion = useAsyncAction(async () => {
 - Early returns over nested branches. Lookup tables over if/else chains that only return.
 - Every `if`, `else` and loop body has braces, single-line bodies included.
 - Every arrow function has a block body.
+- A block-bodied arrow returns only values. A void call is a statement: `setOpen(true)`, not `return setOpen(true)`. `no-confusing-void-expression` and `no-promise-executor-return` enforce it.
 - Blank line before `return`, `if`, `throw` and loops.
 - Blank line after every block: after the closing `}` of `if`, loop, `switch` and `try`.
 - Blank line around every multi-line statement.

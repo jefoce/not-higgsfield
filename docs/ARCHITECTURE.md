@@ -203,9 +203,11 @@ Adding a model:
 | Submit queue | 2 active | Upload and send jobs |
 | Poller | 3 parallel | OpenRouter status reads |
 | Download queue | 2 active | Video downloads and previews |
-| ffmpeg compat | 2 active | Webview-safe copies |
+| `thumbQueue` | 4 active | Thumbnail renders |
+| `imageEncodeQueue` | 2 active | Image re-encode at upload |
+| `compatQueue` | 2 active | Webview-safe copies |
 
-`globalState` keeps one singleton per process even when Next loads a module twice. `server.lock` prevents two servers from sharing one data folder. A live owner makes the new process exit with code 75, a stale lock is replaced.
+The media caps use `createLimiter` (`src/server/sync/limiter.ts`). `globalState` keeps one singleton per process even when Next loads a module twice. `server.lock` prevents two servers from sharing one data folder. A live owner makes the new process exit with code 75, a stale lock is replaced.
 
 ## 9. Secrets and session
 

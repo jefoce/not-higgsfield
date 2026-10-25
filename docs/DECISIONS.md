@@ -10,7 +10,7 @@ Rejected: expression bodies for one-line callbacks, and a length or comment exce
 
 ## 2026-10-25 - A function used by one hook is written inline
 
-Decision: a function used only by one hook is written inside the hook call. `local/inline-hook-callbacks` enforces it, with three rules: inline when one hook uses it once, module level when it captures nothing, keep the name when it is used twice. Hook results stay objects (`deletion.run`), not tuples.
+Decision: `local/inline-hook-callbacks` flags a `const` function used once by one hook. Moving a function that captures nothing to module level, and keeping the name when it is used twice, are conventions. Hook results stay objects (`deletion.run`), not tuples.
 
 Why: one name per action. A separate action, a `run` alias and a handler make the reader connect three names. `const deletion = useAsyncAction(async () => { ... })` keeps the action at the call site and drops the indirection.
 
