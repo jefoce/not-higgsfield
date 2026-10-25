@@ -69,9 +69,8 @@ pub(crate) fn update_info(app: AppHandle<Wry>) -> UpdateInfo {
 pub(crate) async fn update_check(app: AppHandle<Wry>) -> Result<Option<AvailableUpdate>, String> {
     let update = build_updater(&app)?.check().await.map_err(error_text)?;
 
-    let mut settings = settings::load();
-    settings.last_update_check = Some(now_rfc3339());
-    settings::save(&settings)?;
+    let checked_at = now_rfc3339();
+    settings::update(|settings| settings.last_update_check = Some(checked_at))?;
 
     Ok(update.map(available_update))
 }
@@ -158,9 +157,7 @@ pub(crate) async fn update_install(
 
 #[tauri::command]
 pub(crate) fn update_set_auto(is_on: bool) -> Result<(), String> {
-    let mut settings = settings::load();
-    settings.auto_check_updates = is_on;
-    settings::save(&settings)
+    settings::update(|settings| settings.auto_check_updates = is_on)
 }
 
 #[tauri::command]

@@ -96,15 +96,14 @@ pub async fn boot(app: &AppHandle<Wry>) -> Result<(), String> {
         }
     }
 
-    let mut desktop = settings::load();
+    let desktop = settings::load();
     let (port, fallback) = choose_port(desktop.port)?;
     if fallback {
         eprintln!(
             "[not-higgsfield] port {} busy, using {} (draft and view settings reset once)",
             desktop.port, port
         );
-        desktop.port = port;
-        settings::save(&desktop)?;
+        settings::update(|settings| settings.port = port)?;
     }
 
     let token = random_token()?;
@@ -229,9 +228,7 @@ fn create_window(
             let _ = handle.hide();
             if !settings::load().close_hint_shown {
                 notify_close_hint(handle.app_handle());
-                let mut current = settings::load();
-                current.close_hint_shown = true;
-                let _ = settings::save(&current);
+                let _ = settings::update(|current| current.close_hint_shown = true);
             }
         }
         WindowEvent::Moved(_) | WindowEvent::Resized(_) => {
