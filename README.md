@@ -39,7 +39,7 @@ This is a clean-room project. It was written from scratch: no Higgsfield code, a
 
 - A Mac (Apple Silicon), a Windows 10/11 PC, or 64-bit Linux with glibc 2.35+ (Ubuntu 22.04, Debian 12, Fedora 36 or newer).
 - An OpenRouter account with some credit. One account gives you many video models, and you pay only for what you generate.
-- Optional: a Cloudflare account with R2, only for models that take video or sound references. Cloudflare asks for a card to turn R2 on. The free tier is 10 GB, and the app stays under 8 GB.
+- Optional: a Cloudflare account with R2, only for models that take video or sound references. Cloudflare asks for a card to turn R2 on. The free tier is 10 GB, and the app stays under 8 GB. It deletes references it has not used for 30 days.
 
 ## Install
 
@@ -104,40 +104,10 @@ If your keyring is locked when you save keys, Linux asks for your login password
 
 ## First setup
 
-You need OpenRouter. Cloudflare R2 is only for video or sound references, so skip it until you want one.
-Every link below is also in the app: press the gear icon, each section lists its links.
+1. **OpenRouter (required).** Add credit, create an API key with a spend limit, and paste it in Settings (gear icon). [Step-by-step guide](docs/user/OPENROUTER.md)
+2. **Cloudflare R2 (only for video or sound references).** Create a bucket and a token for it, then paste four values in Settings. Free up to 10 GB, and the app stays under 8 GB. Cloudflare asks for a card. [Step-by-step guide](docs/user/CLOUDFLARE-R2.md)
 
-### 1. OpenRouter
-
-1. Sign up at [openrouter.ai](https://openrouter.ai) and add credit: **Account → [Credits](https://openrouter.ai/settings/credits)**.
-2. Create an API key: **Workspace → [API Keys](https://openrouter.ai/workspaces/default/keys) → New Key**.
-   - **Name:** `Not Higgsfield`.
-   - **Expiration:** shorter is safer. When it ends, videos fail with "Your OpenRouter key is not valid". Create a new key and paste it in again.
-   - **Credit limit:** for example 5 dollars, reset every month. A mistake can never spend more.
-   - Copy the key now. OpenRouter shows it only once.
-3. Optional, shows your balance in the app: **Account → [Management Keys](https://openrouter.ai/settings/management-keys) → New Key**, with a name and an expiration. When it ends, the balance disappears until you paste a new one. A management key can create and delete your API keys, so paste it only into the app.
-4. In the app: gear icon → **OpenRouter** → paste the key(s) → **Save** → **Test**.
-
-### 2. Cloudflare R2 (only for video or sound references)
-
-1. Sign up at [cloudflare.com](https://dash.cloudflare.com/sign-up). Open **Storage & databases → [R2 Object Storage](https://dash.cloudflare.com/?to=/:account/r2/overview)** and finish the checkout. Cloudflare asks for a card even for the free tier.
-2. **Create bucket:**
-   - **Bucket name:** for example `not-higgsfield`. It cannot be changed later. Use this bucket for the app only.
-   - **Location:** Automatic. Do not choose "Specify jurisdiction", the app does not support jurisdiction buckets.
-   - **Default storage class:** Standard. Infrequent Access has no free tier.
-3. Create the keys: on the R2 page, **Account Details → API Tokens → Manage → Create Account API token** ([open](https://dash.cloudflare.com/?to=/:account/r2/api-tokens)).
-   - **Permissions:** Object Read & Write.
-   - **Specify bucket(s):** only the bucket from step 2.
-   - **TTL:** your choice. When it ends, references fail until you create a new token.
-   - Create, then copy the **Access Key ID** and **Secret Access Key**. Cloudflare shows the secret only once. The **Account ID** is under Account Details on the R2 page.
-4. In the app: gear icon → **Cloudflare R2** → Account ID, Access key ID, Secret access key, Bucket → **Save** → **Test**.
-
-**Costs.**
-
-- Free each month: 10 GB of storage, 1 million uploads and 10 million reads. Downloads are free.
-- Above that, Cloudflare charges the card ($0.015 per GB per month).
-- The app uploads only video and sound references and shares them as links that expire after 2 hours.
-- It deletes files it has not used for 30 days and keeps the total under 8 GB. Settings shows how much is stored.
+Both guides are also linked in the app: gear icon → **Setup guide**.
 
 ## Make your first video
 
@@ -183,16 +153,16 @@ To back up or move to a new computer, copy the whole folder, then enter your key
 - Not Higgsfield is free and adds no fee. The wallet pill shows what is left on your key.
 - No account, no tracking, no server of ours. Keys stay in your system keychain.
 - Your text and pictures go to OpenRouter and the model's provider. Video and sound references go to your own R2 bucket as private links that expire after 2 hours.
-- R2 stays inside Cloudflare's free tier, see First setup.
+- R2 stays inside Cloudflare's free tier, see [the R2 guide](docs/user/CLOUDFLARE-R2.md).
 
 ## Something went wrong?
 
 | What you see                                                                 | What to do                                                                                                                                                                |
 | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | "OpenRouter key is not set"                                                  | Save your key in Settings (gear icon).                                                                                                                                    |
-| "Your OpenRouter key is not valid"                                           | The key expired or was deleted. Create a new one (First setup, step 1.2) and paste it in Settings.                                                                        |
+| "Your OpenRouter key is not valid."                                          | The key expired or was deleted. Create a new one ([guide](docs/user/OPENROUTER.md)) and paste it in Settings.                                                             |
 | "needs cloud storage (R2)"                                                   | Set up R2, or use pictures instead of video or sound.                                                                                                                     |
-| "R2 is at the app's 8 GB limit"                                              | Wait 2 hours, or use shorter clips. Older references are removed automatically.                                                                                           |
+| "Cloud storage is full."                                                     | Wait 2 hours, or use shorter clips. Older references are removed automatically.                                                                                           |
 | "takes video references as mp4 or mov"                                       | Convert the clip to mp4.                                                                                                                                                  |
 | A model blocks images that look like real people                             | Use a different image, or another model.                                                                                                                                  |
 | "Waiting for keychain access"                                                | A system prompt is open, maybe behind a window. Choose Always Allow.                                                                                                      |
