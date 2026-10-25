@@ -1,8 +1,8 @@
 import 'server-only'
 
 import { MODEL_PRESETS } from '@/core/presets'
+import { primaryBinding } from '@/core/presets/bindings'
 import type { ModelPreset } from '@/core/presets/types'
-import { primaryBinding } from '@/core/pricing'
 
 import type { ProviderModel, ProviderModelList } from '../types'
 

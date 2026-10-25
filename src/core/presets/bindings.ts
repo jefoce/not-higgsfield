@@ -1,5 +1,10 @@
 import type { ModelPreset, ProviderBinding } from './types'
 
+/** The binding used for price and default request decisions. */
+export function primaryBinding(preset: ModelPreset): ProviderBinding {
+  return preset.bindings[0]
+}
+
 /**
  * First binding whose provider is configured, else the primary binding.
  * `isConfigured` keeps core free of server imports.

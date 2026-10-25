@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_PRESET_ID, findPreset, getPreset, MODEL_PRESETS } from '@/core/presets'
+import { primaryBinding } from '@/core/presets/bindings'
 import { ASPECT_RATIOS, RESOLUTIONS } from '@/core/presets/types'
-import { primaryBinding, skuKey } from '@/core/pricing'
+import { skuKey } from '@/core/pricing'
 
 describe('MODEL_PRESETS', () => {
   it('ships Wan and Seedance presets in order', () => {

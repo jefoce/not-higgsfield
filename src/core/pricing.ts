@@ -1,11 +1,11 @@
 import { isNil } from 'lodash-es'
 
 import { outputSize } from './output-size'
+import { primaryBinding } from './presets/bindings'
 import type {
   AspectChoice,
   ModelPreset,
   PricingRule,
-  ProviderBinding,
   Resolution,
   SkuCondition,
   SkuContext,
@@ -17,11 +17,6 @@ export interface PriceContext {
   aspect: AspectChoice
   audio: boolean
   hasVideoInput: boolean
-}
-
-/** The binding used for price and default request decisions. */
-export function primaryBinding(preset: ModelPreset): ProviderBinding {
-  return preset.bindings[0]
 }
 
 /** First matching rule wins. An unmatched context returns an empty key. */

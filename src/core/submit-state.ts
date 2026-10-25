@@ -3,8 +3,8 @@ import { isNil } from 'lodash-es'
 import { GRACE_STALE_MS } from './constants'
 import { isNonEmptyString } from './guards'
 import type { UploadsById } from './media-types'
+import { primaryBinding } from './presets/bindings'
 import type { ModelPreset } from './presets/types'
-import { primaryBinding } from './pricing'
 import type {
   GenerationInput,
   GenerationRecord,

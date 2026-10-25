@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { MODEL_PRESETS } from '@/core/presets'
-import { primaryBinding, skuKey } from '@/core/pricing'
+import { primaryBinding } from '@/core/presets/bindings'
+import { skuKey } from '@/core/pricing'
 import type { Dict } from '@/core/utility-types'
 
 import { required } from './helpers/required'

@@ -1,4 +1,4 @@
-import { primaryBinding } from '../pricing'
+import { primaryBinding } from './bindings'
 import { SEEDANCE_20 } from './seedance/seedance-2.0'
 import { SEEDANCE_25 } from './seedance/seedance-2.5'
 import type { ModelPreset } from './types'

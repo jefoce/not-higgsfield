@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { getPreset } from '@/core/presets'
-import { primaryBinding } from '@/core/pricing'
+import { primaryBinding } from '@/core/presets/bindings'
 import type { Dict } from '@/core/utility-types'
 import { getPricing } from '@/server/providers/openrouter/pricing'
 

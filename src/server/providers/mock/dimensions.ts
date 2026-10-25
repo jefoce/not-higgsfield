@@ -5,7 +5,7 @@ import { isNil } from 'lodash-es'
 import type { PixelSize } from '@/core/geometry'
 import { outputSize } from '@/core/output-size'
 import { MODEL_PRESETS } from '@/core/presets'
-import { primaryBinding } from '@/core/pricing'
+import { primaryBinding } from '@/core/presets/bindings'
 
 interface MockDimensionsParams {
   model: unknown

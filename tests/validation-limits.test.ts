@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { getPreset } from '@/core/presets'
-import { primaryBinding } from '@/core/pricing'
+import { primaryBinding } from '@/core/presets/bindings'
 import { validateInput } from '@/core/validation'
 
 import { input, MB, preset, upload, uploadsOf } from './helpers/validation-fixtures'

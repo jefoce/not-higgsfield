@@ -3,8 +3,9 @@ import { describe, expect, it } from 'vitest'
 import { MEDIA_KINDS } from '@/core/media-kinds'
 import { aspectAllowed } from '@/core/output-size'
 import { minDuration, MODEL_PRESETS } from '@/core/presets'
+import { primaryBinding } from '@/core/presets/bindings'
 import type { ModelPreset } from '@/core/presets/types'
-import { primaryBinding, skuKey } from '@/core/pricing'
+import { skuKey } from '@/core/pricing'
 
 /** Every key the preset can produce for its allowed inputs. */
 function pricingKeys(preset: ModelPreset): string[] {

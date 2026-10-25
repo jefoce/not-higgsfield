@@ -9,8 +9,8 @@ import { isNil, isString } from 'lodash-es'
 
 import { FETCH_TIMEOUTS, MOCK_GENERATE_MS, MOCK_QUEUE_MS } from '@/core/constants'
 import { isNonEmptyString, isRecord } from '@/core/guards'
+import { primaryBinding } from '@/core/presets/bindings'
 import type { ModelPreset } from '@/core/presets/types'
-import { primaryBinding } from '@/core/pricing'
 import { asJobStatus } from '@/core/submit-state'
 import type { PricingInfo, TestResult } from '@/core/types'
 

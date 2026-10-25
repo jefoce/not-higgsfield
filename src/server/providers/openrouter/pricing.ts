@@ -4,8 +4,8 @@ import { isEmpty, isNil } from 'lodash-es'
 import { z } from 'zod'
 
 import { FETCH_TIMEOUTS, PRICING_FALLBACK_TTL_MS } from '@/core/constants'
+import { primaryBinding } from '@/core/presets/bindings'
 import type { ModelPreset } from '@/core/presets/types'
-import { primaryBinding } from '@/core/pricing'
 import type { PricingInfo } from '@/core/types'
 import type { Dict } from '@/core/utility-types'
 
