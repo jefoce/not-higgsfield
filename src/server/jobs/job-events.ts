@@ -1,8 +1,10 @@
 import 'server-only'
 
+import { globalState } from '../global-state'
+
 type JobSentListener = (id: string) => void
 
-const listeners = new Set<JobSentListener>()
+const listeners = globalState<Set<JobSentListener>>('jobEvents', () => new Set())
 
 /** Registers a listener that runs after a submitted job is saved. */
 export function onJobSent(listener: JobSentListener): void {
