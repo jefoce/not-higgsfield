@@ -155,6 +155,17 @@ Search here before writing a helper. One of these covers the case. Extract a new
 - Toasts (`sonner`) only in `src/features` and `src/lib/notify.ts`. `src/core` and `src/server` never show UI.
 - Icon-only buttons have `aria-label`. Decorative lucide icons have `aria-hidden`.
 - Card and row click handlers start with `isOwnEvent(event)`. Portal content (menus, popovers, dialogs) bubbles through React.
+- A function used by one hook is written inside the hook call: inline when one hook uses it once, module level when it captures nothing, keep the name when it is used twice. `local/inline-hook-callbacks` enforces it.
+
+```tsx
+const deletion = useAsyncAction(async () => {
+  await deleteGeneration(record.id)
+  toast.success('Deleted')
+  props.onDeleted?.()
+})
+```
+
+- Hook results stay objects (`deletion.run`, `deletion.isRunning`), not tuples.
 
 ### Event handlers
 
@@ -162,11 +173,12 @@ Search here before writing a helper. One of these covers the case. Extract a new
 - A callback prop passed down stays `props.onAction` at the use site: `onClick={props.onClose}`. Never destructure it just to pass it along, never rename it.
 - A function created in the component (arrow, `function`, `useCallback`, `useEffectEvent`, `debounce`, `throttle`) and passed to an `on*` prop is named `handle<Action>`: `handleDownload`, `handleSelect`, `handleOpenChange`. Use the action, not the DOM event: `handleDelete`, not `handleClick`.
 - An existing function (setter, store action, `video.togglePlay`, `props.onX`, an import) is passed directly. No alias constant.
+- A member callback (`deletion.run`, `confirmDialog.on`) is passed directly (`onClick={deletion.run}`), with no wrapper constant.
 - Destructure a callback only when every use sits inside a hook callback (`useCallback`, `useMemo`, `useEffect`, `useLayoutEffect`, `useInsertionEffect`, `useEffectEvent`, `useImperativeHandle`), where `props.onX()` would make the whole `props` object a dependency: `const { onSelect } = props`.
 - Name a store selection after the action: `const clearSelection = useSelectionStore((state) => state.clear)`, then `onClick={clearSelection}`.
 - Never inline a function in JSX. Every created `onX` gets a named `handle<Action>`. A row that needs the item receives it as a prop and defines `handleSelect` inside. Do not write curried `handleSelect(id)` factories.
 - No arrow or function values as object properties inside components. Name the function and pass it by reference. Arrows passed as call arguments (`useEffect`, `.map`) stay.
-- `react/jsx-handler-names` enforces the `handle` and `on` prefixes, `checkLocalVariables` off for `props.onX`, and leaves inline arrows alone.
+- `react/jsx-handler-names` is off. `local/callback-props` checks that a callback prop passed in JSX from `props` is named `on<Action>`.
 
 ### useCallback and useMemo
 
@@ -220,6 +232,7 @@ Search here before writing a helper. One of these covers the case. Extract a new
 - Do not restate defaults (`flex-row`, `static`, `font-normal` on plain text).
 - Named groups (`group/card`, `group/player`) when a `group` sits inside another `group`.
 - Hidden overlays are not rendered, or are `pointer-events-none`. Nothing invisible may catch hover or clicks.
+- On Linux, `backdrop-blur` is disabled globally. A translucent surface that needs blur to read gets a `linux:` background.
 
 ## Server
 
@@ -235,6 +248,7 @@ Search here before writing a helper. One of these covers the case. Extract a new
 - Comments explain why, not what. JSDoc for block docs, inline notes only inside a function.
 - Early returns over nested branches. Lookup tables over if/else chains that only return.
 - Every `if`, `else` and loop body has braces, single-line bodies included.
+- Every arrow function has a block body.
 - Blank line before `return`, `if`, `throw` and loops.
 - Blank line after every block: after the closing `}` of `if`, loop, `switch` and `try`.
 - Blank line around every multi-line statement.
