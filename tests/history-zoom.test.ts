@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { ZOOM_MAX, ZOOM_MIN } from '@/core/constants'
-import { zoomToGridColumns, zoomToTileWidth } from '@/features/history/view-store'
+import { zoomToGridColumns, zoomToTileWidth } from '@/features/history/list/view-store'
 
 const steps = Array.from({ length: ZOOM_MAX + 1 }, (_, zoom) => zoom)
 

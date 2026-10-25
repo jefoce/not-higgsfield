@@ -2,10 +2,10 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { AspectRatioPopover } from '@/features/generator/AspectRatioPopover'
-import { DurationPopover } from '@/features/generator/DurationPopover'
-import { ResolutionPopover } from '@/features/generator/ResolutionPopover'
-import { useGeneratorStore } from '@/features/generator/store'
+import { AspectRatioPopover } from '@/features/generator/options/AspectRatioPopover'
+import { DurationPopover } from '@/features/generator/options/DurationPopover'
+import { ResolutionPopover } from '@/features/generator/options/ResolutionPopover'
+import { useGeneratorStore } from '@/features/generator/store/store'
 
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 

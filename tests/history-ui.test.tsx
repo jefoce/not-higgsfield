@@ -2,10 +2,10 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { DetailsPanel } from '@/features/history/DetailsPanel'
-import { HistoryGrid } from '@/features/history/HistoryGrid'
-import { useSelectionStore } from '@/features/history/selection-store'
-import { SelectionBar } from '@/features/history/SelectionBar'
+import { DetailsPanel } from '@/features/history/details/DetailsPanel'
+import { HistoryGrid } from '@/features/history/list/HistoryGrid'
+import { useSelectionStore } from '@/features/history/selection/selection-store'
+import { SelectionBar } from '@/features/history/selection/SelectionBar'
 
 import { handleNoop, ids, Observer, record, setOrder, setSelection, tile } from './helpers/history'
 import { required } from './helpers/required'

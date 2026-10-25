@@ -1,8 +1,8 @@
 'use client'
 
-import { GeneratorPanel } from '@/features/generator/GeneratorPanel'
-import { HistorySection } from '@/features/history/HistorySection'
-import { MediaPickerModal } from '@/features/media-picker/MediaPickerModal'
+import { GeneratorPanel } from '@/features/generator/panel/GeneratorPanel'
+import { HistorySection } from '@/features/history/list/HistorySection'
+import { MediaPickerModal } from '@/features/media-picker/picker/MediaPickerModal'
 import { MediaPreviewModal } from '@/features/preview/MediaPreviewModal'
 import { SettingsModal } from '@/features/settings/SettingsModal'
 import { usePointerBlur } from '@/lib/use-pointer-blur'

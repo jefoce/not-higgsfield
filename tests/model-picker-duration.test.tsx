@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { formatRate } from '@/core/pricing'
 import type { PricingInfo } from '@/core/types'
-import { ModelPicker } from '@/features/generator/ModelPicker'
+import { ModelPicker } from '@/features/generator/model/ModelPicker'
 import { usePricing } from '@/features/generator/use-pricing'
 import { Price } from '@/ui/Price'
 

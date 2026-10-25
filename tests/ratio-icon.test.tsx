@@ -4,9 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { AspectRatio } from '@/core/presets/types'
 import type { GenerationRecord } from '@/core/types'
-import { AspectRatioPopover } from '@/features/generator/AspectRatioPopover'
-import { useGeneratorStore } from '@/features/generator/store'
-import { DetailsPanel } from '@/features/history/DetailsPanel'
+import { AspectRatioPopover } from '@/features/generator/options/AspectRatioPopover'
+import { useGeneratorStore } from '@/features/generator/store/store'
+import { DetailsPanel } from '@/features/history/details/DetailsPanel'
 import { RatioIcon } from '@/ui/RatioIcon'
 
 vi.mock('@/lib/fetcher', () => ({

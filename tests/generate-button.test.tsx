@@ -2,7 +2,7 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { GenerateButton } from '@/features/generator/GenerateButton'
+import { GenerateButton } from '@/features/generator/generate/GenerateButton'
 
 afterEach(cleanup)
 

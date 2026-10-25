@@ -3,7 +3,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { isNil } from 'lodash-es'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { FolderTab } from '@/features/media-picker/FolderTab'
+import { FolderTab } from '@/features/media-picker/folders/FolderTab'
 import { closePreview, usePreviewStore } from '@/features/preview/preview-store'
 
 const mocks = vi.hoisted(() => ({
