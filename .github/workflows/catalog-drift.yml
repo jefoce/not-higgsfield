@@ -1,0 +1,22 @@
+name: catalog-drift
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: corepack pnpm install --frozen-lockfile
+      - run: LIVE_CATALOG=1 TMPDIR=/private/tmp corepack pnpm vitest run tests/catalog-live.test.ts

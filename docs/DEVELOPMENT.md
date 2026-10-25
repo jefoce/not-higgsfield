@@ -61,6 +61,7 @@ Mock mode keeps the Test button enabled without stored keys.
 3. Add it to `MODEL_PRESETS` in `src/core/presets/index.ts` (the order is the picker order).
 4. Put a source link in a comment next to every limit, and in the commit message.
 5. `pnpm vitest run tests/presets-contract.test.ts`. It checks defaults, duration options, sizes, pricing keys, reference limits and the error table.
+   After adding or changing a preset, run `LIVE_CATALOG=1 corepack pnpm vitest run tests/catalog-live.test.ts`. A red weekly run of it means the presets drifted from the live OpenRouter catalog.
 6. One real-key run with a prompt, then one with each reference kind. Record anything learned (for example `promptOptional`, the billing floor) in the preset with the date.
    Never branch on a preset id outside `src/core/presets`. Add a preset field instead.
 
