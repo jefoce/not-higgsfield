@@ -2,6 +2,25 @@
 
 ## 0.2.0 - unreleased
 
+### Added
+
+- Unavailable models show as disabled with the reason they cannot run.
+- The cost estimate includes the seconds of reference videos.
+- Reference durations show their exact values.
+- Files chosen in the folder picker are marked before you press Add.
+
+### Fixed
+
+- The Test button in Settings works in the packaged app.
+- Glass surfaces no longer render a broken blur on Linux.
+- R2 status refreshes after you save the settings.
+
+### Changed
+
+- The Linux AppImage steps name the correct FUSE package for Ubuntu 22.04 and 24.04.
+
+Internal: provider and storage layers, stricter lint, stored data validation.
+
 ## 0.1.0 - 2026-10-22
 
 First release.
