@@ -43,24 +43,21 @@ const cache = createTtlCache<ProviderAccount>({
   failTtlMs: 0,
 })
 
-let lastAccount: ProviderAccount | null = null
-
 /** Key and management credits, cached for 30 seconds. Failures are retried, never cached. */
 export async function getProviderAccount(opts?: AccountLookupParams): Promise<ProviderAccount> {
   return cache.get('account', loadAccount, opts?.fresh === true)
 }
 
-async function loadAccount(): Promise<TtlLoadResult<ProviderAccount>> {
+async function loadAccount(
+  previous: ProviderAccount | undefined,
+): Promise<TtlLoadResult<ProviderAccount>> {
   try {
-    const info = await loadCredits()
-
-    lastAccount = info
-
-    return { value: info, isOk: true }
+    return { value: await loadCredits(), isOk: true }
   } catch (error) {
-    const value = withError(lastAccount, messageOf(error, 'Credits request failed'))
-
-    return { value, isOk: false }
+    return {
+      value: withError(previous, messageOf(error, 'Credits request failed')),
+      isOk: false,
+    }
   }
 }
 
@@ -139,7 +136,7 @@ async function getJson(url: string, key: string): Promise<unknown> {
   return res.json()
 }
 
-function withError(last: ProviderAccount | null, message: string): ProviderAccount {
+function withError(last: ProviderAccount | undefined, message: string): ProviderAccount {
   if (last) {
     return { ...last, error: message }
   }
@@ -160,5 +157,4 @@ function withError(last: ProviderAccount | null, message: string): ProviderAccou
 
 onSecretsChange(() => {
   cache.clear()
-  lastAccount = null
 })

@@ -15,8 +15,10 @@ export interface TtlLoadResult<T> {
   isOk: boolean
 }
 
+export type TtlLoader<T> = (previous: T | undefined) => Promise<TtlLoadResult<T>>
+
 export interface TtlCache<T> {
-  get(id: string, load: () => Promise<TtlLoadResult<T>>, isForce?: boolean): Promise<T>
+  get(id: string, load: TtlLoader<T>, isForce?: boolean): Promise<T>
   clear(): void
 }
 
@@ -25,31 +27,29 @@ interface TtlCacheEntry<T> {
   expiresAt: number
 }
 
+interface TtlCacheState<T> {
+  entries: Map<string, TtlCacheEntry<T>>
+  pending: Map<string, Promise<T>>
+  epoch: number
+}
+
 /** Caches loaded values by id, with a shorter window for failed loads. */
 export function createTtlCache<T>(options: TtlCacheOptions): TtlCache<T> {
   const { key, okTtlMs, failTtlMs } = options
 
-  const entries = globalState<Map<string, TtlCacheEntry<T>>>(key, () => {
-    return new Map()
-  })
-
-  const pending = globalState<Map<string, Promise<T>>>(`${key}:pending`, () => {
-    return new Map()
+  const state = globalState<TtlCacheState<T>>(`${key}:cache`, () => {
+    return { entries: new Map(), pending: new Map(), epoch: 0 }
   })
 
   // eslint-disable-next-line @typescript-eslint/max-params -- fixed TtlCache signature
-  async function get(
-    id: string,
-    load: () => Promise<TtlLoadResult<T>>,
-    isForce = false,
-  ): Promise<T> {
-    const cached = entries.get(id)
+  async function get(id: string, load: TtlLoader<T>, isForce = false): Promise<T> {
+    const cached = state.entries.get(id)
 
     if (!isForce && !isNil(cached) && Date.now() < cached.expiresAt) {
       return cached.value
     }
 
-    const running = pending.get(id)
+    const running = state.pending.get(id)
 
     if (!isNil(running)) {
       return running
@@ -59,27 +59,35 @@ export function createTtlCache<T>(options: TtlCacheOptions): TtlCache<T> {
   }
 
   function track(id: string, next: Promise<T>): Promise<T> {
-    pending.set(id, next)
+    state.pending.set(id, next)
 
     return next.finally(() => {
-      if (pending.get(id) === next) {
-        pending.delete(id)
+      if (state.pending.get(id) === next) {
+        state.pending.delete(id)
       }
     })
   }
 
-  async function runLoad(id: string, load: () => Promise<TtlLoadResult<T>>): Promise<T> {
-    const result = await load()
+  async function runLoad(id: string, load: TtlLoader<T>): Promise<T> {
+    const { epoch } = state
+    const result = await load(state.entries.get(id)?.value)
+
+    // A clear() during the load means its inputs changed. The caller gets the result, the cache does not.
+    if (state.epoch !== epoch) {
+      return result.value
+    }
+
     const ttlMs = result.isOk ? okTtlMs : failTtlMs
 
-    entries.set(id, { value: result.value, expiresAt: Date.now() + ttlMs })
+    state.entries.set(id, { value: result.value, expiresAt: Date.now() + ttlMs })
 
     return result.value
   }
 
   function clear(): void {
-    entries.clear()
-    pending.clear()
+    state.epoch += 1
+    state.entries.clear()
+    state.pending.clear()
   }
 
   return { get, clear }
