@@ -1,0 +1,43 @@
+import { R2_NAMES } from '../secret-names'
+import type { StorageProviderDescriptor } from './types'
+
+export const R2_DESCRIPTOR = {
+  id: 'r2',
+  label: 'Cloudflare R2',
+  fields: [
+    {
+      name: 'R2_ACCOUNT_ID',
+      label: 'Account ID',
+      placeholder: '',
+      isSecret: true,
+      hint: null,
+    },
+    {
+      name: 'R2_ACCESS_KEY_ID',
+      label: 'Access key ID',
+      placeholder: '',
+      isSecret: true,
+      hint: null,
+    },
+    {
+      name: 'R2_SECRET_ACCESS_KEY',
+      label: 'Secret access key',
+      placeholder: '',
+      isSecret: true,
+      hint: null,
+    },
+    {
+      name: 'R2_BUCKET',
+      label: 'Bucket',
+      placeholder: '',
+      isSecret: false,
+      hint: null,
+    },
+  ],
+  requiredSecrets: R2_NAMES,
+  links: {
+    keys: 'https://dash.cloudflare.com/?to=/:account/r2/api-tokens',
+    credits: null,
+    docs: 'https://developers.cloudflare.com/r2/',
+  },
+} satisfies StorageProviderDescriptor

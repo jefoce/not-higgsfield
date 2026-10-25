@@ -1,9 +1,8 @@
 import { isFunction, isNil } from 'lodash-es'
 
 import { APP_RULES } from './app'
-import { HTTP_RULES } from './http'
 import { SEEDANCE_RULES } from './seedance'
-import type { ErrorFamily, FriendlyError, HttpRule, Rule } from './types'
+import type { ErrorFamily, FriendlyError, HttpRule, HttpRuleTable, Rule } from './types'
 import { WAN_RULES } from './wan'
 
 function matches(rule: Rule, raw: string): boolean {
@@ -38,6 +37,7 @@ interface FriendlyErrorParams {
   raw: string
   family: ErrorFamily | null
   httpCode?: number
+  httpRules: HttpRuleTable | null
 }
 
 /**
@@ -45,7 +45,7 @@ interface FriendlyErrorParams {
  * Family rules run first, then app rules, then HTTP codes. First match wins.
  */
 export function friendlyError(params: FriendlyErrorParams): FriendlyError {
-  const { raw, family, httpCode } = params
+  const { raw, family, httpCode, httpRules } = params
   let familyRules: readonly Rule[] = []
 
   if (!isNil(family)) {
@@ -60,7 +60,7 @@ export function friendlyError(params: FriendlyErrorParams): FriendlyError {
     return resolve(rule, raw)
   }
 
-  const http = isNil(httpCode) ? undefined : HTTP_RULES[httpCode]
+  const http = isNil(httpCode) || isNil(httpRules) ? undefined : httpRules[httpCode]
 
   if (http) {
     return resolve(http, raw)

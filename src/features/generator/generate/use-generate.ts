@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { inputForSubmit } from '@/core/normalize-input'
 import { getPreset } from '@/core/presets'
 import { friendlyError } from '@/core/provider-errors'
+import { videoProviderDescriptor } from '@/core/providers/registry'
 import { openSettings } from '@/features/settings/settings-store'
 import { refreshCredits } from '@/lib/api/credits'
 import { cancelGenerationRequest, createGeneration } from '@/lib/api/generations'
@@ -50,7 +51,13 @@ interface ShowErrorParams {
 /** Shows the plain error with the preset name, plus Settings when the key is missing. */
 function showError(params: ShowErrorParams): void {
   const { message, presetId, presetTitle } = params
-  const friendly = friendlyError({ raw: message, family: getPreset(presetId).family })
+
+  const friendly = friendlyError({
+    raw: message,
+    family: getPreset(presetId).family,
+    httpRules: videoProviderDescriptor('openrouter').httpRules,
+  })
+
   const title = `${presetTitle}: ${friendly.title}`
 
   if (!message.includes('key is not set')) {

@@ -10,6 +10,7 @@ import {
 } from '@/core/prompt-tokens'
 import { friendlyError } from '@/core/provider-errors'
 import type { FriendlyError } from '@/core/provider-errors/types'
+import { videoProviderDescriptor } from '@/core/providers/registry'
 import type { GenerationRecord } from '@/core/types'
 import { downloadMediaUrl, thumbUrl, uploadThumbUrl } from '@/lib/api/media-urls'
 
@@ -34,6 +35,7 @@ export function recordError(record: GenerationRecord): FriendlyError | null {
   return friendlyError({
     raw: record.error,
     family: findPreset(record.input.presetId)?.family ?? null,
+    httpRules: videoProviderDescriptor('openrouter').httpRules,
   })
 }
 
