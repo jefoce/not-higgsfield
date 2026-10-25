@@ -9,8 +9,6 @@ import { UploadError } from '../errors'
 import { probeMedia } from '../media/ffmpeg'
 import sharp from '../media/sharp'
 
-export { UploadError }
-
 export function assertSupported(ext: string): MediaKind {
   if (ext === '.heic' || ext === '.heif') {
     throw new UploadError(400, 'HEIC images are not supported')

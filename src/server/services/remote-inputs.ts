@@ -9,15 +9,15 @@ import type { UploadItem } from '@/core/types'
 
 import { globalState } from '../global-state'
 import { uploadPaths } from '../paths'
-import { listUploads, updateUpload } from '../repos/uploads'
-import { secretsReady } from '../secrets'
-import { hashFile } from './hash'
+import { hashFile } from '../remote/hash'
 import {
   getRemoteStore,
   type RemoteObjectInfo,
   type RemotePutOptions,
   type RemoteStore,
-} from './remote-store'
+} from '../remote/remote-store'
+import { listUploads, updateUpload } from '../repos/uploads'
+import { secretsReady } from '../secrets'
 
 type Remote = NonNullable<UploadItem['remote']>
 

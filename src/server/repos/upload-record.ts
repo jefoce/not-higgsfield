@@ -16,7 +16,7 @@ const store = jsonDirStore<UploadItem>({
   fileOf: jsonPath,
 })
 
-export function jsonPath(id: string): string {
+function jsonPath(id: string): string {
   return path.join(UPLOADS_DIR, `${id}.json`)
 }
 

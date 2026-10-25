@@ -1,6 +1,5 @@
 import 'server-only'
 
-import { sumBy } from 'lodash-es'
 import { z } from 'zod'
 
 import { FETCH_TIMEOUTS } from '@/core/constants'
@@ -8,7 +7,6 @@ import type { CreditsInfo } from '@/core/types'
 
 import { messageOf } from '../errors'
 import { globalState } from '../global-state'
-import { listGenerations } from '../repos/generations'
 import { getSecret, isNonEmptyString, onSecretsChange, secretsReady } from '../secrets'
 import { isMockMode } from './client'
 
@@ -39,15 +37,17 @@ const CreditsSchema = z
   })
   .loose()
 
+type AccountCredits = Omit<CreditsInfo, 'localSpent'>
+
 interface CacheEntry {
-  info: CreditsInfo
+  info: AccountCredits
   at: number
 }
 
 const cache = globalState('credits', () => ({ entry: undefined as CacheEntry | undefined }))
 
 /** Key and management credits, cached for 30 seconds. Never throws. */
-export async function getCredits(opts?: { fresh?: boolean }): Promise<CreditsInfo> {
+export async function getAccountCredits(opts?: { fresh?: boolean }): Promise<AccountCredits> {
   const cached = cache.entry
 
   if (opts?.fresh !== true && cached && Date.now() - cached.at < CACHE_MS) {
@@ -65,9 +65,8 @@ export async function getCredits(opts?: { fresh?: boolean }): Promise<CreditsInf
   }
 }
 
-async function loadCredits(): Promise<CreditsInfo> {
+async function loadCredits(): Promise<AccountCredits> {
   await secretsReady()
-  const localSpent = await spentLocally()
   const fetchedAt = new Date().toISOString()
 
   if (isMockMode()) {
@@ -77,7 +76,6 @@ async function loadCredits(): Promise<CreditsInfo> {
       keyLimit: null,
       usageDaily: null,
       usageMonthly: null,
-      localSpent,
       source: 'mock',
       fetchedAt,
     }
@@ -91,13 +89,12 @@ async function loadCredits(): Promise<CreditsInfo> {
 
   const keyInfo = await fetchKey(key)
 
-  const info: CreditsInfo = {
+  const info: AccountCredits = {
     balance: null,
     keyLimitRemaining: keyInfo.limit_remaining ?? null,
     keyLimit: keyInfo.limit ?? null,
     usageDaily: keyInfo.usage_daily ?? null,
     usageMonthly: keyInfo.usage_monthly ?? null,
-    localSpent,
     source: 'key',
     fetchedAt,
   }
@@ -155,11 +152,7 @@ async function getJson(url: string, key: string): Promise<unknown> {
   return res.json()
 }
 
-function spentLocally(): Promise<number> {
-  return listGenerations().then((records) => sumBy(records, (record) => record.cost.actualUsd ?? 0))
-}
-
-function withError(last: CreditsInfo | null, message: string): CreditsInfo {
+function withError(last: AccountCredits | null, message: string): AccountCredits {
   if (last) {
     return { ...last, error: message }
   }
@@ -172,7 +165,6 @@ function withError(last: CreditsInfo | null, message: string): CreditsInfo {
     keyLimit: null,
     usageDaily: null,
     usageMonthly: null,
-    localSpent: 0,
     source: 'none',
     fetchedAt,
     error: message,

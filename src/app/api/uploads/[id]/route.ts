@@ -2,7 +2,7 @@ import { inputIds } from '@/core/submit-state'
 import { UploadError } from '@/server/errors'
 import { assertLocalRequest, errorResponse } from '@/server/http'
 import { listActiveGenerations } from '@/server/repos/generations'
-import { removeUpload } from '@/server/repos/uploads'
+import { removeUpload } from '@/server/services/uploads'
 
 interface Params {
   params: Promise<{ id: string }>

@@ -5,6 +5,7 @@ import { isNil } from 'lodash-es'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type * as Uploads from '@/server/repos/uploads'
+import type { createLinkUpload as CreateLinkUpload } from '@/server/services/uploads'
 
 vi.mock('server-only', () => ({}))
 
@@ -17,10 +18,14 @@ const PREVIOUS_ROOT = process.env.STORAGE_ROOT
 process.env.STORAGE_ROOT = ROOT
 
 let uploads: typeof Uploads
+let createLinkUpload: typeof CreateLinkUpload
 
 beforeAll(async () => {
   await fs.rm(ROOT, { recursive: true, force: true })
+
   uploads = await import('@/server/repos/uploads')
+
+  ;({ createLinkUpload } = await import('@/server/services/uploads'))
 })
 
 beforeEach(async () => {
@@ -51,7 +56,7 @@ describe('link upload fallback', () => {
   it('hard links when symlinks are denied', async () => {
     vi.spyOn(fs, 'symlink').mockRejectedValue(errno('EPERM'))
 
-    const item = await uploads.createLinkUpload({ absPath: SOURCE })
+    const item = await createLinkUpload({ absPath: SOURCE })
 
     expect(item.linkMode).toBe('hardlink')
 
@@ -65,7 +70,7 @@ describe('link upload fallback', () => {
     vi.spyOn(fs, 'symlink').mockRejectedValue(errno('EPERM'))
     vi.spyOn(fs, 'link').mockRejectedValue(errno('EXDEV'))
 
-    const item = await uploads.createLinkUpload({ absPath: SOURCE })
+    const item = await createLinkUpload({ absPath: SOURCE })
 
     expect(item.linkMode).toBe('copy')
 
@@ -77,7 +82,7 @@ describe('link upload fallback', () => {
   })
 
   it.skipIf(process.platform === 'win32')('marks a broken symlink missing', async () => {
-    const item = await uploads.createLinkUpload({ absPath: SOURCE })
+    const item = await createLinkUpload({ absPath: SOURCE })
 
     expect(item.linkMode).toBe('symlink')
 

@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { MEDIA_KINDS } from '@/core/media-kinds'
 import { assertLocalRequest, errorResponse, readJsonBody, zodError } from '@/server/http'
-import { createLinkUpload } from '@/server/repos/uploads'
+import { createLinkUpload } from '@/server/services/uploads'
 import { getSystem } from '@/server/system'
 
 const BodySchema = z.object({

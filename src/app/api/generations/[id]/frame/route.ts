@@ -8,7 +8,7 @@ import { assertLocalRequest, errorResponse, jsonError, readJsonBody, zodError } 
 import { extractBoundaryFrame } from '@/server/media/ffmpeg'
 import { downloadPaths, DOWNLOADS_DIR } from '@/server/paths'
 import { getGeneration } from '@/server/repos/generations'
-import { saveFileUpload } from '@/server/repos/uploads'
+import { createFileUpload } from '@/server/services/uploads'
 
 const BodySchema = z.object({ at: z.enum(['first', 'last']) })
 
@@ -59,7 +59,7 @@ export async function POST(request: Request, { params }: Params) {
 
       const bytes = new Uint8Array(await fs.readFile(temp))
 
-      const item = await saveFileUpload({
+      const item = await createFileUpload({
         bytes,
         originalName: `${record.id}-${body.data.at}-frame.png`,
       })

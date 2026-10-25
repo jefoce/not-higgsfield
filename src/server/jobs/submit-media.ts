@@ -12,7 +12,7 @@ import type { GenerationRecord, ReferencePlan, UploadItem } from '@/core/types'
 import { encodeImages } from '../media/image-data-url'
 import { toDataUrl } from '../media/to-data-url'
 import { submitVideo } from '../openrouter/client'
-import { ensureRemote, presignFor } from '../remote/remote-inputs'
+import { ensureRemote, presignFor } from '../services/remote-inputs'
 import { throwIfStopped, updateSubmit } from './submit-record'
 import { shouldRetryAsBase64 } from './submit-retry'
 

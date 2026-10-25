@@ -1,6 +1,7 @@
 import type { UploadItem } from '@/core/types'
 import { assertLocalRequest, errorResponse, jsonError, parseKinds } from '@/server/http'
-import { listUploads, saveFileUpload } from '@/server/repos/uploads'
+import { listUploads } from '@/server/repos/uploads'
+import { createFileUpload } from '@/server/services/uploads'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
 
     for (const file of files) {
       items.push(
-        await saveFileUpload({
+        await createFileUpload({
           bytes: new Uint8Array(await file.arrayBuffer()),
           originalName: file.name === '' ? `pasted-${Date.now()}.png` : file.name,
         }),

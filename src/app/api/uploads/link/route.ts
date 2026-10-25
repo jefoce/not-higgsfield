@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { assertLocalRequest, errorResponse, readJsonBody, zodError } from '@/server/http'
-import { createGenerationLinkUpload, createLinkUpload } from '@/server/repos/uploads'
+import { createGenerationLinkUpload, createLinkUpload } from '@/server/services/uploads'
 
 const BodySchema = z.union([
   z.object({ folderId: z.string().min(1), relPath: z.string().min(1) }),

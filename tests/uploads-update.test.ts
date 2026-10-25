@@ -25,7 +25,9 @@ let removeUpload: (id: string) => Promise<void>
 beforeAll(async () => {
   await fs.rm(ROOT, { recursive: true, force: true })
 
-  ;({ updateUpload, saveUploadItem, removeUpload } = await import('@/server/repos/uploads'))
+  ;({ updateUpload, saveUploadItem } = await import('@/server/repos/uploads'))
+
+  ;({ removeUpload } = await import('@/server/services/uploads'))
 })
 
 afterAll(async () => {

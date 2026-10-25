@@ -111,9 +111,11 @@ function remoteOf(upload: UploadItem): NonNullable<UploadItem['remote']> {
 beforeAll(async () => {
   await fs.rm(ROOT, { recursive: true, force: true })
 
-  ;({ ensureRemote, putOnce } = await import('@/server/remote/remote-inputs'))
+  ;({ ensureRemote, putOnce } = await import('@/server/services/remote-inputs'))
 
-  ;({ saveUploadItem, removeUpload } = await import('@/server/repos/uploads'))
+  ;({ saveUploadItem } = await import('@/server/repos/uploads'))
+
+  ;({ removeUpload } = await import('@/server/services/uploads'))
 
   ;({ hashFile } = await import('@/server/remote/hash'))
 })

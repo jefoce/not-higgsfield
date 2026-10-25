@@ -2,6 +2,7 @@ import 'server-only'
 
 import { randomUUID } from 'node:crypto'
 import fs from 'node:fs/promises'
+import os from 'node:os'
 import path from 'node:path'
 
 import { isNil, isString } from 'lodash-es'
@@ -9,18 +10,47 @@ import { isNil, isString } from 'lodash-es'
 import { extWithDot, mimeFromExt } from '@/core/media-kinds'
 import type { LinkMode, UploadItem } from '@/core/types'
 
+import { UploadError } from '../errors'
 import { removeFile, writeJsonAtomic } from '../fs/json-file'
+import { isUuid } from '../fs/media-ref'
 import { resolveInside, SafePathError } from '../fs/safe-path'
+import { removeEncoded } from '../media/image-cache'
 import { downloadPaths, uploadPaths } from '../paths'
-import { getFolder } from './folders'
-import { getGeneration } from './generations'
-import { assertSupported, probe, UploadError } from './upload-meta'
-import { listUploadRecords, rememberUpload } from './upload-record'
+import { getRemoteStore } from '../remote/remote-store'
+import { getFolder } from '../repos/folders'
+import { getGeneration } from '../repos/generations'
+import { listUploadRecords, loadUploadRecord, rememberUpload } from '../repos/upload-record'
+import { deleteUploadFiles, saveFileUpload } from '../repos/uploads'
+import { withLock } from '../sync/lock'
+import { assertSupported, probe } from './upload-probe'
+
+interface CreateFileUploadParams {
+  bytes: Uint8Array
+  originalName: string
+}
 
 interface LinkUploadParams {
   absPath: string
   folderId?: string
   relPath?: string
+}
+
+/** Validates and probes uploaded bytes, then stores them through the repo. */
+export async function createFileUpload(params: CreateFileUploadParams): Promise<UploadItem> {
+  const { bytes, originalName } = params
+  const ext = extWithDot(originalName)
+  const kind = assertSupported(ext)
+  const temp = path.join(os.tmpdir(), `upload-probe-${randomUUID()}${ext}`)
+
+  await fs.writeFile(temp, bytes)
+
+  try {
+    const meta = await probe(temp, kind)
+
+    return await saveFileUpload({ bytes, originalName, ...meta })
+  } finally {
+    await fs.unlink(temp).catch(() => {})
+  }
 }
 
 /** Links a disk file, falling back to hard link then copy, or reuses an existing link. */
@@ -100,6 +130,29 @@ export async function createGenerationLinkUpload(generationId: string): Promise<
   return createLinkUpload({ absPath: video })
 }
 
+/** Unlinks the media path and json only. A link's target is never touched. */
+export async function removeUpload(id: string): Promise<void> {
+  if (!isUuid(id)) {
+    return
+  }
+
+  await withLock(`upload:${id}`, async () => {
+    const record = await loadUploadRecord(id)
+    let isShared = true
+
+    if (record?.remote) {
+      isShared = await sharesRemote(record)
+    }
+
+    await deleteUploadFiles({ id, ext: record?.ext ?? '' })
+    await removeEncoded(id)
+
+    if (record?.remote && !isShared) {
+      await deleteRemote(record.remote.key)
+    }
+  })
+}
+
 async function resolveRequested(params: LinkUploadParams): Promise<string> {
   const { absPath, folderId, relPath } = params
 
@@ -165,4 +218,20 @@ async function findLink(target: string): Promise<UploadItem | null> {
   }
 
   return null
+}
+
+async function sharesRemote(item: UploadItem): Promise<boolean> {
+  const records = await listUploadRecords()
+
+  return records.some(
+    (record) => record.id !== item.id && record.remote?.sha256 === item.remote?.sha256,
+  )
+}
+
+async function deleteRemote(key: string): Promise<void> {
+  try {
+    await getRemoteStore()?.delete(key)
+  } catch {
+    // Best effort: a failed remote delete must not block local cleanup.
+  }
 }

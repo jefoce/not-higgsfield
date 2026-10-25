@@ -10,7 +10,7 @@ import type { ModelPreset } from '@/core/presets'
 import { WAN_30 } from '@/core/presets/wan/wan-3.0'
 import type { UploadItem } from '@/core/types'
 import type { encodeImages as EncodeImages } from '@/server/media/image-data-url'
-import type { removeUpload as RemoveUpload } from '@/server/repos/uploads'
+import type { removeUpload as RemoveUpload } from '@/server/services/uploads'
 
 const ROOT = path.join(process.cwd(), '.cache', `image-data-url-test-${process.pid}`)
 const PREVIOUS_ROOT = process.env.STORAGE_ROOT
@@ -37,7 +37,7 @@ beforeAll(async () => {
 
   ;({ encodeImages } = await import('@/server/media/image-data-url'))
 
-  ;({ removeUpload } = await import('@/server/repos/uploads'))
+  ;({ removeUpload } = await import('@/server/services/uploads'))
 
   ;({ UPLOADS_DIR: uploadsDir } = await import('@/server/paths'))
 })
