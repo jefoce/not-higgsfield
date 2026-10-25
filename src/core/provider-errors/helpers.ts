@@ -22,7 +22,7 @@ function parameterName(raw: string): string | null {
   const dotted = raw.match(/(?:InvalidParameter|MissingParameter)\.([A-Za-z0-9_]+)/)
 
   if (dotted) {
-    return dotted[1]
+    return dotted[1] ?? null
   }
 
   const after = raw.match(/(?:InvalidParameter|MissingParameter)[^:\n]*:\s*([A-Za-z0-9_.-]+)/)

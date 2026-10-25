@@ -1,6 +1,7 @@
 'use client'
 
 import { type RefObject, useEffect } from 'react'
+import { isNil } from 'lodash-es'
 
 interface UseSlotLifecycleParams {
   id: string
@@ -24,7 +25,7 @@ export function useSlotLifecycle(params: UseSlotLifecycleParams): void {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) {
+        if (!isNil(entry) && !entry.isIntersecting) {
           release(id)
         }
       },

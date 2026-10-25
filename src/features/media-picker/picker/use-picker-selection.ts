@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { isEmpty } from 'lodash-es'
+import { isEmpty, isNil } from 'lodash-es'
 
 import type { UploadItem } from '@/core/media-types'
 
@@ -28,12 +28,14 @@ export function usePickerSelection(request: PickerRequest): PickerSelection {
         (item) => item.missing !== true && request.kinds.includes(item.kind),
       )
 
-      if (isEmpty(allowed)) {
+      const [first] = allowed
+
+      if (isEmpty(allowed) || isNil(first)) {
         return
       }
 
       if (request.max === 1) {
-        request.onPick([allowed[0]])
+        request.onPick([first])
         closeMediaPicker()
 
         return

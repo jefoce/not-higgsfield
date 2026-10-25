@@ -128,7 +128,7 @@ describe('prompt chips', () => {
       expect(chip.className).toContain('font-medium')
     }
 
-    expect(chips[0].className).toContain('ml-auto')
+    expect(required(chips[0], 'warning chip').className).toContain('ml-auto')
   })
 })
 
@@ -183,7 +183,7 @@ describe('liked list row', () => {
     expect(hearts).toHaveLength(1)
     expect(within(media).queryByText('1')).toBeNull()
 
-    const heart = hearts[0]
+    const heart = required(hearts[0], 'heart')
 
     expect(heart.className).not.toContain('opacity-0')
 

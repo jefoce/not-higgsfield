@@ -52,26 +52,27 @@ const pluralVideos = (count: number): string => `${count} ${count === 1 ? 'video
 
 function summaryText(records: GenerationRecord[]): string {
   const counts = countBy(records, 'status')
+  const completed = counts.completed ?? 0
+  const expired = counts.expired ?? 0
+  const failed = counts.failed ?? 0
   const parts: string[] = []
 
-  if (counts.completed > 0) {
+  if (completed > 0) {
     parts.push(
-      `${pluralVideos(counts.completed)} finished while the app was closed and ${
-        counts.completed === 1 ? 'is' : 'are'
+      `${pluralVideos(completed)} finished while the app was closed and ${
+        completed === 1 ? 'is' : 'are'
       } downloading.`,
     )
   }
 
-  if (counts.expired > 0) {
+  if (expired > 0) {
     parts.push(
-      `${pluralVideos(counts.expired)} expired before ${
-        counts.expired === 1 ? 'it' : 'they'
-      } could be downloaded.`,
+      `${pluralVideos(expired)} expired before ${expired === 1 ? 'it' : 'they'} could be downloaded.`,
     )
   }
 
-  if (counts.failed > 0) {
-    parts.push(`${pluralVideos(counts.failed)} failed while the app was closed.`)
+  if (failed > 0) {
+    parts.push(`${pluralVideos(failed)} failed while the app was closed.`)
   }
 
   return parts.join(' ')
@@ -92,9 +93,9 @@ function showChanges(records: GenerationRecord[]): void {
   }
 
   document.getElementById('history-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  const first = records[0]
+  const first = records.at(0)
 
-  if (records.length > 0) {
+  if (!isNil(first)) {
     window.setTimeout(() => scrollToRecord(first.id), HISTORY_SCROLL_DELAY_MS)
   }
 }

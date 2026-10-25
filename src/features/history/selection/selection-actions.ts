@@ -13,8 +13,10 @@ const pluralVideos = (count: number): string => `${count} ${count === 1 ? 'video
 /** Saves one or many completed videos, platform dialogs own the prompts. */
 export async function downloadSelected(selected: GenerationRecord[]): Promise<void> {
   try {
-    if (selected.length === 1) {
-      const isSaved = await platform.saveVideo(selected[0])
+    const [single] = selected
+
+    if (!isNil(single) && selected.length === 1) {
+      const isSaved = await platform.saveVideo(single)
 
       if (!isSaved) {
         return

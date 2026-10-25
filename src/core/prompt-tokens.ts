@@ -115,14 +115,15 @@ interface LooseMatch {
 function readLooseMatch(match: RegExpExecArray): LooseMatch | null {
   const [, atKind, atNum, bracketKind, bracketNum, bareKind, bareNum] = match
   const word = atKind ?? bracketKind ?? bareKind
+  const rawNumber = atNum ?? bracketNum ?? bareNum
 
-  if (isNil(word) || word === '') {
+  if (isNil(word) || word === '' || isNil(rawNumber)) {
     return null
   }
 
   return {
     word,
-    rawNumber: atNum ?? bracketNum ?? bareNum,
+    rawNumber,
     isBare: isNil(atKind) && isNil(bracketKind),
     isCapitalized: /^[A-Z]/.test(bareKind ?? ''),
   }
@@ -160,7 +161,19 @@ export function promptSlots(prompt: string): RefSlot[] {
   const slots: RefSlot[] = []
 
   for (const match of prompt.matchAll(CANONICAL)) {
-    const slot = { kind: KIND_WORD[match[1].toLowerCase()], n: Number(match[2]) }
+    const [, word, rawNumber] = match
+
+    if (isNil(word) || isNil(rawNumber)) {
+      continue
+    }
+
+    const kind = KIND_WORD[word.toLowerCase()]
+
+    if (isNil(kind)) {
+      continue
+    }
+
+    const slot = { kind, n: Number(rawNumber) }
 
     if (!slots.some((seen) => seen.kind === slot.kind && seen.n === slot.n)) {
       slots.push(slot)

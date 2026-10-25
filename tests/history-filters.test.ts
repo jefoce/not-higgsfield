@@ -4,6 +4,8 @@ import { applyFilters, countActive, paginate, sortRecords } from '@/core/history
 import type { AspectChoice, Resolution } from '@/core/presets/types'
 import type { GenerationRecord, GeneratorTab, JobStatus } from '@/core/types'
 
+import { required } from './helpers/required'
+
 interface RecordOptions {
   id: string
   createdAt: string
@@ -149,7 +151,11 @@ describe('applyFilters', () => {
 
 describe('sortRecords', () => {
   it('sorts by createdAt descending without mutating the input', () => {
-    const shuffled = [records[2], records[0], records[4]]
+    const shuffled = [
+      required(records[2], 'record 2'),
+      required(records[0], 'record 0'),
+      required(records[4], 'record 4'),
+    ]
 
     expect(sortRecords(shuffled).map((r) => r.id)).toEqual(['e', 'c', 'a'])
     expect(shuffled.map((r) => r.id)).toEqual(['c', 'a', 'e'])

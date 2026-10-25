@@ -70,7 +70,7 @@ describe('history selection cards', () => {
     setOrder(records.map((item) => item.id))
     render(<HistoryGrid records={records} onOpen={handleNoop} />)
 
-    act(() => fireEvent.click(screen.getAllByRole('checkbox')[0]))
+    act(() => fireEvent.click(required(screen.getAllByRole('checkbox')[0], 'checkbox')))
 
     expect(screen.queryByRole('button', { name: 'Download' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'More actions' })).toBeNull()
@@ -85,8 +85,8 @@ describe('history selection cards', () => {
 
     render(
       <div>
-        <HistoryRow record={records[0]} />
-        <HistoryRow record={records[1]} />
+        <HistoryRow record={required(records[0], 'first record')} />
+        <HistoryRow record={required(records[1], 'second record')} />
       </div>,
     )
 
@@ -117,9 +117,12 @@ describe('history selection cards', () => {
 
     render(<HistoryGrid records={records} onOpen={handleNoop} />)
 
-    fireEvent.click(screen.getAllByRole('button', { name: 'Open video details' })[3], {
-      shiftKey: true,
-    })
+    const target = required(
+      screen.getAllByRole('button', { name: 'Open video details' })[3],
+      'fourth details button',
+    )
+
+    fireEvent.click(target, { shiftKey: true })
 
     expect(ids()).toEqual(['b', 'c', 'd'])
   })
@@ -130,7 +133,7 @@ describe('history selection bar', () => {
     const records = Array.from({ length: 200 }, (_, index) => record(`id-${index}`))
 
     setOrder(records.map((item) => item.id))
-    setSelection([records[0].id])
+    setSelection([required(records[0], 'first record').id])
     render(<SelectionBar records={records} />)
 
     const one = screen.getByText('1 selected')

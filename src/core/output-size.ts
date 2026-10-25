@@ -37,23 +37,45 @@ interface OutputSizeParams {
   aspect: AspectRatio
 }
 
+/** Size from the preset's `WIDTHxHEIGHT` string, null when a part is missing. */
+function parseExact(exact: string): PixelSize | null {
+  const [width, height] = exact.split('x').map(Number)
+
+  if (isNil(width) || isNil(height)) {
+    return null
+  }
+
+  return { width, height }
+}
+
+/** Both sides of an aspect string as positive finite numbers, null when malformed. */
+function parseAspect(aspect: AspectRatio): [number, number] | null {
+  const [a, b] = aspect.split(':').map(Number)
+
+  if (isNil(a) || isNil(b) || !Number.isFinite(a) || !Number.isFinite(b) || a <= 0 || b <= 0) {
+    return null
+  }
+
+  return [a, b]
+}
+
 /** Exact preset size when listed, else an even-dimension estimate from the short side. */
 export function outputSize(params: OutputSizeParams): PixelSize | null {
   const { preset, resolution, aspect } = params
   const exact = preset.outputSizes?.[resolution]?.[aspect]
 
   if (!isNil(exact)) {
-    const [width, height] = exact.split('x').map(Number)
+    return parseExact(exact)
+  }
 
-    return { width, height }
+  const sides = parseAspect(aspect)
+
+  if (isNil(sides)) {
+    return null
   }
 
   const short = SHORT_SIDE[resolution]
-  const [a, b] = aspect.split(':').map(Number)
-
-  if (!Number.isFinite(a) || !Number.isFinite(b) || a <= 0 || b <= 0) {
-    return null
-  }
+  const [a, b] = sides
 
   if (a >= b) {
     return { width: even((short * a) / b), height: short }

@@ -21,12 +21,14 @@ export async function flattenColor(source: string): Promise<FlattenColor> {
   let blue = 0
   let count = 0
 
+  const byteAt = (index: number): number => data.at(index) ?? 0
+
   const alphaAt = (x: number, y: number): number => {
     if (x < 0 || y < 0 || x >= width || y >= height) {
       return 0
     }
 
-    return data[(y * width + x) * channels + 3]
+    return byteAt((y * width + x) * channels + 3)
   }
 
   const touchesTransparency = (x: number, y: number): boolean =>
@@ -39,7 +41,7 @@ export async function flattenColor(source: string): Promise<FlattenColor> {
     for (let x = 0; x < width; x += 1) {
       const index = (y * width + x) * channels
 
-      if (data[index + 3] !== 255) {
+      if (byteAt(index + 3) !== 255) {
         continue
       }
 
@@ -47,9 +49,9 @@ export async function flattenColor(source: string): Promise<FlattenColor> {
         continue
       }
 
-      red += data[index]
-      green += data[index + 1]
-      blue += data[index + 2]
+      red += byteAt(index)
+      green += byteAt(index + 1)
+      blue += byteAt(index + 2)
       count += 1
     }
   }

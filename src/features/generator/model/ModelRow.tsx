@@ -14,8 +14,12 @@ import { Price } from '@/ui/Price'
 import { ModelBadge } from './ModelBadge'
 
 function quality(preset: ModelPreset): string {
-  const first = preset.resolutions[0]
+  const [first] = preset.resolutions
   const last = preset.resolutions.at(-1)
+
+  if (isNil(first) || isNil(last)) {
+    return ''
+  }
 
   return first === last ? first : `${first}-${last}`
 }

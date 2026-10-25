@@ -137,6 +137,10 @@ function parseRange(header: string, size: number): Range | null {
 
   const [, rawStart, rawEnd] = match
 
+  if (isNil(rawStart) || isNil(rawEnd)) {
+    return null
+  }
+
   if (rawStart === '') {
     return parseSuffix(rawEnd, size)
   }

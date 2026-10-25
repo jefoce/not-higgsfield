@@ -1,5 +1,6 @@
 'use client'
 
+import { isNil } from 'lodash-es'
 import { Minimize2 } from 'lucide-react'
 
 import { MEDIA_KINDS } from '@/core/media-kinds'
@@ -26,6 +27,11 @@ export function ReferenceCounters(props: ReferenceCountersProps) {
     <div className="mb-4 flex w-full items-center px-1.5">
       {MEDIA_KINDS.filter((kind) => preset.references[kind] > 0).map((kind) => {
         const Icon = REFERENCE_ICONS[MEDIA_KINDS.indexOf(kind)]
+
+        if (isNil(Icon)) {
+          return null
+        }
+
         const count = `${counts[kind]}/${preset.references[kind]}`
         const hasHint = isDownscaled && kind === 'image'
 

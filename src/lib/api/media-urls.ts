@@ -13,7 +13,7 @@ interface ThumbUrlParams {
 
 /** Media stream URL, routed through the compat copy when the MIME cannot play. */
 export function mediaUrl(ref: string, mime?: string): string {
-  const [pathRef, query = ''] = ref.split('?')
+  const [pathRef = ref, query = ''] = ref.split('?')
   const base = `/api/media/${encodeRef(pathRef)}`
   const plainUrl = isEmpty(query) ? base : `${base}?${query}`
 

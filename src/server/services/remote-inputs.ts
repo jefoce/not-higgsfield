@@ -135,11 +135,13 @@ export async function sweepRemote(store?: ObjectStore): Promise<SweepResult> {
   let cleared = 0
 
   for (const items of Object.values(groups)) {
-    if (items.some((item) => Date.parse(item.remote.lastUsedAt) >= cutoff)) {
+    const [first] = items
+
+    if (isNil(first) || items.some((item) => Date.parse(item.remote.lastUsedAt) >= cutoff)) {
       continue
     }
 
-    await remoteStore.delete(items[0].remote.key)
+    await remoteStore.delete(first.remote.key)
     deleted += 1
 
     for (const item of items) {

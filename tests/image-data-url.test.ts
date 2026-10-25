@@ -12,6 +12,8 @@ import { WAN_30 } from '@/core/presets/wan/wan-3.0'
 import type { encodeImages as EncodeImages } from '@/server/media/image-data-url'
 import type { removeUpload as RemoveUpload } from '@/server/services/uploads'
 
+import { required } from './helpers/required'
+
 const ROOT = path.join(process.cwd(), '.cache', `image-data-url-test-${process.pid}`)
 const PREVIOUS_ROOT = process.env.STORAGE_ROOT
 
@@ -112,10 +114,12 @@ describe('encodeImages sizing', () => {
       budgetBytes: BUDGET,
     })
 
+    const image = required(media[upload.id], 'encoded image')
+
     expect(plan.step).toBe(1)
     expect(plan.maxSide).toBe(4096)
-    expect(media[upload.id].width).toBe(4096)
-    expect(media[upload.id].height).toBeLessThan(3000)
+    expect(image.width).toBe(4096)
+    expect(image.height).toBeLessThan(3000)
   })
 
   it('applies EXIF rotation and strips EXIF', async () => {
@@ -129,7 +133,8 @@ describe('encodeImages sizing', () => {
     const upload = await fixture(source, '.jpg')
     const { media } = await encodeImages({ uploads: [upload], preset: WAN_30, budgetBytes: BUDGET })
 
-    const output = Buffer.from(media[upload.id].url.split(',')[1] ?? '', 'base64')
+    const image = required(media[upload.id], 'encoded image')
+    const output = Buffer.from(image.url.split(',')[1] ?? '', 'base64')
     const meta = await sharp(output).metadata()
 
     expect(meta.width).toBe(200)
@@ -154,7 +159,9 @@ describe('encodeImages formats', () => {
     const upload = await fixture(source, '.png')
     const { media } = await encodeImages({ uploads: [upload], preset: WAN_30, budgetBytes: BUDGET })
 
-    expect(media[upload.id].format).toBe('jpeg')
+    const image = required(media[upload.id], 'encoded image')
+
+    expect(image.format).toBe('jpeg')
   })
 
   it('flattens a white cutout on dark and a dark cutout on white', async () => {
@@ -167,11 +174,14 @@ describe('encodeImages formats', () => {
       budgetBytes: BUDGET,
     })
 
-    expect(media[light.id].format).toBe('jpeg')
-    expect(media[light.id].flattened).toBe('#1c1e20')
-    expect(media[dark.id].flattened).toBe('#ffffff')
+    const lightImage = required(media[light.id], 'light image')
+    const darkImage = required(media[dark.id], 'dark image')
 
-    const corner = await pixels(media[light.id])
+    expect(lightImage.format).toBe('jpeg')
+    expect(lightImage.flattened).toBe('#1c1e20')
+    expect(darkImage.flattened).toBe('#ffffff')
+
+    const corner = await pixels(lightImage)
 
     expect(corner.data[0]).toBeLessThan(80)
   })
@@ -185,7 +195,7 @@ describe('encodeImages formats', () => {
       budgetBytes: BUDGET,
     })
 
-    const image = media[upload.id]
+    const image = required(media[upload.id], 'encoded image')
 
     expect(image.format).toBe('png')
     expect(image.flattened).toBeUndefined()
@@ -205,7 +215,8 @@ describe('encodeImages formats', () => {
     const upload = await fixture(source, '.jpg')
     const { media } = await encodeImages({ uploads: [upload], preset: WAN_30, budgetBytes: BUDGET })
 
-    const output = Buffer.from(media[upload.id].url.split(',')[1] ?? '', 'base64')
+    const image = required(media[upload.id], 'encoded image')
+    const output = Buffer.from(image.url.split(',')[1] ?? '', 'base64')
 
     const reference = await sharp({
       create: { width: 300, height: 200, channels: 3, background: '#f80' },

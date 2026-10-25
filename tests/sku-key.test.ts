@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { MODEL_PRESETS } from '@/core/presets'
 import { primaryBinding, skuKey } from '@/core/pricing'
 
+import { required } from './helpers/required'
+
 /** Keys recorded from the per-preset key functions before the SKU rules replaced them. */
 const EXPECTED: Record<string, Record<string, string>> = {
   'wan-3.0': {
@@ -73,9 +75,7 @@ const COMBINATIONS = [
 describe('skuKey', () => {
   it('returns the recorded key for every preset combination', () => {
     for (const preset of MODEL_PRESETS) {
-      const expected = EXPECTED[preset.id]
-
-      expect(expected, preset.id).toBeDefined()
+      const expected = required(EXPECTED[preset.id], preset.id)
 
       for (const resolution of preset.resolutions) {
         for (const [isAudio, hasVideoInput] of COMBINATIONS) {

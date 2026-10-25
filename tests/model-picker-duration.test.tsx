@@ -10,6 +10,8 @@ import { useModelEntry } from '@/lib/api/models'
 import type { CatalogEntry } from '@/server/services/model-catalog'
 import { Price } from '@/ui/Price'
 
+import { required } from './helpers/required'
+
 vi.mock('@/lib/api/models', () => ({
   useModelEntry: vi.fn(() => null),
 }))
@@ -82,13 +84,12 @@ describe('ModelPicker duration badge', () => {
       ['Wan 3.0 Prime', '5-30s'],
       ['Seedance 2.0', '4-15s'],
       ['Seedance 2.5', '4-30s'],
-    ]
+    ] as const
 
     for (const [title, badge] of cases) {
-      const row = within(dialog).getByText(title).closest('button')
+      const row = required(within(dialog).getByText(title).closest('button'), title)
 
-      expect(row, title).not.toBeNull()
-      expect(within(row as HTMLElement).getByText(badge), title).toBeTruthy()
+      expect(within(row).getByText(badge), title).toBeTruthy()
     }
   })
 })

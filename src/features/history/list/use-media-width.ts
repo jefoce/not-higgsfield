@@ -1,6 +1,7 @@
 'use client'
 
 import { type RefObject, useEffect, useState } from 'react'
+import { isNil } from 'lodash-es'
 
 /** Live content width of an element, 0 until the first resize observation. */
 export function useMediaWidth(ref: RefObject<HTMLDivElement | null>): number {
@@ -13,7 +14,13 @@ export function useMediaWidth(ref: RefObject<HTMLDivElement | null>): number {
       return
     }
 
-    const observer = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width))
+    const observer = new ResizeObserver(([entry]) => {
+      if (isNil(entry)) {
+        return
+      }
+
+      setWidth(entry.contentRect.width)
+    })
 
     observer.observe(node)
 

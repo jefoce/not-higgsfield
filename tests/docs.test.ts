@@ -8,6 +8,8 @@ import * as bounds from '@/core/constants'
 import { MODEL_PRESETS } from '@/core/presets'
 import { STATUS_HELP } from '@/core/status-help'
 
+import { required } from './helpers/required'
+
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const DOCS = path.join(ROOT, 'docs')
 
@@ -42,7 +44,9 @@ const file = (rel: string) => path.join(ROOT, rel)
 
 /** Status labels packed in the first cell of a row, split on `/`. */
 function rowLabels(cells: string[]): string[] {
-  return cells[0].split('/').map((label) => label.trim())
+  return required(cells[0], 'label cell')
+    .split('/')
+    .map((label) => label.trim())
 }
 
 describe('bounds table', () => {
@@ -76,7 +80,9 @@ describe('bounds table', () => {
 
     expect(rows.length).toBe(Object.keys(expected).length)
 
-    for (const [name, value] of rows) {
+    for (const row of rows) {
+      const name = required(row[0], 'row name')
+      const value = required(row[1], 'row value')
       const want = expected[name]
 
       expect(want, `bounds row not covered: ${name}`).toBeDefined()
@@ -151,13 +157,13 @@ describe('documentation tables', () => {
       const source = fs.readFileSync(file(rel), 'utf8')
 
       for (const match of source.matchAll(/!?\[[^\]]*\]\(([^)\s]+)\)/g)) {
-        const target = match[1]
+        const target = required(match[1], 'link target')
 
         if (/^(https?:|mailto:|#)/.test(target)) {
           continue
         }
 
-        const clean = target.split('#')[0].split('?')[0]
+        const clean = target.split(/[#?]/)[0] ?? ''
 
         if (clean === '') {
           continue

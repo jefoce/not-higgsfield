@@ -7,6 +7,8 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { GenerationRecord } from '@/core/types'
 
+import { required } from './helpers/required'
+
 const root = await mkdtemp(path.join(os.tmpdir(), 'nh-export-batch-'))
 
 process.env.STORAGE_ROOT = root
@@ -95,8 +97,11 @@ describe('POST /api/generations/export-batch', () => {
 
     expect(response.status).toBe(200)
     expect(body.saved).toHaveLength(1)
-    expect(path.basename(body.saved[0])).toBe(`a-cat-${item.id.slice(0, 6)}.mp4`)
-    expect(await readFile(body.saved[0])).toEqual(videoBytes)
+
+    const saved = required(body.saved[0], 'saved file')
+
+    expect(path.basename(saved)).toBe(`a-cat-${item.id.slice(0, 6)}.mp4`)
+    expect(await readFile(saved)).toEqual(videoBytes)
     expect(body.skipped).toEqual([])
   })
 
@@ -109,9 +114,11 @@ describe('POST /api/generations/export-batch', () => {
     const response = await POST(exportRequest({ ids: [item.id], dir }))
     const body = (await response.json()) as { saved: string[] }
 
-    expect(path.basename(body.saved[0])).toBe(`a-cat-${item.id.slice(0, 6)} (2).mp4`)
+    const saved = required(body.saved[0], 'saved file')
+
+    expect(path.basename(saved)).toBe(`a-cat-${item.id.slice(0, 6)} (2).mp4`)
     expect(await readFile(first, 'utf8')).toBe('keep')
-    expect((await stat(body.saved[0])).isFile()).toBe(true)
+    expect((await stat(saved)).isFile()).toBe(true)
   })
 
   it('rejects a symlinked target dir', async () => {

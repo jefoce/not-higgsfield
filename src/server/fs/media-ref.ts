@@ -51,11 +51,12 @@ export async function resolveMediaRef(segments: string[]): Promise<ResolvedMedia
 }
 
 function resolveDownload(rest: string[], ref: string): ResolvedMediaRef {
-  if (rest.length !== 1) {
+  const [name] = rest
+
+  if (rest.length !== 1 || isNil(name)) {
     throw new MediaRefError(400, `Invalid downloads ref: ${ref}`)
   }
 
-  const name = rest[0]
   const kind = kindFromName(name)
 
   if (isNil(kind)) {
@@ -66,11 +67,12 @@ function resolveDownload(rest: string[], ref: string): ResolvedMediaRef {
 }
 
 async function resolveUpload(rest: string[], ref: string): Promise<ResolvedMediaRef> {
-  if (rest.length !== 1 || !isUuid(rest[0])) {
+  const [id] = rest
+
+  if (rest.length !== 1 || isNil(id) || !isUuid(id)) {
     throw new MediaRefError(400, `Invalid uploads ref: ${ref}`)
   }
 
-  const id = rest[0]
   const item = await readJson(path.join(UPLOADS_DIR, `${id}.json`), UploadItemSchema)
 
   if (!item) {

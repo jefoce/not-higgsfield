@@ -101,7 +101,11 @@ function focusSlotInEditor(params: FocusSlotParams): void {
         return
       }
 
-      const target = chips[occurrence % chips.length]
+      const target = chips.at(occurrence % chips.length)
+
+      if (isNil(target)) {
+        return
+      }
 
       key = target.getKey()
       const selection = $createNodeSelection()

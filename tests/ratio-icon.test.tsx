@@ -101,7 +101,8 @@ function boxFor(ratio: AspectRatio) {
 describe('RatioIcon', () => {
   it.each(['16:9', '9:16'] satisfies AspectRatio[])('draws %s as an outlined box', (ratio) => {
     const { square, box } = boxFor(ratio)
-    const [width, height] = ratio.split(':').map(Number)
+    const width = Number(ratio.split(':')[0])
+    const height = Number(ratio.split(':')[1])
 
     expect(box.className).toContain('border')
 
@@ -138,7 +139,8 @@ describe('RatioIcon', () => {
 function expectRatioBox(root: HTMLElement, ratio: AspectRatio) {
   const square = root.firstElementChild as HTMLElement
   const box = square.firstElementChild as HTMLElement
-  const [width, height] = ratio.split(':').map(Number)
+  const width = Number(ratio.split(':')[0])
+  const height = Number(ratio.split(':')[1])
 
   expect(square.getAttribute('aria-hidden')).toBe('true')
   expect(box.className).toContain('border')

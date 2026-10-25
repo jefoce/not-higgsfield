@@ -7,6 +7,8 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import type * as Uploads from '@/server/repos/uploads'
 import type { createLinkUpload as CreateLinkUpload } from '@/server/services/uploads'
 
+import { required } from './helpers/required'
+
 vi.mock('server-only', () => ({}))
 
 const ROOT = path.join(process.cwd(), '.cache', `link-mode-test-${process.pid}`)
@@ -61,7 +63,7 @@ describe('link upload fallback', () => {
     expect(item.linkMode).toBe('hardlink')
 
     await fs.rm(SOURCE)
-    const [listed] = await uploads.listUploads({ ids: [item.id] })
+    const listed = required((await uploads.listUploads({ ids: [item.id] }))[0], 'listed upload')
 
     expect(listed.missing).toBe(false)
   })
@@ -75,7 +77,7 @@ describe('link upload fallback', () => {
     expect(item.linkMode).toBe('copy')
 
     await fs.rm(SOURCE)
-    const [listed] = await uploads.listUploads({ ids: [item.id] })
+    const listed = required((await uploads.listUploads({ ids: [item.id] }))[0], 'listed upload')
 
     expect(listed.missing).toBe(false)
     expect(await fs.readFile(path.join(UPLOADS, `${item.id}.png`), 'utf8')).toBe(BYTES)
@@ -87,7 +89,7 @@ describe('link upload fallback', () => {
     expect(item.linkMode).toBe('symlink')
 
     await fs.rm(SOURCE)
-    const [listed] = await uploads.listUploads({ ids: [item.id] })
+    const listed = required((await uploads.listUploads({ ids: [item.id] }))[0], 'listed upload')
 
     expect(listed.missing).toBe(true)
   })

@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { isEmpty } from 'lodash-es'
+import { isEmpty, isNil } from 'lodash-es'
 
 import type { GenerationRecord } from '@/core/types'
 import { useGeneratorStore } from '@/features/generator/store/store'
@@ -70,7 +70,7 @@ export function HistorySection() {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (!isNil(entry) && entry.isIntersecting) {
           loadMore()
         }
       },

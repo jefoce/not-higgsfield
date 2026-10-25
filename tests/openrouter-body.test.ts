@@ -90,7 +90,7 @@ describe('buildRequestBody frames', () => {
       'last_frame',
     ])
 
-    expect(body.frame_images?.[1].image_url.url).toBe('data:image/png;base64,END')
+    expect(body.frame_images?.[1]?.image_url.url).toBe('data:image/png;base64,END')
   })
 })
 
