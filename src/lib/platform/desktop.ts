@@ -1,4 +1,4 @@
-import { Channel, invoke } from '@tauri-apps/api/core'
+import { Channel, invoke, type InvokeArgs } from '@tauri-apps/api/core'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { ask, open, save } from '@tauri-apps/plugin-dialog'
 import {
@@ -26,6 +26,19 @@ import {
   UpdateCheckSchema,
   UpdateProgressSchema,
 } from './update-schemas'
+
+/** Tauri rejects with a string, wrap it so `messageOf` reads the real reason. */
+async function invokeChecked<T>(command: string, args?: InvokeArgs): Promise<T> {
+  try {
+    return await invoke<T>(command, args)
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error
+    }
+
+    throw new Error(String(error))
+  }
+}
 
 export const desktopPlatform: Platform = {
   kind: 'desktop',
@@ -155,11 +168,11 @@ export const desktopPlatform: Platform = {
   },
 
   appInfo: async () => {
-    return AppInfoSchema.parse(await invoke('update_info'))
+    return AppInfoSchema.parse(await invokeChecked('update_info'))
   },
 
   checkUpdate: async () => {
-    return UpdateCheckSchema.parse(await invoke('update_check'))
+    return UpdateCheckSchema.parse(await invokeChecked('update_check'))
   },
 
   installUpdate: async (onProgress: UpdateListener): Promise<InstallResult> => {
@@ -169,14 +182,14 @@ export const desktopPlatform: Platform = {
       onProgress(UpdateProgressSchema.parse(message))
     }
 
-    return InstallResultSchema.parse(await invoke('update_install', { channel }))
+    return InstallResultSchema.parse(await invokeChecked('update_install', { channel }))
   },
 
   setAutoCheck: async (isOn: boolean) => {
-    await invoke('update_set_auto', { isOn })
+    await invokeChecked('update_set_auto', { isOn })
   },
 
   openReleasePage: async () => {
-    await invoke('update_open_release')
+    await invokeChecked('update_open_release')
   },
 }
