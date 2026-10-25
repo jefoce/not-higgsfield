@@ -55,6 +55,7 @@ pnpm typecheck && pnpm lint && pnpm deps && pnpm format:check && pnpm knip && pn
 - One type per API shape, in `src/core`, imported by both the route and the client. No copies of a response type in a component.
 - Flat object types. One level per object type. Every nested shape gets a name. Owner-prefixed when the part belongs to one owner (`RecordJob`, `RecordOutput`), shared when the shape repeats (`PixelSize`, `FrameSlots`, `MediaKindCounts`). Width and height pairs use `PixelSize`. No inline `z.object` inside another schema. Tests are exempt.
 - `satisfies` for literal config objects (presets, tables). `as const` for fixed lists.
+- No type escape hatches. Name the part (`RecordJob`, `PresetIcon`) instead of indexed access (`X['key']`). Name a `ReturnType` once (`type IntervalId = ReturnType<typeof setInterval>`). No pure type aliases that only rename another type. `(typeof LIST)[number]` and one named deriving alias stay allowed.
 - Ternary only as `const name = test ? a : b`. The test is one simple check, branches are plain values. Never render JSX through a ternary: use `&&`, an early return, or a component variable (`const Icon = isOn ? A : B`).
 - Boolean variables and params start with `is`, `has`, `can`, `should` or `did`. Types are PascalCase. Module constants are UPPER_CASE or camelCase.
 - Zod schema constants keep PascalCase names (`QuerySchema`), even though other module constants are camelCase or UPPER_CASE.
@@ -127,6 +128,21 @@ async function copyUnique(params: CopyUniqueParams): Promise<string> {
 | `lib`                   | `core`                                  |
 | `core`                  | packages only                           |
 
+## Shared helpers
+
+Search here before writing a helper. One of these covers the case. Extract a new one only at the second real use.
+
+- `useBoolean` (`src/lib/use-boolean.ts`): boolean state with `value`, `set`, `on`, `off`, `toggle`.
+- `useAsyncAction` (`src/lib/use-async-action.ts`): one async action at a time, exposes `isRunning`.
+- `useDebouncedValue` (`src/lib/use-debounced-value.ts`): debounced copy of a value.
+- `toastError`, `copyText` (`src/lib/notify.ts`).
+- `messageOf` (`src/core/errors.ts`): message of a caught value.
+- `isNonEmptyString` (`src/core/guards.ts`): non-empty string guard.
+- `withQuery` (`src/lib/api/query.ts`): URL with query params, nil and empty values skipped.
+- `joinWords` (`src/core/text.ts`): "a, b, and c" or "a, b, or c".
+- `createTtlCache` (`src/server/sync/ttl-cache.ts`): `globalState` TTL cache.
+- `Dict`, `HasId` (`src/core/utility-types.ts`), `UploadsById` (`src/core/media-types.ts`).
+
 ## React
 
 - Function components and hooks only.
@@ -136,7 +152,7 @@ async function copyUnique(params: CopyUniqueParams): Promise<string> {
 - zustand: always subscribe with a selector, `useStore((state) => state.x)`. Never `useStore()` for the whole store.
 - Server data goes through SWR with keys from `src/lib/swr-keys.ts`. No `fetch` inside `useEffect` for data SWR can own.
 - Browser storage only through `src/lib/local-store.ts` (try/catch plus zod). Never `localStorage` directly.
-- Toasts (`sonner`) only in `src/features`. `src/core` and `src/server` never show UI.
+- Toasts (`sonner`) only in `src/features` and `src/lib/notify.ts`. `src/core` and `src/server` never show UI.
 - Icon-only buttons have `aria-label`. Decorative lucide icons have `aria-hidden`.
 - Card and row click handlers start with `isOwnEvent(event)`. Portal content (menus, popovers, dialogs) bubbles through React.
 
