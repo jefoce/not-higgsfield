@@ -2,8 +2,8 @@ import 'server-only'
 
 import { VIDEO_PROVIDER_IDS, type VideoProviderId } from '@/core/providers/types'
 
+import { isMockMode } from '../config/mock-mode'
 import { createMockProvider } from './mock/provider'
-import { isMockMode } from './openrouter/mock-mode'
 import { createOpenRouterProvider } from './openrouter/provider'
 import type { VideoProvider } from './types'
 

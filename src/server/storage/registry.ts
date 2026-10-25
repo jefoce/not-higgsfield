@@ -2,8 +2,8 @@ import 'server-only'
 
 import { isNil } from 'lodash-es'
 
+import { isMockMode } from '../config/mock-mode'
 import { globalState } from '../global-state'
-import { isMockMode } from '../providers/openrouter/mock-mode'
 import { onSecretsChange } from '../secrets'
 import { createMockStore } from './mock-store'
 import { r2Config } from './r2'

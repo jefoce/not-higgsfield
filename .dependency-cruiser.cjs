@@ -137,6 +137,12 @@ module.exports = {
       to: { path: '^src/server/(providers|storage)/[^/]+/' },
     },
     {
+      name: 'storage-skips-providers',
+      severity: 'error',
+      from: { path: '^src/server/storage/' },
+      to: { path: '^src/server/providers/' },
+    },
+    {
       name: 'sync-is-a-primitive',
       severity: 'error',
       from: { path: '^src/server/(sync|fs)/' },
