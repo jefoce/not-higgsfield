@@ -1,10 +1,9 @@
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 
-type StoredRecordOverrides = Partial<Omit<GenerationRecord, 'schemaVersion'>>
+type StoredRecordOverrides = Partial<GenerationRecord>
 
 export function storedRecord(id: string, overrides: StoredRecordOverrides = {}): GenerationRecord {
   return {
-    schemaVersion: 1,
     id,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',

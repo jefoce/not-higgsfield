@@ -28,7 +28,6 @@ const videoBytes = Buffer.from('fake-mp4-bytes')
 
 function record(id: string, prompt = 'A cat'): GenerationRecord {
   return {
-    schemaVersion: 1,
     id,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',

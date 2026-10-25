@@ -58,7 +58,6 @@ function makeRecord(
   const now = new Date().toISOString()
 
   return {
-    schemaVersion: 1,
     id,
     createdAt: now,
     updatedAt: now,

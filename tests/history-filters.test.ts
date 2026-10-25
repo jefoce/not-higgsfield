@@ -24,7 +24,6 @@ interface RecordOptions {
 
 function record(options: RecordOptions): GenerationRecord {
   return {
-    schemaVersion: 1,
     id: options.id,
     createdAt: options.createdAt,
     updatedAt: options.createdAt,

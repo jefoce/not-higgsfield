@@ -124,7 +124,6 @@ export type GenerationCost = z.infer<typeof GenerationCostSchema>
 
 /** One generation stored in `downloads/<uuid>.json`. */
 export const GenerationRecordSchema = z.object({
-  schemaVersion: z.literal(1).default(1),
   id: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),

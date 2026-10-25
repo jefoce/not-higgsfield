@@ -44,7 +44,6 @@ export async function createGeneration(raw: GenerationInput): Promise<Generation
   }
 
   const record: GenerationRecord = {
-    schemaVersion: 1,
     id: randomUUID(),
     createdAt: now,
     updatedAt: now,

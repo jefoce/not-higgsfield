@@ -37,16 +37,6 @@ describe('stored schemas', () => {
     }
   })
 
-  it('defaults schemaVersion for files written before it existed', async () => {
-    const parsed = GenerationRecordSchema.safeParse(await loadJson('records/submitting.json'))
-
-    expect(parsed.success).toBe(true)
-
-    if (parsed.success) {
-      expect(parsed.data.schemaVersion).toBe(1)
-    }
-  })
-
   it('parses an upload item', async () => {
     expect(UploadItemSchema.safeParse(await loadJson('uploads/item.json')).success).toBe(true)
   })

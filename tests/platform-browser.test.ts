@@ -10,7 +10,6 @@ vi.mock('@/lib/api/system', () => ({
 }))
 
 const record = (id: string): GenerationRecord => ({
-  schemaVersion: 1,
   id,
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
