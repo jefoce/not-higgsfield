@@ -51,7 +51,9 @@ async function readJson<T>(response: Response): Promise<T> {
     return undefined as T
   }
 
-  return JSON.parse(text) as T
+  const parsed: unknown = JSON.parse(text)
+
+  return parsed as T
 }
 
 /** SWR fetcher: GET with same-origin credentials. */

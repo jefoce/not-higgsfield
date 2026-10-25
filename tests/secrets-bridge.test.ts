@@ -173,6 +173,23 @@ describe('secrets bridge failures', () => {
     )
   })
 
+  it('ignores a malformed reply', async () => {
+    const { input, sent, backend } = setup()
+
+    const pending = backend.get('OPENROUTER_API_KEY')
+    const line = request(sent)
+
+    reply(input, { id: line.id, ok: 'yes', value: 'bad' })
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 20)
+    })
+
+    reply(input, { id: line.id, ok: true, value: 'right' })
+
+    await expect(pending).resolves.toBe('right')
+  })
+
   it('ignores replies with an unknown id', async () => {
     const { input, sent, backend } = setup()
 

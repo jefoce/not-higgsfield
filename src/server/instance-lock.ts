@@ -3,20 +3,24 @@ import 'server-only'
 import fsSync from 'node:fs'
 import fs from 'node:fs/promises'
 
+import { z } from 'zod'
+
 import { LOCK_FILE, STORAGE_ROOT } from './paths'
 import { sessionRequired } from './session'
 
-export interface LockInfo {
-  pid: number
-  port: number
-  desktop: boolean
-  startedAt: string
-}
+const LockInfoSchema = z.object({
+  pid: z.number(),
+  port: z.number(),
+  desktop: z.boolean(),
+  startedAt: z.string(),
+})
 
-interface HealthResponse {
-  app?: string
-  pid?: number
-}
+const HealthReplySchema = z.object({
+  app: z.string().optional(),
+  pid: z.number().optional(),
+})
+
+export type LockInfo = z.infer<typeof LockInfoSchema>
 
 const HEALTH_TIMEOUT_MS = 1500
 
@@ -64,9 +68,10 @@ export async function acquireInstanceLock(): Promise<void> {
 /** Removes the lock only when this process owns it. */
 export function releaseInstanceLock(): void {
   try {
-    const owner = JSON.parse(fsSync.readFileSync(LOCK_FILE, 'utf8')) as Partial<LockInfo>
+    const raw: unknown = JSON.parse(fsSync.readFileSync(LOCK_FILE, 'utf8'))
+    const owner = LockInfoSchema.safeParse(raw)
 
-    if (owner.pid === process.pid) {
+    if (owner.success && owner.data.pid === process.pid) {
       fsSync.unlinkSync(LOCK_FILE)
     }
   } catch {
@@ -88,16 +93,25 @@ async function isAlive(owner: LockInfo): Promise<boolean> {
     return null
   })
 
-  const body = (await res?.json().catch(() => {
+  const raw: unknown = await res?.json().catch(() => {
     return null
-  })) as HealthResponse | null
+  })
 
-  return body?.app === 'not-higgsfield' && body.pid === owner.pid
+  const body = HealthReplySchema.safeParse(raw)
+
+  return body.success && body.data.app === 'not-higgsfield' && body.data.pid === owner.pid
 }
 
 async function readLock(): Promise<LockInfo | null> {
   try {
-    return JSON.parse(await fs.readFile(LOCK_FILE, 'utf8')) as LockInfo
+    const raw: unknown = JSON.parse(await fs.readFile(LOCK_FILE, 'utf8'))
+    const parsed = LockInfoSchema.safeParse(raw)
+
+    if (!parsed.success) {
+      return null
+    }
+
+    return parsed.data
   } catch {
     return null
   }

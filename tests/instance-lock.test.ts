@@ -55,6 +55,14 @@ describe('acquireInstanceLock', () => {
     expect(await readPid()).toBe(process.pid)
   })
 
+  it('takes over a malformed lock file', async () => {
+    await fs.writeFile(lockFile, '{"pid":"nope"}')
+    const { acquireInstanceLock } = await loadLock()
+
+    await acquireInstanceLock()
+    expect(await readPid()).toBe(process.pid)
+  })
+
   it('exits with 75 when the owner answers health', async () => {
     await writeLock(4242, 47821)
     vi.spyOn(process, 'kill').mockReturnValue(true)

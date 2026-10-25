@@ -2,11 +2,11 @@ import 'server-only'
 
 import readline from 'node:readline'
 
-import { isBoolean, isNil, isString, isUndefined } from 'lodash-es'
+import { isString } from 'lodash-es'
+import { z } from 'zod'
 
 import { isNonEmptyString, isRecord } from '@/core/guards'
 import { SECRET_NAMES, type SecretName } from '@/core/secret-names'
-import type { Dict } from '@/core/utility-types'
 
 import type { SecretBackend } from './types'
 
@@ -23,13 +23,15 @@ export interface BridgeOptions {
   timeoutMs?: number
 }
 
-interface Reply {
-  id: number
-  ok: boolean
-  value?: string | null
-  error?: string
-  code?: string
-}
+const BridgeReplySchema = z.object({
+  id: z.number(),
+  ok: z.boolean(),
+  value: z.string().nullish(),
+  error: z.string().optional(),
+  code: z.string().optional(),
+})
+
+type Reply = z.infer<typeof BridgeReplySchema>
 
 /** Raised when the parent app reports no usable OS keychain. */
 export class KeychainUnavailableError extends Error {
@@ -115,57 +117,21 @@ export function bridgeBackend(options: BridgeOptions = {}): SecretBackend {
 }
 
 function parseReply(line: string): Reply | null {
-  const parsed = parseReplyObject(line)
-
-  if (!parsed) {
-    return null
-  }
-
-  const reply = parsed as Partial<Reply>
-
-  if (hasReplyShape(reply)) {
-    return reply as Reply
-  }
-
-  return null
-}
-
-function parseReplyObject(line: string): Dict<unknown> | null {
-  if (!line.startsWith('{')) {
-    return null
-  }
+  let raw: unknown
 
   try {
-    const parsed: unknown = JSON.parse(line)
-
-    if (isRecord(parsed)) {
-      return parsed
-    }
-
-    return null
+    raw = JSON.parse(line)
   } catch {
     return null
   }
-}
 
-function hasReplyShape(reply: Partial<Reply>): boolean {
-  if (typeof reply.id !== 'number' || !isBoolean(reply.ok)) {
-    return false
+  const parsed = BridgeReplySchema.safeParse(raw)
+
+  if (!parsed.success) {
+    return null
   }
 
-  if (!isNil(reply.value) && !isString(reply.value)) {
-    return false
-  }
-
-  if (!isUndefined(reply.error) && !isString(reply.error)) {
-    return false
-  }
-
-  if (!isUndefined(reply.code) && !isString(reply.code)) {
-    return false
-  }
-
-  return true
+  return parsed.data
 }
 
 function parseAll(raw: string | null | undefined): Partial<Record<SecretName, string>> {

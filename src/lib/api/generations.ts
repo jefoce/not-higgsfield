@@ -24,8 +24,9 @@ export function createGeneration(input: GenerationInput): Promise<GenerationReco
 
 export function fetchEstimate(key: GenerationEstimateKey): Promise<GenerationEstimate> {
   const [url, json] = key
+  const parsed: unknown = JSON.parse(json)
 
-  return apiPost<GenerationEstimate>(url, JSON.parse(json) as unknown)
+  return apiPost<GenerationEstimate>(url, parsed)
 }
 
 export function cancelGenerationRequest(id: string): Promise<void> {
