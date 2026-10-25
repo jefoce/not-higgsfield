@@ -706,8 +706,10 @@ jobs:
       - uses: tauri-apps/tauri-action@action-v1.0.0
         env:
           NH_PREPARED: 1
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          args: --target ${{ matrix.target }}
+          args: --target ${{ matrix.target }} --config src-tauri/tauri.updater.conf.json
       - name: Verify macOS signature
         if: runner.os == 'macOS'
         shell: bash
@@ -742,7 +744,7 @@ jobs:
           bundle="src-tauri/target/${{ matrix.target }}/release/bundle"
           mkdir -p dist
           find "$bundle" -type f \
-            \( -name '*.dmg' -o -name '*-setup.exe' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' \) \
+            \( -name '*.dmg' -o -name '*-setup.exe' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' -o -name '*.app.tar.gz' \) \
             | sort \
             | while IFS= read -r file; do
                 case "$file" in
@@ -751,9 +753,17 @@ jobs:
                   *.AppImage) suffix=".AppImage" ;;
                   *.deb) suffix=".deb" ;;
                   *.rpm) suffix=".rpm" ;;
+                  *.app.tar.gz) suffix=".app.tar.gz" ;;
                   *) continue ;;
                 esac
-                mv "$file" "dist/not-higgsfield-${VERSION}-${platform}-${arch}${suffix}"
+                dest="dist/not-higgsfield-${VERSION}-${platform}-${arch}${suffix}"
+                mv "$file" "$dest"
+                case "$suffix" in
+                  -setup.exe|.AppImage|.app.tar.gz)
+                    [[ -f "$file.sig" ]] || { echo "::error::missing updater signature for $file"; exit 1; }
+                    mv "$file.sig" "$dest.sig"
+                    ;;
+                esac
               done
           ls -l dist
       - name: Upload installers
@@ -775,6 +785,11 @@ jobs:
         with:
           name: sha256-${{ matrix.target }}
           path: sha256-${{ matrix.target }}.txt
+      - uses: actions/upload-artifact@v4.6.2
+        with:
+          name: updater-sig-${{ matrix.target }}
+          path: dist/*.sig
+          if-no-files-found: error
 
   checksums:
     needs: [version, draft, build]
@@ -837,9 +852,56 @@ jobs:
           cat SHA256SUMS.txt
           bash .github/scripts/upload-release-assets.sh "${{ needs.draft.outputs.id }}" SHA256SUMS.txt sources/*.tar.*
 
+  updater-manifest:
+    needs: [version, draft, build]
+    if: ${{ !cancelled() && needs.version.result == 'success' && needs.draft.result == 'success' && needs.build.result == 'success' }}
+    runs-on: ubuntu-22.04
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - name: Job start
+        shell: bash
+        run: echo "JOB_STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v7.0.1
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Download updater signatures
+        uses: actions/download-artifact@v4.3.0
+        with:
+          pattern: updater-sig-*
+          path: updater-sigs
+          merge-multiple: true
+      - name: Write latest.json
+        shell: bash
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+          TAG: ${{ needs.version.outputs.tag }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          node .github/scripts/updater-manifest.mjs \
+            --version "$VERSION" \
+            --tag "$TAG" \
+            --repo "$REPO" \
+            --changelog CHANGELOG.md \
+            --pub-date "$JOB_STARTED_AT" \
+            --signatures updater-sigs \
+            --out latest.json
+          cat latest.json
+      - name: Upload latest.json
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash .github/scripts/upload-release-assets.sh "${{ needs.draft.outputs.id }}" latest.json
+
   tag:
-    needs: [version, build, checksums]
-    if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/releases' && needs.version.result == 'success' && needs.build.result == 'success' && needs.checksums.result == 'success' }}
+    needs: [version, build, checksums, updater-manifest]
+    if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/releases' && needs.version.result == 'success' && needs.build.result == 'success' && needs.checksums.result == 'success' && needs.updater-manifest.result == 'success' }}
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7.0.1
