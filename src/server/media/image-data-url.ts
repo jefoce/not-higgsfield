@@ -6,8 +6,8 @@ import { IMAGE_MAX_ENCODED_MB, IMAGE_MAX_SIDE_PX, IMAGE_STEPS } from '@/core/con
 import type { ModelPreset, ReferenceLimits } from '@/core/presets'
 import type { ReferencePlan, UploadItem } from '@/core/types'
 
+import { HttpError } from '../errors'
 import { uploadPaths } from '../paths'
-import { HttpError } from '../request-guard'
 import { flattenColor } from './flatten-color'
 import {
   type CacheRecord,

@@ -6,7 +6,7 @@ import { isStaleGrace } from '@/core/submit-state'
 import type { GenerationRecord } from '@/core/types'
 
 import { getGeneration, listGenerations, saveGeneration } from '../repos/generations'
-import { withLock } from './lock'
+import { withLock } from '../sync/lock'
 import { isSubmitOwned, resumeGraceSubmits } from './submit-queue'
 
 export const GRACE_EXPIRED_TEXT = 'Not started: the app was closed before it was sent'

@@ -5,9 +5,9 @@ import { isNil } from 'lodash-es'
 import { R2_NAMES, SECRET_NAMES, type SecretName } from '@/core/secret-names'
 import type { SecretSource, SecretStatus } from '@/core/types'
 
+import { HttpError } from '../errors'
 import { globalState } from '../global-state'
-import { withLock } from '../jobs/lock'
-import { HttpError } from '../request-guard'
+import { withLock } from '../sync/lock'
 import { pickBackend, readStored } from './backend'
 import { KeychainUnavailableError } from './bridge'
 

@@ -3,7 +3,7 @@ import 'server-only'
 import type { GenerationRecord } from '@/core/types'
 
 import { getGeneration, saveGeneration } from '../repos/generations'
-import { withLock } from './lock'
+import { withLock } from '../sync/lock'
 import { isSubmitStopped } from './submit-queue'
 
 /** Serializes a read, patch and atomic save for one record. */

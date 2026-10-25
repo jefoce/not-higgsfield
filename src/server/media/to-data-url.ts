@@ -5,8 +5,8 @@ import fs from 'node:fs/promises'
 import { MAX_INLINE_MEDIA_MB } from '@/core/constants'
 import type { UploadItem } from '@/core/types'
 
+import { HttpError } from '../errors'
 import { uploadPaths } from '../paths'
-import { HttpError } from '../request-guard'
 
 class MediaTooLargeError extends HttpError {
   constructor(message: string) {

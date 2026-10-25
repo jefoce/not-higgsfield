@@ -2,36 +2,10 @@ import 'server-only'
 
 import { isNil } from 'lodash-es'
 
+import { HttpError, RequestBodyError } from './errors'
 import { hasSession } from './session'
 
 const LOCAL_HOSTS = new Set(['127.0.0.1', 'localhost', '[::1]'])
-
-export class HttpError extends Error {
-  constructor(
-    readonly status: number,
-    message: string,
-  ) {
-    super(message)
-    this.name = 'HttpError'
-  }
-}
-
-export class RequestBodyError extends HttpError {
-  constructor() {
-    super(400, 'Invalid JSON body')
-  }
-}
-
-export class ValidationError extends Error {
-  readonly status = 400
-  readonly errors: string[]
-
-  constructor(errors: string[]) {
-    super(errors[0] ?? 'Invalid input')
-    this.name = 'ValidationError'
-    this.errors = errors
-  }
-}
 
 /** Rejects non-local hosts, cross-site writes, foreign origins and missing desktop sessions. */
 export function assertLocalRequest(request: Request, opts: { session?: boolean } = {}): void {

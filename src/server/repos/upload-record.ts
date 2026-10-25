@@ -6,8 +6,8 @@ import type { UploadItem } from '@/core/types'
 
 import { readJson, writeJsonAtomic } from '../fs/json-file'
 import { isUuid } from '../fs/media-ref'
-import { withLock } from '../jobs/lock'
 import { UPLOADS_DIR } from '../paths'
+import { withLock } from '../sync/lock'
 import { jsonDirStore } from './json-dir-store'
 
 const store = jsonDirStore<UploadItem>({

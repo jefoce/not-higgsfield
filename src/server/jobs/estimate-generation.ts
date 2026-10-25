@@ -10,10 +10,10 @@ import { canonicalizePrompt, referenceSlots } from '@/core/prompt-tokens'
 import type { GenerationEstimate, GenerationInput, UploadItem } from '@/core/types'
 import { type PriceInput, validateInput } from '@/core/validation'
 
+import { ValidationError } from '../errors'
 import { getPricing } from '../openrouter/pricing'
 import { getRemoteStore } from '../remote/remote-store'
 import { getActiveCount } from '../repos/generations'
-import { ValidationError } from '../request-guard'
 import { loadUploads } from './run-submit'
 
 export interface GenerationDraft {

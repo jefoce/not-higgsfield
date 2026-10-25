@@ -10,11 +10,11 @@ import { isNil, orderBy } from 'lodash-es'
 import { kindFromName } from '@/core/media-kinds'
 import type { FolderDir, FolderFile, FolderItem, FolderListing, MediaKind } from '@/core/types'
 
+import { HttpError } from '../errors'
 import { readJson, writeJsonAtomic } from '../fs/json-file'
 import { isInside, resolveInside, SafePathError } from '../fs/safe-path'
-import { withLock } from '../jobs/lock'
 import { FOLDERS_FILE } from '../paths'
-import { HttpError } from '../request-guard'
+import { withLock } from '../sync/lock'
 
 class FolderError extends HttpError {}
 

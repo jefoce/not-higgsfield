@@ -10,8 +10,8 @@ import { FFMPEG_TIMEOUTS } from '@/core/constants'
 import type { MediaKind } from '@/core/types'
 
 import { globalState } from '../global-state'
-import { withLock } from '../jobs/lock'
 import { COMPAT_DIR } from '../paths'
+import { withLock } from '../sync/lock'
 import { probeMedia, runFfmpeg } from './ffmpeg'
 
 export interface CompatMedia {

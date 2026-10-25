@@ -5,11 +5,11 @@ import { isNil } from 'lodash-es'
 import { kindFromExt } from '@/core/media-kinds'
 import type { MediaKind, UploadItem } from '@/core/types'
 
+import { UploadError } from '../errors'
 import { probeMedia } from '../media/ffmpeg'
 import sharp from '../media/sharp'
-import { HttpError } from '../request-guard'
 
-export class UploadError extends HttpError {}
+export { UploadError }
 
 export function assertSupported(ext: string): MediaKind {
   if (ext === '.heic' || ext === '.heif') {

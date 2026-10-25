@@ -6,10 +6,10 @@ import type { ZodError } from 'zod'
 import { MEDIA_KINDS } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/types'
 
+import { HttpError, ValidationError } from './errors'
 import { OpenRouterError } from './openrouter/client'
-import { HttpError, ValidationError } from './request-guard'
 
-export { assertLocalRequest, HttpError, readJsonBody } from './request-guard'
+export { assertLocalRequest, readJsonBody } from './request-guard'
 
 interface JsonErrorParams {
   status: number

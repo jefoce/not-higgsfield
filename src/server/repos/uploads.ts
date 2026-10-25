@@ -10,10 +10,10 @@ import type { MediaKind, UploadItem } from '@/core/types'
 
 import { removeFile, writeJsonAtomic } from '../fs/json-file'
 import { isUuid } from '../fs/media-ref'
-import { withLock } from '../jobs/lock'
 import { removeEncoded } from '../media/image-cache'
 import { uploadPaths, UPLOADS_DIR } from '../paths'
 import { getRemoteStore } from '../remote/remote-store'
+import { withLock } from '../sync/lock'
 import { assertSupported, probe, UploadError } from './upload-meta'
 import {
   forgetUpload,
@@ -25,7 +25,6 @@ import {
 } from './upload-record'
 
 export { createGenerationLinkUpload, createLinkUpload } from './upload-links'
-export { UploadError } from './upload-meta'
 export { saveUploadItem, updateUpload } from './upload-record'
 
 interface SaveFileUploadParams {

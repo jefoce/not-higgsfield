@@ -2,8 +2,8 @@ import 'server-only'
 
 import type { MediaKind } from '@/core/types'
 
+import { HttpError } from '../errors'
 import { globalState } from '../global-state'
-import { HttpError } from '../http'
 import { darwin } from './darwin'
 import { linux } from './linux'
 import { win32 } from './win32'

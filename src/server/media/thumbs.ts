@@ -16,8 +16,8 @@ import {
 } from '@/core/constants'
 import type { MediaKind } from '@/core/types'
 
+import { HttpError } from '../errors'
 import { THUMBS_DIR } from '../paths'
-import { HttpError } from '../request-guard'
 import { extractFrame } from './ffmpeg'
 import sharp from './sharp'
 

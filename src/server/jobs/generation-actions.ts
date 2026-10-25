@@ -4,7 +4,7 @@ import { canCancelInGrace } from '@/core/submit-state'
 import { ACTIVE_STATUSES, type GenerationRecord } from '@/core/types'
 
 import { deleteGenerationFiles, getGeneration, saveGeneration } from '../repos/generations'
-import { withLock } from './lock'
+import { withLock } from '../sync/lock'
 import { cancelScheduledSubmit } from './submit-queue'
 
 export type DeleteResult = 'deleted' | 'not_found' | 'active'

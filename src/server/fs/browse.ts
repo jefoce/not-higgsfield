@@ -8,7 +8,7 @@ import { isNil, orderBy } from 'lodash-es'
 
 import type { BrowseResult } from '@/core/types'
 
-import { HttpError } from '../request-guard'
+import { HttpError } from '../errors'
 
 class BrowseError extends HttpError {}
 

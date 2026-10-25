@@ -19,7 +19,7 @@ import { makePreview } from '../media/preview'
 import { fetchVideoContent, type VideoJobResponse } from '../openrouter/client'
 import { downloadPaths } from '../paths'
 import { getGeneration, saveGeneration } from '../repos/generations'
-import { withLock } from './lock'
+import { withLock } from '../sync/lock'
 
 const MAX_DOWNLOADS = 2
 

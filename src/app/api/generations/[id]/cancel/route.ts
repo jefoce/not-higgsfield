@@ -1,8 +1,8 @@
 import { canCancelInGrace } from '@/core/submit-state'
 import { assertLocalRequest, errorResponse, jsonError } from '@/server/http'
-import { withLock } from '@/server/jobs/lock'
 import { cancelScheduledSubmit } from '@/server/jobs/submit-queue'
 import { deleteGenerationFiles, getGeneration } from '@/server/repos/generations'
+import { withLock } from '@/server/sync/lock'
 
 interface Params {
   params: Promise<{ id: string }>
