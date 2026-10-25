@@ -43,8 +43,8 @@ afterEach(() => {
   cleanup()
 })
 
-describe('AppSection', () => {
-  it('hides the install button and shows Download on linux-package', () => {
+describe('AppSection linux package', () => {
+  it('hides the install button and shows Download when available', () => {
     useUpdateStore.setState({
       appInfo: {
         version: '0.2.0',
@@ -64,6 +64,25 @@ describe('AppSection', () => {
     expect(platformMock.openReleasePage).toHaveBeenCalledTimes(1)
   })
 
+  it('hides Download on linux-package when up to date', () => {
+    useUpdateStore.setState({
+      appInfo: {
+        version: '0.2.0',
+        installKind: 'linux-package',
+        autoCheck: true,
+        lastCheck: null,
+      },
+      status: 'upToDate',
+      update: null,
+    })
+
+    render(<AppSection />)
+
+    expect(screen.queryByRole('button', { name: 'Download' })).toBeNull()
+  })
+})
+
+describe('AppSection', () => {
   it('shows only the version line in the browser', () => {
     useUpdateStore.setState({
       appInfo: {

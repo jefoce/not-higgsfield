@@ -168,7 +168,7 @@ export function AppSection() {
             Install and restart
           </Button>
         )}
-        {isLinuxPackage && (
+        {isLinuxPackage && status === 'available' && (
           <Button size="sm" variant="outline" disabled={isBusy} onClick={openRelease}>
             Download
           </Button>
