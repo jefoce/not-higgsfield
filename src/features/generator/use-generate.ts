@@ -6,12 +6,13 @@ import { toast } from 'sonner'
 import { inputForSubmit } from '@/core/normalize-input'
 import { getPreset } from '@/core/presets'
 import { friendlyError } from '@/core/provider-errors'
-import { cancelGeneration } from '@/features/history/record-actions'
-import { revalidateHistory } from '@/features/history/use-history'
 import { openSettings } from '@/features/settings/settings-store'
 import { refreshCredits } from '@/lib/api/credits'
-import { createGeneration } from '@/lib/api/generations'
+import { cancelGenerationRequest, createGeneration } from '@/lib/api/generations'
+import { errorMessage } from '@/lib/errors'
+import { ApiError } from '@/lib/fetcher'
 import { getPlatform } from '@/lib/platform'
+import { refreshHistory } from '@/lib/swr-keys'
 
 import { inputFromState, useGeneratorStore } from './store'
 
@@ -19,6 +20,24 @@ function requestNotifications(): void {
   void getPlatform()
     .then((platform) => platform.requestNotifications())
     .catch(() => {})
+}
+
+/** Cancels a generation still inside the submit grace window. */
+async function cancelGeneration(id: string): Promise<void> {
+  try {
+    await cancelGenerationRequest(id)
+    toast.success('Generation cancelled')
+    await refreshHistory()
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 409) {
+      toast.error('Already sent, cannot cancel')
+      await refreshHistory()
+
+      return
+    }
+
+    toast.error(errorMessage(error))
+  }
 }
 
 interface ShowErrorParams {
@@ -78,7 +97,7 @@ export function useGenerate() {
         })
       }
 
-      await Promise.all([revalidateHistory(), refreshCredits()])
+      await Promise.all([refreshHistory(), refreshCredits()])
 
       return record.id
     } catch (caught) {
