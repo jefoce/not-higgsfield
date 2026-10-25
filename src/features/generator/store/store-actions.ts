@@ -6,18 +6,18 @@ import type { StateCreator } from 'zustand'
 
 import { SEED_MAX } from '@/core/constants'
 import { maxDurationFor } from '@/core/duration-limits'
-import type { UploadItem } from '@/core/media-types'
 import { clampDuration, normalizeForPreset } from '@/core/normalize-input'
 import { findPreset, getPreset } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
 import type { RefSlot } from '@/core/prompt-tokens'
-import type { GenerationInput, GeneratorTab } from '@/core/types'
+import type { GenerationInput } from '@/core/types'
 
-import { defaults, type GeneratorDraft, inputFromState } from './store-draft'
+import { defaults, inputFromState } from './store-draft'
 import { createFrameActions } from './store-frame-actions'
 import { clampReferenceDuration, randomSeed } from './store-helpers'
 import { createLoadActions } from './store-load-actions'
 import { createReferenceActions } from './store-reference-actions'
+import type { GeneratorState } from './store-state'
 
 type MentionInserter = (slot: RefSlot) => void
 
@@ -32,33 +32,6 @@ function clampSeed(seed: number | null): number | null {
   }
 
   return clamp(Math.round(seed), 0, SEED_MAX)
-}
-
-export interface GeneratorState extends GeneratorDraft {
-  uploadsById: Record<string, UploadItem>
-  activeCount: number
-  setActiveCount: (count: number) => void
-  setPreset: (id: string) => void
-  setTab: (tab: GeneratorTab) => void
-  setPrompt: (text: string) => void
-  setAudio: (audio: boolean) => void
-  setDuration: (duration: number) => void
-  setAspectRatio: (aspectRatio: GenerationInput['aspectRatio']) => void
-  setResolution: (resolution: GenerationInput['resolution']) => void
-  setFrame: (slot: 'start' | 'end', upload: UploadItem | null) => void
-  addReferences: (uploads: UploadItem[]) => void
-  replaceReference: (id: string, upload: UploadItem) => void
-  removeReference: (id: string) => void
-  insertMention: (slot: RefSlot) => void
-  focusSlot: (slot: RefSlot, occurrence: number) => void
-  setSeed: (seed: number | null) => void
-  toggleSeedLock: () => void
-  loadInput: (input: GenerationInput, uploads: UploadItem[]) => void
-  normalizeLoaded: () => void
-  reset: () => void
-  registerMentionInserter: (fn: MentionInserter | null) => void
-  registerSlotFocuser: (fn: SlotFocuser | null) => void
-  upsertUploads: (uploads: UploadItem[]) => void
 }
 
 interface NormalizedDraftParams {

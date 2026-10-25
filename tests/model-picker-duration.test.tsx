@@ -2,12 +2,12 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { CatalogEntry } from '@/core/catalog'
 import { formatRate } from '@/core/pricing'
 import type { PricingInfo } from '@/core/types'
 import { ModelPicker } from '@/features/generator/model/ModelPicker'
 import { useGeneratorStore } from '@/features/generator/store/store'
 import { useModelEntry } from '@/lib/api/models'
-import type { CatalogEntry } from '@/server/services/model-catalog'
 import { Price } from '@/ui/Price'
 
 import { required } from './helpers/required'

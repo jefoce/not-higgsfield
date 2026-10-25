@@ -2,33 +2,16 @@ import 'server-only'
 
 import { isEmpty, isNil } from 'lodash-es'
 
+import type { CatalogEntry, ModelCatalog } from '@/core/catalog'
 import { MODEL_PRESETS } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
 import { primaryBinding } from '@/core/pricing'
 import { videoProviderDescriptor } from '@/core/providers/registry'
-import type { VideoProviderId } from '@/core/providers/types'
-import type { PricingInfo } from '@/core/types'
 
 import { globalState } from '../global-state'
 import { getVideoProvider } from '../providers/registry'
 import type { ProviderModel } from '../providers/types'
 import { secretsReady } from '../secrets'
-
-export type ModelStatus = 'available' | 'unverified' | 'missing' | 'no_provider'
-
-export interface CatalogEntry {
-  modelId: string
-  presetId: string
-  provider: VideoProviderId | null
-  status: ModelStatus
-  reason: string | null
-  pricing: PricingInfo | null
-}
-
-export interface ModelCatalog {
-  entries: readonly CatalogEntry[]
-  fetchedAt: string
-}
 
 interface DriftState {
   hasLogged: boolean

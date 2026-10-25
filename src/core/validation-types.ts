@@ -1,5 +1,4 @@
-import type { ModelStatus } from '@/server/services/model-catalog'
-
+import type { ModelStatus } from './catalog'
 import type { UploadItem } from './media-types'
 import type { ModelPreset } from './presets/types'
 import type { RefSlot } from './prompt-tokens'

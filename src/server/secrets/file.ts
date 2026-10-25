@@ -10,7 +10,7 @@ import { SECRET_NAMES, SECRET_SCHEMAS, type SecretName } from '@/core/secret-nam
 
 import { readJson, writeJsonAtomic } from '../fs/json-file'
 import { STORAGE_ROOT } from '../paths'
-import type { SecretBackend } from './index'
+import type { SecretBackend } from './types'
 
 const FILE = path.join(STORAGE_ROOT, 'secrets.json')
 const SecretsFileSchema = z.record(z.string(), z.unknown())

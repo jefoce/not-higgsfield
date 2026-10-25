@@ -4,7 +4,7 @@ import type { StoreApi } from 'zustand'
 
 import { getPreset } from '@/core/presets'
 
-import type { GeneratorState } from './store-actions'
+import type { GeneratorState } from './store-state'
 
 type SetState = StoreApi<GeneratorState>['setState']
 

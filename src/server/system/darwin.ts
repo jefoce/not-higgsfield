@@ -7,7 +7,7 @@ import { promisify } from 'node:util'
 import { acceptForKinds } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 
-import type { SystemAdapter } from './index'
+import type { SystemAdapter } from './types'
 
 const run = promisify(execFile)
 const DIALOG_TIMEOUT = 10 * 60_000

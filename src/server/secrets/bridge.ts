@@ -7,7 +7,7 @@ import { isBoolean, isNil, isString, isUndefined } from 'lodash-es'
 import { isRecord } from '@/core/guards'
 import { SECRET_NAMES, type SecretName } from '@/core/secret-names'
 
-import type { SecretBackend } from './index'
+import type { SecretBackend } from './types'
 
 export const BRIDGE_PREFIX = '@@nh-secrets '
 const DEFAULT_TIMEOUT_MS = 60_000

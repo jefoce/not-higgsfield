@@ -10,14 +10,7 @@ import { globalState } from '../global-state'
 import { withLock } from '../sync/lock'
 import { pickBackend, readStored } from './backend'
 import { KeychainUnavailableError } from './bridge'
-
-export interface SecretBackend {
-  kind: Exclude<SecretSource, 'env'>
-  getAll(): Promise<Partial<Record<SecretName, string>>>
-  get(name: SecretName): Promise<string | null>
-  set(name: SecretName, value: string): Promise<void>
-  remove(name: SecretName): Promise<void>
-}
+import type { SecretBackend } from './types'
 
 interface Entry {
   value: string

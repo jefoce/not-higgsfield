@@ -6,7 +6,7 @@ import { isNil, isString } from 'lodash-es'
 import { isRecord } from '@/core/guards'
 import { SECRET_NAMES, type SecretName } from '@/core/secret-names'
 
-import type { SecretBackend } from './index'
+import type { SecretBackend } from './types'
 
 const SERVICE = 'not-higgsfield'
 

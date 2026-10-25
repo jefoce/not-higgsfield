@@ -146,8 +146,8 @@ module.exports = {
   options: {
     doNotFollow: { path: 'node_modules' },
     exclude: { path: '^(\\.next|src-tauri|docs|tests/fixtures)/' },
-    // Runtime graph only: cycles and layers depend on emitted imports, not on types.
-    tsPreCompilationDeps: false,
+    // Include type-only imports. no-circular still skips them so type cycles stay legal.
+    tsPreCompilationDeps: true,
     tsConfig: { fileName: 'tsconfig.json' },
     enhancedResolveOptions: {
       exportsFields: ['exports'],

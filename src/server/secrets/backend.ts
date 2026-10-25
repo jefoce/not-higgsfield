@@ -7,8 +7,8 @@ import type { SecretName } from '@/core/secret-names'
 import { sessionRequired } from '../session'
 import { bridgeBackend, KeychainUnavailableError } from './bridge'
 import { fileBackend } from './file'
-import type { SecretBackend } from './index'
 import { keychainBackend } from './keychain'
+import type { SecretBackend } from './types'
 
 /** NH_SECRETS_BACKEND=file is a development escape, not a production backend on macOS or Windows. */
 function wantsFileBackend(): boolean {

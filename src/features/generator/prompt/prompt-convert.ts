@@ -29,8 +29,8 @@ import {
 import { thumbUrl } from '@/lib/api/media-urls'
 
 import { useGeneratorStore } from '../store/store'
-import type { GeneratorState } from '../store/store-actions'
 import { slotCounts, uploadForSlot } from '../store/store-helpers'
+import type { GeneratorState } from '../store/store-state'
 
 const LABEL = /^(Image|Video|Audio) (\d+)$/
 

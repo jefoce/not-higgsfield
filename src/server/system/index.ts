@@ -1,29 +1,11 @@
 import 'server-only'
 
-import type { MediaKind } from '@/core/media-types'
-
 import { HttpError } from '../errors'
 import { globalState } from '../global-state'
 import { darwin } from './darwin'
 import { linux } from './linux'
+import type { SystemAdapter } from './types'
 import { win32 } from './win32'
-
-interface ChooseFilesOptions {
-  kinds: MediaKind[]
-  multiple: boolean
-  prompt: string
-}
-
-interface ChooseFolderOptions {
-  prompt: string
-}
-
-export interface SystemAdapter {
-  canChooseFiles(): Promise<boolean>
-  chooseFiles(opts: ChooseFilesOptions): Promise<string[]>
-  chooseFolder(opts: ChooseFolderOptions): Promise<string | null>
-  reveal(path: string): Promise<void>
-}
 
 class DialogBusyError extends HttpError {
   constructor() {

@@ -8,9 +8,9 @@ import { normalizeForPreset } from '@/core/normalize-input'
 import { DEFAULT_PRESET_ID, findPreset, getPreset } from '@/core/presets'
 import { canonicalizePrompt, referenceSlots } from '@/core/prompt-tokens'
 
-import type { GeneratorState } from './store-actions'
 import { inputFromState } from './store-draft'
 import { clampReferenceDuration } from './store-helpers'
+import type { GeneratorState } from './store-state'
 
 type SetState = StoreApi<GeneratorState>['setState']
 

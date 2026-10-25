@@ -7,8 +7,9 @@ import { persist } from 'zustand/middleware'
 import { normalizeForPreset } from '@/core/normalize-input'
 import { DEFAULT_PRESET_ID, findPreset, getPreset } from '@/core/presets'
 
-import { createGeneratorState, type GeneratorState } from './store-actions'
+import { createGeneratorState } from './store-actions'
 import { defaults, inputFromState } from './store-draft'
+import type { GeneratorState } from './store-state'
 
 /** Normalizes the restored draft to the preset once persistence finishes. */
 function rehydrate(state?: GeneratorState): void {
