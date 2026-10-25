@@ -37,6 +37,13 @@ const SHARED_SELECTORS = [
   },
 ]
 
+const SERVER_SELECTORS = [
+  {
+    selector: 'ImportExpression',
+    message: 'No dynamic imports in server code. Wire dependencies in src/server/boot.ts.',
+  },
+]
+
 const PROPS_SELECTOR = {
   selector:
     'FunctionDeclaration > ObjectPattern, VariableDeclarator > ArrowFunctionExpression > ObjectPattern',
@@ -318,18 +325,23 @@ export default defineConfig([
   {
     files: ['src/server/**/*.ts'],
     rules: {
-      'no-restricted-syntax': restrict(SHARED_SELECTORS, PROPS_SELECTOR, SECRET_SELECTORS),
+      'no-restricted-syntax': restrict(
+        SHARED_SELECTORS,
+        PROPS_SELECTOR,
+        SECRET_SELECTORS,
+        SERVER_SELECTORS,
+      ),
     },
   },
   {
     // Secrets code reads process.env directly.
     files: ['src/server/secrets/**'],
     rules: {
-      'no-restricted-syntax': restrict(SHARED_SELECTORS, PROPS_SELECTOR),
+      'no-restricted-syntax': restrict(SHARED_SELECTORS, PROPS_SELECTOR, SERVER_SELECTORS),
     },
   },
   {
-    // Reserved for the dynamic-import exception in B2.
+    // The keychain lazily loads its native module, the one allowed dynamic import.
     files: ['src/server/secrets/keychain.ts'],
     rules: {
       'no-restricted-syntax': restrict(SHARED_SELECTORS, PROPS_SELECTOR),

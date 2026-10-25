@@ -20,8 +20,10 @@ import { getGeneration, saveGeneration } from '../repos/generations'
 import { getUpload } from '../repos/uploads'
 import { secretsReady } from '../secrets'
 import { withLock } from '../sync/lock'
+import { emitJobSent } from './job-events'
 import { buildMedia, recordSent, send, uploadUrls } from './submit-media'
-import { setSubmitRunner, setSubmitStage } from './submit-queue'
+import type { SubmitOutcome } from './submit-queue'
+import { setSubmitStage } from './submit-queue'
 import { throwIfStopped, updateSubmit } from './submit-record'
 
 const LIMIT_BYTES = MAX_REQUEST_MB * 1024 * 1024
@@ -33,24 +35,22 @@ interface Prepared {
 }
 
 /** Uploads url inputs, then submits once. Failures are stored. */
-export async function runSubmit(id: string, signal?: AbortSignal): Promise<void> {
+export async function runSubmit(id: string, signal?: AbortSignal): Promise<SubmitOutcome> {
   await secretsReady()
   const record = await getGeneration(id)
 
   if (record?.status !== 'submitting') {
-    return
+    return 'done'
   }
 
   if (record.submit?.stage === 'grace' && graceDelayMs(record.submit.notBefore) > 0) {
-    await import('./submit-queue').then(({ startSubmit }) => startSubmit(id))
-
-    return
+    return 'requeue'
   }
 
   const prepared = await beginUpload(id)
 
   if (!prepared) {
-    return
+    return 'done'
   }
 
   setSubmitStage(id, 'uploading')
@@ -62,9 +62,9 @@ export async function runSubmit(id: string, signal?: AbortSignal): Promise<void>
   } finally {
     setSubmitStage(id, null)
   }
-}
 
-setSubmitRunner(runSubmit)
+  return 'done'
+}
 
 async function beginUpload(id: string): Promise<Prepared | null> {
   return withLock(id, async () => {
@@ -151,7 +151,7 @@ async function uploadAndSend(params: Prepared, signal?: AbortSignal): Promise<vo
   const saved = await complete(record.id, response)
 
   if (saved) {
-    void import('./poller').then(({ startPoller }) => startPoller())
+    emitJobSent(record.id)
   }
 }
 

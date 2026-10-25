@@ -12,7 +12,13 @@ const MAX_CONCURRENT = 2
 
 export type SubmitStage = 'uploading' | 'sending'
 
-export type SubmitRunner = (id: string, signal: AbortSignal) => Promise<void>
+export type SubmitOutcome = 'done' | 'requeue'
+
+type SubmitRunner = (id: string, signal: AbortSignal) => Promise<SubmitOutcome>
+
+export interface SubmitQueueConfig {
+  run: SubmitRunner
+}
 
 interface SubmitState {
   pending: Set<string>
@@ -34,19 +40,16 @@ const state = globalState<SubmitState>('submitQueue', () => ({
   closed: false,
 }))
 
-/** run-submit registers itself, so this module never imports it back. */
-export function setSubmitRunner(runner: SubmitRunner): void {
-  state.runner = runner
+/** Wired in boot.ts, so this module never imports run-submit back. */
+export function configureSubmitQueue(params: SubmitQueueConfig): void {
+  const { run } = params
+
+  state.runner = run
 }
 
 /** True while this process owns the submit: timer, queued or running. */
 export function isSubmitOwned(id: string): boolean {
   return state.timers.has(id) || state.pending.has(id) || state.active.has(id)
-}
-
-/** Running submits. Shutdown waits for these, queued ones resume next boot. */
-export function activeSubmitCount(): number {
-  return state.active.size
 }
 
 /** Runs that already handed the request to OpenRouter but await its reply. */
@@ -179,11 +182,20 @@ function drain(): void {
     }
 
     void runner(id, controller.signal)
-      .catch((error) => console.error(`[not-higgsfield] submit failed for ${id}`, error))
-      .finally(() => {
+      .catch((error): SubmitOutcome => {
+        console.error(`[not-higgsfield] submit failed for ${id}`, error)
+
+        return 'done'
+      })
+      .then((outcome) => {
         state.active.delete(id)
         state.stages.delete(id)
         state.controllers.delete(id)
+
+        if (outcome === 'requeue') {
+          void startSubmit(id)
+        }
+
         drain()
       })
   }
