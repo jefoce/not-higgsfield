@@ -49,6 +49,12 @@ tester.run('callback-props', rule as Rule.RuleModule, {
   return <button onClick={handleSelect} />
 }`,
     },
+    {
+      name: 'names a store selection after the action',
+      code: `function Comp() {
+  const clearSelection = useSelectionStore((state) => state.clear)
+}`,
+    },
   ],
   invalid: [
     {
@@ -95,6 +101,13 @@ tester.run('callback-props', rule as Rule.RuleModule, {
   return <button onSelect={select} />
 }`,
       errors: [{ messageId: 'alias' }],
+    },
+    {
+      name: 'rejects a store selection named handle*',
+      code: `function Comp() {
+  const handleClear = useSelectionStore((state) => state.clear)
+}`,
+      errors: [{ messageId: 'storeName' }],
     },
   ],
 })

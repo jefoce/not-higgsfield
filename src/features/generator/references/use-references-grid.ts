@@ -16,15 +16,15 @@ export function useReferencesGrid(preset: ModelPreset) {
     return state.uploadsById
   })
 
-  const handleSelectSlot = useGeneratorStore((state) => {
+  const insertMention = useGeneratorStore((state) => {
     return state.insertMention
   })
 
-  const handleReplace = useGeneratorStore((state) => {
+  const replaceReference = useGeneratorStore((state) => {
     return state.replaceReference
   })
 
-  const handleRemove = useGeneratorStore((state) => {
+  const removeReference = useGeneratorStore((state) => {
     return state.removeReference
   })
 
@@ -43,9 +43,9 @@ export function useReferencesGrid(preset: ModelPreset) {
   return {
     references,
     uploadsById,
-    handleSelectSlot,
-    handleReplace,
-    handleRemove,
+    insertMention,
+    replaceReference,
+    removeReference,
     activeId,
     sensors,
     handleDragStart,

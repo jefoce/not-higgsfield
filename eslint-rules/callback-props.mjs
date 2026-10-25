@@ -1,5 +1,6 @@
 const CALLBACK_PROP = /^on[A-Z]/
 const HANDLER_NAME = /^handle[A-Z]/
+const STORE_HOOK = /^use\w*Store$/
 const FUNCTION_TYPES = new Set(['ArrowFunctionExpression', 'FunctionExpression'])
 const WRAPPER_TYPES = new Set(['TSAsExpression', 'TSSatisfiesExpression', 'TSNonNullExpression'])
 const FUNCTION_WRAPPERS = new Set(['useCallback', 'useEffectEvent', 'debounce', 'throttle'])
@@ -115,6 +116,8 @@ const callbackProps = {
         'Read callbacks as props.{{name}}. Destructure only when every use is inside a hook callback.',
       renamed: 'Keep the callback name: props.{{name}}.',
       callbackName: 'Callback props are named on<Action>.',
+      storeName:
+        'Name a store selection after the action: const setZoom = useStore((state) => state.setZoom).',
     },
   },
   create(context) {
@@ -128,6 +131,15 @@ const callbackProps = {
           isAlias(node.init)
         ) {
           context.report({ node, messageId: 'alias' })
+        }
+
+        if (
+          node.id.type === 'Identifier' &&
+          HANDLER_NAME.test(node.id.name) &&
+          node.init?.type === 'CallExpression' &&
+          STORE_HOOK.test(calleeName(node.init) ?? '')
+        ) {
+          context.report({ node, messageId: 'storeName' })
         }
 
         if (

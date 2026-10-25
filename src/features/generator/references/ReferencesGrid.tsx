@@ -64,9 +64,9 @@ export function ReferencesGrid(props: ReferencesGridProps) {
                   previewUploads={grid.previewUploads}
                   slots={grid.slots}
                   extensions={extensions}
-                  onSelectSlot={grid.handleSelectSlot}
-                  onReplace={grid.handleReplace}
-                  onRemove={grid.handleRemove}
+                  onSelectSlot={grid.insertMention}
+                  onReplace={grid.replaceReference}
+                  onRemove={grid.removeReference}
                 />
               )
             })}
@@ -83,9 +83,9 @@ export function ReferencesGrid(props: ReferencesGridProps) {
         slots={grid.slots}
         previewUploads={grid.previewUploads}
         extensions={extensions}
-        onSelectSlot={grid.handleSelectSlot}
-        onReplace={grid.handleReplace}
-        onRemove={grid.handleRemove}
+        onSelectSlot={grid.insertMention}
+        onReplace={grid.replaceReference}
+        onRemove={grid.removeReference}
       />
     </DndContext>
   )

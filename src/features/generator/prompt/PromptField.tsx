@@ -64,7 +64,7 @@ export function PromptField(props: PromptFieldProps) {
     return state.uploadsById
   })
 
-  const handleFocusSlot = useGeneratorStore((state) => {
+  const focusSlot = useGeneratorStore((state) => {
     return state.focusSlot
   })
 
@@ -118,7 +118,7 @@ export function PromptField(props: PromptFieldProps) {
       <div className="flex items-center gap-1 rounded-b-xl bg-surface px-3 pt-2 pb-3">
         <AudioChip />
         <SeedChip />
-        <PromptWarnings warnings={warnings} onFocus={handleFocusSlot} />
+        <PromptWarnings warnings={warnings} onFocus={focusSlot} />
       </div>
     </div>
   )

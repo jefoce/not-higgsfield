@@ -34,7 +34,7 @@ export function DurationPopover() {
     return state.uploadsById
   })
 
-  const handleDurationChange = useGeneratorStore((state) => {
+  const setDuration = useGeneratorStore((state) => {
     return state.setDuration
   })
 
@@ -69,7 +69,7 @@ export function DurationPopover() {
           step={1}
           ariaLabel="Duration"
           name="duration"
-          onValueChange={handleDurationChange}
+          onValueChange={setDuration}
         />
         {isCapped && <p className="text-xs text-fg-2">{limitText}</p>}
         {isFloored && <p className="text-xs text-fg-2">Minimum billed duration is {min}s</p>}
@@ -82,7 +82,7 @@ export function DurationPopover() {
                 duration={draft.duration}
                 limit={limit}
                 limitText={limitText}
-                onSelect={handleDurationChange}
+                onSelect={setDuration}
               />
             )
           })}

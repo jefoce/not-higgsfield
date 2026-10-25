@@ -23,7 +23,7 @@ export function SelectionBar(props: SelectionBarProps) {
     return state.ids
   })
 
-  const handleClear = useSelectionStore((state) => {
+  const clearSelection = useSelectionStore((state) => {
     return state.clear
   })
 
@@ -35,7 +35,7 @@ export function SelectionBar(props: SelectionBarProps) {
 
   const isActive = ids.size > 0
 
-  useSelectionEscape(handleClear)
+  useSelectionEscape(clearSelection)
 
   const byId = new Map(
     records.map((record) => {
@@ -92,7 +92,7 @@ export function SelectionBar(props: SelectionBarProps) {
 
     try {
       await deleteSelected(selected)
-      handleClear()
+      clearSelection()
     } catch (error) {
       toastError(error)
     } finally {
@@ -112,7 +112,7 @@ export function SelectionBar(props: SelectionBarProps) {
       onDownload={handleDownload}
       onLike={handleLike}
       onDelete={handleDelete}
-      onClear={handleClear}
+      onClear={clearSelection}
     />
   )
 }

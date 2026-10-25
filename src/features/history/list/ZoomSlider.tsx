@@ -13,12 +13,12 @@ export function ZoomSlider() {
     return state.zoom
   })
 
-  const handleZoomChange = useHistoryViewStore((state) => {
+  const setZoom = useHistoryViewStore((state) => {
     return state.setZoom
   })
 
   const handleReset = () => {
-    handleZoomChange(ZOOM_DEFAULT)
+    setZoom(ZOOM_DEFAULT)
   }
 
   return (
@@ -37,7 +37,7 @@ export function ZoomSlider() {
         max={ZOOM_STEPS - 1}
         step={1}
         value={zoom}
-        onValueChange={handleZoomChange}
+        onValueChange={setZoom}
         name="zoom"
         className="h-3 w-32 [&>span:first-child]:h-0.75"
       />
