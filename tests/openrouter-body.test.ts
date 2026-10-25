@@ -214,3 +214,21 @@ describe('buildRequestBody prime', () => {
     expect(body.frame_images).toBeUndefined()
   })
 })
+
+describe('buildRequestBody missing media', () => {
+  it('throws when a frame id is absent from media', () => {
+    expect(() =>
+      buildRequestBody({
+        input: input({ tab: 'frames', prompt: '', frames: { start: 'absent', end: null } }),
+        preset,
+        media,
+      }),
+    ).toThrow('Missing media for input absent')
+  })
+
+  it('throws when a reference id is absent from media', () => {
+    expect(() =>
+      buildRequestBody({ input: input({ references: ['absent'] }), preset, media }),
+    ).toThrow('Missing media for input absent')
+  })
+})

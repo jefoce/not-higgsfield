@@ -119,29 +119,28 @@ const aspectFields = (params: BuildRequestBodyParams): Partial<OpenRouterVideoBo
   return { aspect_ratio: input.aspectRatio }
 }
 
-const mediaPayload = (
-  media: Record<string, MediaPayload>,
-  id?: string | null,
-): MediaPayload | null => {
-  if (isNil(id)) {
-    return null
+const mediaPayload = (media: Record<string, MediaPayload>, id: string): MediaPayload => {
+  const payload = media[id]
+
+  if (isNil(payload)) {
+    throw new Error(`Missing media for input ${id}`)
   }
 
-  return media[id] ?? null
+  return payload
 }
 
 const frameParts = (params: BuildRequestBodyParams): OpenRouterFramePart[] => {
   const { input, preset, media } = params
-  const frames: OpenRouterFramePart[] = []
-  const startMedia = mediaPayload(media, input.frames.start)
-  const endMedia = mediaPayload(media, input.frames.end)
+  const { start, end } = input.frames
 
-  if (preset.frames.start && !isNil(startMedia)) {
-    frames.push(framePart(startMedia, 'first_frame'))
+  if (!preset.frames.start || isNil(start)) {
+    return []
   }
 
-  if (preset.frames.end && !isNil(startMedia) && !isNil(endMedia)) {
-    frames.push(framePart(endMedia, 'last_frame'))
+  const frames: OpenRouterFramePart[] = [framePart(mediaPayload(media, start), 'first_frame')]
+
+  if (preset.frames.end && !isNil(end)) {
+    frames.push(framePart(mediaPayload(media, end), 'last_frame'))
   }
 
   return frames
@@ -164,19 +163,7 @@ const mediaFields = (params: BuildRequestBodyParams): Partial<OpenRouterVideoBod
     return {}
   }
 
-  const references: OpenRouterReferencePart[] = []
-
-  for (const id of input.references) {
-    const payload = mediaPayload(media, id)
-
-    if (!isNil(payload)) {
-      references.push(referencePart(payload))
-    }
-  }
-
-  if (references.length === 0) {
-    return {}
-  }
+  const references = input.references.map((id) => referencePart(mediaPayload(media, id)))
 
   return { input_references: references }
 }
