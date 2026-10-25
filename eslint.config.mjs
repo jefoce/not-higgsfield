@@ -21,6 +21,7 @@ import {
   SERVER_SELECTORS,
   SHARED_SELECTORS,
   TYPE_SELECTORS,
+  UNION_SELECTORS,
   restrict,
 } from './eslint-rules/selectors.mjs'
 
@@ -262,6 +263,20 @@ export default defineConfig([
     },
   },
   {
+    // Shared unions live in core and the platform bridge, next to their data.
+    files: ['src/core/**/*.{ts,tsx}', 'src/lib/platform/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-syntax': restrict(
+        SHARED_SELECTORS,
+        MODULE_SELECTORS,
+        PROPS_SELECTOR,
+        SECRET_SELECTORS,
+        TYPE_SELECTORS,
+        UNION_SELECTORS,
+      ),
+    },
+  },
+  {
     // Preset literal checks would flag the data files themselves.
     files: ['src/core/presets/**'],
     rules: {
@@ -270,6 +285,7 @@ export default defineConfig([
         MODULE_SELECTORS,
         PROPS_SELECTOR,
         TYPE_SELECTORS,
+        UNION_SELECTORS,
       ),
     },
   },

@@ -11,3 +11,11 @@ export function isRecord(value: unknown): value is Dict<unknown> {
 export function isNonEmptyString(value: unknown): value is string {
   return isString(value) && !isEmpty(value)
 }
+
+/** Narrows a value to a member of the list. */
+export function isOneOf<const T extends readonly string[]>(
+  list: T,
+  value: unknown,
+): value is T[number] {
+  return isString(value) && list.includes(value)
+}

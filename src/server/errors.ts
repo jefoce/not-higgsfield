@@ -3,12 +3,12 @@ import 'server-only'
 import { REMOTE_FREE_GB, REMOTE_LINK_TTL_SEC, REMOTE_MAX_GB } from '@/core/constants'
 
 export class HttpError extends Error {
-  constructor(
-    readonly status: number,
-    message: string,
-  ) {
+  readonly status: number
+
+  constructor(status: number, message: string) {
     super(message)
     this.name = 'HttpError'
+    this.status = status
   }
 }
 

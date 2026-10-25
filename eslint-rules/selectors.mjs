@@ -44,7 +44,20 @@ export const SHARED_SELECTORS = [
       "CallExpression[callee.property.name='finally'] > ArrowFunctionExpression > BlockStatement > ReturnStatement[argument]",
     message: 'A finally callback returns nothing. Drop the return.',
   },
+  {
+    selector: 'TSEnumDeclaration',
+    message: 'No enum. Use an as const array and a derived union.',
+  },
   ...TERNARY_SELECTORS,
+]
+
+// One exported literal union per as const array, scoped in eslint.config.mjs.
+export const UNION_SELECTORS = [
+  {
+    selector:
+      "ExportNamedDeclaration > TSTypeAliasDeclaration > TSUnionType[types.0.type='TSLiteralType'][types.1.type='TSLiteralType']",
+    message: 'Derive shared unions from an as const array: (typeof LIST)[number].',
+  },
 ]
 
 export const MODULE_SELECTORS = [

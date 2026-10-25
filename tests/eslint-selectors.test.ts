@@ -205,11 +205,22 @@ tester.run('no-restricted-syntax shared selectors', rule, {
       code: 'promise.finally(() => { cleanup() })',
       options: SHARED_SELECTORS,
     },
+    {
+      name: 'const array instead of an enum',
+      code: "const KINDS = ['image', 'video'] as const",
+      options: SHARED_SELECTORS,
+    },
   ],
   invalid: [
     {
       name: 'finally callback returns a value',
       code: 'promise.finally(() => { return cleanup() })',
+      options: SHARED_SELECTORS,
+      errors: 1,
+    },
+    {
+      name: 'enum declaration',
+      code: 'enum Kind { Image, Video }',
       options: SHARED_SELECTORS,
       errors: 1,
     },
