@@ -5,17 +5,10 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import {
   $createNodeSelection,
   $getRoot,
-  $getSelection,
   $isElementNode,
-  $isRangeSelection,
   $setSelection,
-  BLUR_COMMAND,
-  COMMAND_PRIORITY_HIGH,
-  COMMAND_PRIORITY_LOW,
-  KEY_ENTER_COMMAND,
   type LexicalEditor,
   type LexicalNode,
-  PASTE_COMMAND,
 } from 'lexical'
 import { $isBeautifulMentionNode, useBeautifulMentions } from 'lexical-beautiful-mentions'
 import { isNil } from 'lodash-es'
@@ -27,11 +20,11 @@ import { useGeneratorStore } from '../store/store'
 import { slotCounts } from '../store/store-helpers'
 import {
   $convertLiteralMentions,
-  $nodesFromText,
   buildEditor,
   mentionSlot,
   serializeEditor,
 } from './prompt-convert'
+import { usePromptEditorCommands } from './use-prompt-editor-commands'
 
 interface PromptEditorBridgeProps {
   prompt: string
@@ -120,43 +113,9 @@ function focusSlotInEditor(params: FocusSlotParams): void {
   )
 }
 
-/** Pastes plain text as slot chips on the References tab. */
-function handlePaste(editor: LexicalEditor, event: Event): boolean {
-  const data = (event as ClipboardEvent).clipboardData
-
-  if (!data || data.files.length > 0) {
-    return false
-  }
-
-  if (data.types.includes('application/x-lexical-editor')) {
-    return false
-  }
-
-  const text = data.getData('text/plain')
-
-  if (text === '' || useGeneratorStore.getState().tab !== 'references') {
-    return false
-  }
-
-  event.preventDefault()
-  const counts = slotCounts(useGeneratorStore.getState())
-
-  editor.update(() => {
-    const selection = $getSelection()
-
-    if (!$isRangeSelection(selection)) {
-      return
-    }
-
-    selection.insertNodes($nodesFromText(text, counts))
-  })
-
-  return true
-}
-
 /** Editor side effects: draft sync, chip conversion, insertion and shortcuts. */
 export function PromptEditorBridge(props: PromptEditorBridgeProps) {
-  const { prompt, onSubmit } = props
+  const { prompt } = props
   const [editor] = useLexicalComposerContext()
   const { insertMention } = useBeautifulMentions()
 
@@ -223,48 +182,7 @@ export function PromptEditorBridge(props: PromptEditorBridgeProps) {
     }
   }, [editor, registerFocuser])
 
-  useEffect(() => {
-    return editor.registerCommand(
-      KEY_ENTER_COMMAND,
-      (event) => {
-        if (event?.metaKey !== true && event?.ctrlKey !== true) {
-          return false
-        }
-
-        event.preventDefault()
-        onSubmit()
-
-        return true
-      },
-      COMMAND_PRIORITY_HIGH,
-    )
-  }, [editor, onSubmit])
-
-  useEffect(() => {
-    return editor.registerCommand(
-      PASTE_COMMAND,
-      (event) => {
-        return handlePaste(editor, event)
-      },
-      COMMAND_PRIORITY_HIGH,
-    )
-  }, [editor])
-
-  useEffect(() => {
-    return editor.registerCommand(
-      BLUR_COMMAND,
-      () => {
-        const counts = slotCounts(useGeneratorStore.getState())
-
-        editor.update(() => {
-          return $convertLiteralMentions(counts)
-        })
-
-        return false
-      },
-      COMMAND_PRIORITY_LOW,
-    )
-  }, [editor])
+  usePromptEditorCommands(editor, props.onSubmit)
 
   return null
 }

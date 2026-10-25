@@ -2,57 +2,11 @@ import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 
-import { isNil } from 'lodash-es'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { SECRET_NAMES, type SecretName } from '@/core/secret-names'
+import { SECRET_NAMES } from '@/core/secret-names'
 
-interface Backend {
-  kind: 'file'
-  store: Map<string, string>
-  getAll(): Promise<Partial<Record<SecretName, string>>>
-  get(name: SecretName): Promise<string | null>
-  set(name: SecretName, value: string): Promise<void>
-  remove(name: SecretName): Promise<void>
-}
-
-function memoryBackend(values: Partial<Record<SecretName, string>> = {}): Backend {
-  const store = new Map<string, string>()
-
-  for (const [name, value] of Object.entries(values)) {
-    if (!isNil(value)) {
-      store.set(name, value)
-    }
-  }
-
-  return {
-    kind: 'file',
-    store,
-    getAll: async () => {
-      return Object.fromEntries(store)
-    },
-    get: async (name) => {
-      return store.get(name) ?? null
-    },
-    set: async (name, value) => {
-      store.set(name, value)
-    },
-    remove: async (name) => {
-      store.delete(name)
-    },
-  }
-}
-
-async function setup(backend = memoryBackend()) {
-  vi.resetModules()
-  const secrets = await import('@/server/secrets')
-
-  secrets.__resetSecretsForTests()
-  secrets.__setSecretsBackendForTests(backend)
-  await secrets.secretsReady()
-
-  return { secrets, backend }
-}
+import { memoryBackend, setup } from './helpers/secrets'
 
 const originalPlatform = process.platform
 

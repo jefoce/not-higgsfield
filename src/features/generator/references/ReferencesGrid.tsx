@@ -2,24 +2,20 @@
 
 import { closestCenter, DndContext } from '@dnd-kit/core'
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable'
-import { keyBy } from 'lodash-es'
 
 import type { KindExtensions } from '@/core/media-kinds'
 import type { ModelPreset } from '@/core/presets/types'
-import { referenceSlots } from '@/core/prompt-tokens'
 import { UploadProgressTile } from '@/features/media-picker/uploads/UploadProgressTile'
 import type { DropProps } from '@/features/media-picker/uploads/use-drop-upload'
 import type { UploadQueue } from '@/features/media-picker/uploads/use-upload-queue'
 import { cn } from '@/lib/cn'
 
-import { useGeneratorStore } from '../store/store'
 import { AddReferenceTile } from './AddReferenceTile'
-import { labelFor, noteFor, referenceUploads } from './reference-notes'
+import { labelFor, noteFor } from './reference-notes'
 import { ReferenceCounters } from './ReferenceCounters'
 import { ReferenceDragOverlay } from './ReferenceDragOverlay'
 import { ReferenceItem } from './ReferenceItem'
-import { useImagePlan } from './use-image-plan'
-import { useReferencesDnd } from './use-references-dnd'
+import { useReferencesGrid } from './use-references-grid'
 
 interface ReferencesGridProps {
   preset: ModelPreset
@@ -35,58 +31,16 @@ interface ReferencesGridProps {
 export function ReferencesGrid(props: ReferencesGridProps) {
   const { preset, extensions, max, queue, dropProps, isDragging } = props
 
-  const references = useGeneratorStore((state) => {
-    return state.references
-  })
-
-  const uploadsById = useGeneratorStore((state) => {
-    return state.uploadsById
-  })
-
-  const handleSelectSlot = useGeneratorStore((state) => {
-    return state.insertMention
-  })
-
-  const handleReplace = useGeneratorStore((state) => {
-    return state.replaceReference
-  })
-
-  const handleRemove = useGeneratorStore((state) => {
-    return state.removeReference
-  })
-
-  const {
-    activeId,
-    order,
-    sensors,
-    handleDragStart,
-    handleDragOver,
-    handleDragEnd,
-    handleDragCancel,
-  } = useReferencesDnd(references)
-
-  const { counts, slots } = referenceSlots(order, (id) => {
-    return uploadsById[id]?.kind
-  })
-
-  const plan = useImagePlan(
-    preset.id,
-    references.filter((id) => {
-      return uploadsById[id]?.kind === 'image'
-    }),
-  )
-
-  const planned = keyBy(plan?.images ?? [], 'id')
-  const previewUploads = referenceUploads(references, uploadsById)
+  const grid = useReferencesGrid(preset)
 
   return (
     <DndContext
-      sensors={sensors}
+      sensors={grid.sensors}
       collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-      onDragCancel={handleDragCancel}
+      onDragStart={grid.handleDragStart}
+      onDragOver={grid.handleDragOver}
+      onDragEnd={grid.handleDragEnd}
+      onDragCancel={grid.handleDragCancel}
     >
       <div
         className={cn(
@@ -95,24 +49,24 @@ export function ReferencesGrid(props: ReferencesGridProps) {
         )}
         {...dropProps}
       >
-        <ReferenceCounters counts={counts} preset={preset} plan={plan} />
+        <ReferenceCounters counts={grid.counts} preset={preset} plan={grid.plan} />
         <div className="grid grid-cols-4 justify-center gap-2">
           {max > 0 && <AddReferenceTile onPick={props.onPick} />}
-          <SortableContext items={references} strategy={rectSortingStrategy}>
-            {references.map((id) => {
+          <SortableContext items={grid.references} strategy={rectSortingStrategy}>
+            {grid.references.map((id) => {
               return (
                 <ReferenceItem
                   key={id}
                   id={id}
-                  upload={uploadsById[id]}
-                  label={labelFor(slots, id)}
-                  note={noteFor({ id, planned })}
-                  previewUploads={previewUploads}
-                  slots={slots}
+                  upload={grid.uploadsById[id]}
+                  label={labelFor(grid.slots, id)}
+                  note={noteFor({ id, planned: grid.planned })}
+                  previewUploads={grid.previewUploads}
+                  slots={grid.slots}
                   extensions={extensions}
-                  onSelectSlot={handleSelectSlot}
-                  onReplace={handleReplace}
-                  onRemove={handleRemove}
+                  onSelectSlot={grid.handleSelectSlot}
+                  onReplace={grid.handleReplace}
+                  onRemove={grid.handleRemove}
                 />
               )
             })}
@@ -123,15 +77,15 @@ export function ReferencesGrid(props: ReferencesGridProps) {
         </div>
       </div>
       <ReferenceDragOverlay
-        activeId={activeId}
-        uploadsById={uploadsById}
-        planned={planned}
-        slots={slots}
-        previewUploads={previewUploads}
+        activeId={grid.activeId}
+        uploadsById={grid.uploadsById}
+        planned={grid.planned}
+        slots={grid.slots}
+        previewUploads={grid.previewUploads}
         extensions={extensions}
-        onSelectSlot={handleSelectSlot}
-        onReplace={handleReplace}
-        onRemove={handleRemove}
+        onSelectSlot={grid.handleSelectSlot}
+        onReplace={grid.handleReplace}
+        onRemove={grid.handleRemove}
       />
     </DndContext>
   )

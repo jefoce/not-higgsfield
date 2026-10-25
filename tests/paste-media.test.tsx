@@ -117,7 +117,9 @@ describe('usePasteMedia', () => {
 
     expect(linkAbsPath).toHaveBeenCalledWith('/tmp/clip.mp4')
   })
+})
 
+describe('usePasteMedia editor', () => {
   it('ignores a paste inside a text input', () => {
     const onFiles = vi.fn()
 

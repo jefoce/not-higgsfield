@@ -68,6 +68,22 @@ function slotTooltip(params: SlotTooltipParams): string | undefined {
   return undefined
 }
 
+interface PreviewUploadParams {
+  upload?: UploadItem
+  replace: () => void
+  remove: () => void
+}
+
+function previewUpload(params: PreviewUploadParams): void {
+  const { upload, replace, remove } = params
+
+  if (!upload) {
+    return
+  }
+
+  openPreview({ items: [upload], index: 0, actions: { replace, remove } })
+}
+
 /** One frame drop slot with preview, replace and remove actions. */
 export function FrameSlot(props: FrameSlotProps) {
   const { slot, disabled: isDisabled = false, disabledReason } = props
@@ -130,18 +146,7 @@ export function FrameSlot(props: FrameSlotProps) {
   }
 
   const handlePreview = (): void => {
-    if (!upload) {
-      return
-    }
-
-    openPreview({
-      items: [upload],
-      index: 0,
-      actions: {
-        replace: handlePick,
-        remove: handleRemove,
-      },
-    })
+    previewUpload({ upload, replace: handlePick, remove: handleRemove })
   }
 
   const handleSlotPress = isPreviewable ? handlePreview : handlePick

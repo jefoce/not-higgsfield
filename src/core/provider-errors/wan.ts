@@ -3,7 +3,7 @@ import type { Rule } from './types'
 
 export const WAN_RULES: readonly Rule[] = [
   {
-    match: (raw) => {
+    match: (raw: string): boolean => {
       return /DataInspectionFailed/.test(raw) && /output data/i.test(raw)
     },
     title: "The finished video was blocked by Wan's content check.",
@@ -66,7 +66,7 @@ export const WAN_RULES: readonly Rule[] = [
     kind: 'input',
   },
   {
-    match: (raw) => {
+    match: (raw: string): boolean => {
       return (
         /InvalidURL|InputDownloadFailed|InvalidFile\.DownloadFailed|InvalidParameter\.DataInspection/.test(
           raw,
@@ -81,14 +81,14 @@ export const WAN_RULES: readonly Rule[] = [
   },
   {
     match: /InvalidParameter/,
-    title: (raw) => {
+    title: (raw: string): string => {
       return settingTitle('Wan', raw)
     },
     hint: 'The app should have caught this. Send the details to the developer.',
     kind: 'input',
   },
   {
-    match: (raw) => {
+    match: (raw: string): boolean => {
       return /Throttling/.test(raw) || /Too many requests/i.test(raw)
     },
     title: 'Wan is busy right now.',

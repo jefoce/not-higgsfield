@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { isNil } from 'lodash-es'
 
 import type { GenerationRecord } from '@/core/schemas/generation-record'
@@ -9,6 +9,7 @@ import { toastError } from '@/lib/notify'
 import { confirmDelete, deleteSelected, downloadSelected, likeSelected } from './selection-actions'
 import { useSelectionStore } from './selection-store'
 import { SelectionToolbar } from './SelectionToolbar'
+import { useSelectionEscape } from './use-selection-escape'
 
 interface SelectionBarProps {
   records: GenerationRecord[]
@@ -34,25 +35,7 @@ export function SelectionBar(props: SelectionBarProps) {
 
   const isActive = ids.size > 0
 
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || event.defaultPrevented) {
-        return
-      }
-
-      if (document.querySelector('[role="dialog"],[role="menu"]')) {
-        return
-      }
-
-      handleClear()
-    }
-
-    document.addEventListener('keydown', onKey)
-
-    return () => {
-      return document.removeEventListener('keydown', onKey)
-    }
-  }, [handleClear])
+  useSelectionEscape(handleClear)
 
   const byId = new Map(
     records.map((record) => {
@@ -71,8 +54,6 @@ export function SelectionBar(props: SelectionBarProps) {
   const isAllLiked = selected.every((record) => {
     return record.favorite
   })
-
-  const isBusy = !isNil(busy)
 
   const handleDownload = async () => {
     if (!isAllCompleted) {
@@ -127,7 +108,7 @@ export function SelectionBar(props: SelectionBarProps) {
       byId={byId}
       isAllCompleted={isAllCompleted}
       isAllLiked={isAllLiked}
-      isBusy={isBusy}
+      isBusy={!isNil(busy)}
       onDownload={handleDownload}
       onLike={handleLike}
       onDelete={handleDelete}

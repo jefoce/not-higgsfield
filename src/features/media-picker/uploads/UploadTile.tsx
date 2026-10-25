@@ -1,16 +1,16 @@
 'use client'
 
 import { useId, useRef, useState } from 'react'
-import { isEmpty, isNil } from 'lodash-es'
+import { isNil } from 'lodash-es'
 import { CloudUpload } from 'lucide-react'
 import type { ChangeEvent } from 'react'
 
 import { acceptForKinds, type KindExtensions } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 import type { UploadItem } from '@/core/schemas/upload-item'
-import { uploadFilesWithProgress } from '@/lib/api/uploads'
 import { cn } from '@/lib/cn'
-import { toastError } from '@/lib/notify'
+
+import { useUploadFiles } from './use-upload-files'
 
 export interface UploadTileProps {
   kinds: MediaKind[]
@@ -27,44 +27,13 @@ function uploadLabelFor(progress: number | null): string {
   return `Uploading ${progress}%`
 }
 
-function progressPercent(sent: number, total: number): number {
-  if (total <= 0) {
-    return 0
-  }
-
-  return Math.round((sent / total) * 100)
-}
-
 /** Dashed upload tile backed by a hidden file input. */
 export function UploadTile(props: UploadTileProps) {
   const { kinds, max, extensions } = props
   const fileInputId = useId()
   const inputRef = useRef<HTMLInputElement>(null)
-  const [progress, setProgress] = useState<number | null>(null)
   const [isOver, setIsOver] = useState(false)
-  const isBusy = !isNil(progress)
-
-  const handleFiles = async (files: File[]) => {
-    if (isEmpty(files)) {
-      return
-    }
-
-    setProgress(0)
-
-    const handleProgress = (sent: number, total: number) => {
-      return setProgress(progressPercent(sent, total))
-    }
-
-    try {
-      const items = await uploadFilesWithProgress({ files, onProgress: handleProgress })
-
-      props.onUploaded(items)
-    } catch (error) {
-      toastError(error)
-    } finally {
-      setProgress(null)
-    }
-  }
+  const { progress, isBusy, handleFiles } = useUploadFiles({ onUploaded: props.onUploaded })
 
   const handleOpenFile = () => {
     return inputRef.current?.click()

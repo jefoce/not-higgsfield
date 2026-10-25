@@ -118,7 +118,9 @@ describe('history selection cards', () => {
 
     expect(screen.getAllByRole('button', { name: 'Play video' })).toHaveLength(1)
   })
+})
 
+describe('history selection rows', () => {
   it('keeps a selected list row selected when its media is clicked', () => {
     const item = record('a')
 
@@ -239,7 +241,9 @@ describe('history selection bar', () => {
       expect.stringContaining('b.preview'),
     ])
   })
+})
 
+describe('history selection batches', () => {
   it('does not clear on Escape while a dialog is open', () => {
     const records = ['a', 'b'].map((id) => {
       return record(id)

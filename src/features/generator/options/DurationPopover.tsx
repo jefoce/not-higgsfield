@@ -3,14 +3,12 @@
 import { Clock } from 'lucide-react'
 import { useShallow } from 'zustand/react/shallow'
 
-import { maxDurationFor, referenceVideoSeconds } from '@/core/duration-limits'
-import { getPreset, minDuration } from '@/core/presets'
-import { formatSecondsExact } from '@/lib/format'
+import { getPreset } from '@/core/presets'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
 import { Slider } from '@/ui/Slider'
 
 import { useGeneratorStore } from '../store/store'
-import { inputFromState } from '../store/store-draft'
+import { durationLimit } from './duration-limit'
 import { DurationChip } from './DurationChip'
 
 /** Duration setting button and slider popover isCapped by reference video length. */
@@ -41,28 +39,12 @@ export function DurationPopover() {
   })
 
   const preset = getPreset(draft.presetId)
-  const { max } = preset.duration
-  const min = minDuration(preset)
 
-  const limit = maxDurationFor({
-    input: inputFromState(draft),
-    uploads: uploadsById,
+  const { min, limit, chips, isFloored, isCapped, limitText } = durationLimit({
+    draft,
+    uploadsById,
     preset,
   })
-
-  const chips = (preset.duration.options ?? []).filter((value) => {
-    return value >= min && value <= max
-  })
-
-  const isFloored = min > preset.duration.min
-
-  const totalVideo = referenceVideoSeconds({
-    references: draft.references,
-    uploads: uploadsById,
-  })
-
-  const isCapped = limit < max
-  const limitText = `Up to ${limit}s with ${formatSecondsExact(totalVideo)} of reference video`
 
   return (
     <Popover>

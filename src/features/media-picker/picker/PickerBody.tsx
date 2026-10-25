@@ -1,12 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { isNil } from 'lodash-es'
 import useSWR from 'swr'
 
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { fetchFolders } from '@/lib/api/folders'
-import { pauseAudio } from '@/lib/audio-player'
 import { useBoolean } from '@/lib/use-boolean'
 
 import { AddFolderDialog } from '../folders/AddFolderDialog'
@@ -16,6 +15,7 @@ import { PickerDropOverlay } from './PickerDropOverlay'
 import { PickerFooter } from './PickerFooter'
 import { PickerTabs } from './PickerTabs'
 import { closeMediaPicker, type PickerRequest } from './store'
+import { usePauseAudioOnUnmount } from './use-pause-audio'
 import { usePickerConfirm } from './use-picker-confirm'
 import { usePickerFolders } from './use-picker-folders'
 import { usePickerSelection } from './use-picker-selection'
@@ -72,11 +72,7 @@ export function PickerBody(props: PickerBodyProps) {
     onConfirmUploads: confirm,
   })
 
-  useEffect(() => {
-    return () => {
-      return pauseAudio()
-    }
-  }, [])
+  usePauseAudioOnUnmount()
 
   const selectedCount = isFolderTab ? selectedFolderRels.length : selection.selected.length
 

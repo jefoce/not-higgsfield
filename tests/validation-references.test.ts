@@ -80,7 +80,9 @@ describe('validateInput reference counts', () => {
 
     expect(result.errors).toContain('Audio references need at least one image or video reference')
   })
+})
 
+describe('validateInput reference storage', () => {
   it('skips the cloud storage error while remote status is unknown', () => {
     const result = validateInput({
       input: input({ references: ['vid'] }),

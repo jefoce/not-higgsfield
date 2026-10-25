@@ -173,7 +173,9 @@ describe('getModelCatalog status', () => {
       }),
     ).toBe(true)
   })
+})
 
+describe('getModelCatalog providers', () => {
   it('marks every model no_provider when no key is configured', async () => {
     mocks.isConfigured.mockReturnValue(false)
 

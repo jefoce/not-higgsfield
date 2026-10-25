@@ -2,17 +2,16 @@
 
 import { type ChangeEvent, useState } from 'react'
 import { isEmpty } from 'lodash-es'
-import { ChevronRight } from 'lucide-react'
 
 import { getPreset, MODEL_PRESETS } from '@/core/presets'
 import { useModelEntry } from '@/lib/api/models'
 import { useBoolean } from '@/lib/use-boolean'
 import { useMediaQuery } from '@/lib/use-media-query'
 import { SearchInput } from '@/ui/form/SearchInput'
-import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
-import { discountLabel } from '@/ui/Price'
+import { Popover, PopoverContent } from '@/ui/Popover'
 
 import { useGeneratorStore } from '../store/store'
+import { ModelPickerTrigger } from './ModelPickerTrigger'
 import { ModelRow } from './ModelRow'
 
 /** Panel-width preset picker with search and capability badges. */
@@ -59,23 +58,7 @@ export function ModelPicker() {
   return (
     <div className="mt-4">
       <Popover open={modelMenu.value} onOpenChange={handleOpenChange}>
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            className="flex w-full items-center justify-between rounded-xl bg-surface px-4 py-3 text-left hover:bg-white/6"
-          >
-            <span className="flex flex-col">
-              <span className="flex items-center gap-2 text-xs text-fg-2">
-                Model
-                {discount > 0 && (
-                  <span className="text-xxs text-lime">{discountLabel(discount)}</span>
-                )}
-              </span>
-              <span className="text-sm font-medium">{preset.title}</span>
-            </span>
-            <ChevronRight size={16} className="text-fg-2" />
-          </button>
-        </PopoverTrigger>
+        <ModelPickerTrigger title={preset.title} discount={discount} />
         <PopoverContent
           side={side}
           align="start"

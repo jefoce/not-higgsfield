@@ -10,6 +10,7 @@ import { PreviewBody } from './PreviewBody'
 import { PreviewFooter } from './PreviewFooter'
 import { PreviewHeader } from './PreviewHeader'
 import { PreviewNavButton } from './PreviewNavButton'
+import { usePreviewKeys } from './use-preview-keys'
 
 function handleOpenChange(isOpen: boolean): void {
   if (!isOpen) {
@@ -48,31 +49,7 @@ export function MediaPreviewModal() {
     }
   }, [acquire, item, playerId, release])
 
-  useEffect(() => {
-    if (!request) {
-      return
-    }
-
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft') {
-        setIndex((current) => {
-          return Math.max(0, current - 1)
-        })
-      }
-
-      if (event.key === 'ArrowRight') {
-        setIndex((current) => {
-          return Math.min(items.length - 1, current + 1)
-        })
-      }
-    }
-
-    window.addEventListener('keydown', onKey)
-
-    return () => {
-      return window.removeEventListener('keydown', onKey)
-    }
-  }, [items.length, request])
+  usePreviewKeys({ isOpen: Boolean(request), length: items.length, setIndex })
 
   const handleRun = (key: ActionKey) => {
     const action = request?.actions?.[key]

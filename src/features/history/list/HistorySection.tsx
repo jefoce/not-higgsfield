@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { isEmpty, isNil } from 'lodash-es'
+import { useEffect, useMemo, useState } from 'react'
+import { isEmpty } from 'lodash-es'
 
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { useGeneratorStore } from '@/features/generator/store/store'
@@ -18,6 +18,7 @@ import { HistoryModal } from './HistoryModal'
 import { HistoryToolbar } from './HistoryToolbar'
 import { SkeletonRows } from './SkeletonRows'
 import { useHistory } from './use-history'
+import { useHistoryScroll } from './use-history-scroll'
 import { useHistoryViewStore } from './view-store'
 
 /** Right-hand feed: toolbar, list or grid, infinite scroll and grid details modal. */
@@ -46,8 +47,6 @@ export function HistorySection() {
     records.find((record) => {
       return record.id === selectedId
     }) ?? null
-
-  const sentinel = useRef<HTMLDivElement>(null)
 
   const order = useMemo(() => {
     return records.filter(isSelectable).map((record) => {
@@ -96,28 +95,7 @@ export function HistorySection() {
     )
   }, [records])
 
-  useEffect(() => {
-    const node = sentinel.current
-
-    if (!node || !hasMore) {
-      return
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!isNil(entry) && entry.isIntersecting) {
-          loadMore()
-        }
-      },
-      { rootMargin: '400px 0px' },
-    )
-
-    observer.observe(node)
-
-    return () => {
-      return observer.disconnect()
-    }
-  }, [hasMore, loadMore])
+  const sentinel = useHistoryScroll({ hasMore, loadMore })
 
   return (
     <section id="history-section" className="relative flex h-full flex-col overflow-hidden">

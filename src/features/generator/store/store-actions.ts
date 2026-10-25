@@ -1,21 +1,15 @@
 'use client'
 
-import { clamp, isNil, keyBy, omit } from 'lodash-es'
-import { toast } from 'sonner'
+import { clamp, isNil, keyBy } from 'lodash-es'
 import type { StateCreator } from 'zustand'
 
 import { SEED_MAX } from '@/core/constants'
-import { maxDurationFor } from '@/core/duration-limits'
-import { isNonEmptyString } from '@/core/guards'
-import { clampDuration, normalizeForPreset } from '@/core/normalize-input'
-import { findPreset, getPreset } from '@/core/presets'
-import type { ModelPreset } from '@/core/presets/types'
 import type { RefSlot } from '@/core/prompt-tokens'
-import type { GenerationInput, GeneratorTab } from '@/core/schemas/generation-record'
 
-import { defaults, inputFromState } from './store-draft'
+import { defaults } from './store-draft'
+import { createDraftActions } from './store-draft-actions'
 import { createFrameActions } from './store-frame-actions'
-import { clampReferenceDuration, randomSeed } from './store-helpers'
+import { randomSeed } from './store-helpers'
 import { createLoadActions } from './store-load-actions'
 import { createReferenceActions } from './store-reference-actions'
 import type { GeneratorState } from './store-state'
@@ -35,54 +29,6 @@ function clampSeed(seed: number | null): number | null {
   return clamp(Math.round(seed), 0, SEED_MAX)
 }
 
-interface NormalizedDraftParams {
-  state: GeneratorState
-  preset: ModelPreset
-  overrides?: Partial<GenerationInput>
-}
-
-interface NextTabStateParams {
-  state: GeneratorState
-  preset: ModelPreset
-  tab: GeneratorTab
-}
-
-function nextTabState(params: NextTabStateParams): Partial<GeneratorState> {
-  const { state, preset, tab } = params
-
-  const isInvalid =
-    state.aspectRatio === 'auto' && (tab !== 'frames' || !isNonEmptyString(state.frames.start))
-
-  const aspectRatio = isInvalid ? preset.defaultAspectRatio : state.aspectRatio
-
-  return {
-    tab,
-    aspectRatio,
-    duration: clampReferenceDuration({
-      input: inputFromState({ ...state, tab }),
-      uploads: state.uploadsById,
-      preset,
-    }),
-  }
-}
-
-/** Normalizes a draft to the preset, toasts the notes and drops the per-tab prompt. */
-function normalizedDraft(params: NormalizedDraftParams): Partial<GeneratorState> {
-  const { state, preset, overrides } = params
-
-  const { input, notes } = normalizeForPreset({
-    input: { ...inputFromState(state), ...overrides },
-    preset,
-    uploads: state.uploadsById,
-  })
-
-  if (notes.length > 0) {
-    toast(notes.join(' \u00b7 '))
-  }
-
-  return omit(input, 'prompt')
-}
-
 /** Draft state and its actions, wired to persist by store.ts. */
 export const createGeneratorState: StateCreator<
   GeneratorState,
@@ -96,68 +42,7 @@ export const createGeneratorState: StateCreator<
     setActiveCount: (activeCount) => {
       return set({ activeCount })
     },
-    setPreset: (id) => {
-      return set((state) => {
-        const preset = findPreset(id)
-
-        if (!preset) {
-          return {}
-        }
-
-        return normalizedDraft({ state, preset })
-      })
-    },
-    setTab: (tab) => {
-      return set((state) => {
-        return nextTabState({ state, preset: getPreset(state.presetId), tab })
-      })
-    },
-    setPrompt: (text) => {
-      return set((state) => {
-        return { prompts: { ...state.prompts, [state.tab]: text } }
-      })
-    },
-    setAudio: (isAudio) => {
-      return set({ audio: isAudio })
-    },
-    setDuration: (duration) => {
-      return set((state) => {
-        const preset = getPreset(state.presetId)
-
-        const limit = maxDurationFor({
-          input: inputFromState(state),
-          uploads: state.uploadsById,
-          preset,
-        })
-
-        return { duration: clampDuration({ value: duration, preset, limit }) }
-      })
-    },
-    setAspectRatio: (aspectRatio) => {
-      return set((state) => {
-        if (aspectRatio !== 'auto') {
-          return { aspectRatio }
-        }
-
-        const preset = getPreset(state.presetId)
-
-        const isAllowed =
-          state.tab === 'frames' && Boolean(state.frames.start) && preset.autoAspectWithFrames
-
-        const nextAspectRatio = isAllowed ? aspectRatio : preset.defaultAspectRatio
-
-        return { aspectRatio: nextAspectRatio }
-      })
-    },
-    setResolution: (resolution) => {
-      return set((state) => {
-        return normalizedDraft({
-          state,
-          preset: getPreset(state.presetId),
-          overrides: { resolution },
-        })
-      })
-    },
+    ...createDraftActions(set),
     ...createFrameActions(set),
     ...createReferenceActions(set),
     insertMention: (slot) => {
