@@ -5,6 +5,8 @@ import path from 'node:path'
 
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { storedRecord } from './helpers/stored-record'
+
 const root = await mkdtemp(path.join(os.tmpdir(), 'nh-export-'))
 
 process.env.STORAGE_ROOT = root
@@ -37,7 +39,7 @@ const context = (recordId = id) => ({ params: Promise.resolve({ id: recordId }) 
 
 beforeAll(async () => {
   await mkdir(path.join(root, 'downloads'), { recursive: true })
-  await writeFile(path.join(root, 'downloads', `${id}.json`), JSON.stringify({ id }))
+  await writeFile(path.join(root, 'downloads', `${id}.json`), JSON.stringify(storedRecord(id)))
   await writeFile(path.join(root, 'downloads', `${id}.mp4`), videoBytes)
 })
 

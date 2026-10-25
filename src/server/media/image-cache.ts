@@ -42,9 +42,7 @@ const OpaqueSchema = z.boolean()
 
 /** Per upload, so every ladder step and the submit share one stats() result. */
 export async function readOpaque(id: string): Promise<boolean | null> {
-  const parsed = OpaqueSchema.safeParse(await readJson<unknown>(opaqueFile(id)))
-
-  return parsed.success ? parsed.data : null
+  return readJson(opaqueFile(id), OpaqueSchema)
 }
 
 export async function writeOpaque(id: string, isOpaque: boolean): Promise<void> {
@@ -77,21 +75,20 @@ export function toEncoded(record: CacheRecord, data: Buffer): EncodedImage {
 }
 
 export async function readCache(id: string, step: number): Promise<EncodedImage | null> {
-  const raw = await readJson<unknown>(`${cacheStem(id, step)}.json`)
-  const parsed = CacheSchema.safeParse(raw)
+  const record = await readJson(`${cacheStem(id, step)}.json`, CacheSchema)
 
-  if (!parsed.success) {
+  if (!record) {
     return null
   }
 
-  const file = cacheFile({ id, step, format: parsed.data.format })
+  const file = cacheFile({ id, step, format: record.format })
   const data = await fs.readFile(file).catch(() => null)
 
   if (!data) {
     return null
   }
 
-  return toEncoded(parsed.data, data)
+  return toEncoded(record, data)
 }
 
 interface WriteCacheParams {

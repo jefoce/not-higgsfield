@@ -53,6 +53,7 @@ function record(
     },
     output: { video: `${id}.mp4` },
     ...extra,
+    schemaVersion: 1,
   }
 }
 

@@ -6,7 +6,9 @@ import path from 'node:path'
 import { isNil } from 'lodash-es'
 
 import { kindFromExt, kindFromName } from '@/core/media-kinds'
-import type { FolderItem, MediaKind, UploadItem } from '@/core/media-types'
+import type { MediaKind } from '@/core/media-types'
+import { FoldersFileSchema } from '@/core/schemas/folder-item'
+import { UploadItemSchema } from '@/core/schemas/upload-item'
 
 import { HttpError } from '../errors'
 import { DOWNLOADS_DIR, FOLDERS_FILE, uploadPaths, UPLOADS_DIR } from '../paths'
@@ -69,7 +71,7 @@ async function resolveUpload(rest: string[], ref: string): Promise<ResolvedMedia
   }
 
   const id = rest[0]
-  const item = await readJson<UploadItem>(path.join(UPLOADS_DIR, `${id}.json`))
+  const item = await readJson(path.join(UPLOADS_DIR, `${id}.json`), UploadItemSchema)
 
   if (!item) {
     throw new MediaRefError(404, `Upload not found: ${id}`)
@@ -98,7 +100,7 @@ async function resolveFolder(rest: string[], ref: string): Promise<ResolvedMedia
   }
 
   const [folderId, ...rel] = rest
-  const folders = await readJson<FolderItem[]>(FOLDERS_FILE)
+  const folders = await readJson(FOLDERS_FILE, FoldersFileSchema)
   const folder = folders?.find((item) => item.id === folderId)
 
   if (!folder) {

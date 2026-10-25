@@ -4,6 +4,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 
 import { isNil, isString } from 'lodash-es'
+import { z } from 'zod'
 
 import { SECRET_NAMES, SECRET_SCHEMAS, type SecretName } from '@/core/secret-names'
 
@@ -12,6 +13,7 @@ import { STORAGE_ROOT } from '../paths'
 import type { SecretBackend } from './index'
 
 const FILE = path.join(STORAGE_ROOT, 'secrets.json')
+const SecretsFileSchema = z.record(z.string(), z.unknown())
 
 type Values = Partial<Record<SecretName, string>>
 
@@ -54,7 +56,7 @@ async function readAll(): Promise<Values> {
     return {}
   }
 
-  const raw = await readJson<Record<string, unknown>>(FILE)
+  const raw = await readJson(FILE, SecretsFileSchema)
 
   if (!raw) {
     return {}

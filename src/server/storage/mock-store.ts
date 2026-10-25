@@ -7,7 +7,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
 
-import { isString } from 'lodash-es'
+import { z } from 'zod'
 
 import { REMOTE_MOCK_MBPS } from '@/core/constants'
 import type { TestResult } from '@/core/types'
@@ -18,10 +18,12 @@ import { MOCK_REMOTE_PREFIX } from '../local-url'
 import { STORAGE_ROOT } from '../paths'
 import type { ObjectInfo, ObjectStore, PutObjectParams } from './types'
 
-interface MockMeta {
-  size: number
-  serverSha256: string
-}
+const MockMetaSchema = z.object({
+  size: z.number(),
+  serverSha256: z.string(),
+})
+
+type MockMeta = z.infer<typeof MockMetaSchema>
 
 const SECRET = globalState('mockRemoteSecret', () => randomBytes(32))
 
@@ -33,9 +35,9 @@ export function createMockStore(): ObjectStore {
     id: 'r2',
 
     async head(key): Promise<ObjectInfo | null> {
-      const meta = await readJson<MockMeta>(metaPath(key))
+      const meta = await readJson(metaPath(key), MockMetaSchema)
 
-      if (!meta || typeof meta.size !== 'number' || !isString(meta.serverSha256)) {
+      if (!meta) {
         return null
       }
 

@@ -1,26 +1,18 @@
-import type { UploadItem } from './media-types'
 import type { AspectChoice, Resolution } from './presets/types'
-import type { VideoProviderId } from './providers/types'
+import type {
+  GenerationInput as StoredGenerationInput,
+  GenerationRecord as StoredGenerationRecord,
+  GeneratorTab as StoredGeneratorTab,
+  JobStatus as StoredJobStatus,
+} from './schemas/generation-record'
 import type { SecretName } from './secret-names'
 
-export type GeneratorTab = 'frames' | 'references'
+export type GeneratorTab = StoredGeneratorTab
 
 /** Exact generate panel state. Saved in record, copied back by Rerun. */
-export interface GenerationInput {
-  presetId: string
-  tab: GeneratorTab
-  prompt: string
-  audio: boolean
-  duration: number
-  aspectRatio: AspectChoice
-  resolution: Resolution
-  frames: { start: string | null; end: string | null }
-  references: string[]
-  seed: number | null
-}
+export type GenerationInput = StoredGenerationInput
 
-export type JobStatus =
-  'submitting' | 'pending' | 'in_progress' | 'completed' | 'failed' | 'cancelled' | 'expired'
+export type JobStatus = StoredJobStatus
 
 export const ACTIVE_STATUSES: JobStatus[] = ['submitting', 'pending', 'in_progress']
 
@@ -30,66 +22,7 @@ export interface BatchSkip {
   reason: 'not_found' | 'active' | 'not_ready'
 }
 
-interface GenerationCost {
-  currency: 'USD'
-  pricePerSec: number
-  priceSource: 'live' | 'fallback' | 'mock' | 'unknown'
-  estimatedUsd: number
-  actualUsd: number | null
-  isByok: boolean | null
-  billed: boolean | null
-}
-
-export interface GenerationRecord {
-  id: string
-  createdAt: string
-  updatedAt: string
-  status: JobStatus
-
-  /** Provider that owns this job. Absent on old records, which use the default provider. */
-  provider?: VideoProviderId
-  input: GenerationInput
-  preset: { id: string; title: string; slug: string }
-  inputsSnapshot: Record<
-    string,
-    Pick<UploadItem, 'kind' | 'originalName' | 'source' | 'target'> & {
-      width?: number
-      height?: number
-      transport?: 'base64' | 'url'
-      sentWidth?: number
-      sentHeight?: number
-      sentBytes?: number
-      format?: 'jpeg' | 'png'
-      flattened?: '#ffffff' | '#1c1e20'
-    }
-  >
-  submit?: {
-    stage: 'grace' | 'uploading' | 'sending'
-    notBefore?: string
-    progress?: number
-  }
-  job?: {
-    id: string
-    generationId?: string
-    submittedAt: string
-    startedAt?: string
-    completedAt?: string
-    expiresAt?: number
-  }
-  download?: { startedAt: string }
-  seedUsed: number | null
-  favorite: boolean
-  cost: GenerationCost
-  output?: {
-    video: string
-    preview?: string
-    width?: number
-    height?: number
-    durationSec?: number
-    bytes?: number
-  }
-  error?: string
-}
+export type GenerationRecord = StoredGenerationRecord
 
 export interface HistoryFilters {
   q?: string

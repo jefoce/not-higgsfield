@@ -3,6 +3,7 @@ import 'server-only'
 import path from 'node:path'
 
 import type { UploadItem } from '@/core/media-types'
+import { UploadItemSchema } from '@/core/schemas/upload-item'
 
 import { readJson, writeJsonAtomic } from '../fs/json-file'
 import { isUuid } from '../fs/media-ref'
@@ -14,6 +15,7 @@ const store = jsonDirStore<UploadItem>({
   key: 'uploadIndex',
   dir: UPLOADS_DIR,
   fileOf: jsonPath,
+  schema: UploadItemSchema,
 })
 
 function jsonPath(id: string): string {
@@ -33,7 +35,7 @@ export async function getUploadRecord(id: string): Promise<UploadItem | null> {
 }
 
 export async function loadUploadRecord(id: string): Promise<UploadItem | null> {
-  return readJson<UploadItem>(jsonPath(id))
+  return readJson(jsonPath(id), UploadItemSchema)
 }
 
 /** Writes the upload record atomically and returns it unchanged. */

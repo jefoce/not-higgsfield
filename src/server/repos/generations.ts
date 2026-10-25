@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { GenerationRecordSchema } from '@/core/schemas/generation-record'
 import { ACTIVE_STATUSES, type GenerationRecord } from '@/core/types'
 
 import { removeFile, writeJsonAtomic } from '../fs/json-file'
@@ -11,6 +12,7 @@ const store = jsonDirStore<GenerationRecord>({
   key: 'generationIndex',
   dir: DOWNLOADS_DIR,
   fileOf: (id) => downloadPaths(id).json,
+  schema: GenerationRecordSchema,
 })
 
 /** Reads every record once, reloading when the downloads directory changes. */

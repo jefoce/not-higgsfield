@@ -1,41 +1,14 @@
+import type { FolderItem as StoredFolderItem } from './schemas/folder-item'
+import type {
+  LinkMode as StoredLinkMode,
+  UploadItem as StoredUploadItem,
+} from './schemas/upload-item'
+
 export type MediaKind = 'image' | 'video' | 'audio'
 
-type UploadSource = 'file' | 'link'
-
-export type LinkMode = 'symlink' | 'hardlink' | 'copy'
-
-export interface UploadItem {
-  id: string
-  source: UploadSource
-  kind: MediaKind
-  mime: string
-  ext: string
-  originalName: string
-  target?: string
-  linkMode?: LinkMode
-  sizeBytes: number
-  width?: number
-  height?: number
-  durationSec?: number
-  createdAt: string
-  missing?: boolean
-  remote?: {
-    key: string
-    sha256: string
-    serverSha256: string | null
-    size: number
-    mtimeMs: number
-    uploadedAt: string
-    lastUsedAt: string
-  }
-}
-
-export interface FolderItem {
-  id: string
-  name: string
-  path: string
-  addedAt: string
-}
+export type UploadItem = StoredUploadItem
+export type LinkMode = StoredLinkMode
+export type FolderItem = StoredFolderItem
 
 export interface FolderDir {
   name: string

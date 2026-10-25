@@ -34,9 +34,7 @@ let getGeneration: typeof GetGeneration
 
 beforeAll(async () => {
   await fs.mkdir(root, { recursive: true })
-
   ;({ queueDownload } = await import('@/server/jobs/download-queue'))
-
   ;({ getGeneration } = await import('@/server/repos/generations'))
 })
 
@@ -104,6 +102,7 @@ function makeRecord(): GenerationRecord {
   const now = new Date().toISOString()
 
   return {
+    schemaVersion: 1,
     id: ID,
     createdAt: now,
     updatedAt: now,

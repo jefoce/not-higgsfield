@@ -27,6 +27,7 @@ export async function createGeneration(raw: GenerationInput): Promise<Generation
   const now = new Date().toISOString()
 
   const record: GenerationRecord = {
+    schemaVersion: 1,
     id: randomUUID(),
     createdAt: now,
     updatedAt: now,

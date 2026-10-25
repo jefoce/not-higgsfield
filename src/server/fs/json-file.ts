@@ -4,15 +4,37 @@ import { randomUUID } from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-/** Returns null for missing or unparseable files, never throws. */
-export async function readJson<T>(file: string): Promise<T | null> {
-  try {
-    const text = await fs.readFile(file, 'utf8')
+import type { ZodType } from 'zod'
 
-    return JSON.parse(text) as T
+/** Returns null for missing or invalid files, never throws. */
+export async function readJson<T>(file: string, schema: ZodType<T>): Promise<T | null> {
+  let text: string
+
+  try {
+    text = await fs.readFile(file, 'utf8')
   } catch {
     return null
   }
+
+  let raw: unknown
+
+  try {
+    raw = JSON.parse(text)
+  } catch {
+    return null
+  }
+
+  const parsed = schema.safeParse(raw)
+
+  if (parsed.success) {
+    return parsed.data
+  }
+
+  const first = parsed.error.issues[0]
+
+  console.warn(`[not-higgsfield] skipping invalid json ${file}: ${first?.message ?? 'invalid'}`)
+
+  return null
 }
 
 interface WriteJsonAtomicParams {

@@ -15,6 +15,7 @@ import type {
   FolderListing,
   MediaKind,
 } from '@/core/media-types'
+import { FoldersFileSchema } from '@/core/schemas/folder-item'
 
 import { HttpError } from '../errors'
 import { readJson, writeJsonAtomic } from '../fs/json-file'
@@ -25,9 +26,9 @@ import { withLock } from '../sync/lock'
 class FolderError extends HttpError {}
 
 export async function listFolders(): Promise<FolderItem[]> {
-  const folders = await readJson<FolderItem[]>(FOLDERS_FILE)
+  const folders = await readJson(FOLDERS_FILE, FoldersFileSchema)
 
-  if (!Array.isArray(folders)) {
+  if (isNil(folders)) {
     return []
   }
 

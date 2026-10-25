@@ -19,6 +19,7 @@ export interface RecordOverrides {
 
 export function record(id: string, overrides: RecordOverrides = {}): GenerationRecord {
   return {
+    schemaVersion: 1,
     id,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',

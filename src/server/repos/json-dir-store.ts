@@ -4,6 +4,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 
 import { isNil } from 'lodash-es'
+import type { ZodType } from 'zod'
 
 import { listJsonFileNames, readJson } from '../fs/json-file'
 import { globalState } from '../global-state'
@@ -21,17 +22,18 @@ export interface JsonDirStore<T extends { id: string }> {
   forget(id: string): Promise<void>
 }
 
-interface JsonDirStoreParams {
+interface JsonDirStoreParams<T> {
   key: string
   dir: string
   fileOf: (id: string) => string
+  schema: ZodType<T>
 }
 
 /** Indexes `<id>.json` files in one directory, reloading when its mtime changes. */
 export function jsonDirStore<T extends { id: string }>(
-  params: JsonDirStoreParams,
+  params: JsonDirStoreParams<T>,
 ): JsonDirStore<T> {
-  const { key, dir, fileOf } = params
+  const { key, dir, fileOf, schema } = params
 
   const state = globalState<IndexState<T>>(key, () => ({
     map: new Map(),
@@ -55,7 +57,7 @@ export function jsonDirStore<T extends { id: string }>(
     const names = await listJsonFileNames(dir)
 
     const records: (T | null)[] = await Promise.all(
-      names.map((name) => readJson<T>(path.join(dir, name))),
+      names.map((name) => readJson(path.join(dir, name), schema)),
     )
 
     state.map = new Map(
@@ -87,7 +89,7 @@ export function jsonDirStore<T extends { id: string }>(
         return cached
       }
 
-      const record = await readJson<T>(fileOf(id))
+      const record = await readJson(fileOf(id), schema)
 
       if (record) {
         state.map.set(id, record)
