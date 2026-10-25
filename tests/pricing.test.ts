@@ -3,8 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { getPreset } from '@/core/presets'
 import { primaryBinding } from '@/core/presets/bindings'
 import type { ModelPreset, PricingRule, Resolution } from '@/core/presets/types'
-import type { PriceContext } from '@/core/pricing'
-import { estimatePrice, formatRate, pricePerSec } from '@/core/pricing'
+import { estimatePrice, formatRate, type PriceContext, pricePerSec } from '@/core/pricing'
 
 const wan = getPreset('wan-3.0')
 const prime = getPreset('wan-3.0-prime')

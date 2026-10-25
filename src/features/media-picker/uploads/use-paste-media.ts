@@ -1,8 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { type ClipboardEvent, useCallback, useEffect, useRef } from 'react'
 import { isEmpty } from 'lodash-es'
-import type { ClipboardEvent } from 'react'
 import { toast } from 'sonner'
 
 import { isNonEmptyString } from '@/core/guards'

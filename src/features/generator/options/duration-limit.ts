@@ -4,8 +4,7 @@ import { minDuration } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
 import { formatSecondsExact } from '@/lib/format'
 
-import type { GeneratorDraft } from '../store/store-draft'
-import { inputFromState } from '../store/store-draft'
+import { type GeneratorDraft, inputFromState } from '../store/store-draft'
 
 interface DurationLimitParams {
   draft: GeneratorDraft

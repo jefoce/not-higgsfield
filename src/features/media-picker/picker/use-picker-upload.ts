@@ -8,8 +8,7 @@ import type { UploadItem } from '@/core/schemas/upload-item'
 import { type DropProps, useDropUpload } from '../uploads/use-drop-upload'
 import { usePasteMedia } from '../uploads/use-paste-media'
 import { type UploadQueue, useUploadQueue } from '../uploads/use-upload-queue'
-import type { PickerRequest } from './store'
-import { useMediaPickerStore } from './store'
+import { type PickerRequest, useMediaPickerStore } from './store'
 
 interface UsePickerUploadParams {
   request: PickerRequest

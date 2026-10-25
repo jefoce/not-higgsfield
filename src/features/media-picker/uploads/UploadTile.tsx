@@ -1,9 +1,8 @@
 'use client'
 
-import { useId, useRef, useState } from 'react'
+import { type ChangeEvent, useId, useRef, useState } from 'react'
 import { isNil } from 'lodash-es'
 import { CloudUpload } from 'lucide-react'
-import type { ChangeEvent } from 'react'
 
 import { acceptForKinds, type KindExtensions } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'

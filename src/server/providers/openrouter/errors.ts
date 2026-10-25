@@ -2,8 +2,7 @@ import 'server-only'
 
 import { isNil } from 'lodash-es'
 
-import type { ProviderErrorKind } from '../provider-error'
-import { ProviderError } from '../provider-error'
+import { ProviderError, type ProviderErrorKind } from '../provider-error'
 import { OpenRouterError } from './error'
 
 const MODERATION_PATTERN = /moderation|flagged|sensitive|policy/i

@@ -3,8 +3,7 @@
 import { type ChangeEvent, type ReactNode } from 'react'
 import { isEmpty } from 'lodash-es'
 
-import type { SecretName } from '@/core/secret-names'
-import { secretError } from '@/core/secret-names'
+import { secretError, type SecretName } from '@/core/secret-names'
 import type { SecretKeyStatus } from '@/core/types'
 import { Field } from '@/ui/form/Field'
 import { PasswordInput } from '@/ui/form/PasswordInput'

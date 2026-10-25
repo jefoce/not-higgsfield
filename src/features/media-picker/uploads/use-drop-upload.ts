@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { type DragEvent, type RefObject, useEffect, useRef, useState } from 'react'
 import { isEmpty } from 'lodash-es'
-import type { DragEvent, RefObject } from 'react'
 import { toast } from 'sonner'
 
 import { acceptFiles, type KindExtensions } from '@/core/media-kinds'

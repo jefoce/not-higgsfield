@@ -20,8 +20,7 @@ import { getObjectStore } from '../storage/registry'
 import { withLock } from '../sync/lock'
 import { emitJobSent } from './job-events'
 import { buildMedia, recordSent, send, uploadUrls } from './submit-media'
-import type { SubmitOutcome } from './submit-queue'
-import { setSubmitStage } from './submit-queue'
+import { setSubmitStage, type SubmitOutcome } from './submit-queue'
 import { throwIfStopped, updateSubmit } from './submit-record'
 
 const LIMIT_BYTES = MAX_REQUEST_MB * 1024 * 1024

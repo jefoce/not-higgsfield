@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import type { TtlLoader, TtlLoadResult } from '@/server/sync/ttl-cache'
-import { createTtlCache } from '@/server/sync/ttl-cache'
+import { createTtlCache, type TtlLoader, type TtlLoadResult } from '@/server/sync/ttl-cache'
 
 const useClock = (start: number) => {
   let now = start

@@ -1,8 +1,7 @@
 'use client'
 
-import { useMemo } from 'react'
+import { type CSSProperties, useMemo } from 'react'
 import { Ban } from 'lucide-react'
-import type { CSSProperties } from 'react'
 
 import { SUBMIT_GRACE_MS } from '@/core/constants'
 import { graceDelayMs } from '@/core/submit-state'
