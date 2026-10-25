@@ -53,17 +53,19 @@ export function SecretSection(props: SecretSectionProps) {
 
   return (
     <section ref={sectionRef} className="space-y-3">
-      <div className="flex items-baseline justify-between gap-2">
-        <h3 className="text-xs font-semibold tracking-wide text-fg-2 uppercase">
-          {descriptor.label}
-        </h3>
-        <div className="flex items-baseline gap-3">
-          {descriptor.links.map((link) => {
-            return <ProviderLinkButton key={link.url} link={link} />
-          })}
+      <div className="space-y-1">
+        <div className="flex items-baseline justify-between gap-2">
+          <h3 className="text-xs font-semibold tracking-wide text-fg-2 uppercase">
+            {descriptor.label}
+          </h3>
+          <div className="flex items-baseline gap-3">
+            {descriptor.links.map((link) => {
+              return <ProviderLinkButton key={link.url} link={link} />
+            })}
+          </div>
         </div>
+        {!isNil(description) && <p className="text-xxs text-fg-3">{description}</p>}
       </div>
-      {!isNil(description) && <p className="-mt-2.5 text-xxs text-fg-3">{description}</p>}
       <SecretFields
         fields={descriptor.fields}
         keys={keys}
