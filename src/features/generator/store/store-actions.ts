@@ -40,7 +40,7 @@ export const createGeneratorState: StateCreator<
     uploadsById: {},
     activeCount: 0,
     setActiveCount: (activeCount) => {
-      return set({ activeCount })
+      set({ activeCount })
     },
     ...createDraftActions(set),
     ...createFrameActions(set),
@@ -52,10 +52,10 @@ export const createGeneratorState: StateCreator<
       return slotFocuser?.(slot, occurrence)
     },
     setSeed: (seed) => {
-      return set({ seed: clampSeed(seed) })
+      set({ seed: clampSeed(seed) })
     },
     toggleSeedLock: () => {
-      return set((state) => {
+      set((state) => {
         if (isNil(state.seed)) {
           return { seed: randomSeed() }
         }
@@ -65,7 +65,7 @@ export const createGeneratorState: StateCreator<
     },
     ...createLoadActions(set, get),
     reset: () => {
-      return set({ ...defaults() })
+      set({ ...defaults() })
     },
     registerMentionInserter: (fn) => {
       mentionInserter = fn

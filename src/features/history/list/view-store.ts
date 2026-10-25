@@ -90,18 +90,18 @@ export const useHistoryViewStore = create<ViewState>()(
         zoom: ZOOM_DEFAULT,
         filters: { ...DEFAULT_FILTERS },
         setView: (view) => {
-          return set({ view })
+          set({ view })
         },
         setZoom: (zoom) => {
-          return set({ zoom: clamp(Math.round(zoom), 0, MAX_ZOOM) })
+          set({ zoom: clamp(Math.round(zoom), 0, MAX_ZOOM) })
         },
         setFilters: (patch) => {
-          return set((state) => {
+          set((state) => {
             return { filters: { ...state.filters, ...patch } }
           })
         },
         resetFilters: () => {
-          return set({ filters: { ...DEFAULT_FILTERS } })
+          set({ filters: { ...DEFAULT_FILTERS } })
         },
       }
     },

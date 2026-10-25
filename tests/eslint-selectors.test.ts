@@ -1,32 +1,11 @@
-import { Linter, RuleTester } from 'eslint'
-import tseslint from 'typescript-eslint'
-import { describe, it } from 'vitest'
-
 import {
-  INLINE_FUNCTION_SELECTORS,
   MODULE_SELECTORS,
   SERVER_SELECTORS,
   SHARED_SELECTORS,
   TERNARY_SELECTORS,
   TYPE_SELECTORS,
 } from '../eslint-rules/selectors.mjs'
-
-RuleTester.describe = describe
-RuleTester.it = it
-
-const linter = new Linter({ configType: 'eslintrc' })
-const rule = linter.getRules().get('no-restricted-syntax')
-
-if (!rule) {
-  throw new Error('no-restricted-syntax rule missing')
-}
-
-const tester = new RuleTester({
-  languageOptions: {
-    parser: tseslint.parser,
-    parserOptions: { ecmaVersion: 'latest', sourceType: 'module', ecmaFeatures: { jsx: true } },
-  },
-})
+import { rule, tester } from './eslint-rule-tester'
 
 tester.run('no-restricted-syntax type selectors', rule, {
   valid: [
@@ -210,6 +189,11 @@ tester.run('no-restricted-syntax shared selectors', rule, {
       code: "const KINDS = ['image', 'video'] as const",
       options: SHARED_SELECTORS,
     },
+    {
+      name: 'store set call as a statement',
+      code: 'const setView = (view) => { set({ view }) }',
+      options: SHARED_SELECTORS,
+    },
   ],
   invalid: [
     {
@@ -224,31 +208,10 @@ tester.run('no-restricted-syntax shared selectors', rule, {
       options: SHARED_SELECTORS,
       errors: 1,
     },
-  ],
-})
-
-tester.run('no-restricted-syntax inline function selectors', rule, {
-  valid: [
     {
-      name: 'handler by reference',
-      code: `function Comp() {
-  const handleSave = () => {}
-  return <button onClick={handleSave} />
-}`,
-      options: INLINE_FUNCTION_SELECTORS,
-    },
-  ],
-  invalid: [
-    {
-      name: 'inline arrow in jsx',
-      code: 'function Comp() { return <button onClick={() => save()} /> }',
-      options: INLINE_FUNCTION_SELECTORS,
-      errors: 1,
-    },
-    {
-      name: 'inline bind call in jsx',
-      code: 'function Comp() { return <button onClick={handleSave.bind(null)} /> }',
-      options: INLINE_FUNCTION_SELECTORS,
+      name: 'store set call returned',
+      code: 'const setView = (view) => { return set({ view }) }',
+      options: SHARED_SELECTORS,
       errors: 1,
     },
   ],

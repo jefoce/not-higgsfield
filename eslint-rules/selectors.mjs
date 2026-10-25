@@ -45,6 +45,11 @@ export const SHARED_SELECTORS = [
     message: 'A finally callback returns nothing. Drop the return.',
   },
   {
+    selector:
+      'ArrowFunctionExpression > BlockStatement > ReturnStatement > CallExpression[callee.name=/^(set|setState)$/]',
+    message: 'set returns nothing. Call it as a statement.',
+  },
+  {
     selector: 'TSEnumDeclaration',
     message: 'No enum. Use an as const array and a derived union.',
   },
