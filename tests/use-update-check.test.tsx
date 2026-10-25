@@ -85,6 +85,68 @@ describe('useUpdateCheck', () => {
     expect(platformMock.checkUpdate).not.toHaveBeenCalled()
   })
 
+  it('starts checking when the switch turns on', async () => {
+    platformMock.appInfo.mockResolvedValue({
+      version: '0.2.0',
+      installKind: 'macos',
+      autoCheck: false,
+      lastCheck: null,
+    })
+
+    platformMock.checkUpdate.mockResolvedValue(null)
+
+    renderHook(() => {
+      useUpdateCheck()
+    })
+
+    await flush()
+
+    act(() => {
+      useUpdateStore.getState().setAutoCheckValue(true)
+    })
+
+    expect(platformMock.checkUpdate).not.toHaveBeenCalled()
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(UPDATE_CHECK_DELAY_MS)
+    })
+
+    expect(platformMock.checkUpdate).toHaveBeenCalledTimes(1)
+  })
+
+  it('stops checking when the switch turns off', async () => {
+    platformMock.appInfo.mockResolvedValue({
+      version: '0.2.0',
+      installKind: 'macos',
+      autoCheck: true,
+      lastCheck: null,
+    })
+
+    platformMock.checkUpdate.mockResolvedValue(null)
+
+    renderHook(() => {
+      useUpdateCheck()
+    })
+
+    await flush()
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(UPDATE_CHECK_DELAY_MS)
+    })
+
+    expect(platformMock.checkUpdate).toHaveBeenCalledTimes(1)
+
+    act(() => {
+      useUpdateStore.getState().setAutoCheckValue(false)
+    })
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(UPDATE_CHECK_INTERVAL_MS)
+    })
+
+    expect(platformMock.checkUpdate).toHaveBeenCalledTimes(1)
+  })
+
   it('does not check in the browser', async () => {
     platformMock.appInfo.mockResolvedValue({
       version: '0.2.0',
@@ -105,7 +167,9 @@ describe('useUpdateCheck', () => {
 
     expect(platformMock.checkUpdate).not.toHaveBeenCalled()
   })
+})
 
+describe('useUpdateCheck checks', () => {
   it('checks after the start delay, then every 12 h', async () => {
     platformMock.appInfo.mockResolvedValue({
       version: '0.2.0',
