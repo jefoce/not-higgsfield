@@ -1,8 +1,8 @@
 import { isNil } from 'lodash-es'
 
-import type { ReferencePlanImage, UploadsById } from '@/core/media-types'
+import type { ReferencePlanImage } from '@/core/media-types'
 import { type RefSlot, slotLabel } from '@/core/prompt-tokens'
-import type { UploadItem } from '@/core/schemas/upload-item'
+import type { UploadItem, UploadsById } from '@/core/schemas/upload-item'
 import type { Dict } from '@/core/utility-types'
 
 interface NoteForParams {

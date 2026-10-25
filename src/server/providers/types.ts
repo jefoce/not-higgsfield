@@ -4,7 +4,7 @@ import type { MediaKind } from '@/core/media-types'
 import type { ModelPreset } from '@/core/presets/types'
 import type { VideoProviderId } from '@/core/providers/types'
 import type { GenerationInput, JobStatus } from '@/core/schemas/generation-record'
-import type { PricingInfo, TestResult } from '@/core/types'
+import type { AccountSource, PricingInfo, TestResult } from '@/core/types'
 import type { Dict } from '@/core/utility-types'
 
 export interface ProviderModel {
@@ -72,8 +72,6 @@ export interface ContentRequest {
   index: number
   fallback: ContentFallback | null
 }
-
-type AccountSource = 'management' | 'key' | 'mock' | 'none'
 
 export interface ProviderAccount {
   balance: number | null

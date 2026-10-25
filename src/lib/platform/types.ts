@@ -28,17 +28,23 @@ export interface AppUpdate {
   date: string | null
 }
 
+export const UPDATE_PHASES = ['downloading', 'installing'] as const
+
+type UpdatePhase = (typeof UPDATE_PHASES)[number]
+
 export interface UpdateProgress {
   downloaded: number
   total: number | null
-  phase: 'downloading' | 'installing'
+  phase: UpdatePhase
 }
 
 export interface InstallResult {
   cancelled: boolean
 }
 
-export type InstallKind = 'macos' | 'windows' | 'appimage' | 'linux-package' | 'browser'
+export const INSTALL_KINDS = ['macos', 'windows', 'appimage', 'linux-package', 'browser'] as const
+
+type InstallKind = (typeof INSTALL_KINDS)[number]
 
 export type UpdateListener = (progress: UpdateProgress) => void
 

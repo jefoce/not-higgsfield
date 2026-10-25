@@ -8,7 +8,9 @@ import { ZOOM_DEFAULT, ZOOM_STEPS } from '@/core/constants'
 import { DEFAULT_FILTERS, FILTER_PARAMS } from '@/core/history-filters'
 import type { HistoryFilters, HistoryMode } from '@/core/types'
 
-export type HistoryView = 'list' | 'grid'
+export const HISTORY_VIEWS = ['list', 'grid'] as const
+
+export type HistoryView = (typeof HISTORY_VIEWS)[number]
 
 interface ViewFilters extends HistoryFilters {
   mode?: HistoryMode

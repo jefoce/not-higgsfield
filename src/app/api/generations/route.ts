@@ -5,6 +5,8 @@ import { HISTORY_MAX_PAGE_SIZE, HISTORY_PAGE_SIZE, MAX_IDS } from '@/core/consta
 import { applyFilters, countActive, paginate, sortRecords } from '@/core/history-filters'
 import { findPreset } from '@/core/presets'
 import { ASPECT_RATIOS, RESOLUTIONS } from '@/core/presets/types'
+import { GENERATOR_TABS } from '@/core/schemas/generation-record'
+import { AUDIO_FILTERS, HISTORY_MODES, STATUS_FILTERS } from '@/core/types'
 import { buildInputSchema } from '@/core/validation'
 import { errorResponse, jsonError, zodError } from '@/server/http'
 import { listGenerations } from '@/server/repos/generations'
@@ -18,12 +20,12 @@ const QuerySchema = z.object({
   cursor: z.string().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(HISTORY_MAX_PAGE_SIZE).catch(HISTORY_PAGE_SIZE),
   favorite: z.enum(['1', 'true']).optional(),
-  status: z.enum(['all', 'done', 'active', 'failed']).catch('all'),
-  tab: z.enum(['frames', 'references', 'all']).catch('all'),
-  mode: z.enum(['text', 'frames', 'references', 'all']).catch('all'),
+  status: z.enum(STATUS_FILTERS).catch('all'),
+  tab: z.enum([...GENERATOR_TABS, 'all']).catch('all'),
+  mode: z.enum(HISTORY_MODES).catch('all'),
   resolution: z.enum([...RESOLUTIONS, 'all']).optional(),
   aspect: z.enum([...ASPECT_RATIOS, 'auto', 'all']).optional(),
-  audio: z.enum(['any', 'on', 'off']).catch('any'),
+  audio: z.enum(AUDIO_FILTERS).catch('any'),
   q: z.string().optional(),
   model: z.string().optional(),
   ids: z.string().optional(),

@@ -16,8 +16,8 @@ import {
 } from 'lexical-beautiful-mentions'
 import { isNil } from 'lodash-es'
 
-import { kindFromTitle, MEDIA_KINDS } from '@/core/media-kinds'
-import type { MediaKind, MediaKindCounts } from '@/core/media-types'
+import { kindFromTitle } from '@/core/media-kinds'
+import { MEDIA_KINDS, type MediaKind, type MediaKindCounts } from '@/core/media-types'
 import {
   parsePromptParts,
   type PromptPart,

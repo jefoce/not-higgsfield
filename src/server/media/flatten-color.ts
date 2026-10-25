@@ -1,8 +1,8 @@
 import 'server-only'
 
 import { FLATTEN_BACKGROUND, FLATTEN_LIGHT, FLATTEN_LUMINANCE } from '@/core/constants'
+import type { FlattenColor } from '@/core/media-types'
 
-import type { FlattenColor } from './image-cache'
 import sharp from './sharp'
 
 /** Average of opaque pixels that touch transparency, at 256 px preview. */

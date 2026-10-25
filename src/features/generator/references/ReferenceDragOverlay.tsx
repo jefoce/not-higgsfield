@@ -4,9 +4,9 @@ import { DragOverlay } from '@dnd-kit/core'
 import { isNil } from 'lodash-es'
 
 import type { KindExtensions } from '@/core/media-kinds'
-import type { ReferencePlanImage, UploadsById } from '@/core/media-types'
+import type { ReferencePlanImage } from '@/core/media-types'
 import type { RefSlot } from '@/core/prompt-tokens'
-import type { UploadItem } from '@/core/schemas/upload-item'
+import type { UploadItem, UploadsById } from '@/core/schemas/upload-item'
 import type { Dict } from '@/core/utility-types'
 
 import { labelFor, noteFor } from './reference-notes'

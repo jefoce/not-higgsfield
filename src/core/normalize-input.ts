@@ -2,12 +2,12 @@ import { clamp, isNil } from 'lodash-es'
 
 import { durationLimitFor } from './duration-limits'
 import { isNonEmptyString } from './guards'
-import { MEDIA_KINDS } from './media-kinds'
-import type { MediaKindCounts, UploadsById } from './media-types'
+import { MEDIA_KINDS, type MediaKindCounts } from './media-types'
 import { aspectAllowed } from './output-size'
 import { minDuration } from './presets'
 import type { AspectChoice, ModelPreset, Resolution } from './presets/types'
 import type { GenerationInput } from './schemas/generation-record'
+import type { UploadsById } from './schemas/upload-item'
 import type { FrameSlots } from './types'
 
 /** Drop media belonging to the inactive tab. Returns a new object. */

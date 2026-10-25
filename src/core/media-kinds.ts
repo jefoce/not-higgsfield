@@ -1,10 +1,8 @@
 import { isNil } from 'lodash-es'
 
 import { isNonEmptyString } from './guards'
-import type { MediaKind } from './media-types'
+import { MEDIA_KINDS, type MediaKind } from './media-types'
 import type { Dict } from './utility-types'
-
-export const MEDIA_KINDS = ['image', 'video', 'audio'] as const satisfies readonly MediaKind[]
 
 export const KIND_TITLE: Record<MediaKind, string> = {
   image: 'Image',

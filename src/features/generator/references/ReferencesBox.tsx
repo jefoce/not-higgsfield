@@ -3,7 +3,7 @@
 import { isEmpty, sumBy } from 'lodash-es'
 import { toast } from 'sonner'
 
-import { MEDIA_KINDS } from '@/core/media-kinds'
+import { MEDIA_KINDS } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
 import { referenceSlots } from '@/core/prompt-tokens'
 import { extensionsFromLimits, openMediaPicker } from '@/features/media-picker/picker/store'

@@ -2,9 +2,9 @@
 
 import { keyBy } from 'lodash-es'
 
-import type { UploadsById } from '@/core/media-types'
 import type { ModelPreset } from '@/core/presets/types'
 import { referenceSlots } from '@/core/prompt-tokens'
+import type { UploadsById } from '@/core/schemas/upload-item'
 
 import { referenceUploads } from './reference-notes'
 import { useImagePlan } from './use-image-plan'

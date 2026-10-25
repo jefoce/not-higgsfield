@@ -1,6 +1,7 @@
 'use client'
 
-import { KIND_PLURAL, MEDIA_KINDS } from '@/core/media-kinds'
+import { KIND_PLURAL } from '@/core/media-kinds'
+import { MEDIA_KINDS } from '@/core/media-types'
 import type { ModelPreset } from '@/core/presets/types'
 import { joinWords } from '@/core/text'
 import type { DropProps } from '@/features/media-picker/uploads/use-drop-upload'

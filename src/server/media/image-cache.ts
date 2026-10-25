@@ -6,15 +6,15 @@ import path from 'node:path'
 
 import { z } from 'zod'
 
-import { FLATTEN_BACKGROUND, FLATTEN_LIGHT } from '@/core/constants'
+import {
+  FLATTEN_COLORS,
+  type FlattenColor,
+  IMAGE_FORMATS,
+  type ImageFormat,
+} from '@/core/media-types'
 
 import { readJson, writeJsonAtomic } from '../fs/json-file'
 import { UPLOADS_DIR } from '../paths'
-
-/** Flatten color used for transparent images sent to models without alpha. */
-export type FlattenColor = typeof FLATTEN_BACKGROUND | typeof FLATTEN_LIGHT
-
-type ImageFormat = 'jpeg' | 'png'
 
 export interface EncodedImage {
   url: string
@@ -29,8 +29,8 @@ const CacheSchema = z.object({
   width: z.number().int().positive(),
   height: z.number().int().positive(),
   bytes: z.number().int().positive(),
-  format: z.enum(['jpeg', 'png']),
-  flattened: z.enum([FLATTEN_BACKGROUND, FLATTEN_LIGHT]).optional(),
+  format: z.enum(IMAGE_FORMATS),
+  flattened: z.enum(FLATTEN_COLORS).optional(),
 })
 
 export type CacheRecord = z.infer<typeof CacheSchema>

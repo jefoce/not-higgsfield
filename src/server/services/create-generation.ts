@@ -3,7 +3,7 @@ import 'server-only'
 import { randomInt, randomUUID } from 'node:crypto'
 
 import { MAX_REQUEST_MB, REQUEST_RESERVE_MB, SEED_MAX, SUBMIT_GRACE_MS } from '@/core/constants'
-import type { ReferencePlan, UploadsById } from '@/core/media-types'
+import type { ReferencePlan } from '@/core/media-types'
 import { activeBinding } from '@/core/presets/bindings'
 import type {
   GenerationCost,
@@ -12,6 +12,7 @@ import type {
   InputSnapshot,
   SnapshotItem,
 } from '@/core/schemas/generation-record'
+import type { UploadsById } from '@/core/schemas/upload-item'
 
 import { startSubmit } from '../jobs/submit-queue'
 import { encodeImages } from '../media/image-data-url'

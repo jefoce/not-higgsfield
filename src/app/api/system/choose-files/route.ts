@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { MEDIA_KINDS } from '@/core/media-kinds'
+import { MEDIA_KINDS } from '@/core/media-types'
 import { errorResponse, zodError } from '@/server/http'
 import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 import { createLinkUpload } from '@/server/services/uploads'

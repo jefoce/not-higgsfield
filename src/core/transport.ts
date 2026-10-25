@@ -1,7 +1,7 @@
 import type { MediaKind } from './media-types'
-import type { ProviderBinding } from './presets/types'
+import { type ProviderBinding, type RESOLVED_TRANSPORTS } from './presets/types'
 
-export type ResolvedTransport = 'base64' | 'url'
+export type ResolvedTransport = (typeof RESOLVED_TRANSPORTS)[number]
 
 interface ResolveTransportParams {
   binding: ProviderBinding

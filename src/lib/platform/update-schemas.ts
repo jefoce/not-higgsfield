@@ -1,14 +1,6 @@
 import { z } from 'zod'
 
-import type { InstallKind } from './types'
-
-const INSTALL_KINDS = [
-  'macos',
-  'windows',
-  'appimage',
-  'linux-package',
-  'browser',
-] as const satisfies readonly InstallKind[]
+import { INSTALL_KINDS, UPDATE_PHASES } from './types'
 
 const InstallKindSchema = z.enum(INSTALL_KINDS)
 
@@ -30,7 +22,7 @@ export const UpdateCheckSchema = AppUpdateSchema.nullable()
 export const UpdateProgressSchema = z.object({
   downloaded: z.number(),
   total: z.number().nullable(),
-  phase: z.enum(['downloading', 'installing']),
+  phase: z.enum(UPDATE_PHASES),
 })
 
 export const InstallResultSchema = z.object({

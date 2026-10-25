@@ -1,7 +1,9 @@
 import type { VideoProviderId } from './providers/types'
 import type { PricingInfo } from './types'
 
-export type ModelStatus = 'available' | 'unverified' | 'missing' | 'no_provider'
+export const MODEL_STATUSES = ['available', 'unverified', 'missing', 'no_provider'] as const
+
+export type ModelStatus = (typeof MODEL_STATUSES)[number]
 
 export interface CatalogEntry {
   modelId: string

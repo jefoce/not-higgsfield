@@ -1,5 +1,10 @@
 import type { AspectChoice, Resolution } from './presets/types'
-import type { GenerationRecord, GeneratorTab, JobStatus } from './schemas/generation-record'
+import type {
+  GenerationRecord,
+  GeneratorTab,
+  JobStatus,
+  PriceSource,
+} from './schemas/generation-record'
 import type { SecretName } from './secret-names'
 import type { Dict } from './utility-types'
 
@@ -17,11 +22,20 @@ export interface BatchSkip {
   reason: 'not_found' | 'active' | 'not_ready'
 }
 
-export type HistoryMode = 'all' | 'text' | 'frames' | 'references'
-export type StatusFilter = 'all' | 'done' | 'active' | 'failed'
+export const HISTORY_MODES = ['all', 'text', 'frames', 'references'] as const
+
+export type HistoryMode = (typeof HISTORY_MODES)[number]
+
+export const STATUS_FILTERS = ['all', 'done', 'active', 'failed'] as const
+
+export type StatusFilter = (typeof STATUS_FILTERS)[number]
+
 export type ResolutionFilter = Resolution | 'all'
 export type AspectFilter = AspectChoice | 'all'
-export type AudioFilter = 'any' | 'on' | 'off'
+
+export const AUDIO_FILTERS = ['any', 'on', 'off'] as const
+
+export type AudioFilter = (typeof AUDIO_FILTERS)[number]
 
 export interface HistoryFilters {
   q?: string
@@ -41,6 +55,10 @@ export interface GenerationListResult {
   activeCount: number
 }
 
+export const ACCOUNT_SOURCES = ['management', 'key', 'mock', 'none'] as const
+
+export type AccountSource = (typeof ACCOUNT_SOURCES)[number]
+
 export interface CreditsInfo {
   balance: number | null
   keyLimitRemaining: number | null
@@ -48,7 +66,7 @@ export interface CreditsInfo {
   usageDaily: number | null
   usageMonthly: number | null
   localSpent: number
-  source: 'management' | 'key' | 'mock' | 'none'
+  source: AccountSource
   fetchedAt: string
   error?: string
 }
@@ -60,7 +78,9 @@ export interface SystemCapabilities {
   platform: string
 }
 
-export type SecretSource = 'env' | 'keychain' | 'file'
+export const SECRET_SOURCES = ['env', 'keychain', 'file'] as const
+
+export type SecretSource = (typeof SECRET_SOURCES)[number]
 
 export interface SecretKeyStatus {
   set: boolean
@@ -68,7 +88,7 @@ export interface SecretKeyStatus {
   hint: string | null
 }
 
-export type SecretBackend = 'keychain' | 'file' | null
+export type SecretBackend = Exclude<SecretSource, 'env'> | null
 
 /** Stored key status, without values. */
 export interface SecretStatus {
@@ -83,7 +103,7 @@ export interface GenerationEstimate {
   estimatedUsd: number
   listUsd: number
   pricePerSec: number
-  priceSource: 'live' | 'fallback' | 'mock' | 'unknown'
+  priceSource: PriceSource
   discount: number
 }
 
@@ -92,7 +112,7 @@ export interface PricingInfo {
   skus: Dict<number>
   listSkus: Dict<number>
   discount: number
-  source: 'live' | 'fallback' | 'mock'
+  source: Exclude<PriceSource, 'unknown'>
   fetchedAt: string
 }
 

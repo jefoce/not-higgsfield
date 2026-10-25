@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { MEDIA_KINDS } from '@/core/media-kinds'
+import { MEDIA_KINDS } from '@/core/media-types'
 import { aspectAllowed } from '@/core/output-size'
 import { minDuration, MODEL_PRESETS } from '@/core/presets'
 import { primaryBinding } from '@/core/presets/bindings'

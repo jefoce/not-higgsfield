@@ -1,14 +1,17 @@
 import { z } from 'zod'
 
-import { ASPECT_RATIOS, RESOLUTIONS } from '../presets/types'
+import { FLATTEN_COLORS, IMAGE_FORMATS } from '../media-types'
+import { ASPECT_RATIOS, RESOLUTIONS, RESOLVED_TRANSPORTS } from '../presets/types'
 import { VIDEO_PROVIDER_IDS } from '../providers/types'
 import { MediaKindSchema, UploadSourceSchema } from './upload-item'
 
-const GeneratorTabSchema = z.enum(['frames', 'references'])
+export const GENERATOR_TABS = ['frames', 'references'] as const
+
+const GeneratorTabSchema = z.enum(GENERATOR_TABS)
 
 export type GeneratorTab = z.infer<typeof GeneratorTabSchema>
 
-const JobStatusSchema = z.enum([
+export const JOB_STATUSES = [
   'submitting',
   'pending',
   'in_progress',
@@ -16,11 +19,17 @@ const JobStatusSchema = z.enum([
   'failed',
   'cancelled',
   'expired',
-])
+] as const
+
+const JobStatusSchema = z.enum(JOB_STATUSES)
 
 export type JobStatus = z.infer<typeof JobStatusSchema>
 
-const PriceSourceSchema = z.enum(['live', 'fallback', 'mock', 'unknown'])
+export const PRICE_SOURCES = ['live', 'fallback', 'mock', 'unknown'] as const
+
+const PriceSourceSchema = z.enum(PRICE_SOURCES)
+
+export type PriceSource = z.infer<typeof PriceSourceSchema>
 
 export const FrameSlotsSchema = z.object({
   start: z.string().nullable(),
@@ -96,12 +105,12 @@ const SnapshotItemSchema = z.object({
   target: z.string().optional(),
   width: z.number().optional(),
   height: z.number().optional(),
-  transport: z.enum(['base64', 'url']).optional(),
+  transport: z.enum(RESOLVED_TRANSPORTS).optional(),
   sentWidth: z.number().optional(),
   sentHeight: z.number().optional(),
   sentBytes: z.number().optional(),
-  format: z.enum(['jpeg', 'png']).optional(),
-  flattened: z.enum(['#ffffff', '#1c1e20']).optional(),
+  format: z.enum(IMAGE_FORMATS).optional(),
+  flattened: z.enum(FLATTEN_COLORS).optional(),
 })
 
 export type SnapshotItem = z.infer<typeof SnapshotItemSchema>

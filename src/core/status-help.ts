@@ -1,16 +1,19 @@
 import type { JobStatus, RecordDownload, RecordSubmit } from './schemas/generation-record'
 
-export type StatusHelpKey =
-  | 'processing'
-  | 'uploading'
-  | 'sending'
-  | 'in_queue'
-  | 'generating'
-  | 'downloading'
-  | 'completed'
-  | 'failed'
-  | 'expired'
-  | 'cancelled'
+export const STATUS_HELP_KEYS = [
+  'processing',
+  'uploading',
+  'sending',
+  'in_queue',
+  'generating',
+  'downloading',
+  'completed',
+  'failed',
+  'expired',
+  'cancelled',
+] as const
+
+export type StatusHelpKey = (typeof STATUS_HELP_KEYS)[number]
 
 export interface StatusHelp {
   label: string

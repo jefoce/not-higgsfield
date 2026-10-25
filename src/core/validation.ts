@@ -3,11 +3,11 @@ import { z } from 'zod'
 
 import { SEED_MAX } from './constants'
 import { KIND_PLURAL } from './media-kinds'
-import type { UploadsById } from './media-types'
 import { minDuration } from './presets'
 import type { ModelPreset } from './presets/types'
 import { slotLabel } from './prompt-tokens'
-import { FrameSlotsSchema, type GenerationInput } from './schemas/generation-record'
+import { FrameSlotsSchema, type GenerationInput, GENERATOR_TABS } from './schemas/generation-record'
+import type { UploadsById } from './schemas/upload-item'
 import { validateReferences } from './validation-references'
 import {
   validateFrames,
@@ -44,7 +44,7 @@ function durationSchema(preset: ModelPreset) {
 function priceInputSchema(preset: ModelPreset) {
   return z.object({
     presetId: z.string(),
-    tab: z.enum(['frames', 'references']),
+    tab: z.enum(GENERATOR_TABS),
     audio: z.boolean(),
     duration: durationSchema(preset),
     aspectRatio: z.enum([...preset.aspectRatios, 'auto']),

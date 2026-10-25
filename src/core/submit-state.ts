@@ -1,16 +1,17 @@
 import { isNil } from 'lodash-es'
 
 import { GRACE_STALE_MS } from './constants'
-import { isNonEmptyString } from './guards'
-import type { UploadsById } from './media-types'
+import { isNonEmptyString, isOneOf } from './guards'
 import { primaryBinding } from './presets/bindings'
 import type { ModelPreset } from './presets/types'
-import type {
-  GenerationInput,
-  GenerationRecord,
-  InputSnapshot,
-  JobStatus,
+import {
+  type GenerationInput,
+  type GenerationRecord,
+  type InputSnapshot,
+  JOB_STATUSES,
+  type JobStatus,
 } from './schemas/generation-record'
+import type { UploadsById } from './schemas/upload-item'
 import { type ResolvedTransport, resolveTransport } from './transport'
 import type { Dict } from './utility-types'
 
@@ -119,19 +120,9 @@ export function base64Only(transports: Dict<ResolvedTransport>): Dict<ResolvedTr
   )
 }
 
-const JOB_STATUSES: JobStatus[] = [
-  'submitting',
-  'pending',
-  'in_progress',
-  'completed',
-  'failed',
-  'cancelled',
-  'expired',
-]
-
 export function asJobStatus(value: string): JobStatus | null {
-  if (JOB_STATUSES.includes(value as JobStatus)) {
-    return value as JobStatus
+  if (isOneOf(JOB_STATUSES, value)) {
+    return value
   }
 
   return null

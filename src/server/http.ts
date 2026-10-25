@@ -4,8 +4,7 @@ import { isNil } from 'lodash-es'
 import type { ZodError } from 'zod'
 
 import { isNonEmptyString } from '@/core/guards'
-import { MEDIA_KINDS } from '@/core/media-kinds'
-import type { MediaKind } from '@/core/media-types'
+import { MEDIA_KINDS, type MediaKind } from '@/core/media-types'
 
 import { HttpError, ValidationError } from './errors'
 import { ProviderError } from './providers/provider-error'

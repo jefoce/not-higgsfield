@@ -3,6 +3,7 @@ import 'server-only'
 import { isNil } from 'lodash-es'
 
 import { IMAGE_MAX_SIDE_PX } from '@/core/constants'
+import type { FlattenColor } from '@/core/media-types'
 import type { UploadItem } from '@/core/schemas/upload-item'
 
 import { uploadPaths } from '../paths'
@@ -11,7 +12,6 @@ import { flattenColor } from './flatten-color'
 import {
   type CacheRecord,
   type EncodedImage,
-  type FlattenColor,
   readCache,
   readOpaque,
   toEncoded,

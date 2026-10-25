@@ -2,12 +2,11 @@ import { isNil } from 'lodash-es'
 
 import { LOW_RES_MIN_PX, MAX_ACTIVE_JOBS, MAX_INLINE_MEDIA_MB } from './constants'
 import { isNonEmptyString } from './guards'
-import type { UploadsById } from './media-types'
 import { aspectAllowed } from './output-size'
 import { primaryBinding } from './presets/bindings'
 import type { ModelPreset } from './presets/types'
 import type { GenerationInput } from './schemas/generation-record'
-import type { UploadItem } from './schemas/upload-item'
+import { type UploadItem, type UploadsById } from './schemas/upload-item'
 import { resolveTransport } from './transport'
 import { checkReferenceLimits } from './validation-media'
 import type {

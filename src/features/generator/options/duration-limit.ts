@@ -1,7 +1,7 @@
 import { maxDurationFor, referenceVideoSeconds } from '@/core/duration-limits'
-import type { UploadsById } from '@/core/media-types'
 import { minDuration } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
+import type { UploadsById } from '@/core/schemas/upload-item'
 import { formatSecondsExact } from '@/lib/format'
 
 import { type GeneratorDraft, inputFromState } from '../store/store-draft'

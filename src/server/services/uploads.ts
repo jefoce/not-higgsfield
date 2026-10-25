@@ -9,9 +9,8 @@ import { isNil, isString } from 'lodash-es'
 
 import { isNonEmptyString } from '@/core/guards'
 import { extWithDot, mimeFromExt } from '@/core/media-kinds'
-import type { UploadsById } from '@/core/media-types'
 import type { GenerationInput } from '@/core/schemas/generation-record'
-import type { LinkMode, UploadItem } from '@/core/schemas/upload-item'
+import { type LinkMode, type UploadItem, type UploadsById } from '@/core/schemas/upload-item'
 import { inputIds } from '@/core/submit-state'
 
 import { UploadError } from '../errors'

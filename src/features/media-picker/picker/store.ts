@@ -3,8 +3,8 @@
 import { isEmpty, isNil } from 'lodash-es'
 import { create } from 'zustand'
 
-import { type KindExtensions, MEDIA_KINDS } from '@/core/media-kinds'
-import type { MediaKind } from '@/core/media-types'
+import { type KindExtensions } from '@/core/media-kinds'
+import { MEDIA_KINDS, type MediaKind } from '@/core/media-types'
 import type { PresetReferenceLimits } from '@/core/presets/types'
 import type { UploadItem } from '@/core/schemas/upload-item'
 

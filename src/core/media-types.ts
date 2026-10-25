@@ -1,11 +1,17 @@
+import { FLATTEN_BACKGROUND, FLATTEN_LIGHT } from './constants'
 import type { PixelSize } from './geometry'
-import type { UploadItem } from './schemas/upload-item'
-import type { Dict } from './utility-types'
 
-export type MediaKind = 'image' | 'video' | 'audio'
+export const MEDIA_KINDS = ['image', 'video', 'audio'] as const
 
-/** Uploads keyed by upload id. */
-export type UploadsById = Dict<UploadItem>
+export type MediaKind = (typeof MEDIA_KINDS)[number]
+
+export const IMAGE_FORMATS = ['jpeg', 'png'] as const
+
+export type ImageFormat = (typeof IMAGE_FORMATS)[number]
+
+export const FLATTEN_COLORS = [FLATTEN_BACKGROUND, FLATTEN_LIGHT] as const
+
+export type FlattenColor = (typeof FLATTEN_COLORS)[number]
 
 /** Count per media kind. */
 export interface MediaKindCounts {
@@ -57,6 +63,6 @@ export interface ReferencePlan {
 export interface ReferencePlanImage extends PixelSize {
   id: string
   bytes: number
-  format: 'jpeg' | 'png'
-  flattened?: '#ffffff' | '#1c1e20'
+  format: ImageFormat
+  flattened?: FlattenColor
 }

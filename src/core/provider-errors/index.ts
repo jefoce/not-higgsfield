@@ -1,8 +1,9 @@
 import { isFunction, isNil } from 'lodash-es'
 
+import type { PresetFamily } from '../presets/types'
 import { APP_RULES } from './app'
 import { SEEDANCE_RULES } from './seedance'
-import type { ErrorFamily, FriendlyError, HttpRule, HttpRuleTable, Rule } from './types'
+import type { FriendlyError, HttpRule, HttpRuleTable, Rule } from './types'
 import { WAN_RULES } from './wan'
 
 function matches(rule: Rule, raw: string): boolean {
@@ -37,14 +38,14 @@ function resolve(rule: Rule | HttpRule, raw: string): FriendlyError {
   return { title, hint, kind: rule.kind, retry: rule.retry ?? false, raw }
 }
 
-const FAMILY_RULES: Record<ErrorFamily, readonly Rule[]> = {
+const FAMILY_RULES: Record<PresetFamily, readonly Rule[]> = {
   seedance: SEEDANCE_RULES,
   wan: WAN_RULES,
 }
 
 interface FriendlyErrorParams {
   raw: string
-  family: ErrorFamily | null
+  family: PresetFamily | null
   httpCode?: number
   httpRules: HttpRuleTable | null
 }

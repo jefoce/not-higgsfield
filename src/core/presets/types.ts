@@ -21,7 +21,13 @@ export type AspectRatio = (typeof ASPECT_RATIOS)[number]
 export type AspectChoice = AspectRatio | 'auto'
 
 /** @public */
-export type Transport = 'base64' | 'url' | 'auto'
+export const RESOLVED_TRANSPORTS = ['base64', 'url'] as const
+
+/** @public */
+export const TRANSPORTS = [...RESOLVED_TRANSPORTS, 'auto'] as const
+
+/** @public */
+export type Transport = (typeof TRANSPORTS)[number]
 
 /** @public */
 export interface TransportByKind {
@@ -30,9 +36,13 @@ export interface TransportByKind {
   audio: Transport
 }
 
-type PresetFamily = 'wan' | 'seedance'
+export const PRESET_FAMILIES = ['wan', 'seedance'] as const
 
-export type PresetIcon = 'sparkles' | 'audio-lines'
+export type PresetFamily = (typeof PRESET_FAMILIES)[number]
+
+export const PRESET_ICONS = ['sparkles', 'audio-lines'] as const
+
+export type PresetIcon = (typeof PRESET_ICONS)[number]
 
 export interface ReferenceLimits {
   maxBytes?: number

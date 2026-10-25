@@ -1,5 +1,3 @@
-export type ErrorFamily = 'wan' | 'seedance'
-
 type ErrorKind =
   | 'content'
   | 'copyright'
