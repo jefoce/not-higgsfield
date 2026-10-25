@@ -116,8 +116,13 @@ async function dialog(file: string, args: string[]) {
   }
 }
 
+interface CommandError {
+  code?: number | string
+  stderr?: string
+}
+
 function isCancel(error: unknown): boolean {
-  const err = error as { code?: number | string; stderr?: string }
+  const err = error as CommandError
 
   return Number(err.code) === 1 && /User canceled|-128/.test(err.stderr ?? '')
 }

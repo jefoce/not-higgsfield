@@ -7,34 +7,30 @@ import { FETCH_TIMEOUTS } from '@/core/constants'
 import { messageOf } from '../../errors'
 import { globalState } from '../../global-state'
 import { getSecret, isNonEmptyString, onSecretsChange, secretsReady } from '../../secrets'
-import type { ProviderAccount } from '../types'
+import type { AccountLookupParams, ProviderAccount } from '../types'
 
 const BASE_URL = 'https://openrouter.ai'
 const CACHE_MS = 30_000
 
-const KeySchema = z
+const KeyDataSchema = z
   .object({
-    data: z
-      .object({
-        limit: z.number().nullable().optional(),
-        limit_remaining: z.number().nullable().optional(),
-        usage_daily: z.number().nullable().optional(),
-        usage_monthly: z.number().nullable().optional(),
-      })
-      .loose(),
+    limit: z.number().nullable().optional(),
+    limit_remaining: z.number().nullable().optional(),
+    usage_daily: z.number().nullable().optional(),
+    usage_monthly: z.number().nullable().optional(),
   })
   .loose()
 
-const CreditsSchema = z
+const KeySchema = z.object({ data: KeyDataSchema }).loose()
+
+const CreditsDataSchema = z
   .object({
-    data: z
-      .object({
-        total_credits: z.number(),
-        total_usage: z.number(),
-      })
-      .loose(),
+    total_credits: z.number(),
+    total_usage: z.number(),
   })
   .loose()
+
+const CreditsSchema = z.object({ data: CreditsDataSchema }).loose()
 
 interface CacheEntry {
   info: ProviderAccount
@@ -44,7 +40,7 @@ interface CacheEntry {
 const cache = globalState('credits', () => ({ entry: undefined as CacheEntry | undefined }))
 
 /** Key and management credits, cached for 30 seconds. Never throws. */
-export async function getProviderAccount(opts?: { fresh?: boolean }): Promise<ProviderAccount> {
+export async function getProviderAccount(opts?: AccountLookupParams): Promise<ProviderAccount> {
   const cached = cache.entry
 
   if (opts?.fresh !== true && cached && Date.now() - cached.at < CACHE_MS) {

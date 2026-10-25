@@ -8,6 +8,7 @@ import path from 'node:path'
 import { isNil, isString } from 'lodash-es'
 
 import { FETCH_TIMEOUTS, MOCK_GENERATE_MS, MOCK_QUEUE_MS } from '@/core/constants'
+import type { PixelSize } from '@/core/geometry'
 import { isRecord } from '@/core/guards'
 import { outputSize } from '@/core/output-size'
 import { MODEL_PRESETS } from '@/core/presets'
@@ -134,7 +135,12 @@ async function testConnection(): Promise<TestResult> {
   return { ok: true, mock: true }
 }
 
-async function mockSubmit(body: unknown): Promise<{ id: string; status: string }> {
+interface MockSubmitResult {
+  id: string
+  status: string
+}
+
+async function mockSubmit(body: unknown): Promise<MockSubmitResult> {
   const links: string[] = []
 
   collectMockLinks(body, links)
@@ -267,7 +273,7 @@ interface MockDimensionsParams {
 }
 
 /** Sizes the mock from the model slug or preset id, falling back to 720p 16:9. */
-function mockDimensions(params: MockDimensionsParams): { width: number; height: number } {
+function mockDimensions(params: MockDimensionsParams): PixelSize {
   const { model, presetId, resolution, aspect } = params
 
   const preset =

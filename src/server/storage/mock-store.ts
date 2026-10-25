@@ -122,7 +122,11 @@ interface CopyThrottledParams {
   onProgress?: (sent: number, total: number) => void
 }
 
-async function copyThrottled(params: CopyThrottledParams): Promise<{ size: number }> {
+interface CopyThrottledResult {
+  size: number
+}
+
+async function copyThrottled(params: CopyThrottledParams): Promise<CopyThrottledResult> {
   const { source, target, mbps, mode, onProgress } = params
 
   await fs.mkdir(path.dirname(target), { recursive: true })

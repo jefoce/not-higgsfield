@@ -19,6 +19,13 @@ export const SubmitSchema = z
   })
   .loose()
 
+const UsageSchema = z
+  .object({
+    cost: z.number().nullable().optional(),
+    is_byok: z.boolean().optional(),
+  })
+  .loose()
+
 export const JobSchema = z
   .object({
     id: z.string(),
@@ -27,13 +34,7 @@ export const JobSchema = z
     unsigned_urls: z.array(z.string()).optional(),
     urls: z.array(z.string()).optional(),
     expires_at: z.number().optional(),
-    usage: z
-      .object({
-        cost: z.number().nullable().optional(),
-        is_byok: z.boolean().optional(),
-      })
-      .loose()
-      .optional(),
+    usage: UsageSchema.optional(),
     error: z.string().optional(),
   })
   .loose()
@@ -131,8 +132,13 @@ function stripStatusPrefix(message: string, status: number): string {
   return message.replace(new RegExp(`^(?:(?:HTTP\\s+)?${status}:\\s*)+`, 'i'), '').trim()
 }
 
+interface NormalizedError {
+  message: string
+  code?: string
+}
+
 /** Unwraps a JSON error body nested in the provider message, at most twice. */
-function normalizeBase(input: string, status: number): { message: string; code?: string } {
+function normalizeBase(input: string, status: number): NormalizedError {
   let message = input
   let code: string | undefined
 

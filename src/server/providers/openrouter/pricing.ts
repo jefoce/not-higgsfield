@@ -23,13 +23,13 @@ const ModelSchema = z
 
 const ModelsSchema = z.object({ data: z.array(ModelSchema) }).loose()
 
-const EndpointSchema = z
-  .object({ pricing: z.object({ discount: z.number() }).loose().optional() })
-  .loose()
+const EndpointPricingSchema = z.object({ discount: z.number() }).loose()
 
-const EndpointsSchema = z
-  .object({ data: z.object({ endpoints: z.array(EndpointSchema) }).loose() })
-  .loose()
+const EndpointSchema = z.object({ pricing: EndpointPricingSchema.optional() }).loose()
+
+const EndpointsDataSchema = z.object({ endpoints: z.array(EndpointSchema) }).loose()
+
+const EndpointsSchema = z.object({ data: EndpointsDataSchema }).loose()
 
 interface CacheEntry {
   info: PricingInfo

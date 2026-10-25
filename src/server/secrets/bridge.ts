@@ -12,9 +12,13 @@ import type { SecretBackend } from './index'
 export const BRIDGE_PREFIX = '@@nh-secrets '
 const DEFAULT_TIMEOUT_MS = 60_000
 
+interface BridgeOutput {
+  write(chunk: string): unknown
+}
+
 export interface BridgeOptions {
   input?: NodeJS.ReadableStream
-  output?: { write(chunk: string): unknown }
+  output?: BridgeOutput
   timeoutMs?: number
 }
 

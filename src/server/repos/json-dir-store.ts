@@ -15,7 +15,11 @@ interface IndexState<T> {
   loaded: boolean
 }
 
-export interface JsonDirStore<T extends { id: string }> {
+interface Identified {
+  id: string
+}
+
+export interface JsonDirStore<T extends Identified> {
   list(): Promise<T[]>
   get(id: string): Promise<T | null>
   remember(item: T): Promise<void>
@@ -30,9 +34,7 @@ interface JsonDirStoreParams<T> {
 }
 
 /** Indexes `<id>.json` files in one directory, reloading when its mtime changes. */
-export function jsonDirStore<T extends { id: string }>(
-  params: JsonDirStoreParams<T>,
-): JsonDirStore<T> {
+export function jsonDirStore<T extends Identified>(params: JsonDirStoreParams<T>): JsonDirStore<T> {
   const { key, dir, fileOf, schema } = params
 
   const state = globalState<IndexState<T>>(key, () => ({

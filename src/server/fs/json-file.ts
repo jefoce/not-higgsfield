@@ -37,10 +37,14 @@ export async function readJson<T>(file: string, schema: ZodType<T>): Promise<T |
   return null
 }
 
+interface WriteJsonAtomicOptions {
+  mode?: number
+}
+
 interface WriteJsonAtomicParams {
   file: string
   data: unknown
-  opts?: { mode?: number }
+  opts?: WriteJsonAtomicOptions
 }
 
 export async function writeJsonAtomic(params: WriteJsonAtomicParams): Promise<void> {

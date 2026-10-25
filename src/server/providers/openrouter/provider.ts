@@ -37,7 +37,9 @@ import {
 import { listModels } from './models'
 import { getPricing as getPresetPricing } from './pricing'
 
-const KeySchema = z.object({ data: z.object({ label: z.string().optional() }).loose() }).loose()
+const KeyDataSchema = z.object({ label: z.string().optional() }).loose()
+
+const KeySchema = z.object({ data: KeyDataSchema }).loose()
 
 /** OpenRouter adapter. */
 export function createOpenRouterProvider(): VideoProvider {
@@ -89,7 +91,12 @@ async function submit(params: SubmitJobParams): Promise<SubmittedJob> {
   }
 }
 
-function toSubmitted(job: { id: string; status: string }): SubmittedJob {
+interface SubmittedResponse {
+  id: string
+  status: string
+}
+
+function toSubmitted(job: SubmittedResponse): SubmittedJob {
   return { jobId: job.id, status: asJobStatus(job.status) ?? 'pending' }
 }
 

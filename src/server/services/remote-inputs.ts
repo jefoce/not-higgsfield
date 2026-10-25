@@ -12,11 +12,20 @@ import { uploadPaths } from '../paths'
 import { updateUpload } from '../repos/upload-record'
 import { listUploads } from '../repos/uploads'
 import { secretsReady } from '../secrets'
-import { hashFile } from '../storage/hash'
+import { type FileHash, hashFile } from '../storage/hash'
 import { getObjectStore } from '../storage/registry'
 import type { ObjectInfo, ObjectStore, ProgressCallback } from '../storage/types'
 
 type Remote = NonNullable<UploadItem['remote']>
+
+interface RemoteUpload extends UploadItem {
+  remote: Remote
+}
+
+interface SweepResult {
+  deleted: number
+  cleared: number
+}
 
 const puts = globalState('remotePuts', () => new Map<string, Promise<ObjectInfo>>())
 
@@ -108,9 +117,7 @@ export async function presignFor(upload: UploadItem): Promise<string> {
 }
 
 /** Deletes objects whose uploads all passed REMOTE_UNUSED_DAYS, clears their remote. */
-export async function sweepRemote(
-  store?: ObjectStore,
-): Promise<{ deleted: number; cleared: number }> {
+export async function sweepRemote(store?: ObjectStore): Promise<SweepResult> {
   await secretsReady()
   const remoteStore = store ?? getObjectStore()
 
@@ -120,9 +127,7 @@ export async function sweepRemote(
 
   const uploads = await listUploads()
 
-  const withRemote = uploads.filter((item): item is UploadItem & { remote: Remote } =>
-    Boolean(item.remote),
-  )
+  const withRemote = uploads.filter((item): item is RemoteUpload => Boolean(item.remote))
 
   const groups = groupBy(withRemote, (item) => item.remote.key)
   const cutoff = Date.now() - REMOTE_UNUSED_DAYS * 86_400_000
@@ -210,7 +215,7 @@ function sameObject(params: SameObjectParams): boolean {
 
 interface SameDigestParams {
   head: RemoteHead
-  digest: { sha256Hex: string; sha256Base64: string; size: number }
+  digest: FileHash
   prev?: Remote
 }
 

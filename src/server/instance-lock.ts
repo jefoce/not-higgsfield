@@ -13,6 +13,11 @@ export interface LockInfo {
   startedAt: string
 }
 
+interface HealthResponse {
+  app?: string
+  pid?: number
+}
+
 const HEALTH_TIMEOUT_MS = 1500
 
 /** Takes server.lock or exits. A dead owner's lock is taken over. */
@@ -81,7 +86,7 @@ async function isAlive(owner: LockInfo): Promise<boolean> {
     signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
   }).catch(() => null)
 
-  const body = (await res?.json().catch(() => null)) as { app?: string; pid?: number } | null
+  const body = (await res?.json().catch(() => null)) as HealthResponse | null
 
   return body?.app === 'not-higgsfield' && body.pid === owner.pid
 }

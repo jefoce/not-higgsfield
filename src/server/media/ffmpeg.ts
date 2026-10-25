@@ -9,6 +9,7 @@ import path from 'node:path'
 import { isEmpty, isNil } from 'lodash-es'
 
 import { FFMPEG_TIMEOUTS, PREVIEW_WIDTH } from '@/core/constants'
+import type { PixelSize } from '@/core/geometry'
 
 const MAX_BUFFER = 16 * 1024 * 1024
 
@@ -82,10 +83,13 @@ interface ExecFfmpegParams {
   timeoutMs: number
 }
 
+interface ExecFfmpegResult {
+  error: ExecFileException | null
+  stderr: string
+}
+
 /** Runs one ffmpeg child, tracks it for shutdown, and turns a timeout into a clear error. */
-function execFfmpeg(
-  params: ExecFfmpegParams,
-): Promise<{ error: ExecFileException | null; stderr: string }> {
+function execFfmpeg(params: ExecFfmpegParams): Promise<ExecFfmpegResult> {
   const { args, timeoutMs } = params
   const bin = assertFfmpeg()
 
@@ -251,10 +255,11 @@ async function verifyFrame(outPath: string): Promise<void> {
   }
 }
 
-export async function makeTestVideo(
-  outPath: string,
-  opts: { width: number; height: number; durationSec: number },
-): Promise<void> {
+interface MakeTestVideoOptions extends PixelSize {
+  durationSec: number
+}
+
+export async function makeTestVideo(outPath: string, opts: MakeTestVideoOptions): Promise<void> {
   await runFfmpeg({
     args: [
       '-f',

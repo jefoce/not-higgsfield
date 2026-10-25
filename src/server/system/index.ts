@@ -8,10 +8,20 @@ import { darwin } from './darwin'
 import { linux } from './linux'
 import { win32 } from './win32'
 
+interface ChooseFilesOptions {
+  kinds: MediaKind[]
+  multiple: boolean
+  prompt: string
+}
+
+interface ChooseFolderOptions {
+  prompt: string
+}
+
 export interface SystemAdapter {
   canChooseFiles(): Promise<boolean>
-  chooseFiles(opts: { kinds: MediaKind[]; multiple: boolean; prompt: string }): Promise<string[]>
-  chooseFolder(opts: { prompt: string }): Promise<string | null>
+  chooseFiles(opts: ChooseFilesOptions): Promise<string[]>
+  chooseFolder(opts: ChooseFolderOptions): Promise<string | null>
   reveal(path: string): Promise<void>
 }
 
@@ -58,8 +68,13 @@ async function withDialog<T>(task: () => Promise<T>): Promise<T> {
   }
 }
 
+interface CommandTimeoutError {
+  killed?: boolean
+  code?: string
+}
+
 function isTimeout(error: unknown): boolean {
-  const err = error as { killed?: boolean; code?: string }
+  const err = error as CommandTimeoutError
 
   return err.killed === true || err.code === 'ETIMEDOUT'
 }

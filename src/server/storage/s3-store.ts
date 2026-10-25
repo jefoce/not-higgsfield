@@ -29,6 +29,28 @@ export interface S3StoreConfig {
   secretAccessKey: string
 }
 
+interface ChecksumFields {
+  ChecksumSHA256?: string
+}
+
+interface S3ClientBundle {
+  bucket: string
+  client: S3Client
+}
+
+interface ErrorWithName {
+  name?: unknown
+}
+
+interface S3ErrorMetadata {
+  httpStatusCode?: number
+}
+
+interface S3ErrorShape {
+  $metadata?: S3ErrorMetadata
+  name?: string
+}
+
 /** Generic S3 store used by the R2 backend. */
 export function createS3Store(config: S3StoreConfig): ObjectStore {
   const { bucket, client } = clientFor(config)
@@ -60,7 +82,7 @@ export function createS3Store(config: S3StoreConfig): ObjectStore {
       const { key, file, contentType, sha256, onProgress } = params
       const stats = await fs.stat(file)
       const isMultipart = stats.size > PART_SIZE
-      const checksum: { ChecksumSHA256?: string } = {}
+      const checksum: ChecksumFields = {}
 
       if (!isMultipart) {
         checksum.ChecksumSHA256 = sha256
@@ -125,7 +147,7 @@ export function createS3Store(config: S3StoreConfig): ObjectStore {
   }
 }
 
-function clientFor(config: S3StoreConfig): { bucket: string; client: S3Client } {
+function clientFor(config: S3StoreConfig): S3ClientBundle {
   const { endpoint, region, bucket, accessKeyId, secretAccessKey } = config
 
   return {
@@ -142,7 +164,7 @@ function clientFor(config: S3StoreConfig): { bucket: string; client: S3Client } 
 
 function s3ErrorCode(error: unknown): string {
   if (isObject(error)) {
-    const name = (error as { name?: unknown }).name
+    const name = (error as ErrorWithName).name
 
     if (isString(name) && name !== '') {
       return name
@@ -157,8 +179,9 @@ function isNotFound(error: unknown): boolean {
     return false
   }
 
-  const meta = (error as { $metadata?: { httpStatusCode?: number } }).$metadata
-  const name = (error as { name?: string }).name
+  const err = error as S3ErrorShape
 
-  return meta?.httpStatusCode === 404 || name === 'NotFound' || name === 'NoSuchKey'
+  return (
+    err.$metadata?.httpStatusCode === 404 || err.name === 'NotFound' || err.name === 'NoSuchKey'
+  )
 }

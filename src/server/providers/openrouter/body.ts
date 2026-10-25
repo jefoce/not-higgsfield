@@ -14,16 +14,30 @@ interface MediaPayload {
   url: string
 }
 
-interface OpenRouterFramePart {
+interface OpenRouterImageUrl {
+  url: string
+}
+
+interface OpenRouterImagePart {
   type: 'image_url'
-  image_url: { url: string }
+  image_url: OpenRouterImageUrl
+}
+
+interface OpenRouterVideoPart {
+  type: 'video_url'
+  video_url: OpenRouterImageUrl
+}
+
+interface OpenRouterAudioPart {
+  type: 'audio_url'
+  audio_url: OpenRouterImageUrl
+}
+
+interface OpenRouterFramePart extends OpenRouterImagePart {
   frame_type: 'first_frame' | 'last_frame'
 }
 
-type OpenRouterReferencePart =
-  | { type: 'image_url'; image_url: { url: string } }
-  | { type: 'video_url'; video_url: { url: string } }
-  | { type: 'audio_url'; audio_url: { url: string } }
+type OpenRouterReferencePart = OpenRouterImagePart | OpenRouterVideoPart | OpenRouterAudioPart
 
 interface OpenRouterVideoBody {
   model: string

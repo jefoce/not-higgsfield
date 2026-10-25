@@ -31,7 +31,11 @@ export interface ModelCatalog {
   fetchedAt: string
 }
 
-const driftState = globalState<{ hasLogged: boolean }>('modelCatalogDrift', () => ({
+interface DriftState {
+  hasLogged: boolean
+}
+
+const driftState = globalState<DriftState>('modelCatalogDrift', () => ({
   hasLogged: false,
 }))
 

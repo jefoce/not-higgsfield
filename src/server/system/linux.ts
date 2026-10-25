@@ -142,8 +142,12 @@ async function dialog(file: string, args: string[]) {
   }
 }
 
+interface CancelError {
+  code?: number | string
+}
+
 function isCancel(error: unknown): boolean {
-  const err = error as { code?: number | string }
+  const err = error as CancelError
 
   return Number(err.code) === 1
 }

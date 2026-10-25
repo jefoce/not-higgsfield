@@ -7,8 +7,12 @@ import { hasSession } from './session'
 
 const LOCAL_HOSTS = new Set(['127.0.0.1', 'localhost', '[::1]'])
 
+interface LocalRequestOptions {
+  session?: boolean
+}
+
 /** Rejects non-local hosts, cross-site writes, foreign origins and missing desktop sessions. */
-export function assertLocalRequest(request: Request, opts: { session?: boolean } = {}): void {
+export function assertLocalRequest(request: Request, opts: LocalRequestOptions = {}): void {
   const host = request.headers.get('host') ?? ''
 
   if (!LOCAL_HOSTS.has(host.replace(/:\d+$/, ''))) {

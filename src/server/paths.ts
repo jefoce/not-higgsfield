@@ -64,8 +64,12 @@ export function uploadPaths(id: string, ext: string): UploadPaths {
   return { media: `${base}${ext}`, json: `${base}.json` }
 }
 
+interface CleanupResult {
+  removed: number
+}
+
 /** Deletes stale `*.part` and `*.tmp-*` files. Skips symlinks. */
-export async function cleanupStale(): Promise<{ removed: number }> {
+export async function cleanupStale(): Promise<CleanupResult> {
   const cutoff = Date.now() - UPLOAD_CLEANUP_MS
 
   const [downloads, uploads] = await Promise.all([
