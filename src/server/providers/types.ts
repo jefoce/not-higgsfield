@@ -40,6 +40,7 @@ export interface JobRef {
 export interface JobUsage {
   costUsd: number | null
   isByok: boolean | null
+  usesEstimatedCost: boolean
 }
 
 export interface JobSnapshot {

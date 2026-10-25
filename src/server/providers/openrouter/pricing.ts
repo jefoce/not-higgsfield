@@ -8,7 +8,6 @@ import type { ModelPreset } from '@/core/presets/types'
 import type { PricingInfo } from '@/core/types'
 
 import { globalState } from '../../global-state'
-import { isMockMode } from './mock-mode'
 
 const API_URL = 'https://openrouter.ai/api/v1'
 const MODELS_URL = `${API_URL}/videos/models`
@@ -40,10 +39,6 @@ const cache = globalState<Map<string, CacheEntry>>('pricing', () => new Map())
 
 /** List and discounted rates. Live results cache for an hour, fallback for five minutes. */
 export async function getPricing(preset: ModelPreset, isForce = false): Promise<PricingInfo> {
-  if (isMockMode()) {
-    return mockPricing(preset)
-  }
-
   const cached = cache.get(preset.id)
   const ttl = cached?.info.source === 'live' ? LIVE_TTL_MS : PRICING_FALLBACK_TTL_MS
 
@@ -56,18 +51,6 @@ export async function getPricing(preset: ModelPreset, isForce = false): Promise<
   cache.set(preset.id, { info, at: Date.now() })
 
   return info
-}
-
-function mockPricing(preset: ModelPreset): PricingInfo {
-  const listSkus = { ...preset.pricing.fallback }
-
-  return {
-    skus: { ...listSkus },
-    listSkus,
-    discount: 0,
-    source: 'mock',
-    fetchedAt: new Date().toISOString(),
-  }
 }
 
 function fallback(preset: ModelPreset): PricingInfo {

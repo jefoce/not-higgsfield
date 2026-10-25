@@ -26,7 +26,6 @@ vi.mock('@/server/jobs/submit-retry', () => ({ shouldRetryAsBase64: () => false 
 
 vi.mock('@/server/providers/registry', () => ({
   getVideoProvider: () => ({ submit: submitVideo }),
-  isMockMode: () => false,
 }))
 
 vi.mock('@/server/repos/generations', () => ({

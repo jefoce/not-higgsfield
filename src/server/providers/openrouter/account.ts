@@ -8,7 +8,6 @@ import { messageOf } from '../../errors'
 import { globalState } from '../../global-state'
 import { getSecret, isNonEmptyString, onSecretsChange, secretsReady } from '../../secrets'
 import type { ProviderAccount } from '../types'
-import { isMockMode } from './mock-mode'
 
 const BASE_URL = 'https://openrouter.ai'
 const CACHE_MS = 30_000
@@ -66,20 +65,6 @@ export async function getProviderAccount(opts?: { fresh?: boolean }): Promise<Pr
 async function loadCredits(): Promise<ProviderAccount> {
   await secretsReady()
   const fetchedAt = new Date().toISOString()
-
-  if (isMockMode()) {
-    return {
-      balance: 10,
-      keyLimitRemaining: null,
-      keyLimit: null,
-      usageDaily: null,
-      usageMonthly: null,
-      source: 'mock',
-      fetchedAt,
-      error: null,
-    }
-  }
-
   const key = getSecret('OPENROUTER_API_KEY')
 
   if (!isNonEmptyString(key)) {

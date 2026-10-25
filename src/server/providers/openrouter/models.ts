@@ -3,14 +3,11 @@ import 'server-only'
 import { z } from 'zod'
 
 import { FETCH_TIMEOUTS, PRICING_FALLBACK_TTL_MS } from '@/core/constants'
-import { MODEL_PRESETS } from '@/core/presets'
-import type { ModelPreset } from '@/core/presets/types'
 
 import { globalState } from '../../global-state'
 import { onSecretsChange } from '../../secrets'
 import type { ProviderModel } from '../types'
 import { BASE_URL } from './http'
-import { isMockMode } from './mock-mode'
 
 const MODELS_URL = `${BASE_URL}/api/v1/videos/models`
 const LIVE_TTL_MS = 3_600_000
@@ -39,10 +36,6 @@ const cache = globalState('providerModels', () => ({ entry: undefined as CacheEn
 
 /** Live model capabilities. A good result caches for an hour, a failure for five minutes. */
 export async function listModels(): Promise<readonly ProviderModel[]> {
-  if (isMockMode()) {
-    return MODEL_PRESETS.map(staticModel)
-  }
-
   const cached = cache.entry
   const ttl = cached?.isFallback === true ? PRICING_FALLBACK_TTL_MS : LIVE_TTL_MS
 
@@ -94,36 +87,6 @@ function toModel(model: z.infer<typeof ModelSchema>): ProviderModel {
     generatesAudio: model.generate_audio ?? null,
     hasSeed: model.seed ?? null,
   }
-}
-
-function staticModel(preset: ModelPreset): ProviderModel {
-  return {
-    modelId: preset.slug,
-    durations: preset.duration.options ?? allDurations(preset),
-    resolutions: preset.resolutions,
-    aspectRatios: preset.aspectRatios,
-    frameImages: frameImages(preset),
-    generatesAudio: preset.audio.supported,
-    hasSeed: preset.seed,
-  }
-}
-
-function allDurations(preset: ModelPreset): number[] {
-  const { min, max } = preset.duration
-
-  return Array.from({ length: max - min + 1 }, (_, index) => min + index)
-}
-
-function frameImages(preset: ModelPreset): readonly string[] | null {
-  if (!preset.frames.start) {
-    return null
-  }
-
-  if (!preset.frames.end) {
-    return ['first_frame']
-  }
-
-  return ['first_frame', 'last_frame']
 }
 
 onSecretsChange(() => {

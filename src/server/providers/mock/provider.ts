@@ -11,19 +11,28 @@ import { FETCH_TIMEOUTS, MOCK_GENERATE_MS, MOCK_QUEUE_MS } from '@/core/constant
 import { isRecord } from '@/core/guards'
 import { outputSize } from '@/core/output-size'
 import { MODEL_PRESETS } from '@/core/presets'
+import type { ModelPreset } from '@/core/presets/types'
+import { asJobStatus } from '@/core/submit-state'
+import type { PricingInfo, TestResult } from '@/core/types'
 
 import { globalState } from '../../global-state'
 import { MOCK_REMOTE_PREFIX } from '../../local-url'
 import { makeTestVideo } from '../../media/ffmpeg'
-import { OpenRouterError } from './error'
-import type { VideoJobResponse } from './http'
-
-export interface MockContentFallback {
-  presetId: string
-  duration: number
-  resolution: string
-  aspectRatio: string
-}
+import { buildRequestBody } from '../openrouter/body'
+import { OpenRouterError } from '../openrouter/error'
+import type { VideoJobResponse } from '../openrouter/http'
+import type {
+  ContentFallback,
+  ContentRequest,
+  JobRef,
+  JobSnapshot,
+  JobUsage,
+  ProviderAccount,
+  SubmitJobParams,
+  SubmittedJob,
+  VideoProvider,
+} from '../types'
+import { listModels } from './models'
 
 interface MockState {
   mockStart: Map<string, number>
@@ -37,7 +46,94 @@ const mockState = globalState<MockState>('mock', () => ({
   mockBody: new Map(),
 }))
 
-export async function mockSubmit(body: unknown): Promise<{ id: string; status: string }> {
+/** Mock OpenRouter adapter. Runs the whole pipeline without provider calls. */
+export function createMockProvider(): VideoProvider {
+  return {
+    id: 'openrouter',
+    isConfigured,
+    submit,
+    getJob,
+    fetchContent,
+    getAccount,
+    getPricing,
+    listModels,
+    testConnection,
+  }
+}
+
+function isConfigured(): boolean {
+  return true
+}
+
+async function submit(params: SubmitJobParams): Promise<SubmittedJob> {
+  const { preset, input, media } = params
+  const body = buildRequestBody({ input, preset, media })
+  const job = await mockSubmit(body)
+
+  return { jobId: job.id, status: asJobStatus(job.status) ?? 'pending' }
+}
+
+async function getJob(params: JobRef): Promise<JobSnapshot> {
+  const job = mockJob(params.jobId, params.submittedAt)
+
+  return {
+    status: asJobStatus(job.status) ?? 'pending',
+    generationId: null,
+    expiresAt: null,
+    urls: null,
+    usage: toUsage(job.usage),
+    error: job.error ?? null,
+  }
+}
+
+function toUsage(usage: VideoJobResponse['usage']): JobUsage | null {
+  if (isNil(usage)) {
+    return null
+  }
+
+  return {
+    costUsd: usage.cost ?? null,
+    isByok: usage.is_byok ?? null,
+    usesEstimatedCost: true,
+  }
+}
+
+async function fetchContent(params: ContentRequest): Promise<Response> {
+  const { job, fallback } = params
+
+  return mockContent(job.jobId, fallback ?? undefined)
+}
+
+async function getAccount(): Promise<ProviderAccount> {
+  return {
+    balance: 0,
+    keyLimitRemaining: 0,
+    keyLimit: 0,
+    usageDaily: 0,
+    usageMonthly: 0,
+    source: 'mock',
+    fetchedAt: new Date().toISOString(),
+    error: null,
+  }
+}
+
+async function getPricing(preset: ModelPreset): Promise<PricingInfo> {
+  const listSkus = { ...preset.pricing.fallback }
+
+  return {
+    skus: { ...listSkus },
+    listSkus,
+    discount: 0,
+    source: 'mock',
+    fetchedAt: new Date().toISOString(),
+  }
+}
+
+async function testConnection(): Promise<TestResult> {
+  return { ok: true, mock: true }
+}
+
+async function mockSubmit(body: unknown): Promise<{ id: string; status: string }> {
   const links: string[] = []
 
   collectMockLinks(body, links)
@@ -97,7 +193,7 @@ function collectMockLinks(value: unknown, out: string[]): void {
   }
 }
 
-export function mockJob(id: string, submittedAt?: string): VideoJobResponse {
+function mockJob(id: string, submittedAt?: string): VideoJobResponse {
   const elapsed = Date.now() - mockStarted(id, submittedAt)
 
   if (elapsed < MOCK_QUEUE_MS) {
@@ -127,7 +223,7 @@ function mockStarted(id: string, submittedAt?: string): number {
   return Number.isFinite(parsed) ? parsed : Date.now()
 }
 
-export async function mockContent(id: string, fallback?: MockContentFallback): Promise<Response> {
+async function mockContent(id: string, fallback?: ContentFallback): Promise<Response> {
   const body = mockState.mockBody.get(id)
   const resolution = field(body, 'resolution') ?? fallback?.resolution
   const aspect = field(body, 'aspect_ratio') ?? fallback?.aspectRatio

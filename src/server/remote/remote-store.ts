@@ -3,7 +3,7 @@ import 'server-only'
 import { isNil } from 'lodash-es'
 
 import { globalState } from '../global-state'
-import { isMockMode } from '../providers/registry'
+import { isMockProvider } from '../providers/registry'
 import { getSecret, onSecretsChange } from '../secrets'
 import { createMockStore } from './mock'
 import { createR2Store } from './r2'
@@ -52,7 +52,7 @@ export function getRemoteStore(): RemoteStore | null {
   }
 
   if ((process.env.REMOTE_MOCK?.trim() ?? '') !== '') {
-    if (isMockMode()) {
+    if (isMockProvider('openrouter')) {
       cache.value = createMockStore()
     } else {
       console.warn(

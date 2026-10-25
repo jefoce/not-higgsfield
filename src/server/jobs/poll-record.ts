@@ -6,7 +6,7 @@ import { MAX_JOB_AGE_MIN } from '@/core/constants'
 import type { GenerationRecord, JobStatus } from '@/core/types'
 
 import { ProviderError } from '../providers/provider-error'
-import { getVideoProvider, isMockMode } from '../providers/registry'
+import { getVideoProvider } from '../providers/registry'
 import type { JobSnapshot } from '../providers/types'
 import { saveGeneration } from '../repos/generations'
 import { queueDownload } from './download-queue'
@@ -116,20 +116,20 @@ interface ApplyUsageCostParams {
 
 function applyUsageCost(params: ApplyUsageCostParams): GenerationRecord {
   const { record, job } = params
-  const usageCost = job.usage?.costUsd
+  const usage = job.usage
 
-  if (isNil(usageCost)) {
+  if (isNil(usage) || isNil(usage.costUsd)) {
     return record
   }
 
-  const actual = isMockMode() ? record.cost.estimatedUsd : usageCost
+  const actual = usage.usesEstimatedCost ? record.cost.estimatedUsd : usage.costUsd
 
   return {
     ...record,
     cost: {
       ...record.cost,
       actualUsd: actual,
-      isByok: job.usage?.isByok ?? null,
+      isByok: usage.isByok ?? null,
       billed: actual > 0,
     },
   }

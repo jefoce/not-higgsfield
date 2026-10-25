@@ -2,7 +2,7 @@ import 'server-only'
 
 import type { TestResult } from '@/core/types'
 
-import { getVideoProvider, isMockMode } from '../providers/registry'
+import { getVideoProvider, isMockProvider } from '../providers/registry'
 import { testR2 } from '../remote/r2'
 import { secretsReady } from '../secrets'
 
@@ -16,7 +16,7 @@ export async function testConnection(target: TestTarget): Promise<TestResult> {
     return getVideoProvider('openrouter').testConnection()
   }
 
-  if ((process.env.REMOTE_MOCK?.trim() ?? '') !== '' && isMockMode()) {
+  if ((process.env.REMOTE_MOCK?.trim() ?? '') !== '' && isMockProvider('openrouter')) {
     return { ok: true, mock: true }
   }
 

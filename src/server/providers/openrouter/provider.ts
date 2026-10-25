@@ -34,8 +34,6 @@ import {
   SubmitSchema,
   type VideoJobResponse,
 } from './http'
-import { isMockMode } from './mock-mode'
-import { mockContent, mockJob, mockSubmit } from './mock-provider'
 import { listModels } from './models'
 import { getPricing as getPresetPricing } from './pricing'
 
@@ -57,16 +55,12 @@ export function createOpenRouterProvider(): VideoProvider {
 }
 
 function isConfigured(): boolean {
-  return isMockMode() || isNonEmptyString(getSecret('OPENROUTER_API_KEY'))
+  return isNonEmptyString(getSecret('OPENROUTER_API_KEY'))
 }
 
 async function submit(params: SubmitJobParams): Promise<SubmittedJob> {
   const { preset, input, media } = params
   const body = buildRequestBody({ input, preset, media })
-
-  if (isMockMode()) {
-    return toSubmitted(await mockSubmit(body))
-  }
 
   try {
     const res = await request({
@@ -100,10 +94,6 @@ function toSubmitted(job: { id: string; status: string }): SubmittedJob {
 }
 
 async function getJob(job: JobRef): Promise<JobSnapshot> {
-  if (isMockMode()) {
-    return toSnapshot(mockJob(job.jobId, job.submittedAt))
-  }
-
   try {
     const res = await request({
       url: `${BASE_URL}/api/v1/videos/${encodeURIComponent(job.jobId)}`,
@@ -144,11 +134,7 @@ function toSnapshot(job: VideoJobResponse): JobSnapshot {
 }
 
 async function fetchContent(params: ContentRequest): Promise<Response> {
-  const { job, index, fallback } = params
-
-  if (isMockMode()) {
-    return mockContent(job.jobId, fallback ?? undefined)
-  }
+  const { job, index } = params
 
   try {
     const res = await request({
@@ -176,10 +162,6 @@ function getPricing(preset: ModelPreset, isForce?: boolean): Promise<PricingInfo
 }
 
 async function testConnection(): Promise<TestResult> {
-  if (isMockMode()) {
-    return { ok: true, mock: true }
-  }
-
   const key = getSecret('OPENROUTER_API_KEY')
 
   if (isNil(key) || key === '') {
@@ -215,7 +197,7 @@ function toUsage(usage: VideoJobResponse['usage']): JobUsage | null {
     return null
   }
 
-  return { costUsd: usage.cost ?? null, isByok: usage.is_byok ?? null }
+  return { costUsd: usage.cost ?? null, isByok: usage.is_byok ?? null, usesEstimatedCost: false }
 }
 
 function toExpiresAt(value: number | undefined): number | null {
