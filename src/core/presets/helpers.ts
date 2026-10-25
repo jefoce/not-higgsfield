@@ -14,16 +14,18 @@ interface PricingOptions {
 export const perSecondPricing = (
   fallback: SkuTable,
   { referenceVideoFactor = 0 }: PricingOptions = {},
-): PerSecondPricing => ({
-  kind: 'perSecond',
-  unit: 'usd',
-  skuRules: [{ when: {}, key: 'duration_seconds_{resolution}' }],
-  tiers: {},
-  fallback,
-  // Wan bills a 5 second floor regardless of the requested duration.
-  minBillableSec: 5,
-  referenceVideoFactor,
-})
+): PerSecondPricing => {
+  return {
+    kind: 'perSecond',
+    unit: 'usd',
+    skuRules: [{ when: {}, key: 'duration_seconds_{resolution}' }],
+    tiers: {},
+    fallback,
+    // Wan bills a 5 second floor regardless of the requested duration.
+    minBillableSec: 5,
+    referenceVideoFactor,
+  }
+}
 
 interface VideoTokenPricingParams extends PricingOptions {
   skuRules: readonly SkuRule[]

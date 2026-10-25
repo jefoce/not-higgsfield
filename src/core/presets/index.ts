@@ -14,12 +14,20 @@ export const MODEL_PRESETS = [
 
 export const DEFAULT_PRESET_ID = 'wan-3.0'
 
-export const findPreset = (id: string): ModelPreset | null =>
-  MODEL_PRESETS.find((preset) => preset.id === id) ?? null
+export const findPreset = (id: string): ModelPreset | null => {
+  return (
+    MODEL_PRESETS.find((preset) => {
+      return preset.id === id
+    }) ?? null
+  )
+}
 
 /** Display fallback only. Submissions must use findPreset. */
-export const getPreset = (id: string): ModelPreset => findPreset(id) ?? MODEL_PRESETS[0]
+export const getPreset = (id: string): ModelPreset => {
+  return findPreset(id) ?? MODEL_PRESETS[0]
+}
 
 /** Shortest duration to submit: the provider minimum raised to the billing floor. */
-export const minDuration = (preset: ModelPreset): number =>
-  Math.max(preset.duration.min, primaryBinding(preset).pricing.minBillableSec)
+export const minDuration = (preset: ModelPreset): number => {
+  return Math.max(preset.duration.min, primaryBinding(preset).pricing.minBillableSec)
+}

@@ -40,7 +40,9 @@ export function ChooseDiskTile(props: ChooseDiskTileProps) {
 
   const { isRunning: isBusy, run } = useAsyncAction(pickFiles)
 
-  const handlePick = () => void run()
+  const handlePick = () => {
+    return void run()
+  }
 
   const label = isBusy ? 'Choosing...' : 'Choose from disk'
 

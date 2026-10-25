@@ -6,7 +6,9 @@ import type { ReferencePlan } from '@/core/media-types'
 import { useImagePlan } from '@/features/generator/references/use-image-plan'
 import { apiPost } from '@/lib/fetcher'
 
-vi.mock('@/lib/fetcher', () => ({ apiPost: vi.fn() }))
+vi.mock('@/lib/fetcher', () => {
+  return { apiPost: vi.fn() }
+})
 
 function deferred<T>() {
   return Promise.withResolvers<T>()
@@ -32,7 +34,10 @@ describe('useImagePlan', () => {
     const answer = deferred<ReferencePlan>()
 
     post.mockReturnValueOnce(answer.promise)
-    const { result } = renderHook(() => useImagePlan('wan-3.0', ['a']))
+
+    const { result } = renderHook(() => {
+      return useImagePlan('wan-3.0', ['a'])
+    })
 
     act(() => {
       vi.advanceTimersByTime(399)
@@ -59,9 +64,14 @@ describe('useImagePlan', () => {
 
     post.mockReturnValueOnce(older.promise).mockReturnValueOnce(newer.promise)
 
-    const { result, rerender } = renderHook(({ ids }) => useImagePlan('wan-3.0', ids), {
-      initialProps: { ids: ['a'] },
-    })
+    const { result, rerender } = renderHook(
+      ({ ids }) => {
+        return useImagePlan('wan-3.0', ids)
+      },
+      {
+        initialProps: { ids: ['a'] },
+      },
+    )
 
     act(() => {
       vi.advanceTimersByTime(400)
@@ -89,7 +99,9 @@ describe('useImagePlan', () => {
   })
 
   it('does nothing without images', () => {
-    renderHook(() => useImagePlan('wan-3.0', []))
+    renderHook(() => {
+      return useImagePlan('wan-3.0', [])
+    })
 
     act(() => {
       vi.advanceTimersByTime(400)

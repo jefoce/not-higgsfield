@@ -14,7 +14,10 @@ export async function GET(request: Request, { params }: PathRouteContext) {
     assertLocalRequest(request)
     const { ref } = await params
     const media = await resolveMediaRef(ref)
-    const stats = await fs.stat(media.absolutePath).catch(() => null)
+
+    const stats = await fs.stat(media.absolutePath).catch(() => {
+      return null
+    })
 
     if (!stats) {
       return jsonError({ status: 404, error: 'File not found' })

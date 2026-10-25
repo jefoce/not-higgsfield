@@ -23,9 +23,13 @@ export function FolderFileTile(props: FolderFileTileProps) {
   const { file, src, isBroken, isSelected } = props
   const isAudio = file.kind === 'audio'
 
-  const handleSelect = () => props.onPickFile(file.rel)
+  const handleSelect = () => {
+    return props.onPickFile(file.rel)
+  }
 
-  const handleImageError = () => props.onBroken(src)
+  const handleImageError = () => {
+    return props.onBroken(src)
+  }
 
   const handleExpandClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()

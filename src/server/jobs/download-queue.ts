@@ -47,13 +47,15 @@ interface DownloadParams {
 const DISK_FULL = 'Disk is full. Free some space, the download retries every minute.'
 const DISK_FULL_RETRY_MS = 60_000
 
-const downloads = globalState<DownloadQueue>('downloadQueue', () => ({
-  pending: new Map(),
-  active: new Set(),
-  stopped: false,
-  failures: new Map(),
-  diskFullAt: new Map(),
-}))
+const downloads = globalState<DownloadQueue>('downloadQueue', () => {
+  return {
+    pending: new Map(),
+    active: new Set(),
+    stopped: false,
+    failures: new Map(),
+    diskFullAt: new Map(),
+  }
+})
 
 /** True while a download for this generation is queued or running. */
 export function isDownloadQueued(id: string): boolean {
@@ -114,7 +116,9 @@ function drainDownloads(): void {
 
       await finalize({ ...task.record, favorite: current.favorite }, task.job)
     })
-      .catch((error) => console.error(`[not-higgsfield] download failed for ${id}`, error))
+      .catch((error) => {
+        return console.error(`[not-higgsfield] download failed for ${id}`, error)
+      })
       .finally(() => {
         downloads.active.delete(id)
         drainDownloads()
@@ -192,12 +196,19 @@ async function completeDownload(params: CompleteDownloadParams): Promise<void> {
   downloads.failures.delete(record.id)
   downloads.diskFullAt.delete(record.id)
   const preview = await makePreview({ id: record.id, video, out: previewPath })
-  const probe = await probeMedia(video).catch(() => null)
+
+  const probe = await probeMedia(video).catch(() => {
+    return null
+  })
 
   const bytes = await fs
     .stat(video)
-    .then((stat) => stat.size)
-    .catch(() => null)
+    .then((stat) => {
+      return stat.size
+    })
+    .catch(() => {
+      return null
+    })
 
   const output: RecordOutput = {
     video: `${record.id}.mp4`,

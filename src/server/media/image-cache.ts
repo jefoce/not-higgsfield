@@ -35,10 +35,13 @@ const CacheSchema = z.object({
 
 export type CacheRecord = z.infer<typeof CacheSchema>
 
-const cacheStem = (id: string, step: number): string =>
-  path.join(UPLOADS_DIR, `${id}.encoded-${step}`)
+const cacheStem = (id: string, step: number): string => {
+  return path.join(UPLOADS_DIR, `${id}.encoded-${step}`)
+}
 
-const opaqueFile = (id: string): string => path.join(UPLOADS_DIR, `${id}.opaque.json`)
+const opaqueFile = (id: string): string => {
+  return path.join(UPLOADS_DIR, `${id}.opaque.json`)
+}
 
 const OpaqueSchema = z.boolean()
 
@@ -86,7 +89,10 @@ export async function readCache(id: string, step: number): Promise<EncodedImage 
   }
 
   const file = cacheFile({ id, step, format: record.format })
-  const data = await fs.readFile(file).catch(() => null)
+
+  const data = await fs.readFile(file).catch(() => {
+    return null
+  })
 
   if (!data) {
     return null
@@ -118,11 +124,18 @@ export async function writeCache(params: WriteCacheParams): Promise<void> {
 export async function removeEncoded(id: string): Promise<void> {
   const prefix = `${id}.encoded-`
   const opaque = `${id}.opaque.json`
-  const names = await fs.readdir(UPLOADS_DIR).catch(() => [])
+
+  const names = await fs.readdir(UPLOADS_DIR).catch(() => {
+    return []
+  })
 
   await Promise.all(
     names
-      .filter((name) => name.startsWith(prefix) || name === opaque)
-      .map((name) => fs.unlink(path.join(UPLOADS_DIR, name)).catch(() => {})),
+      .filter((name) => {
+        return name.startsWith(prefix) || name === opaque
+      })
+      .map((name) => {
+        return fs.unlink(path.join(UPLOADS_DIR, name)).catch(() => {})
+      }),
   )
 }

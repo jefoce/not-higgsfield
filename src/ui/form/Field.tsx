@@ -34,7 +34,9 @@ export function Field(props: FieldProps) {
   const errorId = hasError ? `${controlId}-error` : undefined
 
   const describedByText = [children.props['aria-describedby'], hintId, errorId]
-    .filter((value): value is string => isNonEmptyString(value))
+    .filter((value): value is string => {
+      return isNonEmptyString(value)
+    })
     .join(' ')
 
   const describedBy = describedByText === '' ? undefined : describedByText

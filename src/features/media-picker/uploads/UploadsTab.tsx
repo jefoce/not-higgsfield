@@ -32,17 +32,22 @@ export interface UploadsTabProps {
 export function UploadsTab(props: UploadsTabProps) {
   const { kinds, max, extensions, selected, uploading = [] } = props
 
-  const { data, isLoading, mutate } = useSWR(['uploads', kinds], () => fetchUploads({ kinds }))
+  const { data, isLoading, mutate } = useSWR(['uploads', kinds], () => {
+    return fetchUploads({ kinds })
+  })
 
-  const { data: canChooseFiles } = useSWR('platform-choose', async () =>
-    (await getPlatform()).canChooseFiles(),
-  )
+  const { data: canChooseFiles } = useSWR('platform-choose', async () => {
+    return (await getPlatform()).canChooseFiles()
+  })
 
-  const items = (data ?? []).filter((item) =>
-    extensionAllowed({ kind: item.kind, ext: item.ext, extensions }),
-  )
+  const items = (data ?? []).filter((item) => {
+    return extensionAllowed({ kind: item.kind, ext: item.ext, extensions })
+  })
 
-  const selectedIds = selected.map((item) => item.id)
+  const selectedIds = selected.map((item) => {
+    return item.id
+  })
+
   const isMaxReached = selected.length >= max
 
   const handleAvailable = (item: UploadItem) => {

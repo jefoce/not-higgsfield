@@ -27,7 +27,11 @@ interface HistoryRowProps {
 export function HistoryRow(props: HistoryRowProps) {
   const { record } = props
   const isCompleted = record.status === 'completed'
-  const zoom = useHistoryViewStore((state) => state.zoom)
+
+  const zoom = useHistoryViewStore((state) => {
+    return state.zoom
+  })
+
   const videoShare = listVideoShare(zoom)
   const mediaRef = useRef<HTMLDivElement>(null)
   const mediaWidth = useMediaWidth(mediaRef)
@@ -56,7 +60,9 @@ export function HistoryRow(props: HistoryRowProps) {
     }
   }
 
-  const handleCancel = () => void cancelGeneration(record.id)
+  const handleCancel = () => {
+    return void cancelGeneration(record.id)
+  }
 
   return (
     <div

@@ -7,12 +7,11 @@ import { skuKey } from '@/core/pricing'
 
 describe('MODEL_PRESETS', () => {
   it('ships Wan and Seedance presets in order', () => {
-    expect(MODEL_PRESETS.map((preset) => preset.id)).toEqual([
-      'wan-3.0',
-      'wan-3.0-prime',
-      'seedance-2.0',
-      'seedance-2.5',
-    ])
+    expect(
+      MODEL_PRESETS.map((preset) => {
+        return preset.id
+      }),
+    ).toEqual(['wan-3.0', 'wan-3.0-prime', 'seedance-2.0', 'seedance-2.5'])
 
     expect(DEFAULT_PRESET_ID).toBe('wan-3.0')
   })

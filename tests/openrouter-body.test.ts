@@ -86,10 +86,11 @@ describe('buildRequestBody frames', () => {
       media,
     })
 
-    expect(body.frame_images?.map((frame) => frame.frame_type)).toEqual([
-      'first_frame',
-      'last_frame',
-    ])
+    expect(
+      body.frame_images?.map((frame) => {
+        return frame.frame_type
+      }),
+    ).toEqual(['first_frame', 'last_frame'])
 
     expect(body.frame_images?.[1]?.image_url.url).toBe('data:image/png;base64,END')
   })
@@ -185,7 +186,11 @@ describe('buildRequestBody limits', () => {
       media,
     })
 
-    expect(body.frame_images?.map((frame) => frame.frame_type)).toEqual(['first_frame'])
+    expect(
+      body.frame_images?.map((frame) => {
+        return frame.frame_type
+      }),
+    ).toEqual(['first_frame'])
   })
 
   it('omits the first frame when the preset lacks it', () => {
@@ -218,18 +223,18 @@ describe('buildRequestBody prime', () => {
 
 describe('buildRequestBody missing media', () => {
   it('throws when a frame id is absent from media', () => {
-    expect(() =>
-      buildRequestBody({
+    expect(() => {
+      return buildRequestBody({
         input: input({ tab: 'frames', prompt: '', frames: { start: 'absent', end: null } }),
         preset,
         media,
-      }),
-    ).toThrow('Missing media for input absent')
+      })
+    }).toThrow('Missing media for input absent')
   })
 
   it('throws when a reference id is absent from media', () => {
-    expect(() =>
-      buildRequestBody({ input: input({ references: ['absent'] }), preset, media }),
-    ).toThrow('Missing media for input absent')
+    expect(() => {
+      return buildRequestBody({ input: input({ references: ['absent'] }), preset, media })
+    }).toThrow('Missing media for input absent')
   })
 })

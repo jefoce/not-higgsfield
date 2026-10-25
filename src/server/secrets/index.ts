@@ -27,14 +27,16 @@ interface SecretsState {
   loadError: string | null
 }
 
-const state = globalState<SecretsState>('secrets', () => ({
-  loaded: false,
-  backend: null,
-  values: new Map(),
-  listeners: new Set(),
-  loading: null,
-  loadError: null,
-}))
+const state = globalState<SecretsState>('secrets', () => {
+  return {
+    loaded: false,
+    backend: null,
+    values: new Map(),
+    listeners: new Set(),
+    loading: null,
+    loadError: null,
+  }
+})
 
 /** Starts or waits for the one-time load. */
 export function secretsReady(): Promise<void> {
@@ -106,7 +108,9 @@ export function getSecret(name: SecretName): string | null {
 export async function setSecrets(
   changes: Partial<Record<SecretName, string | null>>,
 ): Promise<void> {
-  await withLock('secrets', () => applySecrets(changes))
+  await withLock('secrets', () => {
+    return applySecrets(changes)
+  })
 }
 
 async function applySecrets(changes: Partial<Record<SecretName, string | null>>): Promise<void> {
@@ -249,11 +253,15 @@ const hintFor = (value: string): string | null => {
 export function onSecretsChange(listener: () => void): () => void {
   state.listeners.add(listener)
 
-  return () => state.listeners.delete(listener)
+  return () => {
+    return state.listeners.delete(listener)
+  }
 }
 
 function assertR2Group(values: Map<SecretName, Entry>): void {
-  const count = R2_NAMES.filter((name) => values.has(name)).length
+  const count = R2_NAMES.filter((name) => {
+    return values.has(name)
+  }).length
 
   if (count !== 0 && count !== R2_NAMES.length) {
     throw new HttpError(400, 'R2 needs all four fields')

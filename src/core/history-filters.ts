@@ -24,8 +24,9 @@ type FilterKey = keyof typeof DEFAULT_FILTERS
 /** Filter name and its inactive value, in query order. */
 export const FILTER_PARAMS = Object.entries(DEFAULT_FILTERS) as [FilterKey, string][]
 
-const hasMedia = (input: GenerationInput): boolean =>
-  !isEmpty(input.frames.start) || !isEmpty(input.frames.end) || !isEmpty(input.references)
+const hasMedia = (input: GenerationInput): boolean => {
+  return !isEmpty(input.frames.start) || !isEmpty(input.frames.end) || !isEmpty(input.references)
+}
 
 const matchesStatus = (status: JobStatus, wanted: StatusFilter): boolean => {
   if (wanted === 'all') {
@@ -63,14 +64,17 @@ const matchesQuery = (record: GenerationRecord, filters: HistoryFilters): boolea
   return `${record.input.prompt} ${record.preset.title}`.toLowerCase().includes(q)
 }
 
-const matchesModel = (record: GenerationRecord, filters: HistoryFilters): boolean =>
-  !isNonEmptyString(filters.model) || record.input.presetId === filters.model
+const matchesModel = (record: GenerationRecord, filters: HistoryFilters): boolean => {
+  return !isNonEmptyString(filters.model) || record.input.presetId === filters.model
+}
 
-const matchesFavorite = (record: GenerationRecord, filters: HistoryFilters): boolean =>
-  isNil(filters.favorite) || record.favorite === filters.favorite
+const matchesFavorite = (record: GenerationRecord, filters: HistoryFilters): boolean => {
+  return isNil(filters.favorite) || record.favorite === filters.favorite
+}
 
-const matchesStatusFilter = (record: GenerationRecord, filters: HistoryFilters): boolean =>
-  isNil(filters.status) || matchesStatus(record.status, filters.status)
+const matchesStatusFilter = (record: GenerationRecord, filters: HistoryFilters): boolean => {
+  return isNil(filters.status) || matchesStatus(record.status, filters.status)
+}
 
 const matchesMode = (record: GenerationRecord, filters: HistoryFilters): boolean => {
   const mode = activeMode(filters)
@@ -150,7 +154,11 @@ export function applyFilters(
   records: GenerationRecord[],
   filters: HistoryFilters,
 ): GenerationRecord[] {
-  return filter(records, (record) => FILTER_CHECKS.every((check) => check(record, filters)))
+  return filter(records, (record) => {
+    return FILTER_CHECKS.every((check) => {
+      return check(record, filters)
+    })
+  })
 }
 
 export function sortRecords(records: GenerationRecord[]): GenerationRecord[] {
@@ -176,9 +184,12 @@ function parseCursor(cursor: string | null | undefined): Cursor | null {
   return { createdAt: cursor.slice(0, sep), id: cursor.slice(sep + 1) }
 }
 
-const isAfter = (record: GenerationRecord, cursor: Cursor): boolean =>
-  record.createdAt < cursor.createdAt ||
-  (record.createdAt === cursor.createdAt && record.id < cursor.id)
+const isAfter = (record: GenerationRecord, cursor: Cursor): boolean => {
+  return (
+    record.createdAt < cursor.createdAt ||
+    (record.createdAt === cursor.createdAt && record.id < cursor.id)
+  )
+}
 
 interface PaginateParams {
   records: GenerationRecord[]
@@ -201,7 +212,11 @@ export function paginate(params: PaginateParams): HistoryPage {
 
   const size = clamp(requestedSize, 1, HISTORY_MAX_PAGE_SIZE)
   const at = parseCursor(cursor)
-  const remaining = records.filter((record) => isNil(at) || isAfter(record, at))
+
+  const remaining = records.filter((record) => {
+    return isNil(at) || isAfter(record, at)
+  })
+
   const items = remaining.slice(0, size)
   const last = items.at(-1)
 
@@ -213,5 +228,7 @@ export function paginate(params: PaginateParams): HistoryPage {
 }
 
 export function countActive(records: GenerationRecord[]): number {
-  return filter(records, (record) => ACTIVE_STATUSES.includes(record.status)).length
+  return filter(records, (record) => {
+    return ACTIVE_STATUSES.includes(record.status)
+  }).length
 }

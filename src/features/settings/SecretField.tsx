@@ -94,10 +94,13 @@ export function SecretField(props: SecretFieldProps) {
     hint: status.hint,
   })
 
-  const handleRemove = () => props.onChange(name, { remove: !isRemoved })
+  const handleRemove = () => {
+    return props.onChange(name, { remove: !isRemoved })
+  }
 
-  const handleValueChange = (event: ChangeEvent<HTMLInputElement>) =>
-    props.onChange(name, { value: event.target.value.trim() })
+  const handleValueChange = (event: ChangeEvent<HTMLInputElement>) => {
+    return props.onChange(name, { value: event.target.value.trim() })
+  }
 
   const removeLabel = isRemoved ? 'Undo' : 'Remove'
 

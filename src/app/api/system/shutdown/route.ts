@@ -20,7 +20,9 @@ export async function POST(request: Request) {
     return errorResponse(error)
   }
 
-  setTimeout(() => void shutdown(), SHUTDOWN_EXIT_DELAY_MS) // lets the 202 flush first
+  setTimeout(() => {
+    return void shutdown()
+  }, SHUTDOWN_EXIT_DELAY_MS) // lets the 202 flush first
 
   return new Response(null, { status: 202 })
 }

@@ -17,16 +17,23 @@ interface ReferenceState {
   uploadsById: UploadsById
 }
 
-export const randomSeed = (): number => Math.floor(Math.random() * (SEED_MAX + 1))
+export const randomSeed = (): number => {
+  return Math.floor(Math.random() * (SEED_MAX + 1))
+}
 
 /** Attached references counted per kind in API order. */
 export function slotCounts(state: ReferenceState): MediaKindCounts {
-  return referenceSlots(state.references, (id) => state.uploadsById[id]?.kind).counts
+  return referenceSlots(state.references, (id) => {
+    return state.uploadsById[id]?.kind
+  }).counts
 }
 
 /** Upload attached at a 1-based slot, resolved live from reference order. */
 export function uploadForSlot(state: ReferenceState, slot: RefSlot): UploadItem | undefined {
-  const { slots } = referenceSlots(state.references, (id) => state.uploadsById[id]?.kind)
+  const { slots } = referenceSlots(state.references, (id) => {
+    return state.uploadsById[id]?.kind
+  })
+
   const id = idForSlot(slots, slot)
 
   if (!isNonEmptyString(id)) {

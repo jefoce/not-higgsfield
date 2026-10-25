@@ -27,7 +27,13 @@ interface HistoryPollParams {
 
 function activeIds(records: GenerationRecord[]): string[] {
   return uniq(
-    records.filter((record) => ACTIVE_STATUSES.includes(record.status)).map((record) => record.id),
+    records
+      .filter((record) => {
+        return ACTIVE_STATUSES.includes(record.status)
+      })
+      .map((record) => {
+        return record.id
+      }),
   )
 }
 
@@ -82,13 +88,17 @@ export function useHistoryPoll(params: HistoryPollParams): void {
           return
         }
 
-        const byId = new Map(result.items.map((record) => [record.id, record]))
-
-        await mutate(
-          (pages) =>
-            pages?.map((page) => patchPage({ page, byId, activeCount: result.activeCount })),
-          false,
+        const byId = new Map(
+          result.items.map((record) => {
+            return [record.id, record]
+          }),
         )
+
+        await mutate((pages) => {
+          return pages?.map((page) => {
+            return patchPage({ page, byId, activeCount: result.activeCount })
+          })
+        }, false)
       } catch {
         // Next tick retries, polling does not surface transient errors.
       } finally {
@@ -103,7 +113,10 @@ export function useHistoryPoll(params: HistoryPollParams): void {
     }
 
     void tick()
-    const timer = window.setInterval(() => void tick(), HISTORY_POLL_MS)
+
+    const timer = window.setInterval(() => {
+      return void tick()
+    }, HISTORY_POLL_MS)
 
     document.addEventListener('visibilitychange', onVisible)
 

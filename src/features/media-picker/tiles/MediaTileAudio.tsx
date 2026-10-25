@@ -68,18 +68,20 @@ export function MediaTileAudio(props: MediaTileAudioProps) {
         {item.originalName}
       </span>
       <span className="pointer-events-none absolute inset-x-2 top-1/2 flex h-10 max-h-10 -translate-y-1/2 items-center gap-px">
-        {audioBars.map((height, index) => (
-          <span
-            /* eslint-disable-next-line react/no-array-index-key -- static list */
-            key={index}
-            style={{ height: `${height}%` }}
-            className={cn(
-              'min-w-px flex-1 rounded-full',
-              index / audioBars.length < played && 'bg-lime',
-              !(index / audioBars.length < played) && 'bg-fg-2/50',
-            )}
-          />
-        ))}
+        {audioBars.map((height, index) => {
+          return (
+            <span
+              /* eslint-disable-next-line react/no-array-index-key -- static list */
+              key={index}
+              style={{ height: `${height}%` }}
+              className={cn(
+                'min-w-px flex-1 rounded-full',
+                index / audioBars.length < played && 'bg-lime',
+                !(index / audioBars.length < played) && 'bg-fg-2/50',
+              )}
+            />
+          )
+        })}
       </span>
       <button
         type="button"

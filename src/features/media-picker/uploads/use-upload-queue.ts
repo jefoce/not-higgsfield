@@ -31,16 +31,17 @@ async function runUpload(params: RunUploadParams): Promise<void> {
 
   controllers.current.set(entry.id, controller)
 
-  const patch = (change: Partial<UploadProgressItem>) =>
-    setItems((previous) =>
-      previous.map((item) => {
+  const patch = (change: Partial<UploadProgressItem>) => {
+    return setItems((previous) => {
+      return previous.map((item) => {
         if (item.id !== entry.id) {
           return item
         }
 
         return { ...item, ...change }
-      }),
-    )
+      })
+    })
+  }
 
   patch({ progress: 0, error: undefined })
 
@@ -63,7 +64,12 @@ async function runUpload(params: RunUploadParams): Promise<void> {
       return
     }
 
-    setItems((previous) => previous.filter((item) => item.id !== entry.id))
+    setItems((previous) => {
+      return previous.filter((item) => {
+        return item.id !== entry.id
+      })
+    })
+
     onUploaded(uploaded)
   } catch (error) {
     if (controller.signal.aborted) {
@@ -71,7 +77,12 @@ async function runUpload(params: RunUploadParams): Promise<void> {
     }
 
     if (onError) {
-      setItems((previous) => previous.filter((item) => item.id !== entry.id))
+      setItems((previous) => {
+        return previous.filter((item) => {
+          return item.id !== entry.id
+        })
+      })
+
       onError(messageOf(error))
 
       return
@@ -93,19 +104,25 @@ export function useUploadQueue(
   const controllers = useRef(new Map<string, AbortController>())
 
   const run = useCallback(
-    (entry: UploadProgressItem) => runUpload({ entry, controllers, setItems, onUploaded, onError }),
+    (entry: UploadProgressItem) => {
+      return runUpload({ entry, controllers, setItems, onUploaded, onError })
+    },
     [onUploaded, onError],
   )
 
   const enqueue = useCallback(
     (files: File[]) => {
-      const entries = files.map((file) => ({
-        id: `upload-${(nextId.current += 1)}`,
-        file,
-        progress: 0,
-      }))
+      const entries = files.map((file) => {
+        return {
+          id: `upload-${(nextId.current += 1)}`,
+          file,
+          progress: 0,
+        }
+      })
 
-      setItems((previous) => [...previous, ...entries])
+      setItems((previous) => {
+        return [...previous, ...entries]
+      })
 
       for (const entry of entries) {
         void run(entry)
@@ -116,7 +133,9 @@ export function useUploadQueue(
 
   const retry = useCallback(
     (id: string) => {
-      const entry = items.find((item) => item.id === id)
+      const entry = items.find((item) => {
+        return item.id === id
+      })
 
       if (entry) {
         void run(entry)
@@ -126,7 +145,11 @@ export function useUploadQueue(
   )
 
   const dismiss = useCallback((id: string) => {
-    setItems((previous) => previous.filter((item) => item.id !== id))
+    setItems((previous) => {
+      return previous.filter((item) => {
+        return item.id !== id
+      })
+    })
   }, [])
 
   const clear = useCallback(() => {

@@ -23,5 +23,7 @@ export async function getCredits(params: GetCreditsParams = {}): Promise<Credits
 async function spentLocally(): Promise<number> {
   const records = await listGenerations()
 
-  return sumBy(records, (record) => record.cost.actualUsd ?? 0)
+  return sumBy(records, (record) => {
+    return record.cost.actualUsd ?? 0
+  })
 }

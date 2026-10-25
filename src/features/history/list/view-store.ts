@@ -25,7 +25,9 @@ const GRID_COLUMNS = [8, 7, 6, 5, 4, 3] as const
 
 const TILE_WIDTHS = [172, 200, 252, 286, 362, 486] as const
 
-const zoomStep = (zoom: number): number => clamp(Math.round(zoom), 0, MAX_ZOOM)
+const zoomStep = (zoom: number): number => {
+  return clamp(Math.round(zoom), 0, MAX_ZOOM)
+}
 
 /** Table value at a clamped zoom step. The ranges below cover every step. */
 function stepValue<T>(values: readonly T[], zoom: number): T {
@@ -39,14 +41,19 @@ function stepValue<T>(values: readonly T[], zoom: number): T {
 }
 
 /** Video width as a share of the list row at each zoom step. */
-export const listVideoShare = (zoom: number): number =>
-  stepValue(LIST_VIDEO_WIDTHS, zoom) / REFERENCE_ROW_WIDTH
+export const listVideoShare = (zoom: number): number => {
+  return stepValue(LIST_VIDEO_WIDTHS, zoom) / REFERENCE_ROW_WIDTH
+}
 
 /** Fixed grid columns per step: 8 at zoom 0 down to 3 at max. */
-export const zoomToGridColumns = (zoom: number): number => stepValue(GRID_COLUMNS, zoom)
+export const zoomToGridColumns = (zoom: number): number => {
+  return stepValue(GRID_COLUMNS, zoom)
+}
 
 /** Tile width from the design table, measured at the 1518px reference row. */
-export const zoomToTileWidth = (zoom: number): number => stepValue(TILE_WIDTHS, zoom)
+export const zoomToTileWidth = (zoom: number): number => {
+  return stepValue(TILE_WIDTHS, zoom)
+}
 
 export function countActiveFilters(filters: ViewFilters): number {
   const active = FILTER_PARAMS.filter(([key, fallback]) => {
@@ -75,19 +82,33 @@ interface ViewState {
 
 export const useHistoryViewStore = create<ViewState>()(
   persist(
-    (set) => ({
-      view: 'list',
-      zoom: ZOOM_DEFAULT,
-      filters: { ...DEFAULT_FILTERS },
-      setView: (view) => set({ view }),
-      setZoom: (zoom) => set({ zoom: clamp(Math.round(zoom), 0, MAX_ZOOM) }),
-      setFilters: (patch) => set((state) => ({ filters: { ...state.filters, ...patch } })),
-      resetFilters: () => set({ filters: { ...DEFAULT_FILTERS } }),
-    }),
+    (set) => {
+      return {
+        view: 'list',
+        zoom: ZOOM_DEFAULT,
+        filters: { ...DEFAULT_FILTERS },
+        setView: (view) => {
+          return set({ view })
+        },
+        setZoom: (zoom) => {
+          return set({ zoom: clamp(Math.round(zoom), 0, MAX_ZOOM) })
+        },
+        setFilters: (patch) => {
+          return set((state) => {
+            return { filters: { ...state.filters, ...patch } }
+          })
+        },
+        resetFilters: () => {
+          return set({ filters: { ...DEFAULT_FILTERS } })
+        },
+      }
+    },
     {
       name: 'not-higgsfield:view',
       version: 1,
-      partialize: (state) => ({ view: state.view, zoom: state.zoom, filters: state.filters }),
+      partialize: (state) => {
+        return { view: state.view, zoom: state.zoom, filters: state.filters }
+      },
     },
   ),
 )

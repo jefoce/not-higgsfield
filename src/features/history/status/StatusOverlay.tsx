@@ -51,7 +51,9 @@ export function StatusOverlay(props: StatusOverlayProps) {
   const aspectStyle = { aspectRatio: boxAspect ?? recordAspect(record), margin: '0 auto' }
   const boxStyle = isFill ? undefined : aspectStyle
 
-  const handleRerun = () => void rerunRecord(record)
+  const handleRerun = () => {
+    return void rerunRecord(record)
+  }
 
   return (
     <div

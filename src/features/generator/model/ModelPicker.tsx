@@ -19,16 +19,23 @@ import { ModelRow } from './ModelRow'
 export function ModelPicker() {
   const modelMenu = useBoolean()
   const [query, setQuery] = useState('')
-  const presetId = useGeneratorStore((state) => state.presetId)
-  const setPreset = useGeneratorStore((state) => state.setPreset)
+
+  const presetId = useGeneratorStore((state) => {
+    return state.presetId
+  })
+
+  const setPreset = useGeneratorStore((state) => {
+    return state.setPreset
+  })
+
   const isWide = useMediaQuery('(min-width: 900px)')
   const preset = getPreset(presetId)
   const entry = useModelEntry(presetId)
   const discount = entry?.pricing?.discount ?? 0
 
-  const options = MODEL_PRESETS.filter((option) =>
-    option.title.toLowerCase().includes(query.trim().toLowerCase()),
-  )
+  const options = MODEL_PRESETS.filter((option) => {
+    return option.title.toLowerCase().includes(query.trim().toLowerCase())
+  })
 
   const handleOpenChange = (isOpen: boolean): void => {
     modelMenu.set(isOpen)
@@ -85,14 +92,16 @@ export function ModelPicker() {
             className="border-0 bg-page-2 pr-2"
           />
           <div className="min-h-0 flex-1 space-y-1 overflow-y-auto">
-            {options.map((option) => (
-              <ModelRow
-                key={option.id}
-                option={option}
-                selected={option.id === presetId}
-                onSelect={handleSelectPreset}
-              />
-            ))}
+            {options.map((option) => {
+              return (
+                <ModelRow
+                  key={option.id}
+                  option={option}
+                  selected={option.id === presetId}
+                  onSelect={handleSelectPreset}
+                />
+              )
+            })}
             {isEmpty(options) && <p className="p-3 text-center text-xs text-fg-2">No models</p>}
           </div>
         </PopoverContent>

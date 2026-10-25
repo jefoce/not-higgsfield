@@ -29,7 +29,9 @@ interface ErrorBody {
 }
 
 async function throwApiError(response: Response): Promise<never> {
-  const body = (await response.json().catch(() => null)) as ErrorBody | null
+  const body = (await response.json().catch(() => {
+    return null
+  })) as ErrorBody | null
 
   throw new ApiError({
     status: response.status,

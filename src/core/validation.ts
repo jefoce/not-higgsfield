@@ -109,8 +109,13 @@ export function validateInput(params: ValidateInputParams): ValidationResult {
     validateLimits({ input, uploads, preset, ctx }),
   ]
 
-  const errors = groups.flatMap((group) => group.errors)
-  const warnings = groups.flatMap((group) => group.warnings)
+  const errors = groups.flatMap((group) => {
+    return group.errors
+  })
+
+  const warnings = groups.flatMap((group) => {
+    return group.warnings
+  })
 
   return { ok: isEmpty(errors), errors, warnings }
 }

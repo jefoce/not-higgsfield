@@ -33,12 +33,14 @@ export function createLoadActions(set: SetState, get: GetState): LoadActions {
       const normalized = normalizeForPreset({ input, preset, uploads: cache }).input
       const duration = clampReferenceDuration({ input: normalized, uploads: cache, preset })
 
-      set((state) => ({
-        ...omit(normalized, 'prompt'),
-        duration,
-        prompts: { ...state.prompts, [input.tab]: input.prompt },
-        uploadsById: cache,
-      }))
+      set((state) => {
+        return {
+          ...omit(normalized, 'prompt'),
+          duration,
+          prompts: { ...state.prompts, [input.tab]: input.prompt },
+          uploadsById: cache,
+        }
+      })
     },
     normalizeLoaded: () => {
       const state = get()
@@ -51,7 +53,11 @@ export function createLoadActions(set: SetState, get: GetState): LoadActions {
       })
 
       const duration = clampReferenceDuration({ input, uploads: state.uploadsById, preset })
-      const { counts } = referenceSlots(input.references, (id) => state.uploadsById[id]?.kind)
+
+      const { counts } = referenceSlots(input.references, (id) => {
+        return state.uploadsById[id]?.kind
+      })
+
       const references = canonicalizePrompt(state.prompts.references, counts)
       const next = omit({ ...input, duration, prompts: { ...state.prompts, references } }, 'prompt')
 

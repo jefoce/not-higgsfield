@@ -46,7 +46,9 @@ export async function testR2(): Promise<TestResult> {
   const config = r2Config()
 
   if (isNil(config)) {
-    const missing = MISSING_ORDER.find((name) => !isNonEmptyString(getSecret(name)))
+    const missing = MISSING_ORDER.find((name) => {
+      return !isNonEmptyString(getSecret(name))
+    })
 
     return { ok: false, error: `${missing ?? 'R2_BUCKET'} is not set` }
   }

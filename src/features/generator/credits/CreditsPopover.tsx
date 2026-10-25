@@ -16,7 +16,9 @@ function handleOpenSettings(): void {
 
 function handleTopUp(): void {
   void getPlatform()
-    .then((platform) => platform.openExternal('https://openrouter.ai/settings/credits'))
+    .then((platform) => {
+      return platform.openExternal('https://openrouter.ai/settings/credits')
+    })
     .catch(() => {})
 }
 
@@ -38,7 +40,9 @@ export function CreditsPopover() {
     ? 'No key limit'
     : `${money(credits.keyLimitRemaining)} / ${money(credits.keyLimit)}`
 
-  const handleRefresh = (): void => refresh(true)
+  const handleRefresh = (): void => {
+    return refresh(true)
+  }
 
   const balance = credits?.balance
 

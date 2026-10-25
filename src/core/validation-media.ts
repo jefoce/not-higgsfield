@@ -8,9 +8,13 @@ import { joinWords } from './text'
 const MB = 1024 * 1024
 
 /** Whole seconds stay plain, fractions keep up to two decimals. */
-export const seconds = (value: number): string => String(Number(value.toFixed(2)))
+export const seconds = (value: number): string => {
+  return String(Number(value.toFixed(2)))
+}
 
-const formatRatio = (ratio: number): string => String(Number(ratio.toFixed(1)))
+const formatRatio = (ratio: number): string => {
+  return String(Number(ratio.toFixed(1)))
+}
 
 interface CheckReferenceLimitsParams {
   upload: UploadItem

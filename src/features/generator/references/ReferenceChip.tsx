@@ -24,7 +24,11 @@ export const ReferenceChip = forwardRef<
 >(function ReferenceChip(props, ref) {
   const { value, data, className, classNameFocused, 'data-beautiful-mention': mentionAttr } = props
   const slot = mentionSlot(value, data)
-  const upload = useGeneratorStore((state) => uploadForSlot(state, slot))
+
+  const upload = useGeneratorStore((state) => {
+    return uploadForSlot(state, slot)
+  })
+
   const label = slotLabel(slot)
   const title = upload ? `${label} \u00b7 ${upload.originalName}` : `${label} is not attached`
 

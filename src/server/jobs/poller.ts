@@ -29,15 +29,17 @@ interface PollerState {
   stopped: boolean
 }
 
-const state = globalState<PollerState>('poller', () => ({
-  timer: null,
-  sweepTimer: null,
-  sweepFirst: null,
-  running: false,
-  started: false,
-  booted: false,
-  stopped: false,
-}))
+const state = globalState<PollerState>('poller', () => {
+  return {
+    timer: null,
+    sweepTimer: null,
+    sweepFirst: null,
+    running: false,
+    started: false,
+    booted: false,
+    stopped: false,
+  }
+})
 
 /** Starts the singleton poller. Safe to call many times. */
 export function startPoller(): void {
@@ -93,14 +95,24 @@ async function boot(): Promise<void> {
     return
   }
 
-  state.timer = setInterval(() => void tick(), POLL_INTERVAL_MS)
+  state.timer = setInterval(() => {
+    return void tick()
+  }, POLL_INTERVAL_MS)
+
   state.timer.unref()
   state.booted = true
   void tick()
 
-  state.sweepFirst = setTimeout(() => void sweepUnusedRemote(), 60_000)
+  state.sweepFirst = setTimeout(() => {
+    return void sweepUnusedRemote()
+  }, 60_000)
+
   state.sweepFirst.unref()
-  state.sweepTimer = setInterval(() => void sweepUnusedRemote(), SWEEP_INTERVAL_MS)
+
+  state.sweepTimer = setInterval(() => {
+    return void sweepUnusedRemote()
+  }, SWEEP_INTERVAL_MS)
+
   state.sweepTimer.unref()
 }
 
@@ -136,11 +148,13 @@ async function tick(): Promise<void> {
       const chunk = records.slice(i, i + POLL_PARALLEL)
 
       await Promise.all(
-        chunk.map((record) =>
-          withLock(record.id, () => processById(record.id)).catch((error) =>
-            console.error(`[not-higgsfield] poll failed for ${record.id}`, error),
-          ),
-        ),
+        chunk.map((record) => {
+          return withLock(record.id, () => {
+            return processById(record.id)
+          }).catch((error) => {
+            return console.error(`[not-higgsfield] poll failed for ${record.id}`, error)
+          })
+        }),
       )
     }
   } catch (error) {

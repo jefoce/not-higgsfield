@@ -28,7 +28,9 @@ function clickDownload(url: string): void {
 }
 
 function wait(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+  return new Promise((resolve) => {
+    return setTimeout(resolve, ms)
+  })
 }
 
 const noop = (): void => {}
@@ -40,12 +42,17 @@ async function noFileDrop(): Promise<() => void> {
 export const browserPlatform: Platform = {
   kind: 'browser',
 
-  canChooseFiles: async () => (await fetchSystemCapabilities()).chooseFiles,
+  canChooseFiles: async () => {
+    return (await fetchSystemCapabilities()).chooseFiles
+  },
 
-  chooseFiles: ({ kinds, multiple: isMultiple }): Promise<UploadItem[]> =>
-    chooseFilesFromServer(kinds, isMultiple),
+  chooseFiles: ({ kinds, multiple: isMultiple }): Promise<UploadItem[]> => {
+    return chooseFilesFromServer(kinds, isMultiple)
+  },
 
-  chooseFolder: (): Promise<FolderItem | null> => chooseFolderFromServer(),
+  chooseFolder: (): Promise<FolderItem | null> => {
+    return chooseFolderFromServer()
+  },
 
   requestNotifications: async () => {
     if (typeof Notification === 'undefined') {
@@ -75,7 +82,9 @@ export const browserPlatform: Platform = {
     window.open(url, '_blank', 'noopener')
   },
 
-  confirm: async (message: string) => window.confirm(message),
+  confirm: async (message: string) => {
+    return window.confirm(message)
+  },
 
   saveVideo: async (record: GenerationRecord) => {
     clickDownload(downloadUrl(record))

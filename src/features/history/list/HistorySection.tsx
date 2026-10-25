@@ -23,19 +23,47 @@ import { useHistoryViewStore } from './view-store'
 /** Right-hand feed: toolbar, list or grid, infinite scroll and grid details modal. */
 export function HistorySection() {
   const { records, activeCount, isLoading, hasMore, loadMore } = useHistory()
-  const view = useHistoryViewStore((state) => state.view)
-  const filters = useHistoryViewStore((state) => state.filters)
-  const isSelecting = useSelectionStore((state) => state.ids.size > 0)
-  const setActiveCount = useGeneratorStore((state) => state.setActiveCount)
+
+  const view = useHistoryViewStore((state) => {
+    return state.view
+  })
+
+  const filters = useHistoryViewStore((state) => {
+    return state.filters
+  })
+
+  const isSelecting = useSelectionStore((state) => {
+    return state.ids.size > 0
+  })
+
+  const setActiveCount = useGeneratorStore((state) => {
+    return state.setActiveCount
+  })
+
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const selected = records.find((record) => record.id === selectedId) ?? null
+
+  const selected =
+    records.find((record) => {
+      return record.id === selectedId
+    }) ?? null
+
   const sentinel = useRef<HTMLDivElement>(null)
-  const order = useMemo(() => records.filter(isSelectable).map((record) => record.id), [records])
+
+  const order = useMemo(() => {
+    return records.filter(isSelectable).map((record) => {
+      return record.id
+    })
+  }, [records])
+
   const paddingClass = isSelecting ? 'pb-28' : 'pb-14'
 
-  const handleOpen = (record: GenerationRecord) => setSelectedId(record.id)
+  const handleOpen = (record: GenerationRecord) => {
+    return setSelectedId(record.id)
+  }
 
-  const handleDeleted = () => setSelectedId(null)
+  const handleDeleted = () => {
+    return setSelectedId(null)
+  }
 
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
@@ -59,7 +87,13 @@ export function HistorySection() {
   }, [order])
 
   useEffect(() => {
-    useSelectionStore.getState().prune(new Set(records.map((record) => record.id)))
+    useSelectionStore.getState().prune(
+      new Set(
+        records.map((record) => {
+          return record.id
+        }),
+      ),
+    )
   }, [records])
 
   useEffect(() => {
@@ -80,7 +114,9 @@ export function HistorySection() {
 
     observer.observe(node)
 
-    return () => observer.disconnect()
+    return () => {
+      return observer.disconnect()
+    }
   }, [hasMore, loadMore])
 
   return (

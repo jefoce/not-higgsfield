@@ -45,7 +45,9 @@ export async function GET(request: Request) {
 
     const ids = (query.data.ids ?? '')
       .split(',')
-      .map((part) => part.trim())
+      .map((part) => {
+        return part.trim()
+      })
       .filter(Boolean)
 
     if (ids.length > MAX_IDS) {
@@ -56,7 +58,11 @@ export async function GET(request: Request) {
       const wanted = new Set(ids)
 
       return Response.json({
-        items: sortRecords(records.filter((record) => wanted.has(record.id))),
+        items: sortRecords(
+          records.filter((record) => {
+            return wanted.has(record.id)
+          }),
+        ),
         nextCursor: null,
         activeCount: countActive(records),
       })

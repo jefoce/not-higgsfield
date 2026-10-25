@@ -33,7 +33,11 @@ export async function listFolders(): Promise<FolderItem[]> {
 export async function getFolder(id: string): Promise<FolderItem | null> {
   const folders = await listFolders()
 
-  return folders.find((folder) => folder.id === id) ?? null
+  return (
+    folders.find((folder) => {
+      return folder.id === id
+    }) ?? null
+  )
 }
 
 interface AddFolderParams {
@@ -48,13 +52,17 @@ export async function addFolder(params: AddFolderParams): Promise<FolderItem> {
     throw new FolderError(400, 'Path must be absolute')
   }
 
-  const real = await fs.realpath(requested).catch(() => null)
+  const real = await fs.realpath(requested).catch(() => {
+    return null
+  })
 
   if (!isNonEmptyString(real)) {
     throw new FolderError(404, 'Folder not found')
   }
 
-  const stats = await fs.stat(real).catch(() => null)
+  const stats = await fs.stat(real).catch(() => {
+    return null
+  })
 
   if (!stats) {
     throw new FolderError(404, 'Folder not found')
@@ -65,8 +73,12 @@ export async function addFolder(params: AddFolderParams): Promise<FolderItem> {
   }
 
   const isReadable = await fs.access(real, constants.R_OK).then(
-    () => true,
-    () => false,
+    () => {
+      return true
+    },
+    () => {
+      return false
+    },
   )
 
   if (!isReadable) {
@@ -77,7 +89,9 @@ export async function addFolder(params: AddFolderParams): Promise<FolderItem> {
     const folders = await listFolders()
 
     for (const folder of folders) {
-      const existing = await fs.realpath(folder.path).catch(() => folder.path)
+      const existing = await fs.realpath(folder.path).catch(() => {
+        return folder.path
+      })
 
       if (existing === real) {
         throw new FolderError(409, 'Folder already connected')
@@ -101,7 +115,10 @@ export async function addFolder(params: AddFolderParams): Promise<FolderItem> {
 export async function removeFolder(id: string): Promise<void> {
   await withLock('folders', async () => {
     const folders = await listFolders()
-    const next = folders.filter((folder) => folder.id !== id)
+
+    const next = folders.filter((folder) => {
+      return folder.id !== id
+    })
 
     if (next.length === folders.length) {
       return
@@ -127,12 +144,20 @@ export async function listFolderFiles(params: ListFolderFilesParams): Promise<Fo
 
   const current = resolveSub(folder.path, sub ?? '')
   const entries = await readDirectory(current)
-  const visible = entries.filter((entry) => !entry.name.startsWith('.'))
+
+  const visible = entries.filter((entry) => {
+    return !entry.name.startsWith('.')
+  })
+
   const relDir = path.relative(folder.path, current).split(path.sep).join('/')
 
-  const relOf = (name: string): string => path.posix.join(relDir, name)
+  const relOf = (name: string): string => {
+    return path.posix.join(relDir, name)
+  }
 
-  const rootReal = await fs.realpath(folder.path).catch(() => folder.path)
+  const rootReal = await fs.realpath(folder.path).catch(() => {
+    return folder.path
+  })
 
   const dirs: FolderDir[] = []
   const files: FolderFile[] = []
@@ -165,7 +190,9 @@ export async function listFolderFiles(params: ListFolderFilesParams): Promise<Fo
 }
 
 async function readDirectory(dir: string): Promise<Dirent[]> {
-  const stats = await fs.stat(dir).catch(() => null)
+  const stats = await fs.stat(dir).catch(() => {
+    return null
+  })
 
   if (!stats) {
     throw new FolderError(404, 'Path not found')
@@ -175,7 +202,9 @@ async function readDirectory(dir: string): Promise<Dirent[]> {
     throw new FolderError(400, 'Not a directory')
   }
 
-  const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => null)
+  const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => {
+    return null
+  })
 
   if (!entries) {
     throw new FolderError(404, 'Path not found')
@@ -212,7 +241,10 @@ async function classifyEntry(params: ClassifyEntryParams): Promise<EntryOutcome>
 
 async function classifySymlink(params: ClassifyEntryParams): Promise<EntryOutcome> {
   const { entry, full, rel, rootReal } = params
-  const target = await fs.stat(full).catch(() => null)
+
+  const target = await fs.stat(full).catch(() => {
+    return null
+  })
 
   if (!target) {
     return { isFile: false }
@@ -222,7 +254,9 @@ async function classifySymlink(params: ClassifyEntryParams): Promise<EntryOutcom
     return { isFile: target.isFile() }
   }
 
-  const real = await fs.realpath(full).catch(() => null)
+  const real = await fs.realpath(full).catch(() => {
+    return null
+  })
 
   if (!isNonEmptyString(real) || !isInside(rootReal, real)) {
     return { isFile: false }
@@ -250,7 +284,9 @@ async function toFileEntry(params: FileEntryParams): Promise<FolderFile | null> 
     return null
   }
 
-  const stats = await fs.stat(full).catch(() => null)
+  const stats = await fs.stat(full).catch(() => {
+    return null
+  })
 
   if (isNil(stats) || !stats.isFile()) {
     return null

@@ -11,7 +11,9 @@ import { Switch } from '@/ui/form/Switch'
 
 const NATIVE_LABELS: Dict<string> = { darwin: 'Finder', win32: 'Explorer' }
 
-const nativeLabel = (platform: string): string => NATIVE_LABELS[platform] ?? 'Files'
+const nativeLabel = (platform: string): string => {
+  return NATIVE_LABELS[platform] ?? 'Files'
+}
 
 interface AddFolderFooterProps {
   data: BrowseResult | null

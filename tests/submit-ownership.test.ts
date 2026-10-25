@@ -2,12 +2,18 @@ import { beforeAll, describe, expect, it, vi } from 'vitest'
 
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 
-const { owned } = vi.hoisted(() => ({ owned: new Set<string>() }))
+const { owned } = vi.hoisted(() => {
+  return { owned: new Set<string>() }
+})
 
-vi.mock('@/server/jobs/submit-queue', () => ({
-  isSubmitOwned: (id: string) => owned.has(id),
-  resumeGraceSubmits: vi.fn(),
-}))
+vi.mock('@/server/jobs/submit-queue', () => {
+  return {
+    isSubmitOwned: (id: string) => {
+      return owned.has(id)
+    },
+    resumeGraceSubmits: vi.fn(),
+  }
+})
 
 let needsInterruptFail: (record: GenerationRecord) => boolean
 

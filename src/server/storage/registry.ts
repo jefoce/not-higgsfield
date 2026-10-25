@@ -10,9 +10,11 @@ import { r2Config } from './r2'
 import { createS3Store } from './s3-store'
 import type { ObjectStore } from './types'
 
-const cache = globalState('objectStore', () => ({
-  value: undefined as ObjectStore | null | undefined,
-}))
+const cache = globalState('objectStore', () => {
+  return {
+    value: undefined as ObjectStore | null | undefined,
+  }
+})
 
 /** Mock wins only in mock provider mode, then complete R2 config, else null. */
 export function getObjectStore(): ObjectStore | null {

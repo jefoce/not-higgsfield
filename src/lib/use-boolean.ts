@@ -14,11 +14,21 @@ export interface BooleanState {
 export function useBoolean(isInitiallyOn = false): BooleanState {
   const [isOn, setIsOn] = useState(isInitiallyOn)
 
-  const on = useCallback(() => setIsOn(true), [])
+  const on = useCallback(() => {
+    return setIsOn(true)
+  }, [])
 
-  const off = useCallback(() => setIsOn(false), [])
+  const off = useCallback(() => {
+    return setIsOn(false)
+  }, [])
 
-  const toggle = useCallback(() => setIsOn((isCurrent) => !isCurrent), [])
+  const toggle = useCallback(() => {
+    return setIsOn((isCurrent) => {
+      return !isCurrent
+    })
+  }, [])
 
-  return useMemo(() => ({ value: isOn, set: setIsOn, on, off, toggle }), [isOn, off, on, toggle])
+  return useMemo(() => {
+    return { value: isOn, set: setIsOn, on, off, toggle }
+  }, [isOn, off, on, toggle])
 }

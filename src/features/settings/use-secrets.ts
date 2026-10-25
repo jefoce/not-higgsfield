@@ -40,7 +40,13 @@ export function useSecrets() {
     },
   })
 
-  return { status: data, isLoading, refresh: () => refresh() }
+  return {
+    status: data,
+    isLoading,
+    refresh: () => {
+      return refresh()
+    },
+  }
 }
 
 /** OS label for the keychain backend. */

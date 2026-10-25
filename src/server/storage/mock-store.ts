@@ -25,7 +25,9 @@ const MockMetaSchema = z.object({
 
 type MockMeta = z.infer<typeof MockMetaSchema>
 
-const SECRET = globalState('mockRemoteSecret', () => randomBytes(32))
+const SECRET = globalState('mockRemoteSecret', () => {
+  return randomBytes(32)
+})
 
 export function createMockStore(): ObjectStore {
   const mode = process.env.REMOTE_MOCK?.trim() === 'fail' ? 'fail' : 'ok'

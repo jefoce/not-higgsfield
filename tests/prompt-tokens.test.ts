@@ -17,15 +17,21 @@ import {
 } from '@/core/prompt-tokens'
 import type { Dict } from '@/core/utility-types'
 
-const counts = (image = 0, video = 0, audio = 0): Record<MediaKind, number> => ({
-  image,
-  video,
-  audio,
-})
+const counts = (image = 0, video = 0, audio = 0): Record<MediaKind, number> => {
+  return {
+    image,
+    video,
+    audio,
+  }
+}
 
-const text = (value: string): PromptPart => ({ type: 'text', text: value })
+const text = (value: string): PromptPart => {
+  return { type: 'text', text: value }
+}
 
-const slot = (kind: MediaKind, n: number): PromptPart => ({ type: 'slot', slot: { kind, n } })
+const slot = (kind: MediaKind, n: number): PromptPart => {
+  return { type: 'slot', slot: { kind, n } }
+}
 
 describe('slot labels', () => {
   it('formats labels and stored tokens', () => {
@@ -140,7 +146,9 @@ describe('canonicalizePrompt', () => {
 describe('referenceSlots', () => {
   const kinds: Dict<MediaKind> = { i1: 'image', i2: 'image', v1: 'video', a1: 'audio' }
 
-  const kindOf = (id: string): MediaKind | undefined => kinds[id]
+  const kindOf = (id: string): MediaKind | undefined => {
+    return kinds[id]
+  }
 
   it('numbers slots per kind in reference order', () => {
     const result = referenceSlots(['i1', 'v1', 'i2', 'a1'], kindOf)

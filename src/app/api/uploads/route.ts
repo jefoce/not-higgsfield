@@ -13,7 +13,9 @@ export async function GET(request: Request) {
 
     const ids = (query.get('ids') ?? '')
       .split(',')
-      .map((part) => part.trim())
+      .map((part) => {
+        return part.trim()
+      })
       .filter(Boolean)
 
     const items = await listUploads({ kinds: parseKinds(query.get('kind')), ids })
@@ -27,13 +29,18 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     assertLocalRequest(request)
-    const form = await request.formData().catch(() => null)
+
+    const form = await request.formData().catch(() => {
+      return null
+    })
 
     if (!form) {
       return jsonError({ status: 400, error: 'Invalid form data' })
     }
 
-    const files = form.getAll('file').filter((value): value is File => value instanceof File)
+    const files = form.getAll('file').filter((value): value is File => {
+      return value instanceof File
+    })
 
     if (files.length === 0) {
       return jsonError({ status: 400, error: 'No files provided' })

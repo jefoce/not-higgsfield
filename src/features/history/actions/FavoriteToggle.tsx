@@ -6,8 +6,13 @@ import { useHistoryViewStore } from '../list/view-store'
 
 /** Favorites-only switch row. */
 export function FavoriteToggle() {
-  const filters = useHistoryViewStore((state) => state.filters)
-  const setFilters = useHistoryViewStore((state) => state.setFilters)
+  const filters = useHistoryViewStore((state) => {
+    return state.filters
+  })
+
+  const setFilters = useHistoryViewStore((state) => {
+    return state.setFilters
+  })
 
   const handleToggle = () => {
     if (filters.favorite === true) {

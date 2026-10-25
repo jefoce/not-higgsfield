@@ -14,7 +14,9 @@ import type {
   PutObjectParams,
 } from '@/server/storage/types'
 
-vi.mock('server-only', () => ({}))
+vi.mock('server-only', () => {
+  return {}
+})
 
 const ROOT = path.join(process.cwd(), '.cache', `remote-inputs-test-${process.pid}`)
 const PREVIOUS_ROOT = process.env.STORAGE_ROOT

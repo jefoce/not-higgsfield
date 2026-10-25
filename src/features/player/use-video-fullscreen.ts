@@ -19,11 +19,15 @@ export function useVideoFullscreen(
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   useEffect(() => {
-    const onChange = () => setIsFullscreen(document.fullscreenElement === rootRef.current)
+    const onChange = () => {
+      return setIsFullscreen(document.fullscreenElement === rootRef.current)
+    }
 
     document.addEventListener('fullscreenchange', onChange)
 
-    return () => document.removeEventListener('fullscreenchange', onChange)
+    return () => {
+      return document.removeEventListener('fullscreenchange', onChange)
+    }
   }, [rootRef])
 
   const toggleFullscreen = () => {

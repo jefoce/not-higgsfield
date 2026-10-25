@@ -374,6 +374,7 @@ export default defineConfig([
     plugins: { local: localPlugin },
     rules: {
       'local/padding-around-functions': 'error',
+      'arrow-body-style': ['error', 'always'],
       curly: ['error', 'all'],
       '@stylistic/padding-line-between-statements': [
         'error',

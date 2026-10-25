@@ -88,78 +88,112 @@ export const createGeneratorState: StateCreator<
   GeneratorState,
   [['zustand/persist', unknown]],
   []
-> = (set, get) => ({
-  ...defaults(),
-  uploadsById: {},
-  activeCount: 0,
-  setActiveCount: (activeCount) => set({ activeCount }),
-  setPreset: (id) =>
-    set((state) => {
-      const preset = findPreset(id)
+> = (set, get) => {
+  return {
+    ...defaults(),
+    uploadsById: {},
+    activeCount: 0,
+    setActiveCount: (activeCount) => {
+      return set({ activeCount })
+    },
+    setPreset: (id) => {
+      return set((state) => {
+        const preset = findPreset(id)
 
-      if (!preset) {
-        return {}
-      }
+        if (!preset) {
+          return {}
+        }
 
-      return normalizedDraft({ state, preset })
-    }),
-  setTab: (tab) => set((state) => nextTabState({ state, preset: getPreset(state.presetId), tab })),
-  setPrompt: (text) => set((state) => ({ prompts: { ...state.prompts, [state.tab]: text } })),
-  setAudio: (isAudio) => set({ audio: isAudio }),
-  setDuration: (duration) =>
-    set((state) => {
-      const preset = getPreset(state.presetId)
+        return normalizedDraft({ state, preset })
+      })
+    },
+    setTab: (tab) => {
+      return set((state) => {
+        return nextTabState({ state, preset: getPreset(state.presetId), tab })
+      })
+    },
+    setPrompt: (text) => {
+      return set((state) => {
+        return { prompts: { ...state.prompts, [state.tab]: text } }
+      })
+    },
+    setAudio: (isAudio) => {
+      return set({ audio: isAudio })
+    },
+    setDuration: (duration) => {
+      return set((state) => {
+        const preset = getPreset(state.presetId)
 
-      const limit = maxDurationFor({
-        input: inputFromState(state),
-        uploads: state.uploadsById,
-        preset,
+        const limit = maxDurationFor({
+          input: inputFromState(state),
+          uploads: state.uploadsById,
+          preset,
+        })
+
+        return { duration: clampDuration({ value: duration, preset, limit }) }
+      })
+    },
+    setAspectRatio: (aspectRatio) => {
+      return set((state) => {
+        if (aspectRatio !== 'auto') {
+          return { aspectRatio }
+        }
+
+        const preset = getPreset(state.presetId)
+
+        const isAllowed =
+          state.tab === 'frames' && Boolean(state.frames.start) && preset.autoAspectWithFrames
+
+        const nextAspectRatio = isAllowed ? aspectRatio : preset.defaultAspectRatio
+
+        return { aspectRatio: nextAspectRatio }
+      })
+    },
+    setResolution: (resolution) => {
+      return set((state) => {
+        return normalizedDraft({
+          state,
+          preset: getPreset(state.presetId),
+          overrides: { resolution },
+        })
+      })
+    },
+    ...createFrameActions(set),
+    ...createReferenceActions(set),
+    insertMention: (slot) => {
+      return mentionInserter?.(slot)
+    },
+    focusSlot: (slot, occurrence) => {
+      return slotFocuser?.(slot, occurrence)
+    },
+    setSeed: (seed) => {
+      return set({ seed: clampSeed(seed) })
+    },
+    toggleSeedLock: () => {
+      return set((state) => {
+        if (isNil(state.seed)) {
+          return { seed: randomSeed() }
+        }
+
+        return { seed: null }
+      })
+    },
+    ...createLoadActions(set, get),
+    reset: () => {
+      return set({ ...defaults() })
+    },
+    registerMentionInserter: (fn) => {
+      mentionInserter = fn
+    },
+    registerSlotFocuser: (fn) => {
+      slotFocuser = fn
+    },
+    upsertUploads: (uploads) => {
+      set((state) => {
+        return { uploadsById: { ...state.uploadsById, ...keyBy(uploads, 'id') } }
       })
 
-      return { duration: clampDuration({ value: duration, preset, limit }) }
-    }),
-  setAspectRatio: (aspectRatio) =>
-    set((state) => {
-      if (aspectRatio !== 'auto') {
-        return { aspectRatio }
-      }
-
-      const preset = getPreset(state.presetId)
-
-      const isAllowed =
-        state.tab === 'frames' && Boolean(state.frames.start) && preset.autoAspectWithFrames
-
-      const nextAspectRatio = isAllowed ? aspectRatio : preset.defaultAspectRatio
-
-      return { aspectRatio: nextAspectRatio }
-    }),
-  setResolution: (resolution) =>
-    set((state) =>
-      normalizedDraft({ state, preset: getPreset(state.presetId), overrides: { resolution } }),
-    ),
-  ...createFrameActions(set),
-  ...createReferenceActions(set),
-  insertMention: (slot) => mentionInserter?.(slot),
-  focusSlot: (slot, occurrence) => slotFocuser?.(slot, occurrence),
-  setSeed: (seed) => set({ seed: clampSeed(seed) }),
-  toggleSeedLock: () =>
-    set((state) => {
-      if (isNil(state.seed)) {
-        return { seed: randomSeed() }
-      }
-
-      return { seed: null }
-    }),
-  ...createLoadActions(set, get),
-  reset: () => set({ ...defaults() }),
-  registerMentionInserter: (fn) => {
-    mentionInserter = fn
-  },
-  registerSlotFocuser: (fn) => {
-    slotFocuser = fn
-  },
-  upsertUploads: (uploads) => {
-    set((state) => ({ uploadsById: { ...state.uploadsById, ...keyBy(uploads, 'id') } }))
-    get().normalizeLoaded()
-  },
-})
+      get().normalizeLoaded()
+    },
+  }
+}

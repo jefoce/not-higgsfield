@@ -33,8 +33,12 @@ export function useAddFolderBrowse(isOpen: boolean): AddFolderBrowse {
     let isAlive = true
 
     browseDirs(path ?? undefined, isHidden)
-      .then((result) => isAlive && setData(result))
-      .catch((error) => isAlive && toastError(error))
+      .then((result) => {
+        return isAlive && setData(result)
+      })
+      .catch((error) => {
+        return isAlive && toastError(error)
+      })
 
     return () => {
       isAlive = false
@@ -44,12 +48,19 @@ export function useAddFolderBrowse(isOpen: boolean): AddFolderBrowse {
   const navigate = useCallback((next: string) => {
     setData(null)
     setPath(next)
-    setReload((value) => value + 1)
+
+    setReload((value) => {
+      return value + 1
+    })
   }, [])
 
-  const navigateRoot = useCallback(() => navigate('/'), [navigate])
+  const navigateRoot = useCallback(() => {
+    return navigate('/')
+  }, [navigate])
 
-  const navigateParent = useCallback(() => navigate(data?.parent ?? '/'), [data?.parent, navigate])
+  const navigateParent = useCallback(() => {
+    return navigate(data?.parent ?? '/')
+  }, [data?.parent, navigate])
 
   const reset = useCallback(() => {
     setPath(null)

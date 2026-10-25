@@ -51,8 +51,9 @@ export function UploadTile(props: UploadTileProps) {
 
     setProgress(0)
 
-    const handleProgress = (sent: number, total: number) =>
-      setProgress(progressPercent(sent, total))
+    const handleProgress = (sent: number, total: number) => {
+      return setProgress(progressPercent(sent, total))
+    }
 
     try {
       const items = await uploadFilesWithProgress({ files, onProgress: handleProgress })
@@ -65,15 +66,25 @@ export function UploadTile(props: UploadTileProps) {
     }
   }
 
-  const handleOpenFile = () => inputRef.current?.click()
+  const handleOpenFile = () => {
+    return inputRef.current?.click()
+  }
 
-  const handleDragEnter = () => setIsOver(true)
+  const handleDragEnter = () => {
+    return setIsOver(true)
+  }
 
-  const handleDragOver = () => setIsOver(true)
+  const handleDragOver = () => {
+    return setIsOver(true)
+  }
 
-  const handleDragLeave = () => setIsOver(false)
+  const handleDragLeave = () => {
+    return setIsOver(false)
+  }
 
-  const handleDrop = () => setIsOver(false)
+  const handleDrop = () => {
+    return setIsOver(false)
+  }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? [])

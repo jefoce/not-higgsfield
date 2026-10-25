@@ -91,7 +91,9 @@ function focusSlotInEditor(params: FocusSlotParams): void {
       { duration: 900 },
     )
 
-    editor.update(() => $setSelection(null))
+    editor.update(() => {
+      return $setSelection(null)
+    })
   }
 
   editor.update(
@@ -157,25 +159,41 @@ export function PromptEditorBridge(props: PromptEditorBridgeProps) {
   const { prompt, onSubmit } = props
   const [editor] = useLexicalComposerContext()
   const { insertMention } = useBeautifulMentions()
-  const registerInserter = useGeneratorStore((state) => state.registerMentionInserter)
-  const registerFocuser = useGeneratorStore((state) => state.registerSlotFocuser)
 
-  const refsKey = useGeneratorStore((state) =>
-    [...referenceSlots(state.references, (id) => state.uploadsById[id]?.kind).slots]
-      .map(([id, slot]) => `${id}:${slot.kind}`)
-      .join(','),
-  )
+  const registerInserter = useGeneratorStore((state) => {
+    return state.registerMentionInserter
+  })
+
+  const registerFocuser = useGeneratorStore((state) => {
+    return state.registerSlotFocuser
+  })
+
+  const refsKey = useGeneratorStore((state) => {
+    return [
+      ...referenceSlots(state.references, (id) => {
+        return state.uploadsById[id]?.kind
+      }).slots,
+    ]
+      .map(([id, slot]) => {
+        return `${id}:${slot.kind}`
+      })
+      .join(',')
+  })
 
   useEffect(() => {
     if (serializeEditor(editor.getEditorState()) !== prompt) {
-      editor.update(() => buildEditor(prompt))
+      editor.update(() => {
+        return buildEditor(prompt)
+      })
     }
   }, [editor, prompt])
 
   useEffect(() => {
     const counts = slotCounts(useGeneratorStore.getState())
 
-    editor.update(() => $convertLiteralMentions(counts))
+    editor.update(() => {
+      return $convertLiteralMentions(counts)
+    })
   }, [editor, refsKey])
 
   useEffect(() => {
@@ -190,59 +208,63 @@ export function PromptEditorBridge(props: PromptEditorBridgeProps) {
       })
     })
 
-    return () => registerInserter(null)
+    return () => {
+      return registerInserter(null)
+    }
   }, [editor, insertMention, registerInserter])
 
   useEffect(() => {
-    registerFocuser((slot, occurrence) => focusSlotInEditor({ editor, slot, occurrence }))
+    registerFocuser((slot, occurrence) => {
+      return focusSlotInEditor({ editor, slot, occurrence })
+    })
 
-    return () => registerFocuser(null)
+    return () => {
+      return registerFocuser(null)
+    }
   }, [editor, registerFocuser])
 
-  useEffect(
-    () =>
-      editor.registerCommand(
-        KEY_ENTER_COMMAND,
-        (event) => {
-          if (event?.metaKey !== true && event?.ctrlKey !== true) {
-            return false
-          }
-
-          event.preventDefault()
-          onSubmit()
-
-          return true
-        },
-        COMMAND_PRIORITY_HIGH,
-      ),
-    [editor, onSubmit],
-  )
-
-  useEffect(
-    () =>
-      editor.registerCommand(
-        PASTE_COMMAND,
-        (event) => handlePaste(editor, event),
-        COMMAND_PRIORITY_HIGH,
-      ),
-    [editor],
-  )
-
-  useEffect(
-    () =>
-      editor.registerCommand(
-        BLUR_COMMAND,
-        () => {
-          const counts = slotCounts(useGeneratorStore.getState())
-
-          editor.update(() => $convertLiteralMentions(counts))
-
+  useEffect(() => {
+    return editor.registerCommand(
+      KEY_ENTER_COMMAND,
+      (event) => {
+        if (event?.metaKey !== true && event?.ctrlKey !== true) {
           return false
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-    [editor],
-  )
+        }
+
+        event.preventDefault()
+        onSubmit()
+
+        return true
+      },
+      COMMAND_PRIORITY_HIGH,
+    )
+  }, [editor, onSubmit])
+
+  useEffect(() => {
+    return editor.registerCommand(
+      PASTE_COMMAND,
+      (event) => {
+        return handlePaste(editor, event)
+      },
+      COMMAND_PRIORITY_HIGH,
+    )
+  }, [editor])
+
+  useEffect(() => {
+    return editor.registerCommand(
+      BLUR_COMMAND,
+      () => {
+        const counts = slotCounts(useGeneratorStore.getState())
+
+        editor.update(() => {
+          return $convertLiteralMentions(counts)
+        })
+
+        return false
+      },
+      COMMAND_PRIORITY_LOW,
+    )
+  }, [editor])
 
   return null
 }

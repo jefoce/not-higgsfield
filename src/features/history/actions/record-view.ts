@@ -31,8 +31,9 @@ export function recordError(record: GenerationRecord): FriendlyError | null {
   })
 }
 
-const hasPx = (value: number | undefined): boolean =>
-  !isNil(value) && value !== 0 && !Number.isNaN(value)
+const hasPx = (value: number | undefined): boolean => {
+  return !isNil(value) && value !== 0 && !Number.isNaN(value)
+}
 
 const sizedAspect = (width: number | undefined, height: number | undefined): string | undefined => {
   if (!hasPx(width) || !hasPx(height)) {
@@ -65,12 +66,17 @@ export function recordAspect(record: GenerationRecord): string {
   return aspect.replace(':', '/')
 }
 
-export const videoSrc = (record: GenerationRecord): string =>
-  downloadMediaUrl(record.output?.video ?? `${record.id}.mp4`)
+export const videoSrc = (record: GenerationRecord): string => {
+  return downloadMediaUrl(record.output?.video ?? `${record.id}.mp4`)
+}
 
 /** Rounds up to the next poster bucket. */
 function posterWidth(widthPx: number): number {
-  return POSTER_WIDTHS.find((width) => width >= widthPx) ?? Math.max(...POSTER_WIDTHS)
+  return (
+    POSTER_WIDTHS.find((width) => {
+      return width >= widthPx
+    }) ?? Math.max(...POSTER_WIDTHS)
+  )
 }
 
 /** Poster thumb rounded up to a fixed bucket, defaults to the preview width. */
@@ -93,7 +99,9 @@ export function posterForWidth(record: GenerationRecord, mediaWidth: number): st
   return posterSrc(record, width)
 }
 
-export const uploadThumb = (id: string, width = 160): string => uploadThumbUrl(id, width)
+export const uploadThumb = (id: string, width = 160): string => {
+  return uploadThumbUrl(id, width)
+}
 
 interface RecordSlots {
   counts: MediaKindCounts
@@ -102,7 +110,9 @@ interface RecordSlots {
 
 /** Reference counts and slot positions from the record snapshot order. */
 export function recordSlots(record: GenerationRecord): RecordSlots {
-  return referenceSlots(record.input.references, (id) => record.inputsSnapshot[id]?.kind)
+  return referenceSlots(record.input.references, (id) => {
+    return record.inputsSnapshot[id]?.kind
+  })
 }
 
 /** Reference counts by kind for a record prompt. */

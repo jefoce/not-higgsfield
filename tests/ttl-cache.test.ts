@@ -6,14 +6,18 @@ import { createTtlCache } from '@/server/sync/ttl-cache'
 const useClock = (start: number) => {
   let now = start
 
-  vi.spyOn(Date, 'now').mockImplementation(() => now)
+  vi.spyOn(Date, 'now').mockImplementation(() => {
+    return now
+  })
 
   return (elapsedMs: number) => {
     now += elapsedMs
   }
 }
 
-const value = (next: number, isOk = true): TtlLoadResult<number> => ({ value: next, isOk })
+const value = (next: number, isOk = true): TtlLoadResult<number> => {
+  return { value: next, isOk }
+}
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -24,7 +28,10 @@ describe('createTtlCache', () => {
     useClock(1_000)
 
     const cache = createTtlCache<number>({ key: 'test-fresh', okTtlMs: 100, failTtlMs: 10 })
-    const load = vi.fn(async () => value(1))
+
+    const load = vi.fn(async () => {
+      return value(1)
+    })
 
     expect(await cache.get('a', load)).toBe(1)
     expect(await cache.get('a', load)).toBe(1)
@@ -49,7 +56,10 @@ describe('createTtlCache', () => {
     const advance = useClock(1_000)
 
     const cache = createTtlCache<number>({ key: 'test-fail', okTtlMs: 100, failTtlMs: 10 })
-    const load = vi.fn(async () => value(0, false))
+
+    const load = vi.fn(async () => {
+      return value(0, false)
+    })
 
     expect(await cache.get('a', load)).toBe(0)
 

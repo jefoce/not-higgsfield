@@ -114,16 +114,20 @@ function getDraftFlags(params: DraftFlagsParams): DraftFlags {
   const changed = Object.keys(edits) as SecretName[]
   const isDirty = !isEmpty(changed)
 
-  const isAllValid = changed.every(
-    (name) => isNull(edits[name]) || isNull(secretError(name, edits[name] ?? '')),
-  )
+  const isAllValid = changed.every((name) => {
+    return isNull(edits[name]) || isNull(secretError(name, edits[name] ?? ''))
+  })
 
   const sectionReady = Object.fromEntries(
-    [...VIDEO_PROVIDERS, ...STORAGE_PROVIDERS].map((descriptor) => [
-      descriptor.id,
-      isMock === true ||
-        descriptor.requiredSecrets.every((name) => status?.keys[name].set === true),
-    ]),
+    [...VIDEO_PROVIDERS, ...STORAGE_PROVIDERS].map((descriptor) => {
+      return [
+        descriptor.id,
+        isMock === true ||
+          descriptor.requiredSecrets.every((name) => {
+            return status?.keys[name].set === true
+          }),
+      ]
+    }),
   ) as Record<SettingsSection, boolean>
 
   const storageValid = Object.fromEntries(
@@ -176,7 +180,9 @@ export function useSettingsDraft(params: UseSettingsDraftParams): SettingsDraft 
   })
 
   const onFieldChange = (name: SecretName, change: SecretChange) => {
-    setEdits((current) => applyChange({ current, name, change }))
+    setEdits((current) => {
+      return applyChange({ current, name, change })
+    })
   }
 
   const onClose = async (shouldOpen: boolean) => {

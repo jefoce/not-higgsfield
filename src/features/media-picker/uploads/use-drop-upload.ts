@@ -72,8 +72,12 @@ function uploadDropped(params: UploadDroppedParams): void {
   }
 
   void uploadFiles(accepted)
-    .then((items) => onUploaded.current(items))
-    .catch((error) => toastError(error))
+    .then((items) => {
+      return onUploaded.current(items)
+    })
+    .catch((error) => {
+      return toastError(error)
+    })
 }
 
 interface UseDropUpload {
@@ -104,10 +108,16 @@ export function useDropUpload(params: DropUploadParams): UseDropUpload {
     }
 
     return registerDropZone(id, {
-      kinds: () => kindsRef.current,
-      extensions: () => extensionsRef.current,
+      kinds: () => {
+        return kindsRef.current
+      },
+      extensions: () => {
+        return extensionsRef.current
+      },
       onHover: setIsDragging,
-      onUploaded: (items) => callback.current(items),
+      onUploaded: (items) => {
+        return callback.current(items)
+      },
     })
   }, [id, isEnabled])
 

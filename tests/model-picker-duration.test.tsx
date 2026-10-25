@@ -12,9 +12,13 @@ import { Price } from '@/ui/Price'
 
 import { required } from './helpers/required'
 
-vi.mock('@/lib/api/models', () => ({
-  useModelEntry: vi.fn(() => null),
-}))
+vi.mock('@/lib/api/models', () => {
+  return {
+    useModelEntry: vi.fn(() => {
+      return null
+    }),
+  }
+})
 
 const mockUseModelEntry = vi.mocked(useModelEntry)
 
@@ -60,11 +64,13 @@ beforeEach(() => {
   useGeneratorStore.setState({ presetId: 'wan-3.0' })
   vi.stubGlobal('ResizeObserver', Observer)
 
-  vi.stubGlobal('matchMedia', () => ({
-    matches: false,
-    addEventListener: () => {},
-    removeEventListener: () => {},
-  }))
+  vi.stubGlobal('matchMedia', () => {
+    return {
+      matches: false,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }
+  })
 })
 
 afterEach(() => {

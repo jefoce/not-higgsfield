@@ -43,9 +43,13 @@ export function DeleteConfirm(props: DeleteConfirmProps) {
 
   const { isRunning: isDeleting, run: runDelete } = useAsyncAction(deleteRecord)
 
-  const handleDelete = () => void runDelete()
+  const handleDelete = () => {
+    return void runDelete()
+  }
 
-  const handleCancel = () => props.onOpenChange(false)
+  const handleCancel = () => {
+    return props.onOpenChange(false)
+  }
 
   return (
     <Modal open={isOpen} onOpenChange={props.onOpenChange} label="Delete video" className="w-100">

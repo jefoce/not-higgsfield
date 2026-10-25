@@ -22,7 +22,9 @@ import { inputFromState } from '../store/store-draft'
 
 function requestNotifications(): void {
   void getPlatform()
-    .then((platform) => platform.requestNotifications())
+    .then((platform) => {
+      return platform.requestNotifications()
+    })
     .catch(() => {})
 }
 
@@ -70,7 +72,12 @@ function showError(params: ShowErrorParams): void {
   }
 
   toast.error(title, {
-    action: { label: 'Open Settings', onClick: () => openSettings('openrouter') },
+    action: {
+      label: 'Open Settings',
+      onClick: () => {
+        return openSettings('openrouter')
+      },
+    },
   })
 }
 
@@ -99,7 +106,12 @@ export function useGenerate() {
         })
       } else {
         toast.success('Generation starts in 10s', {
-          action: { label: 'Undo', onClick: () => void cancelGeneration(record.id) },
+          action: {
+            label: 'Undo',
+            onClick: () => {
+              return void cancelGeneration(record.id)
+            },
+          },
         })
       }
 

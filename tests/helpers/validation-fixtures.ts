@@ -55,5 +55,9 @@ export function input(overrides: Partial<GenerationInput> = {}): GenerationInput
 }
 
 export function uploadsOf(...items: UploadItem[]): UploadsById {
-  return Object.fromEntries(items.map((item) => [item.id, item]))
+  return Object.fromEntries(
+    items.map((item) => {
+      return [item.id, item]
+    }),
+  )
 }

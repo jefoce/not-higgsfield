@@ -18,7 +18,13 @@ beforeEach(() => {
   vi.useFakeTimers()
   vi.setSystemTime(new Date('2026-01-01T00:00:00Z'))
   isHidden = false
-  Object.defineProperty(document, 'hidden', { configurable: true, get: () => isHidden })
+
+  Object.defineProperty(document, 'hidden', {
+    configurable: true,
+    get: () => {
+      return isHidden
+    },
+  })
 })
 
 afterEach(() => {
@@ -30,8 +36,15 @@ afterEach(() => {
 describe('useNow', () => {
   it('shares one interval between subscribers', () => {
     const interval = vi.spyOn(globalThis, 'setInterval')
-    const first = renderHook(() => useNow(true))
-    const second = renderHook(() => useNow(true))
+
+    const first = renderHook(() => {
+      return useNow(true)
+    })
+
+    const second = renderHook(() => {
+      return useNow(true)
+    })
+
     const start = first.result.current
 
     expect(interval).toHaveBeenCalledTimes(1)
@@ -46,7 +59,11 @@ describe('useNow', () => {
 
   it('does not subscribe while inactive', () => {
     const interval = vi.spyOn(globalThis, 'setInterval')
-    const { result } = renderHook(() => useNow(false))
+
+    const { result } = renderHook(() => {
+      return useNow(false)
+    })
+
     const start = result.current
 
     act(() => {
@@ -60,8 +77,14 @@ describe('useNow', () => {
   it('stops the interval after the last subscriber leaves', () => {
     const interval = vi.spyOn(globalThis, 'setInterval')
     const clear = vi.spyOn(globalThis, 'clearInterval')
-    const first = renderHook(() => useNow(true))
-    const second = renderHook(() => useNow(true))
+
+    const first = renderHook(() => {
+      return useNow(true)
+    })
+
+    const second = renderHook(() => {
+      return useNow(true)
+    })
 
     expect(interval).toHaveBeenCalledTimes(1)
 
@@ -73,7 +96,10 @@ describe('useNow', () => {
   })
 
   it('pauses while the page is hidden and refreshes when visible', () => {
-    const { result } = renderHook(() => useNow(true))
+    const { result } = renderHook(() => {
+      return useNow(true)
+    })
+
     const start = result.current
 
     setHidden(true)

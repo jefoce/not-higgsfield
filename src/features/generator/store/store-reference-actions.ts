@@ -19,8 +19,8 @@ type ReferenceActions = Pick<
 /** Reference add, replace and remove actions, kept out of the store creator. */
 export function createReferenceActions(set: SetState): ReferenceActions {
   return {
-    addReferences: (items) =>
-      set((state) => {
+    addReferences: (items) => {
+      return set((state) => {
         const preset = getPreset(state.presetId)
         const uploadsById = { ...state.uploadsById }
         const references = [...state.references]
@@ -48,9 +48,10 @@ export function createReferenceActions(set: SetState): ReferenceActions {
         })
 
         return { references, uploadsById, duration }
-      }),
-    replaceReference: (id, upload) =>
-      set((state) => {
+      })
+    },
+    replaceReference: (id, upload) => {
+      return set((state) => {
         const uploadsById = { ...state.uploadsById, [upload.id]: upload }
         const index = state.references.indexOf(id)
 
@@ -76,10 +77,14 @@ export function createReferenceActions(set: SetState): ReferenceActions {
         })
 
         return { references, uploadsById, duration }
-      }),
-    removeReference: (id) =>
-      set((state) => {
-        const references = state.references.filter((ref) => ref !== id)
+      })
+    },
+    removeReference: (id) => {
+      return set((state) => {
+        const references = state.references.filter((ref) => {
+          return ref !== id
+        })
+
         const preset = getPreset(state.presetId)
 
         const duration = clampReferenceDuration({
@@ -89,6 +94,7 @@ export function createReferenceActions(set: SetState): ReferenceActions {
         })
 
         return { references, duration }
-      }),
+      })
+    },
   }
 }

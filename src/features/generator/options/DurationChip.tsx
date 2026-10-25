@@ -37,7 +37,9 @@ export function DurationChip(props: DurationChipProps) {
   const { value, duration, limit, limitText } = props
   const isOverLimit = value > limit
 
-  const handleSelect = (): void => props.onSelect(value)
+  const handleSelect = (): void => {
+    return props.onSelect(value)
+  }
 
   const tooltip = isOverLimit ? limitText : null
 

@@ -20,7 +20,9 @@ function routeFiles(dir: string): string[] {
 const NO_SESSION_ALLOWED = ['health/route.ts', 'session/route.ts', 'dev/remote/']
 
 function isAllowed(rel: string): boolean {
-  return NO_SESSION_ALLOWED.some((allowed) => rel === allowed || rel.startsWith(allowed))
+  return NO_SESSION_ALLOWED.some((allowed) => {
+    return rel === allowed || rel.startsWith(allowed)
+  })
 }
 
 describe('route guards', () => {
@@ -29,18 +31,24 @@ describe('route guards', () => {
 
     expect(files.length).toBeGreaterThan(0)
 
-    const unguarded = files.filter(
-      (file) => !readFileSync(file, 'utf8').includes('assertLocalRequest('),
-    )
+    const unguarded = files.filter((file) => {
+      return !readFileSync(file, 'utf8').includes('assertLocalRequest(')
+    })
 
     expect(unguarded).toEqual([])
   })
 
   it('only health, session and dev/remote skip the session check', () => {
     const offenders = routeFiles(API_DIR)
-      .filter((file) => readFileSync(file, 'utf8').includes('session: false'))
-      .map((file) => path.relative(API_DIR, file).split(path.sep).join('/'))
-      .filter((rel) => !isAllowed(rel))
+      .filter((file) => {
+        return readFileSync(file, 'utf8').includes('session: false')
+      })
+      .map((file) => {
+        return path.relative(API_DIR, file).split(path.sep).join('/')
+      })
+      .filter((rel) => {
+        return !isAllowed(rel)
+      })
 
     expect(offenders).toEqual([])
   })

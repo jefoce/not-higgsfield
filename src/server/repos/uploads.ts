@@ -86,11 +86,15 @@ export async function listUploads(params: ListUploadsParams = {}): Promise<Uploa
   let records = await listUploadRecords()
 
   if (!isNil(kinds) && kinds.length > 0) {
-    records = filter(records, (record) => kinds.includes(record.kind))
+    records = filter(records, (record) => {
+      return kinds.includes(record.kind)
+    })
   }
 
   if (!isNil(ids) && ids.length > 0) {
-    records = filter(records, (record) => ids.includes(record.id))
+    records = filter(records, (record) => {
+      return ids.includes(record.id)
+    })
   }
 
   const sorted = orderBy(records, ['createdAt'], ['desc'])
@@ -120,8 +124,12 @@ export async function deleteUploadFiles(params: DeleteUploadFilesParams): Promis
 
 async function pathExists(file: string): Promise<boolean> {
   return fs.stat(file).then(
-    () => true,
-    () => false,
+    () => {
+      return true
+    },
+    () => {
+      return false
+    },
   )
 }
 

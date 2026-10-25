@@ -19,8 +19,12 @@ export async function POST(request: Request, { params }: IdRouteContext) {
     const video = downloadPaths(record.id).video
 
     const hasVideo = await fs.stat(video).then(
-      (stats) => stats.isFile(),
-      () => false,
+      (stats) => {
+        return stats.isFile()
+      },
+      () => {
+        return false
+      },
     )
 
     if (!hasVideo) {

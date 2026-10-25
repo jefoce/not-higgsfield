@@ -28,8 +28,12 @@ function memoryBackend(values: Partial<Record<SecretName, string>> = {}): Backen
   return {
     kind: 'file',
     store,
-    getAll: async () => Object.fromEntries(store),
-    get: async (name) => store.get(name) ?? null,
+    getAll: async () => {
+      return Object.fromEntries(store)
+    },
+    get: async (name) => {
+      return store.get(name) ?? null
+    },
     set: async (name, value) => {
       store.set(name, value)
     },

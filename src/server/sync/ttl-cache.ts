@@ -28,8 +28,14 @@ interface TtlCacheEntry<T> {
 /** Caches loaded values by id, with a shorter window for failed loads. */
 export function createTtlCache<T>(options: TtlCacheOptions): TtlCache<T> {
   const { key, okTtlMs, failTtlMs } = options
-  const entries = globalState<Map<string, TtlCacheEntry<T>>>(key, () => new Map())
-  const pending = globalState<Map<string, Promise<T>>>(`${key}:pending`, () => new Map())
+
+  const entries = globalState<Map<string, TtlCacheEntry<T>>>(key, () => {
+    return new Map()
+  })
+
+  const pending = globalState<Map<string, Promise<T>>>(`${key}:pending`, () => {
+    return new Map()
+  })
 
   // eslint-disable-next-line @typescript-eslint/max-params -- fixed TtlCache signature
   async function get(

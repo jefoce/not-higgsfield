@@ -9,10 +9,17 @@ import { useHistoryViewStore } from './view-store'
 
 /** Six-step zoom for list height and grid tile width, persisted. */
 export function ZoomSlider() {
-  const zoom = useHistoryViewStore((state) => state.zoom)
-  const handleZoomChange = useHistoryViewStore((state) => state.setZoom)
+  const zoom = useHistoryViewStore((state) => {
+    return state.zoom
+  })
 
-  const handleReset = () => handleZoomChange(ZOOM_DEFAULT)
+  const handleZoomChange = useHistoryViewStore((state) => {
+    return state.setZoom
+  })
+
+  const handleReset = () => {
+    return handleZoomChange(ZOOM_DEFAULT)
+  }
 
   return (
     <div className="flex items-center gap-1.5">

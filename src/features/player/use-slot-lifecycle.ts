@@ -34,10 +34,16 @@ export function useSlotLifecycle(params: UseSlotLifecycleParams): void {
 
     observer.observe(node)
 
-    return () => observer.disconnect()
+    return () => {
+      return observer.disconnect()
+    }
   }, [id, release, rootRef])
 
-  useEffect(() => () => release(id), [id, release])
+  useEffect(() => {
+    return () => {
+      return release(id)
+    }
+  }, [id, release])
 
   // Selection mode turns the player off for unselected list rows.
   useEffect(() => {

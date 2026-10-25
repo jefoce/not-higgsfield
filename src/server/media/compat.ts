@@ -42,7 +42,9 @@ interface Gate {
   waiting: Array<() => void>
 }
 
-const gate = globalState<Gate>('compatQueue', () => ({ active: 0, waiting: [] }))
+const gate = globalState<Gate>('compatQueue', () => {
+  return { active: 0, waiting: [] }
+})
 
 /** Webview-safe H.264/AAC copy of a source, built once and reused until it goes stale. */
 interface GetCompatMediaParams {
@@ -53,7 +55,10 @@ interface GetCompatMediaParams {
 
 export async function getCompatMedia(params: GetCompatMediaParams): Promise<CompatMedia> {
   const { absPath, kind, ref } = params
-  const source = await fs.stat(absPath).catch(() => null)
+
+  const source = await fs.stat(absPath).catch(() => {
+    return null
+  })
 
   if (isNil(source) || !source.isFile()) {
     throw new Error(`Compat source missing: ${ref}`)
@@ -101,7 +106,11 @@ export async function getCompatMedia(params: GetCompatMediaParams): Promise<Comp
 /** Deletes files not read for 30 days, plus their failure markers. */
 export async function sweepCompatFiles(): Promise<number> {
   const cutoff = Date.now() - UNUSED_TTL_MS
-  const entries = await fs.readdir(COMPAT_DIR, { withFileTypes: true }).catch(() => [])
+
+  const entries = await fs.readdir(COMPAT_DIR, { withFileTypes: true }).catch(() => {
+    return []
+  })
+
   let removed = 0
 
   for (const entry of entries) {
@@ -110,7 +119,10 @@ export async function sweepCompatFiles(): Promise<number> {
     }
 
     const file = path.join(COMPAT_DIR, entry.name)
-    const stats = await fs.stat(file).catch(() => null)
+
+    const stats = await fs.stat(file).catch(() => {
+      return null
+    })
 
     if (!stats || stats.mtimeMs >= cutoff) {
       continue
@@ -147,7 +159,9 @@ async function convertOrMarkFailed(params: ConvertOrMarkFailedParams): Promise<v
 
 /** Skips conversion for 10 minutes while a matching failure marker exists. */
 async function assertNotFailed(failedPath: string, sourceMtimeMs: number): Promise<void> {
-  const failed = await fs.stat(failedPath).catch(() => null)
+  const failed = await fs.stat(failedPath).catch(() => {
+    return null
+  })
 
   if (isNil(failed) || !failed.isFile()) {
     return
@@ -165,7 +179,9 @@ async function assertNotFailed(failedPath: string, sourceMtimeMs: number): Promi
 }
 
 async function isFresh(filePath: string, sourceMtimeMs: number): Promise<boolean> {
-  const stats = await fs.stat(filePath).catch(() => null)
+  const stats = await fs.stat(filePath).catch(() => {
+    return null
+  })
 
   return !isNil(stats) && stats.isFile() && stats.mtimeMs >= sourceMtimeMs
 }
@@ -178,7 +194,9 @@ function touch(filePath: string): Promise<void> {
 /** Runs at most MAX_CONVERSIONS at once. Waiting slots are handed over. */
 async function acquire(): Promise<() => void> {
   if (gate.active >= MAX_CONVERSIONS) {
-    await new Promise<void>((resolve) => gate.waiting.push(resolve))
+    await new Promise<void>((resolve) => {
+      return gate.waiting.push(resolve)
+    })
   } else {
     gate.active += 1
   }

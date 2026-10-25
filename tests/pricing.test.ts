@@ -11,19 +11,23 @@ const prime = getPreset('wan-3.0-prime')
 const seedance = getPreset('seedance-2.0')
 const seedance25 = getPreset('seedance-2.5')
 
-const ctx = (resolution: Resolution, overrides: Partial<PriceContext> = {}): PriceContext => ({
-  resolution,
-  aspect: '16:9',
-  audio: true,
-  hasVideoInput: false,
-  ...overrides,
-})
+const ctx = (resolution: Resolution, overrides: Partial<PriceContext> = {}): PriceContext => {
+  return {
+    resolution,
+    aspect: '16:9',
+    audio: true,
+    hasVideoInput: false,
+    ...overrides,
+  }
+}
 
-const withPricing = (pricing: PricingRule, overrides: Partial<ModelPreset> = {}): ModelPreset => ({
-  ...wan,
-  ...overrides,
-  bindings: [{ ...primaryBinding(wan), pricing }],
-})
+const withPricing = (pricing: PricingRule, overrides: Partial<ModelPreset> = {}): ModelPreset => {
+  return {
+    ...wan,
+    ...overrides,
+    bindings: [{ ...primaryBinding(wan), pricing }],
+  }
+}
 
 describe('pricePerSec Wan', () => {
   it('reads Wan USD keys', () => {

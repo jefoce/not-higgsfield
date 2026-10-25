@@ -23,15 +23,17 @@ export function SegmentedTabs(props: SegmentedTabsProps) {
       className={cn('grid gap-0 rounded-xl bg-surface', className)}
       style={{ gridTemplateColumns: `repeat(${Math.max(options.length, 1)}, minmax(0, 1fr))` }}
     >
-      {options.map((option) => (
-        <SegmentedTab
-          key={option.value}
-          option={option}
-          isActive={option.value === value}
-          sizeClass={sizeClass}
-          onValueChange={props.onValueChange}
-        />
-      ))}
+      {options.map((option) => {
+        return (
+          <SegmentedTab
+            key={option.value}
+            option={option}
+            isActive={option.value === value}
+            sizeClass={sizeClass}
+            onValueChange={props.onValueChange}
+          />
+        )
+      })}
     </div>
   )
 }

@@ -48,8 +48,12 @@ function fromRate(preset: ModelPreset, skus?: Dict<number>): number | null {
   }
 
   const rates = preset.resolutions
-    .map((resolution) => pricePerSec({ preset, ctx: { ...ctx, resolution }, skus }))
-    .filter((rate): rate is number => !isNil(rate))
+    .map((resolution) => {
+      return pricePerSec({ preset, ctx: { ...ctx, resolution }, skus })
+    })
+    .filter((rate): rate is number => {
+      return !isNil(rate)
+    })
 
   if (rates.length > 0) {
     return Math.min(...rates)

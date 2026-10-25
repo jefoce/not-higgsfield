@@ -103,7 +103,10 @@ async function resolveFolder(rest: string[], ref: string): Promise<ResolvedMedia
 
   const [folderId, ...rel] = rest
   const folders = await readJson(FOLDERS_FILE, FoldersFileSchema)
-  const folder = folders?.find((item) => item.id === folderId)
+
+  const folder = folders?.find((item) => {
+    return item.id === folderId
+  })
 
   if (!folder) {
     throw new MediaRefError(404, `Folder not found: ${folderId}`)

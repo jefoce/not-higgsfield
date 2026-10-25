@@ -172,13 +172,14 @@ export function validateLimits(params: ValidateWithContextParams): RuleResult {
     }
   }
 
-  const isLowRes = attached.some(
-    (upload) =>
+  const isLowRes = attached.some((upload) => {
+    return (
       upload.kind === 'image' &&
       !isNil(upload.width) &&
       !isNil(upload.height) &&
-      Math.min(upload.width, upload.height) < LOW_RES_MIN_PX,
-  )
+      Math.min(upload.width, upload.height) < LOW_RES_MIN_PX
+    )
+  })
 
   if (isLowRes) {
     warnings.push({ type: 'text', text: 'Low resolution input, output may look soft' })
@@ -195,8 +196,12 @@ export function validateLimits(params: ValidateWithContextParams): RuleResult {
 function attachedMedia(input: GenerationInput, uploads: UploadsById): UploadItem[] {
   if (input.tab === 'references') {
     return input.references
-      .map((id) => uploads[id])
-      .filter((upload): upload is UploadItem => Boolean(upload))
+      .map((id) => {
+        return uploads[id]
+      })
+      .filter((upload): upload is UploadItem => {
+        return Boolean(upload)
+      })
   }
 
   const startId = input.frames.start
@@ -213,7 +218,9 @@ function attachedMedia(input: GenerationInput, uploads: UploadsById): UploadItem
     end = uploads[endId]
   }
 
-  return [start, end].filter((upload): upload is UploadItem => Boolean(upload))
+  return [start, end].filter((upload): upload is UploadItem => {
+    return Boolean(upload)
+  })
 }
 
 function checkUpload(params: CheckUploadParams): UploadItem | null {

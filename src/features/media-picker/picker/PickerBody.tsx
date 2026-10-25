@@ -57,7 +57,9 @@ export function PickerBody(props: PickerBodyProps) {
     addFolderDialog.set(isOpen)
   }
 
-  const handleSelectUpload = (item: UploadItem) => commit([item])
+  const handleSelectUpload = (item: UploadItem) => {
+    return commit([item])
+  }
 
   const activeFolder = foldersState.activeFolder
   const isFolderTab = !isNil(activeFolder) && activeTab !== 'uploads'
@@ -70,7 +72,11 @@ export function PickerBody(props: PickerBodyProps) {
     onConfirmUploads: confirm,
   })
 
-  useEffect(() => () => pauseAudio(), [])
+  useEffect(() => {
+    return () => {
+      return pauseAudio()
+    }
+  }, [])
 
   const selectedCount = isFolderTab ? selectedFolderRels.length : selection.selected.length
 

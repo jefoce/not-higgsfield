@@ -6,7 +6,9 @@ import { canPlay } from '@/lib/media-support'
 
 import { withQuery } from './query'
 
-const encodeRef = (ref: string): string => ref.split('/').map(encodeURIComponent).join('/')
+const encodeRef = (ref: string): string => {
+  return ref.split('/').map(encodeURIComponent).join('/')
+}
 
 interface ThumbUrlParams {
   ref: string

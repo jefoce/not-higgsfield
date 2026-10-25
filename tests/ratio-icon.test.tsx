@@ -9,21 +9,27 @@ import { useGeneratorStore } from '@/features/generator/store/store'
 import { DetailsPanel } from '@/features/history/details/DetailsPanel'
 import { RatioIcon } from '@/ui/RatioIcon'
 
-vi.mock('@/lib/fetcher', () => ({
-  apiPost: vi.fn(),
-  apiPatch: vi.fn(),
-  apiDelete: vi.fn(),
-  fetcher: vi.fn(),
-  ApiError: class ApiError extends Error {
-    status = 0
-  },
-}))
+vi.mock('@/lib/fetcher', () => {
+  return {
+    apiPost: vi.fn(),
+    apiPatch: vi.fn(),
+    apiDelete: vi.fn(),
+    fetcher: vi.fn(),
+    ApiError: class ApiError extends Error {
+      status = 0
+    },
+  }
+})
 
-vi.mock('@/lib/platform', () => ({
-  platform: { confirm: vi.fn(), saveVideo: vi.fn(), saveVideos: vi.fn() },
-}))
+vi.mock('@/lib/platform', () => {
+  return {
+    platform: { confirm: vi.fn(), saveVideo: vi.fn(), saveVideos: vi.fn() },
+  }
+})
 
-vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
+vi.mock('sonner', () => {
+  return { toast: { success: vi.fn(), error: vi.fn() } }
+})
 
 class Observer {
   observe() {}

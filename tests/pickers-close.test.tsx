@@ -7,11 +7,17 @@ import { DurationPopover } from '@/features/generator/options/DurationPopover'
 import { ResolutionPopover } from '@/features/generator/options/ResolutionPopover'
 import { useGeneratorStore } from '@/features/generator/store/store'
 
-vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
+vi.mock('sonner', () => {
+  return { toast: { success: vi.fn(), error: vi.fn() } }
+})
 
-vi.mock('@/lib/api/models', () => ({
-  useModelEntry: () => null,
-}))
+vi.mock('@/lib/api/models', () => {
+  return {
+    useModelEntry: () => {
+      return null
+    },
+  }
+})
 
 class Observer {
   observe() {}
@@ -51,7 +57,9 @@ function open(label: string): HTMLElement {
 }
 
 function expectClosed(): Promise<void> {
-  return waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  return waitFor(() => {
+    return expect(screen.queryByRole('dialog')).toBeNull()
+  })
 }
 
 describe('single-choice pickers close on pick', () => {
@@ -75,7 +83,9 @@ describe('single-choice pickers close on pick', () => {
       bottom: 20,
       x: 0,
       y: 0,
-      toJSON: () => ({}),
+      toJSON: () => {
+        return {}
+      },
     })
 
     render(<DurationPopover />)
@@ -84,7 +94,9 @@ describe('single-choice pickers close on pick', () => {
 
     Object.assign(thumb, {
       setPointerCapture: vi.fn(),
-      hasPointerCapture: () => true,
+      hasPointerCapture: () => {
+        return true
+      },
       releasePointerCapture: vi.fn(),
     })
 

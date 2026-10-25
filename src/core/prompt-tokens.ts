@@ -30,9 +30,13 @@ const KIND_WORD: Dict<MediaKind> = {
   audio: 'audio',
 }
 
-export const slotLabel = (slot: RefSlot): string => `${KIND_TITLE[slot.kind]} ${slot.n}`
+export const slotLabel = (slot: RefSlot): string => {
+  return `${KIND_TITLE[slot.kind]} ${slot.n}`
+}
 
-export const slotToken = (slot: RefSlot): string => `@${slotLabel(slot)}`
+export const slotToken = (slot: RefSlot): string => {
+  return `@${slotLabel(slot)}`
+}
 
 const CANONICAL = /@(Image|Video|Audio) (\d{1,2})(?!\d)/g
 
@@ -183,7 +187,11 @@ export function promptSlots(prompt: string): RefSlot[] {
 
     const slot = { kind, n: Number(rawNumber) }
 
-    if (!slots.some((seen) => seen.kind === slot.kind && seen.n === slot.n)) {
+    if (
+      !slots.some((seen) => {
+        return seen.kind === slot.kind && seen.n === slot.n
+      })
+    ) {
       slots.push(slot)
     }
   }
@@ -193,15 +201,17 @@ export function promptSlots(prompt: string): RefSlot[] {
 
 /** Slots mentioned but not attached. */
 export function missingSlots(prompt: string, counts: MediaKindCounts): RefSlot[] {
-  return promptSlots(prompt).filter((slot) => slot.n > counts[slot.kind])
+  return promptSlots(prompt).filter((slot) => {
+    return slot.n > counts[slot.kind]
+  })
 }
 
 /** API text: "@Image 1" -> preset.refLabel ("Image 1", "@Image 1", ...). */
 export function renderPromptForApi(prompt: string, preset: ModelPreset): string {
   // eslint-disable-next-line @typescript-eslint/max-params -- fixed signature (String.replace)
-  return prompt.replaceAll(CANONICAL, (_whole, kind: string, n: string) =>
-    preset.refLabel.replace('{Kind}', kind).replace('{n}', n),
-  )
+  return prompt.replaceAll(CANONICAL, (_whole, kind: string, n: string) => {
+    return preset.refLabel.replace('{Kind}', kind).replace('{n}', n)
+  })
 }
 
 /** Canonicalize loose forms (used by the server and history migration). */

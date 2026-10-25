@@ -99,8 +99,12 @@ export function bridgeBackend(options: BridgeOptions = {}): SecretBackend {
 
   return {
     kind: 'keychain',
-    getAll: async () => parseAll(unwrap(await call({ op: 'getAll', name: '' })).value),
-    get: async (name) => unwrap(await call({ op: 'get', name })).value ?? null,
+    getAll: async () => {
+      return parseAll(unwrap(await call({ op: 'getAll', name: '' })).value)
+    },
+    get: async (name) => {
+      return unwrap(await call({ op: 'get', name })).value ?? null
+    },
     set: async (name, value) => {
       unwrap(await call({ op: 'set', name, value }))
     },

@@ -24,9 +24,9 @@ export function usePickerSelection(request: PickerRequest): PickerSelection {
         return
       }
 
-      const allowed = items.filter(
-        (item) => item.missing !== true && request.kinds.includes(item.kind),
-      )
+      const allowed = items.filter((item) => {
+        return item.missing !== true && request.kinds.includes(item.kind)
+      })
 
       const [first] = allowed
 
@@ -45,7 +45,9 @@ export function usePickerSelection(request: PickerRequest): PickerSelection {
         const next = [...previous]
 
         for (const item of allowed) {
-          const index = next.findIndex((entry) => entry.id === item.id)
+          const index = next.findIndex((entry) => {
+            return entry.id === item.id
+          })
 
           if (index >= 0) {
             next.splice(index, 1)
@@ -69,7 +71,11 @@ export function usePickerSelection(request: PickerRequest): PickerSelection {
   }, [request, selected])
 
   const removeSelected = useCallback((id: string) => {
-    setSelected((previous) => previous.filter((item) => item.id !== id))
+    setSelected((previous) => {
+      return previous.filter((item) => {
+        return item.id !== id
+      })
+    })
   }, [])
 
   return { selected, commit, confirm, removeSelected }

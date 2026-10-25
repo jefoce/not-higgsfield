@@ -66,10 +66,14 @@ describe('reconcile grace cancel', () => {
 
     await fs.writeFile(path.join(downloads, `${id}.json`), JSON.stringify(record))
 
-    vi.doMock('@/server/jobs/submit-queue', () => ({
-      isSubmitOwned: () => false,
-      resumeGraceSubmits: vi.fn(),
-    }))
+    vi.doMock('@/server/jobs/submit-queue', () => {
+      return {
+        isSubmitOwned: () => {
+          return false
+        },
+        resumeGraceSubmits: vi.fn(),
+      }
+    })
 
     const { reconcile, GRACE_EXPIRED_TEXT } = await import('@/server/jobs/reconcile')
 

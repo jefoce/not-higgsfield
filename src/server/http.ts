@@ -91,7 +91,13 @@ export function parseKinds(value: string | null): MediaKind[] {
     return []
   }
 
-  const wanted = new Set(value.split(',').map((part) => part.trim()))
+  const wanted = new Set(
+    value.split(',').map((part) => {
+      return part.trim()
+    }),
+  )
 
-  return MEDIA_KINDS.filter((kind) => wanted.has(kind))
+  return MEDIA_KINDS.filter((kind) => {
+    return wanted.has(kind)
+  })
 }

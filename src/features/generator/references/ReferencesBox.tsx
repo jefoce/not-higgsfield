@@ -17,15 +17,41 @@ import { ReferencesGrid } from './ReferencesGrid'
 
 /** References tab: limits, thumbs, reorder, drag-drop and mention insert. */
 export function ReferencesBox() {
-  const preset = getPreset(useGeneratorStore((state) => state.presetId))
+  const preset = getPreset(
+    useGeneratorStore((state) => {
+      return state.presetId
+    }),
+  )
+
   const extensions = extensionsFromLimits(preset.referenceLimits)
-  const references = useGeneratorStore((state) => state.references)
-  const uploadsById = useGeneratorStore((state) => state.uploadsById)
-  const addReferences = useGeneratorStore((state) => state.addReferences)
-  const queue = useUploadQueue(addReferences, (message) => toast.error(message))
-  const { counts } = referenceSlots(references, (id) => uploadsById[id]?.kind)
-  const kinds = MEDIA_KINDS.filter((kind) => counts[kind] < preset.references[kind])
-  const max = sumBy(kinds, (kind) => preset.references[kind] - counts[kind])
+
+  const references = useGeneratorStore((state) => {
+    return state.references
+  })
+
+  const uploadsById = useGeneratorStore((state) => {
+    return state.uploadsById
+  })
+
+  const addReferences = useGeneratorStore((state) => {
+    return state.addReferences
+  })
+
+  const queue = useUploadQueue(addReferences, (message) => {
+    return toast.error(message)
+  })
+
+  const { counts } = referenceSlots(references, (id) => {
+    return uploadsById[id]?.kind
+  })
+
+  const kinds = MEDIA_KINDS.filter((kind) => {
+    return counts[kind] < preset.references[kind]
+  })
+
+  const max = sumBy(kinds, (kind) => {
+    return preset.references[kind] - counts[kind]
+  })
 
   const handlePick = (): void => {
     if (isEmpty(kinds)) {
@@ -62,9 +88,9 @@ export function ReferencesBox() {
     <>
       {queue.items.length > 0 && (
         <div className="mb-2 grid grid-cols-4 gap-2">
-          {queue.items.map((item) => (
-            <UploadProgressTile key={item.id} item={item} />
-          ))}
+          {queue.items.map((item) => {
+            return <UploadProgressTile key={item.id} item={item} />
+          })}
         </div>
       )}
       <ReferencesEmpty

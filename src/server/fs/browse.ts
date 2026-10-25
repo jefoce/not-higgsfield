@@ -47,9 +47,15 @@ export async function browseDirectories(input: BrowseInput): Promise<BrowseResul
 
   const dirs = orderBy(
     entries
-      .filter((entry) => entry.isDirectory())
-      .filter((entry) => input.hidden === true || !entry.name.startsWith('.'))
-      .map((entry) => ({ name: entry.name, path: path.join(real, entry.name) })),
+      .filter((entry) => {
+        return entry.isDirectory()
+      })
+      .filter((entry) => {
+        return input.hidden === true || !entry.name.startsWith('.')
+      })
+      .map((entry) => {
+        return { name: entry.name, path: path.join(real, entry.name) }
+      }),
     ['name'],
     ['asc'],
   )

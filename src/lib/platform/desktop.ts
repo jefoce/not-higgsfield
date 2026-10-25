@@ -23,7 +23,9 @@ import type { Platform } from './types'
 export const desktopPlatform: Platform = {
   kind: 'desktop',
 
-  canChooseFiles: async () => true,
+  canChooseFiles: async () => {
+    return true
+  },
 
   chooseFiles: async (params): Promise<UploadItem[]> => {
     const { kinds, multiple: isMultiple, extensions } = params
@@ -74,7 +76,9 @@ export const desktopPlatform: Platform = {
     await openUrl(url)
   },
 
-  confirm: async (message: string) => ask(message, { title: 'Not Higgsfield', kind: 'warning' }),
+  confirm: async (message: string) => {
+    return ask(message, { title: 'Not Higgsfield', kind: 'warning' })
+  },
 
   saveVideo: async (record: GenerationRecord) => {
     const target = await save({
@@ -108,7 +112,12 @@ export const desktopPlatform: Platform = {
     let saved = 0
 
     for (const part of chunk(records, HISTORY_BATCH_MAX)) {
-      const result = await exportBatch({ ids: part.map((record) => record.id), dir })
+      const result = await exportBatch({
+        ids: part.map((record) => {
+          return record.id
+        }),
+        dir,
+      })
 
       saved += result.saved.length
     }

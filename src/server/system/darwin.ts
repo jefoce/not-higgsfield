@@ -13,11 +13,15 @@ const run = promisify(execFile)
 const DIALOG_TIMEOUT = 10 * 60_000
 
 export const darwin: SystemAdapter = {
-  canChooseFiles: async () => true,
+  canChooseFiles: async () => {
+    return true
+  },
 
   async chooseFiles({ kinds, multiple: isMultiple, prompt }) {
     const types = extensions(kinds)
-      .map((ext) => `"${ext}"`)
+      .map((ext) => {
+        return `"${ext}"`
+      })
       .join(', ')
 
     const typeClause = types === '' ? '' : ` of type {${types}}`
@@ -44,7 +48,9 @@ export const darwin: SystemAdapter = {
 
     const { stdout } = await dialog(
       'osascript',
-      script.flatMap((line) => ['-e', line]),
+      script.flatMap((line) => {
+        return ['-e', line]
+      }),
     )
 
     return lines(stdout)
@@ -61,7 +67,9 @@ export const darwin: SystemAdapter = {
 
     const { stdout } = await dialog(
       'osascript',
-      script.flatMap((line) => ['-e', line]),
+      script.flatMap((line) => {
+        return ['-e', line]
+      }),
     )
 
     const picked = stdout.trim()
@@ -75,8 +83,12 @@ export const darwin: SystemAdapter = {
 
   async reveal(path) {
     const hasFile = await fs.stat(path).then(
-      (stats) => stats.isFile(),
-      () => false,
+      (stats) => {
+        return stats.isFile()
+      },
+      () => {
+        return false
+      },
     )
 
     if (hasFile) {
@@ -93,13 +105,17 @@ function extensions(kinds: readonly MediaKind[]): string[] {
   return acceptForKinds(kinds)
     .split(',')
     .filter(Boolean)
-    .map((ext) => ext.slice(1))
+    .map((ext) => {
+      return ext.slice(1)
+    })
 }
 
 function lines(stdout: string): string[] {
   return stdout
     .split('\n')
-    .map((line) => line.trim())
+    .map((line) => {
+      return line.trim()
+    })
     .filter(Boolean)
 }
 

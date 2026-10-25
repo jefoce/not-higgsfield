@@ -28,7 +28,11 @@ function useModelCatalog(): ModelCatalogState {
 export function useModelEntry(presetId: string): CatalogEntry | null {
   const { catalog } = useModelCatalog()
 
-  return catalog?.entries.find((entry) => entry.presetId === presetId) ?? null
+  return (
+    catalog?.entries.find((entry) => {
+      return entry.presetId === presetId
+    }) ?? null
+  )
 }
 
 /** Revalidates the catalog after settings change. */

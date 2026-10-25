@@ -21,7 +21,9 @@ import { usePanelPaste, useUploadsRefresh } from './use-panel-uploads'
 
 const noop = (): void => {}
 
-const emptySubscribe = () => noop
+const emptySubscribe = () => {
+  return noop
+}
 
 function handleOpenSettings(): void {
   openSettings()
@@ -29,7 +31,10 @@ function handleOpenSettings(): void {
 
 /** Left generate panel: tabs, prompt, settings, warnings, generate. */
 export function GeneratorPanel() {
-  const tab = useGeneratorStore((state) => state.tab)
+  const tab = useGeneratorStore((state) => {
+    return state.tab
+  })
+
   const { validation, isKeyMissing, isSecretsFailed } = usePanelDraft()
   const { handlePaste } = usePanelPaste()
   const { price, listPrice, discount, isLoading: isPriceLoading } = usePanelPrice()
@@ -37,8 +42,12 @@ export function GeneratorPanel() {
 
   const isMounted = useSyncExternalStore(
     emptySubscribe,
-    () => true,
-    () => false,
+    () => {
+      return true
+    },
+    () => {
+      return false
+    },
   )
 
   useUploadsRefresh()

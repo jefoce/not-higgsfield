@@ -43,8 +43,9 @@ export function PreviewFooter(props: PreviewFooterProps) {
 
   const available = actions?.available?.(item)
 
-  const isVisible = (action: (typeof ACTIONS)[number]) =>
-    !isNil(actions?.[action.key]) && (isNil(available) || available.includes(action.key))
+  const isVisible = (action: (typeof ACTIONS)[number]) => {
+    return !isNil(actions?.[action.key]) && (isNil(available) || available.includes(action.key))
+  }
 
   const provided = ACTIONS.filter(isVisible)
 
@@ -54,15 +55,17 @@ export function PreviewFooter(props: PreviewFooterProps) {
 
   return (
     <footer className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-line px-4 py-3">
-      {provided.map(({ key, label }) => (
-        <PreviewActionButton
-          key={key}
-          actionKey={key}
-          label={label}
-          variant={ACTION_VARIANT[key]}
-          onRun={props.onRun}
-        />
-      ))}
+      {provided.map(({ key, label }) => {
+        return (
+          <PreviewActionButton
+            key={key}
+            actionKey={key}
+            label={label}
+            variant={ACTION_VARIANT[key]}
+            onRun={props.onRun}
+          />
+        )
+      })}
     </footer>
   )
 }

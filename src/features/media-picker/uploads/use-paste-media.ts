@@ -72,8 +72,12 @@ function handlePastedPath(event: PasteLike, params: PasteMediaOptions): void {
   event.preventDefault()
 
   void linkAbsPath(path)
-    .then((item) => params.onUploaded([item]))
-    .catch((error) => toastError(error))
+    .then((item) => {
+      return params.onUploaded([item])
+    })
+    .catch((error) => {
+      return toastError(error)
+    })
 }
 
 interface PasteTarget {
@@ -136,11 +140,15 @@ export function usePasteMedia(params: PasteMediaOptions): UsePasteMedia {
       return
     }
 
-    const listener = (event: globalThis.ClipboardEvent) => handlePaste(event, current.current)
+    const listener = (event: globalThis.ClipboardEvent) => {
+      return handlePaste(event, current.current)
+    }
 
     window.addEventListener('paste', listener)
 
-    return () => window.removeEventListener('paste', listener)
+    return () => {
+      return window.removeEventListener('paste', listener)
+    }
   }, [scope, isEnabled])
 
   if (scope === 'element') {

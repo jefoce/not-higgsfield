@@ -9,11 +9,13 @@ import { listModels as mockListModels } from '@/server/providers/mock/models'
 import type { ProviderModel, ProviderModelList } from '@/server/providers/types'
 import { getModelCatalog } from '@/server/services/model-catalog'
 
-const multi = vi.hoisted(() => ({
-  id: 'multi-binding',
-  laterModel: 'later/model',
-  fakeProvider: 'fake' as VideoProviderId,
-}))
+const multi = vi.hoisted(() => {
+  return {
+    id: 'multi-binding',
+    laterModel: 'later/model',
+    fakeProvider: 'fake' as VideoProviderId,
+  }
+})
 
 const mocks = vi.hoisted(() => {
   const pricing = {
@@ -25,9 +27,15 @@ const mocks = vi.hoisted(() => {
   }
 
   return {
-    getPricing: vi.fn(async () => pricing),
-    isConfigured: vi.fn((_id: string): boolean => true),
-    listModels: vi.fn(async (): Promise<ProviderModelList> => ({ models: [], isFresh: true })),
+    getPricing: vi.fn(async () => {
+      return pricing
+    }),
+    isConfigured: vi.fn((_id: string): boolean => {
+      return true
+    }),
+    listModels: vi.fn(async (): Promise<ProviderModelList> => {
+      return { models: [], isFresh: true }
+    }),
   }
 })
 
@@ -45,21 +53,33 @@ vi.mock('@/core/presets', async (importOriginal) => {
   return { ...actual, MODEL_PRESETS: [...actual.MODEL_PRESETS, preset] }
 })
 
-vi.mock('@/core/providers/registry', () => ({
-  videoProviderDescriptor: (id: string) => ({ id, label: 'OpenRouter' }),
-}))
+vi.mock('@/core/providers/registry', () => {
+  return {
+    videoProviderDescriptor: (id: string) => {
+      return { id, label: 'OpenRouter' }
+    },
+  }
+})
 
-vi.mock('@/server/providers/registry', () => ({
-  getVideoProvider: (id: string) => ({
-    getPricing: mocks.getPricing,
-    isConfigured: () => mocks.isConfigured(id),
-    listModels: mocks.listModels,
-  }),
-}))
+vi.mock('@/server/providers/registry', () => {
+  return {
+    getVideoProvider: (id: string) => {
+      return {
+        getPricing: mocks.getPricing,
+        isConfigured: () => {
+          return mocks.isConfigured(id)
+        },
+        listModels: mocks.listModels,
+      }
+    },
+  }
+})
 
-vi.mock('@/server/secrets', () => ({
-  secretsReady: vi.fn(async () => {}),
-}))
+vi.mock('@/server/secrets', () => {
+  return {
+    secretsReady: vi.fn(async () => {}),
+  }
+})
 
 function model(modelId: string): ProviderModel {
   return {
@@ -73,8 +93,11 @@ function model(modelId: string): ProviderModel {
   }
 }
 
-const allPresetModels = (): ProviderModel[] =>
-  MODEL_PRESETS.map((preset) => model(primaryBinding(preset).modelId))
+const allPresetModels = (): ProviderModel[] => {
+  return MODEL_PRESETS.map((preset) => {
+    return model(primaryBinding(preset).modelId)
+  })
+}
 
 beforeEach(() => {
   mocks.getPricing.mockClear()
@@ -90,8 +113,17 @@ describe('getModelCatalog status', () => {
 
     const { entries } = await getModelCatalog()
 
-    expect(entries.every((entry) => entry.status === 'available')).toBe(true)
-    expect(entries.every((entry) => entry.reason === null)).toBe(true)
+    expect(
+      entries.every((entry) => {
+        return entry.status === 'available'
+      }),
+    ).toBe(true)
+
+    expect(
+      entries.every((entry) => {
+        return entry.reason === null
+      }),
+    ).toBe(true)
   })
 
   it('marks an absent model as missing with the provider label', async () => {
@@ -99,15 +131,29 @@ describe('getModelCatalog status', () => {
 
     const { entries } = await getModelCatalog()
 
-    expect(entries.every((entry) => entry.status === 'missing')).toBe(true)
+    expect(
+      entries.every((entry) => {
+        return entry.status === 'missing'
+      }),
+    ).toBe(true)
+
     expect(entries[0]?.reason).toBe('Not available on OpenRouter right now.')
   })
 
   it('marks a fresh but empty list as unverified without a reason', async () => {
     const { entries } = await getModelCatalog()
 
-    expect(entries.every((entry) => entry.status === 'unverified')).toBe(true)
-    expect(entries.every((entry) => entry.reason === null)).toBe(true)
+    expect(
+      entries.every((entry) => {
+        return entry.status === 'unverified'
+      }),
+    ).toBe(true)
+
+    expect(
+      entries.every((entry) => {
+        return entry.reason === null
+      }),
+    ).toBe(true)
   })
 
   it('marks a failed list as unverified even when it carries cached models', async () => {
@@ -115,8 +161,17 @@ describe('getModelCatalog status', () => {
 
     const { entries } = await getModelCatalog()
 
-    expect(entries.every((entry) => entry.status === 'unverified')).toBe(true)
-    expect(entries.every((entry) => entry.reason === null)).toBe(true)
+    expect(
+      entries.every((entry) => {
+        return entry.status === 'unverified'
+      }),
+    ).toBe(true)
+
+    expect(
+      entries.every((entry) => {
+        return entry.reason === null
+      }),
+    ).toBe(true)
   })
 
   it('marks every model no_provider when no key is configured', async () => {
@@ -124,7 +179,12 @@ describe('getModelCatalog status', () => {
 
     const { entries } = await getModelCatalog()
 
-    expect(entries.every((entry) => entry.status === 'no_provider')).toBe(true)
+    expect(
+      entries.every((entry) => {
+        return entry.status === 'no_provider'
+      }),
+    ).toBe(true)
+
     expect(entries[0]?.reason).toBe('Add your OpenRouter key in Settings.')
     expect(mocks.listModels).not.toHaveBeenCalled()
   })
@@ -134,16 +194,31 @@ describe('getModelCatalog status', () => {
 
     const { entries } = await getModelCatalog()
 
-    expect(entries.every((entry) => entry.status === 'available')).toBe(true)
-    expect(entries.every((entry) => entry.reason === null)).toBe(true)
+    expect(
+      entries.every((entry) => {
+        return entry.status === 'available'
+      }),
+    ).toBe(true)
+
+    expect(
+      entries.every((entry) => {
+        return entry.reason === null
+      }),
+    ).toBe(true)
   })
 
   it('uses a configured later binding for the catalog entry', async () => {
-    mocks.isConfigured.mockImplementation((id) => id === multi.fakeProvider)
+    mocks.isConfigured.mockImplementation((id) => {
+      return id === multi.fakeProvider
+    })
+
     mocks.listModels.mockResolvedValue({ models: [model(multi.laterModel)], isFresh: true })
 
     const { entries } = await getModelCatalog()
-    const entry = entries.find((item) => item.presetId === multi.id)
+
+    const entry = entries.find((item) => {
+      return item.presetId === multi.id
+    })
 
     expect(entry?.modelId).toBe(multi.laterModel)
     expect(entry?.provider).toBe(multi.fakeProvider)
@@ -153,25 +228,33 @@ describe('getModelCatalog status', () => {
 
 describe('activeBinding', () => {
   it('returns the first configured binding', () => {
-    const preset = MODEL_PRESETS.find((item) => item.id === multi.id)
+    const preset = MODEL_PRESETS.find((item) => {
+      return item.id === multi.id
+    })
 
     if (isNil(preset)) {
       throw new Error('multi-binding preset is missing')
     }
 
-    const binding = activeBinding(preset, (item) => item.provider === multi.fakeProvider)
+    const binding = activeBinding(preset, (item) => {
+      return item.provider === multi.fakeProvider
+    })
 
     expect(binding.modelId).toBe(multi.laterModel)
   })
 
   it('falls back to the primary binding when none is configured', () => {
-    const preset = MODEL_PRESETS.find((item) => item.id === multi.id)
+    const preset = MODEL_PRESETS.find((item) => {
+      return item.id === multi.id
+    })
 
     if (isNil(preset)) {
       throw new Error('multi-binding preset is missing')
     }
 
-    const binding = activeBinding(preset, () => false)
+    const binding = activeBinding(preset, () => {
+      return false
+    })
 
     expect(binding.modelId).toBe(primaryBinding(preset).modelId)
   })

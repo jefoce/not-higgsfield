@@ -29,9 +29,15 @@ export function usePickerUpload(params: UsePickerUploadParams): PickerUpload {
   const { mutate } = useSWRConfig()
 
   const refreshUploads = useCallback(() => {
-    void mutate((key) => Array.isArray(key) && key[0] === 'uploads', undefined, {
-      revalidate: true,
-    })
+    void mutate(
+      (key) => {
+        return Array.isArray(key) && key[0] === 'uploads'
+      },
+      undefined,
+      {
+        revalidate: true,
+      },
+    )
   }, [mutate])
 
   const handleUploaded = useCallback(
@@ -57,9 +63,13 @@ export function usePickerUpload(params: UsePickerUploadParams): PickerUpload {
     onFiles: queue.enqueue,
   })
 
-  const readKinds = () => request.kinds
+  const readKinds = () => {
+    return request.kinds
+  }
 
-  const readExtensions = () => request.extensions
+  const readExtensions = () => {
+    return request.extensions
+  }
 
   usePasteMedia({
     enabled: true,

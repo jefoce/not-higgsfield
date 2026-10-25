@@ -134,7 +134,11 @@ interface DurationTotals {
   audioTotal: number
 }
 
-const totalDuration = (items: UploadItem[]): number => sumBy(items, (item) => item.durationSec ?? 0)
+const totalDuration = (items: UploadItem[]): number => {
+  return sumBy(items, (item) => {
+    return item.durationSec ?? 0
+  })
+}
 
 const checkDurationTotals = (params: CheckDurationTotalsParams): DurationTotals => {
   const { videos, audio, preset, errors } = params
@@ -247,16 +251,29 @@ export function validateReferences(params: ValidateWithContextParams): RuleResul
     return { errors, warnings }
   }
 
-  if (MEDIA_KINDS.every((kind) => preset.references[kind] === 0)) {
+  if (
+    MEDIA_KINDS.every((kind) => {
+      return preset.references[kind] === 0
+    })
+  ) {
     errors.push(`References are not supported by ${preset.title}`)
 
     return { errors, warnings }
   }
 
   const attached = collectReferences({ input, uploads, preset, errors })
-  const { counts } = referenceSlots(input.references, (id) => uploads[id]?.kind)
-  const videos = attached.filter((upload) => upload.kind === 'video')
-  const audio = attached.filter((upload) => upload.kind === 'audio')
+
+  const { counts } = referenceSlots(input.references, (id) => {
+    return uploads[id]?.kind
+  })
+
+  const videos = attached.filter((upload) => {
+    return upload.kind === 'video'
+  })
+
+  const audio = attached.filter((upload) => {
+    return upload.kind === 'audio'
+  })
 
   checkReferenceCounts({ counts, preset, errors })
   checkRemoteTransport({ counts, preset, ctx, errors })

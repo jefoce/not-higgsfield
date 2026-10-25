@@ -95,7 +95,10 @@ export function headers(isJson: boolean): Dict<string> {
 
 /** Provider detail from `error.metadata`, never headers or the request body. */
 export async function errorFromResponse(res: Response): Promise<OpenRouterError> {
-  const payload: unknown = await res.json().catch(() => null)
+  const payload: unknown = await res.json().catch(() => {
+    return null
+  })
+
   const isError = isRecord(payload)
 
   const error = isError ? payload.error : undefined

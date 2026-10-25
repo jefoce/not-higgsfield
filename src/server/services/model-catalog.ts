@@ -17,9 +17,11 @@ interface DriftState {
   logged: Set<string>
 }
 
-const driftState = globalState<DriftState>('modelCatalogDrift', () => ({
-  logged: new Set<string>(),
-}))
+const driftState = globalState<DriftState>('modelCatalogDrift', () => {
+  return {
+    logged: new Set<string>(),
+  }
+})
 
 function isBindingConfigured(binding: ProviderBinding): boolean {
   return getVideoProvider(binding.provider).isConfigured()
@@ -58,7 +60,9 @@ async function buildEntry(preset: ModelPreset): Promise<CatalogEntry> {
     return { ...base, provider: binding.provider, status: 'unverified', reason: null }
   }
 
-  const model = models.find((item) => item.modelId === binding.modelId)
+  const model = models.find((item) => {
+    return item.modelId === binding.modelId
+  })
 
   if (isNil(model)) {
     return {
@@ -117,8 +121,12 @@ function missing(params: MissingParams): string[] {
   }
 
   return values
-    .filter((item) => !live.includes(item))
-    .map((item) => `${label} ${item} not in live list`)
+    .filter((item) => {
+      return !live.includes(item)
+    })
+    .map((item) => {
+      return `${label} ${item} not in live list`
+    })
 }
 
 interface MismatchParams {
@@ -154,5 +162,7 @@ function framesOf(preset: ModelPreset): string[] {
 function allDurations(preset: ModelPreset): number[] {
   const { min, max } = preset.duration
 
-  return Array.from({ length: max - min + 1 }, (_, index) => min + index)
+  return Array.from({ length: max - min + 1 }, (_, index) => {
+    return min + index
+  })
 }

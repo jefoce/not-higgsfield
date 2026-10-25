@@ -17,37 +17,58 @@ const DOCS = path.join(ROOT, 'docs')
 /** Rows of a markdown section's table, header excluded. */
 function tableRows(markdown: string, heading: string): string[][] {
   const lines = markdown.split('\n')
-  const start = lines.findIndex((line) => line.trim() === `## ${heading}`)
+
+  const start = lines.findIndex((line) => {
+    return line.trim() === `## ${heading}`
+  })
 
   if (start === -1) {
     throw new Error(`Missing section: ${heading}`)
   }
 
   const rest = lines.slice(start + 1)
-  const end = rest.findIndex((line) => line.startsWith('## '))
+
+  const end = rest.findIndex((line) => {
+    return line.startsWith('## ')
+  })
+
   const section = (end === -1 ? rest : rest.slice(0, end)).join('\n')
 
   return section
     .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.startsWith('|'))
-    .map((line) =>
-      line
+    .map((line) => {
+      return line.trim()
+    })
+    .filter((line) => {
+      return line.startsWith('|')
+    })
+    .map((line) => {
+      return line
         .slice(1, -1)
         .split('|')
-        .map((cell) => cell.trim().replaceAll('`', '')),
-    )
-    .filter((cells) => !cells.every((cell) => /^:?-{3,}:?$/.test(cell)))
+        .map((cell) => {
+          return cell.trim().replaceAll('`', '')
+        })
+    })
+    .filter((cells) => {
+      return !cells.every((cell) => {
+        return /^:?-{3,}:?$/.test(cell)
+      })
+    })
     .slice(1)
 }
 
-const file = (rel: string) => path.join(ROOT, rel)
+const file = (rel: string) => {
+  return path.join(ROOT, rel)
+}
 
 /** Status labels packed in the first cell of a row, split on `/`. */
 function rowLabels(cells: string[]): string[] {
   return required(cells[0], 'label cell')
     .split('/')
-    .map((label) => label.trim())
+    .map((label) => {
+      return label.trim()
+    })
 }
 
 describe('bounds table', () => {
@@ -101,7 +122,11 @@ describe('bounds table', () => {
 describe('documentation tables', () => {
   it('keeps the README status table equal to STATUS_HELP', () => {
     const rows = tableRows(fs.readFileSync(file('README.md'), 'utf8'), 'What the statuses mean')
-    const labels = Object.values(STATUS_HELP).map((help) => help.label)
+
+    const labels = Object.values(STATUS_HELP).map((help) => {
+      return help.label
+    })
+
     const tableLabels = rows.flatMap(rowLabels)
 
     for (const cells of rows) {
@@ -121,7 +146,9 @@ describe('documentation tables', () => {
     expect(rows.length).toBe(MODEL_PRESETS.length)
 
     for (const [title, duration, resolutions, references] of rows) {
-      const preset = MODEL_PRESETS.find((item) => item.title === title)
+      const preset = MODEL_PRESETS.find((item) => {
+        return item.title === title
+      })
 
       if (!preset) {
         throw new Error(`Unknown model: ${title}`)
@@ -150,8 +177,12 @@ describe('documentation tables', () => {
       'README.md',
       ...fs
         .readdirSync(DOCS)
-        .filter((name) => name.endsWith('.md'))
-        .map((name) => path.join('docs', name)),
+        .filter((name) => {
+          return name.endsWith('.md')
+        })
+        .map((name) => {
+          return path.join('docs', name)
+        }),
     ]
 
     for (const rel of files) {

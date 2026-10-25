@@ -68,18 +68,20 @@ export function FolderTab(props: FolderTabProps) {
 
   const [broken, setBroken] = useState<string[]>([])
 
-  const { data, isLoading } = useSWR(['folder-files', folderId, sub, kinds], () =>
-    fetchFolderFiles({ folderId, sub, kinds }),
-  )
+  const { data, isLoading } = useSWR(['folder-files', folderId, sub, kinds], () => {
+    return fetchFolderFiles({ folderId, sub, kinds })
+  })
 
   const dirs = data?.dirs ?? []
 
-  const files = (data?.files ?? []).filter((file) =>
-    extensionAllowed({ kind: file.kind, ext: extWithDot(file.name), extensions }),
-  )
+  const files = (data?.files ?? []).filter((file) => {
+    return extensionAllowed({ kind: file.kind, ext: extWithDot(file.name), extensions })
+  })
 
   const handleExpand = (file: FolderFile) => {
-    const handleSelect = () => handleSelectFile(file.rel)
+    const handleSelect = () => {
+      return handleSelectFile(file.rel)
+    }
 
     openPreview({
       items: [folderPreviewItem({ folderId, file })],
@@ -88,7 +90,11 @@ export function FolderTab(props: FolderTabProps) {
     })
   }
 
-  const handleBroken = (src: string) => setBroken((previous) => [...previous, src])
+  const handleBroken = (src: string) => {
+    return setBroken((previous) => {
+      return [...previous, src]
+    })
+  }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -99,13 +105,15 @@ export function FolderTab(props: FolderTabProps) {
       <div className="min-h-0 flex-1 overflow-y-auto">
         <div className="grid grid-cols-4 content-start gap-3 p-3">
           {isLoading &&
-            SKELETON.map((key) => (
-              <div key={key} className="aspect-square animate-pulse rounded-lg bg-surface-2" />
-            ))}
+            SKELETON.map((key) => {
+              return (
+                <div key={key} className="aspect-square animate-pulse rounded-lg bg-surface-2" />
+              )
+            })}
 
-          {dirs.map((dir) => (
-            <FolderDirTile key={dir.rel} dir={dir} onNavigate={props.onNavigate} />
-          ))}
+          {dirs.map((dir) => {
+            return <FolderDirTile key={dir.rel} dir={dir} onNavigate={props.onNavigate} />
+          })}
 
           {files.map((file) => {
             const ref = `folders/${folderId}/${file.rel}`

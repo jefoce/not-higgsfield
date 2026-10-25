@@ -60,7 +60,10 @@ export async function getThumbnail(input: ThumbInput): Promise<ThumbResult> {
   const filePath = path.join(THUMBS_DIR, `${hash}.webp`)
 
   await fs.mkdir(THUMBS_DIR, { recursive: true })
-  const stats = await fs.stat(filePath).catch(() => null)
+
+  const stats = await fs.stat(filePath).catch(() => {
+    return null
+  })
 
   if (stats) {
     // Touch at most once a day, so the sweep keeps hot files without churning mtime.
@@ -77,7 +80,9 @@ export async function getThumbnail(input: ThumbInput): Promise<ThumbResult> {
     return shared
   }
 
-  const task = createThumb({ input, hash, width, filePath }).finally(() => inFlight.delete(hash))
+  const task = createThumb({ input, hash, width, filePath }).finally(() => {
+    return inFlight.delete(hash)
+  })
 
   inFlight.set(hash, task)
 
@@ -113,7 +118,9 @@ async function createThumb(params: CreateThumbParams): Promise<ThumbResult> {
 
 async function withSlot<T>(fn: () => Promise<T>): Promise<T> {
   if (active >= MAX_CONCURRENT) {
-    await new Promise<void>((resolve) => waiters.push(resolve))
+    await new Promise<void>((resolve) => {
+      return waiters.push(resolve)
+    })
   }
 
   active += 1
@@ -212,7 +219,11 @@ interface CollectedThumbs {
 
 async function collectThumbs(params: CollectThumbsParams): Promise<CollectedThumbs> {
   const { dir, cutoff } = params
-  const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => [])
+
+  const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => {
+    return []
+  })
+
   const files: ThumbFile[] = []
   let removed = 0
 
@@ -222,7 +233,10 @@ async function collectThumbs(params: CollectThumbsParams): Promise<CollectedThum
     }
 
     const file = path.join(dir, entry.name)
-    const stats = await fs.stat(file).catch(() => null)
+
+    const stats = await fs.stat(file).catch(() => {
+      return null
+    })
 
     if (!stats) {
       continue

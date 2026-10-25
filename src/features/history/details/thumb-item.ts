@@ -23,7 +23,9 @@ export interface ThumbItem {
   sent?: string
 }
 
-const isFilled = (value: string | null | undefined): value is string => isNonEmptyString(value)
+const isFilled = (value: string | null | undefined): value is string => {
+  return isNonEmptyString(value)
+}
 
 function sentNote(item: SnapshotItem | undefined): string | undefined {
   if (isNil(item)) {
@@ -90,7 +92,9 @@ export function thumbItems(record: GenerationRecord): ThumbItem[] {
   }
 
   if (tab === 'references') {
-    const { slots } = referenceSlots(references, (id) => snapshot[id]?.kind)
+    const { slots } = referenceSlots(references, (id) => {
+      return snapshot[id]?.kind
+    })
 
     for (const id of references) {
       const slot = slots.get(id)

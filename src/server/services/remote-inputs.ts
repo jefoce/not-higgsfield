@@ -25,7 +25,9 @@ interface SweepResult {
   cleared: number
 }
 
-const puts = globalState('remotePuts', () => new Map<string, Promise<ObjectInfo>>())
+const puts = globalState('remotePuts', () => {
+  return new Map<string, Promise<ObjectInfo>>()
+})
 
 interface PutObjectOptions {
   contentType: string
@@ -125,9 +127,14 @@ export async function sweepRemote(store?: ObjectStore): Promise<SweepResult> {
 
   const uploads = await listUploads()
 
-  const withRemote = uploads.filter((item): item is RemoteUpload => Boolean(item.remote))
+  const withRemote = uploads.filter((item): item is RemoteUpload => {
+    return Boolean(item.remote)
+  })
 
-  const groups = groupBy(withRemote, (item) => item.remote.key)
+  const groups = groupBy(withRemote, (item) => {
+    return item.remote.key
+  })
+
   const cutoff = Date.now() - REMOTE_UNUSED_DAYS * 86_400_000
   let deleted = 0
   let cleared = 0
@@ -135,7 +142,12 @@ export async function sweepRemote(store?: ObjectStore): Promise<SweepResult> {
   for (const items of Object.values(groups)) {
     const [first] = items
 
-    if (isNil(first) || items.some((item) => Date.parse(item.remote.lastUsedAt) >= cutoff)) {
+    if (
+      isNil(first) ||
+      items.some((item) => {
+        return Date.parse(item.remote.lastUsedAt) >= cutoff
+      })
+    ) {
       continue
     }
 
@@ -143,7 +155,9 @@ export async function sweepRemote(store?: ObjectStore): Promise<SweepResult> {
     deleted += 1
 
     for (const item of items) {
-      const saved = await updateUpload(item.id, (current) => ({ ...current, remote: undefined }))
+      const saved = await updateUpload(item.id, (current) => {
+        return { ...current, remote: undefined }
+      })
 
       if (saved) {
         cleared += 1
@@ -171,7 +185,9 @@ export function putOnce(params: PutOnceParams): Promise<ObjectInfo> {
       sha256: opts.sha256,
       onProgress: opts.onProgress ?? null,
     })
-    .finally(() => puts.delete(key))
+    .finally(() => {
+      return puts.delete(key)
+    })
 
   puts.set(key, job)
 
@@ -179,7 +195,9 @@ export function putOnce(params: PutOnceParams): Promise<ObjectInfo> {
 }
 
 async function saveRemote(id: string, remote: UploadRemote): Promise<UploadItem> {
-  const saved = await updateUpload(id, (item) => ({ ...item, remote }))
+  const saved = await updateUpload(id, (item) => {
+    return { ...item, remote }
+  })
 
   if (!saved) {
     throw new Error('Input file was removed during upload')

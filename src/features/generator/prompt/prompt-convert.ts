@@ -35,7 +35,10 @@ import type { GeneratorState } from '../store/store-state'
 const LABEL = /^(Image|Video|Audio) (\d+)$/
 
 function slotFromData(data?: Dict<BeautifulMentionsItemData>): RefSlot | null {
-  const kind = MEDIA_KINDS.find((item) => item === String(data?.kind ?? ''))
+  const kind = MEDIA_KINDS.find((item) => {
+    return item === String(data?.kind ?? '')
+  })
+
   const n = Number(data?.n)
 
   if (isNil(kind) || !Number.isInteger(n) || n <= 0) {
@@ -80,7 +83,9 @@ function serializeNode(node: LexicalNode): string {
 
 /** Stored prompt string for the current editor state. */
 export function serializeEditor(state: EditorState): string {
-  return state.read(() => $getRoot().getChildren().map(serializeNode).join('\n'))
+  return state.read(() => {
+    return $getRoot().getChildren().map(serializeNode).join('\n')
+  })
 }
 
 interface MentionItem {
@@ -186,7 +191,11 @@ export function $convertLiteralMentions(counts: MediaKindCounts): void {
   for (const node of $getRoot().getAllTextNodes()) {
     const parts = parsePromptParts(node.getTextContent(), counts)
 
-    if (!parts.some((part) => part.type === 'slot')) {
+    if (
+      !parts.some((part) => {
+        return part.type === 'slot'
+      })
+    ) {
       continue
     }
 

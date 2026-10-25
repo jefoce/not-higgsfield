@@ -39,7 +39,9 @@ export function SettingsBody(props: SettingsBodyProps) {
     onRetry,
   } = draft
 
-  const handleRetry = () => void onRetry()
+  const handleRetry = () => {
+    return void onRetry()
+  }
 
   const loadError = status?.loadError
 
@@ -64,43 +66,47 @@ export function SettingsBody(props: SettingsBodyProps) {
 
   return (
     <>
-      {VIDEO_PROVIDERS.map((descriptor) => (
-        <SecretSection
-          key={descriptor.id}
-          sectionRef={sectionRefs[descriptor.id]}
-          descriptor={descriptor}
-          keys={status.keys}
-          values={edits}
-          onChange={handleFieldChange}
-          ready={ready[descriptor.id]}
-          testing={testing === descriptor.id}
-          result={results[descriptor.id]}
-          onTest={handleTest}
-        />
-      ))}
+      {VIDEO_PROVIDERS.map((descriptor) => {
+        return (
+          <SecretSection
+            key={descriptor.id}
+            sectionRef={sectionRefs[descriptor.id]}
+            descriptor={descriptor}
+            keys={status.keys}
+            values={edits}
+            onChange={handleFieldChange}
+            ready={ready[descriptor.id]}
+            testing={testing === descriptor.id}
+            result={results[descriptor.id]}
+            onTest={handleTest}
+          />
+        )
+      })}
 
-      {STORAGE_PROVIDERS.map((descriptor) => (
-        <SecretSection
-          key={descriptor.id}
-          sectionRef={sectionRefs[descriptor.id]}
-          descriptor={descriptor}
-          description={STORAGE_DESCRIPTION}
-          keys={status.keys}
-          values={edits}
-          onChange={handleFieldChange}
-          ready={ready[descriptor.id]}
-          testing={testing === descriptor.id}
-          result={results[descriptor.id]}
-          warning={
-            !valid[descriptor.id] && (
-              <p className="text-xxs text-danger">
-                {descriptor.id.toUpperCase()} needs all four fields
-              </p>
-            )
-          }
-          onTest={handleTest}
-        />
-      ))}
+      {STORAGE_PROVIDERS.map((descriptor) => {
+        return (
+          <SecretSection
+            key={descriptor.id}
+            sectionRef={sectionRefs[descriptor.id]}
+            descriptor={descriptor}
+            description={STORAGE_DESCRIPTION}
+            keys={status.keys}
+            values={edits}
+            onChange={handleFieldChange}
+            ready={ready[descriptor.id]}
+            testing={testing === descriptor.id}
+            result={results[descriptor.id]}
+            warning={
+              !valid[descriptor.id] && (
+                <p className="text-xxs text-danger">
+                  {descriptor.id.toUpperCase()} needs all four fields
+                </p>
+              )
+            }
+            onTest={handleTest}
+          />
+        )
+      })}
     </>
   )
 }

@@ -26,12 +26,15 @@ interface HistoryResult {
 }
 
 export function useHistory(): HistoryResult {
-  const filters = useHistoryViewStore((state) => state.filters)
+  const filters = useHistoryViewStore((state) => {
+    return state.filters
+  })
 
   const { data, isLoading, isValidating, size, setSize, mutate } =
     useSWRInfinite<GenerationListResult>(
-      (index: number, previous: GenerationListResult | null) =>
-        generationPageKey({ filters, index, previous }),
+      (index: number, previous: GenerationListResult | null) => {
+        return generationPageKey({ filters, index, previous })
+      },
       fetchGenerationPage,
       {
         keepPreviousData: true,
@@ -43,10 +46,14 @@ export function useHistory(): HistoryResult {
   useEffect(() => {
     registerHistoryRefresh(mutate)
 
-    return () => registerHistoryRefresh(null)
+    return () => {
+      return registerHistoryRefresh(null)
+    }
   }, [mutate])
 
-  const records = useMemo(() => loadedRecords(data), [data])
+  const records = useMemo(() => {
+    return loadedRecords(data)
+  }, [data])
 
   // Local active records keep title and overlay honest when the server lags.
   const activeCount = Math.max(data?.[0]?.activeCount ?? 0, countActive(records))

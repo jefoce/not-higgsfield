@@ -13,8 +13,8 @@ type FrameActions = Pick<GeneratorState, 'setFrame'>
 /** Frame slot attach and clear actions, kept out of the store creator. */
 export function createFrameActions(set: SetState): FrameActions {
   return {
-    setFrame: (slot, upload) =>
-      set((state) => {
+    setFrame: (slot, upload) => {
+      return set((state) => {
         const preset = getPreset(state.presetId)
         const frames = { ...state.frames, [slot]: upload?.id ?? null }
         const shouldClearStart = slot === 'start' && !upload
@@ -34,6 +34,7 @@ export function createFrameActions(set: SetState): FrameActions {
         const aspectRatio = isAspectRatio ? preset.defaultAspectRatio : state.aspectRatio
 
         return { frames, uploadsById, aspectRatio }
-      }),
+      })
+    },
   }
 }

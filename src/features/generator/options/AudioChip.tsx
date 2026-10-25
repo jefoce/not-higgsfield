@@ -9,11 +9,23 @@ import { useGeneratorStore } from '../store/store'
 
 /** Prompt audio toggle chip. Hidden when the model has no audio. */
 export function AudioChip() {
-  const isAudio = useGeneratorStore((state) => state.audio)
-  const setAudio = useGeneratorStore((state) => state.setAudio)
-  const preset = getPreset(useGeneratorStore((state) => state.presetId))
+  const isAudio = useGeneratorStore((state) => {
+    return state.audio
+  })
 
-  const handleToggle = (): void => setAudio(!isAudio)
+  const setAudio = useGeneratorStore((state) => {
+    return state.setAudio
+  })
+
+  const preset = getPreset(
+    useGeneratorStore((state) => {
+      return state.presetId
+    }),
+  )
+
+  const handleToggle = (): void => {
+    return setAudio(!isAudio)
+  }
 
   if (!preset.audio.supported) {
     return null

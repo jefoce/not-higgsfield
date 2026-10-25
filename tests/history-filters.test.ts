@@ -77,21 +77,43 @@ const records = [
 
 describe('applyFilters', () => {
   it('searches prompt and preset title case-insensitively', () => {
-    expect(applyFilters(records, { q: 'RED fox' }).map((r) => r.id)).toEqual(['a'])
-    expect(applyFilters(records, { q: 'other' }).map((r) => r.id)).toEqual(['b'])
+    expect(
+      applyFilters(records, { q: 'RED fox' }).map((r) => {
+        return r.id
+      }),
+    ).toEqual(['a'])
+
+    expect(
+      applyFilters(records, { q: 'other' }).map((r) => {
+        return r.id
+      }),
+    ).toEqual(['b'])
+
     expect(applyFilters(records, { q: 'zzz' })).toEqual([])
   })
 
   it('maps done to completed', () => {
-    expect(applyFilters(records, { status: 'done' }).map((r) => r.id)).toEqual(['a'])
+    expect(
+      applyFilters(records, { status: 'done' }).map((r) => {
+        return r.id
+      }),
+    ).toEqual(['a'])
   })
 
   it('maps active to active statuses', () => {
-    expect(applyFilters(records, { status: 'active' }).map((r) => r.id)).toEqual(['b', 'f', 'g'])
+    expect(
+      applyFilters(records, { status: 'active' }).map((r) => {
+        return r.id
+      }),
+    ).toEqual(['b', 'f', 'g'])
   })
 
   it('maps failed to failed, cancelled and expired', () => {
-    expect(applyFilters(records, { status: 'failed' }).map((r) => r.id)).toEqual(['c', 'd', 'e'])
+    expect(
+      applyFilters(records, { status: 'failed' }).map((r) => {
+        return r.id
+      }),
+    ).toEqual(['c', 'd', 'e'])
   })
 
   it('returns everything for status all', () => {
@@ -99,7 +121,11 @@ describe('applyFilters', () => {
   })
 
   it('filters favorites', () => {
-    expect(applyFilters(records, { favorite: true }).map((r) => r.id)).toEqual(['a'])
+    expect(
+      applyFilters(records, { favorite: true }).map((r) => {
+        return r.id
+      }),
+    ).toEqual(['a'])
   })
 
   it('filters by preset id', () => {
@@ -108,8 +134,18 @@ describe('applyFilters', () => {
       record({ id: 'prime', createdAt: at(2), presetId: 'wan-3.0-prime' }),
     ]
 
-    expect(applyFilters(mixed, { model: 'wan-3.0-prime' }).map((r) => r.id)).toEqual(['prime'])
-    expect(applyFilters(mixed, { model: 'wan-3.0' }).map((r) => r.id)).toEqual(['wan'])
+    expect(
+      applyFilters(mixed, { model: 'wan-3.0-prime' }).map((r) => {
+        return r.id
+      }),
+    ).toEqual(['prime'])
+
+    expect(
+      applyFilters(mixed, { model: 'wan-3.0' }).map((r) => {
+        return r.id
+      }),
+    ).toEqual(['wan'])
+
     expect(applyFilters(mixed, { model: 'removed' })).toEqual([])
   })
 
@@ -135,17 +171,43 @@ describe('applyFilters', () => {
       record({ id: 'refs', createdAt: at(3), tab: 'frames', references: ['r'] }),
     ]
 
-    expect(applyFilters(modes, { mode: 'text' }).map((r) => r.id)).toEqual(['text'])
-    expect(applyFilters(modes, { mode: 'frames' }).map((r) => r.id)).toEqual(['frames'])
-    expect(applyFilters(modes, { mode: 'references' }).map((r) => r.id)).toEqual(['refs'])
-    expect(applyFilters(modes, { mode: 'all', tab: 'frames' }).map((r) => r.id)).toEqual(['refs'])
+    expect(
+      applyFilters(modes, { mode: 'text' }).map((r) => {
+        return r.id
+      }),
+    ).toEqual(['text'])
+
+    expect(
+      applyFilters(modes, { mode: 'frames' }).map((r) => {
+        return r.id
+      }),
+    ).toEqual(['frames'])
+
+    expect(
+      applyFilters(modes, { mode: 'references' }).map((r) => {
+        return r.id
+      }),
+    ).toEqual(['refs'])
+
+    expect(
+      applyFilters(modes, { mode: 'all', tab: 'frames' }).map((r) => {
+        return r.id
+      }),
+    ).toEqual(['refs'])
   })
 
   it('does not mutate the input array', () => {
-    const original = records.map((r) => r.id)
+    const original = records.map((r) => {
+      return r.id
+    })
 
     applyFilters(records, { q: 'red' })
-    expect(records.map((r) => r.id)).toEqual(original)
+
+    expect(
+      records.map((r) => {
+        return r.id
+      }),
+    ).toEqual(original)
   })
 })
 
@@ -157,8 +219,17 @@ describe('sortRecords', () => {
       required(records[4], 'record 4'),
     ]
 
-    expect(sortRecords(shuffled).map((r) => r.id)).toEqual(['e', 'c', 'a'])
-    expect(shuffled.map((r) => r.id)).toEqual(['c', 'a', 'e'])
+    expect(
+      sortRecords(shuffled).map((r) => {
+        return r.id
+      }),
+    ).toEqual(['e', 'c', 'a'])
+
+    expect(
+      shuffled.map((r) => {
+        return r.id
+      }),
+    ).toEqual(['c', 'a', 'e'])
   })
 })
 
@@ -168,22 +239,42 @@ describe('paginate', () => {
   it('walks pages with a createdAt cursor', () => {
     const first = paginate({ records: sorted, cursor: null, limit: 2 })
 
-    expect(first.items.map((r) => r.id)).toEqual(['g', 'f'])
+    expect(
+      first.items.map((r) => {
+        return r.id
+      }),
+    ).toEqual(['g', 'f'])
+
     expect(first.nextCursor).toBe(`${at(6)}|f`)
 
     const second = paginate({ records: sorted, cursor: first.nextCursor, limit: 2 })
 
-    expect(second.items.map((r) => r.id)).toEqual(['e', 'd'])
+    expect(
+      second.items.map((r) => {
+        return r.id
+      }),
+    ).toEqual(['e', 'd'])
+
     expect(second.nextCursor).toBe(`${at(4)}|d`)
 
     const third = paginate({ records: sorted, cursor: second.nextCursor, limit: 2 })
 
-    expect(third.items.map((r) => r.id)).toEqual(['c', 'b'])
+    expect(
+      third.items.map((r) => {
+        return r.id
+      }),
+    ).toEqual(['c', 'b'])
+
     expect(third.nextCursor).toBe(`${at(2)}|b`)
 
     const last = paginate({ records: sorted, cursor: third.nextCursor, limit: 2 })
 
-    expect(last.items.map((r) => r.id)).toEqual(['a'])
+    expect(
+      last.items.map((r) => {
+        return r.id
+      }),
+    ).toEqual(['a'])
+
     expect(last.nextCursor).toBeNull()
   })
 
@@ -196,24 +287,40 @@ describe('paginate', () => {
 
     const first = paginate({ records: same, cursor: null, limit: 1 })
 
-    expect(first.items.map((r) => r.id)).toEqual(['z'])
+    expect(
+      first.items.map((r) => {
+        return r.id
+      }),
+    ).toEqual(['z'])
+
     const second = paginate({ records: same, cursor: first.nextCursor, limit: 1 })
 
-    expect(second.items.map((r) => r.id)).toEqual(['y'])
+    expect(
+      second.items.map((r) => {
+        return r.id
+      }),
+    ).toEqual(['y'])
+
     const third = paginate({ records: same, cursor: second.nextCursor, limit: 1 })
 
-    expect(third.items.map((r) => r.id)).toEqual(['x'])
+    expect(
+      third.items.map((r) => {
+        return r.id
+      }),
+    ).toEqual(['x'])
 
-    expect(paginate({ records: same, cursor: at(5), limit: 10 }).items.map((r) => r.id)).toEqual([
-      'z',
-      'y',
-      'x',
-    ])
+    expect(
+      paginate({ records: same, cursor: at(5), limit: 10 }).items.map((r) => {
+        return r.id
+      }),
+    ).toEqual(['z', 'y', 'x'])
   })
 
   it('defaults the limit and clamps it to the maximum', () => {
     const many = sortRecords(
-      Array.from({ length: 60 }, (_, i) => record({ id: `r${i}`, createdAt: at(i % 60) })),
+      Array.from({ length: 60 }, (_, i) => {
+        return record({ id: `r${i}`, createdAt: at(i % 60) })
+      }),
     )
 
     expect(paginate({ records: many, cursor: null, limit: 0 }).items).toHaveLength(20)

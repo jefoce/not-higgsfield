@@ -12,7 +12,9 @@ export const SHORT_SIDE = {
   '4K': 2160,
 } as const
 
-const even = (value: number): number => Math.round(value / 2) * 2
+const even = (value: number): number => {
+  return Math.round(value / 2) * 2
+}
 
 interface AspectAllowedParams {
   preset: ModelPreset

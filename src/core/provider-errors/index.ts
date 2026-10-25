@@ -62,8 +62,12 @@ export function friendlyError(params: FriendlyErrorParams): FriendlyError {
   }
 
   const rule =
-    familyRules.find((candidate) => matches(candidate, raw)) ??
-    APP_RULES.find((candidate) => matches(candidate, raw))
+    familyRules.find((candidate) => {
+      return matches(candidate, raw)
+    }) ??
+    APP_RULES.find((candidate) => {
+      return matches(candidate, raw)
+    })
 
   if (rule) {
     return resolve(rule, raw)

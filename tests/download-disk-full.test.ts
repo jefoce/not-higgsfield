@@ -12,11 +12,17 @@ const root = path.join(os.tmpdir(), `nh-disk-full-${process.pid}-${Date.now()}`)
 
 process.env.STORAGE_ROOT = root
 
-const fetchVideoContent = vi.hoisted(() => vi.fn())
+const fetchVideoContent = vi.hoisted(() => {
+  return vi.fn()
+})
 
-vi.mock('@/server/providers/registry', () => ({
-  getVideoProvider: () => ({ fetchContent: fetchVideoContent }),
-}))
+vi.mock('@/server/providers/registry', () => {
+  return {
+    getVideoProvider: () => {
+      return { fetchContent: fetchVideoContent }
+    },
+  }
+})
 
 const JOB = {
   status: 'completed' as const,
@@ -68,7 +74,11 @@ describe('download on a full disk', () => {
 
     await queueDownload(saved, JOB)
     spy.mockRestore()
-    await waitFor(async () => (fetchVideoContent.mock.calls.length === 2 ? true : null))
+
+    await waitFor(async () => {
+      return fetchVideoContent.mock.calls.length === 2 ? true : null
+    })
+
     expect(fetchVideoContent).toHaveBeenCalledTimes(2)
   })
 })
@@ -94,7 +104,9 @@ async function waitFor<T>(read: () => Promise<T | null>, timeoutMs = 2000): Prom
       return value
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 20))
+    await new Promise((resolve) => {
+      return setTimeout(resolve, 20)
+    })
   }
 
   throw new Error('Timed out waiting for the saved record')

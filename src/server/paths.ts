@@ -49,9 +49,9 @@ export async function ensureDirs(): Promise<void> {
   await fs.chmod(STORAGE_ROOT, 0o700)
 
   await Promise.all(
-    [DOWNLOADS_DIR, UPLOADS_DIR, DATA_DIR, THUMBS_DIR, COMPAT_DIR, LOGS_DIR].map((dir) =>
-      fs.mkdir(dir, { recursive: true, mode: 0o700 }),
-    ),
+    [DOWNLOADS_DIR, UPLOADS_DIR, DATA_DIR, THUMBS_DIR, COMPAT_DIR, LOGS_DIR].map((dir) => {
+      return fs.mkdir(dir, { recursive: true, mode: 0o700 })
+    }),
   )
 }
 
@@ -89,7 +89,10 @@ export async function cleanupStale(): Promise<CleanupResult> {
 }
 
 async function removeStale(dir: string, cutoff: number): Promise<number> {
-  const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => [])
+  const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => {
+    return []
+  })
+
   let removed = 0
 
   for (const entry of entries) {

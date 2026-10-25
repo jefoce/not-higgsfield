@@ -69,10 +69,17 @@ interface GhostUploadsParams {
 /** Rerun ghosts: snapshot entries the uploads API no longer returns. */
 function ghostUploads(params: GhostUploadsParams): UploadItem[] {
   const { record, ids, uploads } = params
-  const found = new Set(uploads.map((upload) => upload.id))
+
+  const found = new Set(
+    uploads.map((upload) => {
+      return upload.id
+    }),
+  )
 
   return ids
-    .filter((id) => !found.has(id))
+    .filter((id) => {
+      return !found.has(id)
+    })
     .map((id) => {
       const item = record.inputsSnapshot[id]
 

@@ -81,7 +81,11 @@ async function submit(params: SubmitJobParams): Promise<SubmittedJob> {
       throw await errorFromResponse(res)
     }
 
-    const parsed = SubmitSchema.safeParse(await res.json().catch(() => null))
+    const parsed = SubmitSchema.safeParse(
+      await res.json().catch(() => {
+        return null
+      }),
+    )
 
     if (!parsed.success) {
       throw new OpenRouterError({ message: 'Invalid submit response', status: res.status })
@@ -117,7 +121,11 @@ async function getJob(job: JobRef): Promise<JobSnapshot> {
       throw await errorFromResponse(res)
     }
 
-    const parsed = JobSchema.safeParse(await res.json().catch(() => null))
+    const parsed = JobSchema.safeParse(
+      await res.json().catch(() => {
+        return null
+      }),
+    )
 
     if (!parsed.success) {
       throw new OpenRouterError({ message: 'Invalid job response', status: res.status })
@@ -188,7 +196,12 @@ async function testConnection(): Promise<TestResult> {
       return { ok: false, error: `OpenRouter ${res.status} ${res.statusText}` }
     }
 
-    const parsed = KeySchema.safeParse(await res.json().catch(() => null))
+    const parsed = KeySchema.safeParse(
+      await res.json().catch(() => {
+        return null
+      }),
+    )
+
     const label = parsed.success ? parsed.data.data.label : undefined
 
     if (!isNonEmptyString(label)) {

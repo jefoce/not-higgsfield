@@ -6,9 +6,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { SECRET_NAMES } from '@/core/secret-names'
 
-const keychainBackendMock = vi.hoisted(() => vi.fn(async () => null))
+const keychainBackendMock = vi.hoisted(() => {
+  return vi.fn(async () => {
+    return null
+  })
+})
 
-vi.mock('@/server/secrets/keychain', () => ({ keychainBackend: keychainBackendMock }))
+vi.mock('@/server/secrets/keychain', () => {
+  return { keychainBackend: keychainBackendMock }
+})
 
 const originalPlatform = process.platform
 

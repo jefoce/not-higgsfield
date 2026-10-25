@@ -31,15 +31,17 @@ interface SubmitState {
   closed: boolean
 }
 
-const state = globalState<SubmitState>('submitQueue', () => ({
-  pending: new Set(),
-  active: new Set(),
-  timers: new Map(),
-  stages: new Map(),
-  controllers: new Map(),
-  runner: null,
-  closed: false,
-}))
+const state = globalState<SubmitState>('submitQueue', () => {
+  return {
+    pending: new Set(),
+    active: new Set(),
+    timers: new Map(),
+    stages: new Map(),
+    controllers: new Map(),
+    runner: null,
+    closed: false,
+  }
+})
 
 /** Wired in boot.ts, so this module never imports run-submit back. */
 export function configureSubmitQueue(params: SubmitQueueConfig): void {
@@ -139,7 +141,9 @@ export async function waitForSendingDone(timeoutMs: number): Promise<boolean> {
   const deadline = Date.now() + timeoutMs
 
   while (sendingCount() > 0 && Date.now() < deadline) {
-    await new Promise((resolve) => setTimeout(resolve, SUBMIT_YIELD_MS))
+    await new Promise((resolve) => {
+      return setTimeout(resolve, SUBMIT_YIELD_MS)
+    })
   }
 
   return sendingCount() === 0

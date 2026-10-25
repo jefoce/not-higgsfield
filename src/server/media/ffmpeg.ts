@@ -199,7 +199,11 @@ export async function probeMedia(filePath: string): Promise<MediaProbe> {
     : null
 
   const lines = stderr.split('\n')
-  const videoLine = lines.find((line) => line.includes('Video:'))
+
+  const videoLine = lines.find((line) => {
+    return line.includes('Video:')
+  })
+
   let candidates = lines
 
   if (isNonEmptyString(videoLine)) {
@@ -255,7 +259,9 @@ export async function extractBoundaryFrame(params: ExtractBoundaryFrameParams): 
 }
 
 async function verifyFrame(outPath: string): Promise<void> {
-  const stats = await fs.stat(outPath).catch(() => null)
+  const stats = await fs.stat(outPath).catch(() => {
+    return null
+  })
 
   if (!stats || stats.size === 0) {
     throw new Error('Frame extraction failed')

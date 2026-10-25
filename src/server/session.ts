@@ -37,7 +37,9 @@ export function hasSession(request: Request): boolean {
 
   const value = cookie
     .split(/;\s*/)
-    .find((part) => part.startsWith(`${SESSION_COOKIE}=`))
+    .find((part) => {
+      return part.startsWith(`${SESSION_COOKIE}=`)
+    })
     ?.slice(SESSION_COOKIE.length + 1)
 
   return tokenMatches(value)

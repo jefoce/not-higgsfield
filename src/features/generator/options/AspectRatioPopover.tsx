@@ -10,12 +10,31 @@ import { AspectOption } from './AspectOption'
 
 /** Aspect ratio button and preset list with conditional Auto. */
 export function AspectRatioPopover() {
-  const aspectRatio = useGeneratorStore((state) => state.aspectRatio)
-  const setAspectRatio = useGeneratorStore((state) => state.setAspectRatio)
-  const tab = useGeneratorStore((state) => state.tab)
-  const start = useGeneratorStore((state) => state.frames.start)
-  const resolution = useGeneratorStore((state) => state.resolution)
-  const preset = getPreset(useGeneratorStore((state) => state.presetId))
+  const aspectRatio = useGeneratorStore((state) => {
+    return state.aspectRatio
+  })
+
+  const setAspectRatio = useGeneratorStore((state) => {
+    return state.setAspectRatio
+  })
+
+  const tab = useGeneratorStore((state) => {
+    return state.tab
+  })
+
+  const start = useGeneratorStore((state) => {
+    return state.frames.start
+  })
+
+  const resolution = useGeneratorStore((state) => {
+    return state.resolution
+  })
+
+  const preset = getPreset(
+    useGeneratorStore((state) => {
+      return state.presetId
+    }),
+  )
 
   const isAutoAllowed = tab === 'frames' && Boolean(start) && preset.autoAspectWithFrames
   const options: AspectChoice[] = [...preset.aspectRatios]
@@ -30,7 +49,9 @@ export function AspectRatioPopover() {
     }
   }
 
-  const handleSelectAspect = (option: AspectChoice): void => setAspectRatio(option)
+  const handleSelectAspect = (option: AspectChoice): void => {
+    return setAspectRatio(option)
+  }
 
   const label = aspectRatio === 'auto' ? 'Auto' : aspectRatio
 
@@ -46,16 +67,18 @@ export function AspectRatioPopover() {
         </button>
       </PopoverTrigger>
       <PopoverContent align="center" className="w-40 space-y-1">
-        {options.map((option) => (
-          <AspectOption
-            key={option}
-            option={option}
-            selected={aspectRatio}
-            preset={preset}
-            resolution={resolution}
-            onSelect={handleSelectAspect}
-          />
-        ))}
+        {options.map((option) => {
+          return (
+            <AspectOption
+              key={option}
+              option={option}
+              selected={aspectRatio}
+              preset={preset}
+              resolution={resolution}
+              onSelect={handleSelectAspect}
+            />
+          )
+        })}
       </PopoverContent>
     </Popover>
   )

@@ -55,7 +55,11 @@ interface EncodeStepParams {
 /** Encodes every image at one shared ladder step, then checks the request budget. */
 export async function encodeImages(params: EncodeImagesParams): Promise<EncodedImages> {
   const { uploads, preset, budgetBytes, baseBytes = 0 } = params
-  const images = uploads.filter((upload) => upload.kind === 'image')
+
+  const images = uploads.filter((upload) => {
+    return upload.kind === 'image'
+  })
+
   const limit = preset.referenceLimits?.image
   const perImageBytes = Math.min(limit?.maxBytes ?? Infinity, IMAGE_MAX_ENCODED_MB * MB)
 
@@ -109,48 +113,63 @@ async function tryStep(params: TryStepParams): Promise<EncodedImages | null> {
   const maxSide = sideFor(step.maxSidePx, limit?.maxSidePx)
 
   const encoded = await Promise.all(
-    images.map(async (upload) => ({
-      upload,
-      image: await encodeAtStep({
+    images.map(async (upload) => {
+      return {
         upload,
-        step: stepNumber,
-        maxSide,
-        jpegQuality: step.jpegQuality,
-        alpha: limit?.alpha ?? false,
-      }),
-    })),
+        image: await encodeAtStep({
+          upload,
+          step: stepNumber,
+          maxSide,
+          jpegQuality: step.jpegQuality,
+          alpha: limit?.alpha ?? false,
+        }),
+      }
+    }),
   )
 
-  const totalBytes = sumBy(encoded, ({ image }) => image.bytes)
+  const totalBytes = sumBy(encoded, ({ image }) => {
+    return image.bytes
+  })
+
   const isWithinBudget = totalBytes + baseBytes <= budgetBytes
-  const isUnderCap = encoded.every(({ image }) => image.bytes <= perImageBytes)
+
+  const isUnderCap = encoded.every(({ image }) => {
+    return image.bytes <= perImageBytes
+  })
 
   if (!isWithinBudget || !isUnderCap) {
     return null
   }
 
-  const media = Object.fromEntries(encoded.map(({ upload, image }) => [upload.id, image]))
+  const media = Object.fromEntries(
+    encoded.map(({ upload, image }) => {
+      return [upload.id, image]
+    }),
+  )
 
   return {
     plan: {
       step: stepNumber,
       maxSide,
       totalBytes,
-      images: encoded.map(({ upload, image }) => ({
-        id: upload.id,
-        width: image.width,
-        height: image.height,
-        bytes: image.bytes,
-        format: image.format,
-        flattened: image.flattened,
-      })),
+      images: encoded.map(({ upload, image }) => {
+        return {
+          id: upload.id,
+          width: image.width,
+          height: image.height,
+          bytes: image.bytes,
+          format: image.format,
+          flattened: image.flattened,
+        }
+      }),
     },
     media,
   }
 }
 
-const sideFor = (stepSide: number, modelSide?: number): number =>
-  Math.min(stepSide, modelSide ?? IMAGE_MAX_SIDE_PX)
+const sideFor = (stepSide: number, modelSide?: number): number => {
+  return Math.min(stepSide, modelSide ?? IMAGE_MAX_SIDE_PX)
+}
 
 const MAX_CONCURRENT = 2
 const inFlight = new Map<string, Promise<EncodedImage>>()
@@ -174,7 +193,11 @@ async function encodeAtStep(params: EncodeStepParams): Promise<EncodedImage> {
     return shared
   }
 
-  const task = withSlot(() => encodeUncached(params)).finally(() => inFlight.delete(key))
+  const task = withSlot(() => {
+    return encodeUncached(params)
+  }).finally(() => {
+    return inFlight.delete(key)
+  })
 
   inFlight.set(key, task)
 
@@ -183,7 +206,9 @@ async function encodeAtStep(params: EncodeStepParams): Promise<EncodedImage> {
 
 async function withSlot<T>(fn: () => Promise<T>): Promise<T> {
   if (active >= MAX_CONCURRENT) {
-    await new Promise<void>((resolve) => waiters.push(resolve))
+    await new Promise<void>((resolve) => {
+      return waiters.push(resolve)
+    })
   }
 
   active += 1
@@ -267,7 +292,9 @@ async function opacityFor(upload: UploadItem, source: string): Promise<boolean> 
 
       return isOpaque
     })
-    .finally(() => opacityInFlight.delete(upload.id))
+    .finally(() => {
+      return opacityInFlight.delete(upload.id)
+    })
 
   opacityInFlight.set(upload.id, task)
 
@@ -285,4 +312,6 @@ async function statsOpaque(source: string): Promise<boolean> {
   return (await sharp(source, { pages: 1 }).stats()).isOpaque
 }
 
-const base64Bytes = (bytes: number): number => Math.ceil(bytes / 3) * 4
+const base64Bytes = (bytes: number): number => {
+  return Math.ceil(bytes / 3) * 4
+}

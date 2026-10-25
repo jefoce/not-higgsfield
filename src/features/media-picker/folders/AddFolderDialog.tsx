@@ -30,7 +30,9 @@ export function AddFolderDialog(props: AddFolderDialogProps) {
     props.onOpenChange(isNext)
   }
 
-  const handleClose = () => handleOpenChange(false)
+  const handleClose = () => {
+    return handleOpenChange(false)
+  }
 
   const connect = useFolderConnect({
     data: browse.data,

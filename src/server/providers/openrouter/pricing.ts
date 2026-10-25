@@ -32,7 +32,13 @@ const cache = createTtlCache<PricingInfo>({
 
 /** List and discounted rates. Live results cache for an hour, fallback for five minutes. */
 export async function getPricing(preset: ModelPreset, isForce = false): Promise<PricingInfo> {
-  return cache.get(preset.id, () => loadPricing(preset, isForce), isForce)
+  return cache.get(
+    preset.id,
+    () => {
+      return loadPricing(preset, isForce)
+    },
+    isForce,
+  )
 }
 
 async function loadPricing(
@@ -85,7 +91,10 @@ async function fetchPricing(preset: ModelPreset, isForce: boolean): Promise<Pric
 async function fetchListSkus(preset: ModelPreset, isForce: boolean): Promise<Dict<number> | null> {
   try {
     const models = await fetchVideoModels(isForce)
-    const model = models.find((item) => item.id === primaryBinding(preset).modelId)
+
+    const model = models.find((item) => {
+      return item.id === primaryBinding(preset).modelId
+    })
 
     if (isNil(model)) {
       return null

@@ -24,10 +24,12 @@ interface FolderCrumb {
 function crumbPaths(path: string): FolderCrumb[] {
   const parts = path.split('/').filter(Boolean)
 
-  return parts.map((label, index) => ({
-    label,
-    path: `/${parts.slice(0, index + 1).join('/')}`,
-  }))
+  return parts.map((label, index) => {
+    return {
+      label,
+      path: `/${parts.slice(0, index + 1).join('/')}`,
+    }
+  })
 }
 
 /** Path bar and directory list for the add-folder dialog. */
@@ -45,14 +47,16 @@ export function FolderBrowser(props: FolderBrowserProps) {
         >
           /
         </button>
-        {crumbs.map((crumb) => (
-          <FolderCrumbButton
-            key={crumb.path}
-            label={crumb.label}
-            path={crumb.path}
-            onNavigate={props.onNavigate}
-          />
-        ))}
+        {crumbs.map((crumb) => {
+          return (
+            <FolderCrumbButton
+              key={crumb.path}
+              label={crumb.label}
+              path={crumb.path}
+              onNavigate={props.onNavigate}
+            />
+          )
+        })}
       </div>
 
       <div className="mt-3 min-h-0 flex-1 overflow-y-auto">
@@ -73,9 +77,9 @@ export function FolderBrowser(props: FolderBrowserProps) {
           </button>
         )}
 
-        {data?.dirs.map((dir) => (
-          <DirectoryButton key={dir.path} dir={dir} onNavigate={props.onNavigate} />
-        ))}
+        {data?.dirs.map((dir) => {
+          return <DirectoryButton key={dir.path} dir={dir} onNavigate={props.onNavigate} />
+        })}
       </div>
     </>
   )

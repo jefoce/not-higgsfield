@@ -4,13 +4,16 @@ import { submitError } from '@/server/jobs/run-submit'
 import { errorFromResponse } from '@/server/providers/openrouter/http'
 import { ProviderError } from '@/server/providers/provider-error'
 
-vi.mock('server-only', () => ({}))
+vi.mock('server-only', () => {
+  return {}
+})
 
-const response = (body: unknown, status = 400): Response =>
-  new Response(JSON.stringify(body), {
+const response = (body: unknown, status = 400): Response => {
+  return new Response(JSON.stringify(body), {
     status,
     headers: { 'content-type': 'application/json' },
   })
+}
 
 describe('errorFromResponse', () => {
   it('combines the message with provider and raw detail', async () => {

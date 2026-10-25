@@ -35,8 +35,12 @@ export async function POST(request: Request, { params }: IdRouteContext) {
       record.status === 'completed' &&
       Boolean(record.output?.video) &&
       (await fs.stat(videoPath).then(
-        (stats) => stats.isFile(),
-        () => false,
+        (stats) => {
+          return stats.isFile()
+        },
+        () => {
+          return false
+        },
       ))
 
     if (!isReady) {

@@ -71,7 +71,10 @@ function slotTooltip(params: SlotTooltipParams): string | undefined {
 /** One frame drop slot with preview, replace and remove actions. */
 export function FrameSlot(props: FrameSlotProps) {
   const { slot, disabled: isDisabled = false, disabledReason } = props
-  const frameId = useGeneratorStore((state) => state.frames[slot])
+
+  const frameId = useGeneratorStore((state) => {
+    return state.frames[slot]
+  })
 
   const upload = useGeneratorStore((state) => {
     if (!isNonEmptyString(frameId)) {
@@ -81,8 +84,16 @@ export function FrameSlot(props: FrameSlotProps) {
     return state.uploadsById[frameId]
   })
 
-  const setFrame = useGeneratorStore((state) => state.setFrame)
-  const preset = getPreset(useGeneratorStore((state) => state.presetId))
+  const setFrame = useGeneratorStore((state) => {
+    return state.setFrame
+  })
+
+  const preset = getPreset(
+    useGeneratorStore((state) => {
+      return state.presetId
+    }),
+  )
+
   const extensions = extensionsFromLimits(preset.referenceLimits)
 
   const handleUploaded = (items: UploadItem[]): void => {
@@ -104,16 +115,19 @@ export function FrameSlot(props: FrameSlotProps) {
   const hasFrame = Boolean(frameId)
   const { isBroken, isPreviewable } = frameState({ hasFrame, upload })
 
-  const handlePick = (): void =>
-    openMediaPicker({
+  const handlePick = (): void => {
+    return openMediaPicker({
       target: TARGETS[slot],
       kinds: ['image'],
       max: 1,
       extensions,
       onPick: handleUploaded,
     })
+  }
 
-  const handleRemove = (): void => setFrame(slot, null)
+  const handleRemove = (): void => {
+    return setFrame(slot, null)
+  }
 
   const handlePreview = (): void => {
     if (!upload) {

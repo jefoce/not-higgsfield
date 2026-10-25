@@ -71,8 +71,11 @@ function normalizeFrames(frames: FrameSlots, preset: ModelPreset): FrameSlots {
   return { start: frames.start, end: frames.end }
 }
 
-const referencesDisabled = (preset: ModelPreset): boolean =>
-  MEDIA_KINDS.every((kind) => preset.references[kind] === 0)
+const referencesDisabled = (preset: ModelPreset): boolean => {
+  return MEDIA_KINDS.every((kind) => {
+    return preset.references[kind] === 0
+  })
+}
 
 interface TrimReferencesParams {
   ids: string[]
@@ -109,7 +112,9 @@ function trimReferences(params: TrimReferencesParams): TrimReferencesResult {
     return false
   })
 
-  const notes = MEDIA_KINDS.filter((kind) => removed[kind] > 0).map((kind) => {
+  const notes = MEDIA_KINDS.filter((kind) => {
+    return removed[kind] > 0
+  }).map((kind) => {
     const count = removed[kind]
     const suffix = count === 1 ? '' : 's'
 

@@ -51,14 +51,16 @@ export function UploadsGrid(props: UploadsGridProps) {
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
       <div className="grid grid-cols-4 content-start gap-3 p-3">
-        {uploading.map((entry) => (
-          <UploadingRow
-            key={entry.id}
-            entry={entry}
-            onRetry={props.onRetry}
-            onDismiss={props.onDismiss}
-          />
-        ))}
+        {uploading.map((entry) => {
+          return (
+            <UploadingRow
+              key={entry.id}
+              entry={entry}
+              onRetry={props.onRetry}
+              onDismiss={props.onDismiss}
+            />
+          )
+        })}
         {canChooseFiles && (
           <ChooseDiskTile
             kinds={kinds}
@@ -76,23 +78,25 @@ export function UploadsGrid(props: UploadsGridProps) {
           />
         )}
         {isLoading &&
-          SKELETON.map((key) => (
-            <div key={key} className="aspect-square animate-pulse rounded-lg bg-surface-2" />
-          ))}
+          SKELETON.map((key) => {
+            return <div key={key} className="aspect-square animate-pulse rounded-lg bg-surface-2" />
+          })}
         {!isLoading &&
-          items.map((item, previewIndex) => (
-            <MediaRow
-              key={item.id}
-              item={item}
-              items={items}
-              previewIndex={previewIndex}
-              actions={actions}
-              selectedIndex={selectedIds.indexOf(item.id)}
-              isAtMax={isMaxReached}
-              onSelect={props.onSelect}
-              onDelete={props.onDelete}
-            />
-          ))}
+          items.map((item, previewIndex) => {
+            return (
+              <MediaRow
+                key={item.id}
+                item={item}
+                items={items}
+                previewIndex={previewIndex}
+                actions={actions}
+                selectedIndex={selectedIds.indexOf(item.id)}
+                isAtMax={isMaxReached}
+                onSelect={props.onSelect}
+                onDelete={props.onDelete}
+              />
+            )
+          })}
         {!isLoading && isEmpty(items) && (
           <p className="col-span-full py-8 text-center text-sm text-fg-2">No uploads yet</p>
         )}

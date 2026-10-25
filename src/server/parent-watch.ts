@@ -23,7 +23,9 @@ export function startParentWatch(): () => void {
     process.exit(0)
   }, CHECK_MS)
 
-  return () => clearInterval(timer)
+  return () => {
+    return clearInterval(timer)
+  }
 }
 
 /** EPERM means the parent exists but is not signalable, so treat it as alive. */

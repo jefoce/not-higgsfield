@@ -37,11 +37,17 @@ export function DetailsActions(props: DetailsActionsProps) {
 
   const timeNow = isActive ? now : undefined
 
-  const handleReuse = () => void rerunRecord(record)
+  const handleReuse = () => {
+    return void rerunRecord(record)
+  }
 
-  const handleDownload = () => void saveRecordVideo(record)
+  const handleDownload = () => {
+    return void saveRecordVideo(record)
+  }
 
-  const handleFavorite = () => void toggleFavorite(record)
+  const handleFavorite = () => {
+    return void toggleFavorite(record)
+  }
 
   const handleConfirmOpenChange = (isOpen: boolean): void => {
     confirmDialog.set(isOpen)

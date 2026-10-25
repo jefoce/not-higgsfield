@@ -26,85 +26,98 @@ interface SelectionState {
   prune: (existing: ReadonlySet<string>) => void
 }
 
-export const useSelectionStore = create<SelectionState>()((set, get) => ({
-  ids: new Set(),
-  order: [],
-  anchorId: null,
+export const useSelectionStore = create<SelectionState>()((set, get) => {
+  return {
+    ids: new Set(),
+    order: [],
+    anchorId: null,
 
-  toggle: (id) =>
-    set((state) => {
-      const ids = new Set(state.ids)
+    toggle: (id) => {
+      return set((state) => {
+        const ids = new Set(state.ids)
 
-      if (ids.has(id)) {
-        ids.delete(id)
-      } else {
-        ids.add(id)
-      }
-
-      return { ids, anchorId: id }
-    }),
-
-  selectRange: (toId) => {
-    const { anchorId, order } = get()
-    let from = -1
-
-    if (!isNil(anchorId)) {
-      from = order.indexOf(anchorId)
-    }
-
-    const to = order.indexOf(toId)
-
-    if (from === -1 || to === -1) {
-      get().toggle(toId)
-
-      return
-    }
-
-    const start = Math.min(from, to)
-    const end = Math.max(from, to)
-
-    set((state) => {
-      const ids = new Set(state.ids)
-
-      for (const id of order.slice(start, end + 1)) {
-        ids.add(id)
-      }
-
-      return { ids }
-    })
-  },
-
-  setOrder: (order) => set({ order }),
-
-  setMany: (list, isOn) =>
-    set((state) => {
-      const ids = new Set(state.ids)
-
-      for (const id of list) {
-        if (isOn) {
-          ids.add(id)
-        } else {
+        if (ids.has(id)) {
           ids.delete(id)
+        } else {
+          ids.add(id)
         }
+
+        return { ids, anchorId: id }
+      })
+    },
+
+    selectRange: (toId) => {
+      const { anchorId, order } = get()
+      let from = -1
+
+      if (!isNil(anchorId)) {
+        from = order.indexOf(anchorId)
       }
 
-      return { ids }
-    }),
+      const to = order.indexOf(toId)
 
-  clear: () => set({ ids: new Set(), anchorId: null }),
+      if (from === -1 || to === -1) {
+        get().toggle(toId)
 
-  prune: (existing) =>
-    set((state) => {
-      const ids = new Set([...state.ids].filter((id) => existing.has(id)))
-
-      const isAnchorId = isNonEmptyString(state.anchorId) && existing.has(state.anchorId)
-
-      const anchorId = isAnchorId ? state.anchorId : null
-
-      if (ids.size === state.ids.size && anchorId === state.anchorId) {
-        return state
+        return
       }
 
-      return { ids, anchorId }
-    }),
-}))
+      const start = Math.min(from, to)
+      const end = Math.max(from, to)
+
+      set((state) => {
+        const ids = new Set(state.ids)
+
+        for (const id of order.slice(start, end + 1)) {
+          ids.add(id)
+        }
+
+        return { ids }
+      })
+    },
+
+    setOrder: (order) => {
+      return set({ order })
+    },
+
+    setMany: (list, isOn) => {
+      return set((state) => {
+        const ids = new Set(state.ids)
+
+        for (const id of list) {
+          if (isOn) {
+            ids.add(id)
+          } else {
+            ids.delete(id)
+          }
+        }
+
+        return { ids }
+      })
+    },
+
+    clear: () => {
+      return set({ ids: new Set(), anchorId: null })
+    },
+
+    prune: (existing) => {
+      return set((state) => {
+        const ids = new Set(
+          [...state.ids].filter((id) => {
+            return existing.has(id)
+          }),
+        )
+
+        const isAnchorId = isNonEmptyString(state.anchorId) && existing.has(state.anchorId)
+
+        const anchorId = isAnchorId ? state.anchorId : null
+
+        if (ids.size === state.ids.size && anchorId === state.anchorId) {
+          return state
+        }
+
+        return { ids, anchorId }
+      })
+    },
+  }
+})

@@ -8,13 +8,22 @@ const listeners = new Set<() => void>()
  * Marks id active, newest last. Evicts the oldest beyond MAX_ACTIVE.
  */
 export function acquire(id: string) {
-  const next = [...active.filter((x) => x !== id), id]
+  const next = [
+    ...active.filter((x) => {
+      return x !== id
+    }),
+    id,
+  ]
 
   while (next.length > MAX_ACTIVE) {
     next.shift()
   }
 
-  const isUnchanged = next.length === active.length && next.every((x, i) => x === active[i])
+  const isUnchanged =
+    next.length === active.length &&
+    next.every((x, i) => {
+      return x === active[i]
+    })
 
   if (isUnchanged) {
     return
@@ -30,7 +39,10 @@ export function release(id: string) {
     return
   }
 
-  active = active.filter((x) => x !== id)
+  active = active.filter((x) => {
+    return x !== id
+  })
+
   emit()
 }
 

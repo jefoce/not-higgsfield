@@ -21,7 +21,9 @@ export function InputThumb(props: InputThumbProps) {
   const firstChar = item.name.charAt(0).toUpperCase()
   const initial = firstChar === '' ? '?' : firstChar
 
-  const handleOpen = () => void openThumb(item)
+  const handleOpen = () => {
+    return void openThumb(item)
+  }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== 'Enter' && event.key !== ' ') {
@@ -32,7 +34,9 @@ export function InputThumb(props: InputThumbProps) {
     handleOpen()
   }
 
-  const handleError = () => setIsBroken(true)
+  const handleError = () => {
+    return setIsBroken(true)
+  }
 
   const title = `${item.label} \u00b7 ${item.name}`
   const sent = item.sent

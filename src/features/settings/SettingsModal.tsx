@@ -17,15 +17,26 @@ import { useSettingsDraft } from './use-settings-draft'
 
 function createSectionRefs(): Record<SettingsSection, RefObject<HTMLElement | null>> {
   return Object.fromEntries(
-    SETTINGS_SECTION_IDS.map((id) => [id, createRef<HTMLElement>()]),
+    SETTINGS_SECTION_IDS.map((id) => {
+      return [id, createRef<HTMLElement>()]
+    }),
   ) as Record<SettingsSection, RefObject<HTMLElement | null>>
 }
 
 /** Stored key editor: status, save, remove and test. */
 export function SettingsModal() {
-  const isOpen = useSettingsStore((state) => state.open)
-  const section = useSettingsStore((state) => state.section)
-  const closeSettings = useSettingsStore((state) => state.closeSettings)
+  const isOpen = useSettingsStore((state) => {
+    return state.open
+  })
+
+  const section = useSettingsStore((state) => {
+    return state.section
+  })
+
+  const closeSettings = useSettingsStore((state) => {
+    return state.closeSettings
+  })
+
   const { status } = useSecrets()
 
   const { data: credits } = useSWR<CreditsInfo>(CREDITS_KEY, fetchCredits, {
@@ -38,14 +49,20 @@ export function SettingsModal() {
 
   const draft = useSettingsDraft({ status, mock: isMock, closeSettings })
 
-  const sectionRefs = useMemo(() => createSectionRefs(), [])
+  const sectionRefs = useMemo(() => {
+    return createSectionRefs()
+  }, [])
 
   const note = backendNote(status?.backend)
   const { onClose } = draft
 
-  const handleClose = () => void onClose(false)
+  const handleClose = () => {
+    return void onClose(false)
+  }
 
-  const handleSave = () => void draft.onSave()
+  const handleSave = () => {
+    return void draft.onSave()
+  }
 
   useEffect(() => {
     if (!isOpen) {

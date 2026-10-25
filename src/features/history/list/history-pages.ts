@@ -5,8 +5,14 @@ import type { GenerationListResult } from '@/core/types'
 import { refreshHistory } from '@/lib/swr-keys'
 
 /** Deduped records from every loaded history page. */
-export const loadedRecords = (pages?: GenerationListResult[]): GenerationRecord[] =>
-  uniqBy(pages?.flatMap((page) => page.items) ?? [], 'id')
+export const loadedRecords = (pages?: GenerationListResult[]): GenerationRecord[] => {
+  return uniqBy(
+    pages?.flatMap((page) => {
+      return page.items
+    }) ?? [],
+    'id',
+  )
+}
 
 interface PatchPageParams {
   page: GenerationListResult
@@ -17,7 +23,10 @@ interface PatchPageParams {
 /** Replaces matching records in one page, keeping order, cursors and the polled count. */
 export function patchPage(params: PatchPageParams): GenerationListResult {
   const { page, byId, activeCount } = params
-  const hasMatch = page.items.some((item) => byId.has(item.id))
+
+  const hasMatch = page.items.some((item) => {
+    return byId.has(item.id)
+  })
 
   if (!hasMatch && page.activeCount === activeCount) {
     return page
@@ -26,7 +35,9 @@ export function patchPage(params: PatchPageParams): GenerationListResult {
   let items = page.items
 
   if (hasMatch) {
-    items = page.items.map((item) => byId.get(item.id) ?? item)
+    items = page.items.map((item) => {
+      return byId.get(item.id) ?? item
+    })
   }
 
   return {

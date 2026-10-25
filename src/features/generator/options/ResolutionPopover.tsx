@@ -13,22 +13,43 @@ import { ResolutionOption } from './ResolutionOption'
 
 /** Resolution button and preset list with list and discounted per-second rates. */
 export function ResolutionPopover() {
-  const resolution = useGeneratorStore((state) => state.resolution)
-  const setResolution = useGeneratorStore((state) => state.setResolution)
-  const isAudio = useGeneratorStore((state) => state.audio)
-  const aspect = useGeneratorStore((state) => state.aspectRatio)
+  const resolution = useGeneratorStore((state) => {
+    return state.resolution
+  })
 
-  const hasVideoInput = useGeneratorStore(
-    (state) =>
+  const setResolution = useGeneratorStore((state) => {
+    return state.setResolution
+  })
+
+  const isAudio = useGeneratorStore((state) => {
+    return state.audio
+  })
+
+  const aspect = useGeneratorStore((state) => {
+    return state.aspectRatio
+  })
+
+  const hasVideoInput = useGeneratorStore((state) => {
+    return (
       state.tab === 'references' &&
-      state.references.some((id) => state.uploadsById[id]?.kind === 'video'),
+      state.references.some((id) => {
+        return state.uploadsById[id]?.kind === 'video'
+      })
+    )
+  })
+
+  const preset = getPreset(
+    useGeneratorStore((state) => {
+      return state.presetId
+    }),
   )
 
-  const preset = getPreset(useGeneratorStore((state) => state.presetId))
   const pricing = useModelEntry(preset.id)?.pricing
   const discount = pricing?.discount ?? 0
 
-  const handleSelectResolution = (option: Resolution): void => setResolution(option)
+  const handleSelectResolution = (option: Resolution): void => {
+    return setResolution(option)
+  }
 
   return (
     <Popover>

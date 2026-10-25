@@ -22,18 +22,20 @@ export function SecretFields(props: SecretFieldsProps) {
 
   return (
     <div className="space-y-3">
-      {fields.map((field) => (
-        <SecretField
-          key={field.name}
-          name={field.name}
-          label={field.label}
-          hint={field.hint}
-          status={keys[field.name]}
-          value={values[field.name] ?? ''}
-          remove={isNull(values[field.name])}
-          onChange={props.onChange}
-        />
-      ))}
+      {fields.map((field) => {
+        return (
+          <SecretField
+            key={field.name}
+            name={field.name}
+            label={field.label}
+            hint={field.hint}
+            status={keys[field.name]}
+            value={values[field.name] ?? ''}
+            remove={isNull(values[field.name])}
+            onChange={props.onChange}
+          />
+        )
+      })}
     </div>
   )
 }

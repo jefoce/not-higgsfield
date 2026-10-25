@@ -15,7 +15,9 @@ interface PreviewActionButtonProps {
 export function PreviewActionButton(props: PreviewActionButtonProps) {
   const { actionKey, label, variant } = props
 
-  const handleClick = () => props.onRun(actionKey)
+  const handleClick = () => {
+    return props.onRun(actionKey)
+  }
 
   return (
     <Button size="sm" variant={variant} onClick={handleClick}>

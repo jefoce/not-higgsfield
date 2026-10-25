@@ -31,7 +31,10 @@ export async function createGeneration(raw: GenerationInput): Promise<Generation
 
   const estimate = await estimateGeneration({ preset, input, uploads })
   const now = new Date().toISOString()
-  const binding = activeBinding(preset, (item) => getVideoProvider(item.provider).isConfigured())
+
+  const binding = activeBinding(preset, (item) => {
+    return getVideoProvider(item.provider).isConfigured()
+  })
 
   const cost: GenerationCost = {
     currency: 'USD',
@@ -69,7 +72,11 @@ export async function createGeneration(raw: GenerationInput): Promise<Generation
 }
 
 function snapshot(uploads: UploadsById, plan: ReferencePlan): InputSnapshot {
-  const sent = new Map(plan.images.map((image) => [image.id, image]))
+  const sent = new Map(
+    plan.images.map((image) => {
+      return [image.id, image]
+    }),
+  )
 
   return Object.fromEntries(
     Object.values(uploads).map((upload) => {

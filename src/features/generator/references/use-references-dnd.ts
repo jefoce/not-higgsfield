@@ -27,7 +27,9 @@ export function useReferencesDnd(references: string[]) {
   const order = previewOrder ?? references
 
   const indexes = useCallback(
-    (a: string, b: string): [number, number] => [references.indexOf(a), references.indexOf(b)],
+    (a: string, b: string): [number, number] => {
+      return [references.indexOf(a), references.indexOf(b)]
+    },
     [references],
   )
 

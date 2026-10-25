@@ -9,7 +9,9 @@ import { ZoomSlider } from './ZoomSlider'
 
 /** Fixed history header: section pill, zoom, view switch and filters. */
 export function HistoryToolbar() {
-  const filters = useHistoryViewStore((state) => state.filters)
+  const filters = useHistoryViewStore((state) => {
+    return state.filters
+  })
 
   return (
     <div className="flex h-14 items-center justify-between gap-3 px-4">

@@ -7,7 +7,9 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import type { UploadItem } from '@/core/schemas/upload-item'
 
-vi.mock('server-only', () => ({}))
+vi.mock('server-only', () => {
+  return {}
+})
 
 const ROOT = path.join(process.cwd(), '.cache', `uploads-update-test-${process.pid}`)
 const PREVIOUS_ROOT = process.env.STORAGE_ROOT
@@ -46,10 +48,12 @@ describe('updateUpload', () => {
 
     await saveUploadItem(item)
 
-    const updated = await updateUpload(item.id, (current) => ({
-      ...current,
-      originalName: 'renamed.png',
-    }))
+    const updated = await updateUpload(item.id, (current) => {
+      return {
+        ...current,
+        originalName: 'renamed.png',
+      }
+    })
 
     expect(updated?.originalName).toBe('renamed.png')
   })
@@ -60,7 +64,9 @@ describe('updateUpload', () => {
     await saveUploadItem(item)
     await removeUpload(item.id)
 
-    const updated = await updateUpload(item.id, (current) => current)
+    const updated = await updateUpload(item.id, (current) => {
+      return current
+    })
 
     expect(updated).toBeNull()
   })

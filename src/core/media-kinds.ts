@@ -18,8 +18,13 @@ export const KIND_PLURAL: Record<MediaKind, string> = {
   audio: 'audio',
 }
 
-export const kindFromTitle = (title: string): MediaKind | null =>
-  MEDIA_KINDS.find((kind) => KIND_TITLE[kind] === title) ?? null
+export const kindFromTitle = (title: string): MediaKind | null => {
+  return (
+    MEDIA_KINDS.find((kind) => {
+      return KIND_TITLE[kind] === title
+    }) ?? null
+  )
+}
 
 export type KindExtensions = Partial<Record<MediaKind, readonly string[]>>
 
@@ -44,12 +49,18 @@ const MIME_TYPES: Dict<string> = {
   ogg: 'audio/ogg',
 }
 
-const normalizeExt = (ext: string): string => ext.trim().toLowerCase().replace(/^\./, '')
+const normalizeExt = (ext: string): string => {
+  return ext.trim().toLowerCase().replace(/^\./, '')
+}
 
 export function kindFromExt(ext: string): MediaKind | null {
   const normalized = normalizeExt(ext)
 
-  return MEDIA_KINDS.find((kind) => EXTENSIONS[kind].includes(normalized)) ?? null
+  return (
+    MEDIA_KINDS.find((kind) => {
+      return EXTENSIONS[kind].includes(normalized)
+    }) ?? null
+  )
 }
 
 export function kindFromName(name: string): MediaKind | null {
@@ -115,7 +126,9 @@ export function kindFromFile(file: FileInfo): MediaKind | null {
     return byName
   }
 
-  const ext = Object.entries(MIME_TYPES).find(([, mime]) => mime === file.type)?.[0]
+  const ext = Object.entries(MIME_TYPES).find(([, mime]) => {
+    return mime === file.type
+  })?.[0]
 
   if (!isNonEmptyString(ext)) {
     return null
@@ -166,7 +179,9 @@ export function mimeFromExt(ext: string): string | null {
 
 export function acceptForKinds(kinds: readonly MediaKind[], extensions?: KindExtensions): string {
   return extensionsForKinds(kinds, extensions)
-    .map((ext) => `.${ext}`)
+    .map((ext) => {
+      return `.${ext}`
+    })
     .join(',')
 }
 
@@ -193,7 +208,11 @@ function extensionOf(file: FileInfo): string {
     return file.name.slice(dot + 1)
   }
 
-  return Object.entries(MIME_TYPES).find(([, mime]) => mime === file.type)?.[0] ?? ''
+  return (
+    Object.entries(MIME_TYPES).find(([, mime]) => {
+      return mime === file.type
+    })?.[0] ?? ''
+  )
 }
 
 export function extWithDot(name: string): string {

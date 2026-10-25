@@ -6,10 +6,12 @@ import type { UploadItem } from '@/core/schemas/upload-item'
 
 export const wan = getPreset('wan-3.0')
 
-export const withPreset = (overrides: Partial<ModelPreset>): ModelPreset => ({
-  ...wan,
-  ...overrides,
-})
+export const withPreset = (overrides: Partial<ModelPreset>): ModelPreset => {
+  return {
+    ...wan,
+    ...overrides,
+  }
+}
 
 export function input(overrides: Partial<GenerationInput> = {}): GenerationInput {
   return {
@@ -45,5 +47,10 @@ export function upload(
   }
 }
 
-export const uploadsOf = (...items: UploadItem[]): UploadsById =>
-  Object.fromEntries(items.map((item) => [item.id, item]))
+export const uploadsOf = (...items: UploadItem[]): UploadsById => {
+  return Object.fromEntries(
+    items.map((item) => {
+      return [item.id, item]
+    }),
+  )
+}

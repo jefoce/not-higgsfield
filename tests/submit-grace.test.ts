@@ -5,11 +5,13 @@ import { canCancelInGrace, graceDelayMs } from '@/core/submit-state'
 
 type CancelState = Pick<GenerationRecord, 'status' | 'submit' | 'job'>
 
-const state = (overrides: Partial<CancelState> = {}): CancelState => ({
-  status: 'submitting',
-  submit: { stage: 'grace', notBefore: '2026-01-01T00:00:10.000Z' },
-  ...overrides,
-})
+const state = (overrides: Partial<CancelState> = {}): CancelState => {
+  return {
+    status: 'submitting',
+    submit: { stage: 'grace', notBefore: '2026-01-01T00:00:10.000Z' },
+    ...overrides,
+  }
+}
 
 const NOW = Date.parse('2026-01-01T00:00:00.000Z')
 

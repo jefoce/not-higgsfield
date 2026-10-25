@@ -27,16 +27,18 @@ function priceJson(draft: PriceDraft): string {
 /** Server price for the current draft, with the list price when discounted. */
 export function usePanelPrice() {
   const draft = useGeneratorStore(
-    useShallow((state) => ({
-      presetId: state.presetId,
-      tab: state.tab,
-      audio: state.audio,
-      duration: state.duration,
-      aspectRatio: state.aspectRatio,
-      resolution: state.resolution,
-      frames: state.frames,
-      references: state.references,
-    })),
+    useShallow((state) => {
+      return {
+        presetId: state.presetId,
+        tab: state.tab,
+        audio: state.audio,
+        duration: state.duration,
+        aspectRatio: state.aspectRatio,
+        resolution: state.resolution,
+        frames: state.frames,
+        references: state.references,
+      }
+    }),
   )
 
   const json = priceJson(draft)

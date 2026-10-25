@@ -96,11 +96,17 @@ async function uploadAndSend(params: Prepared, signal?: AbortSignal): Promise<vo
 
   throwIfStopped(signal)
 
-  if (inputIds(record.input).some((id) => isNil(uploads[id]))) {
+  if (
+    inputIds(record.input).some((id) => {
+      return isNil(uploads[id])
+    })
+  ) {
     throw new Error('Input file was removed before submit')
   }
 
-  const gone = Object.values(uploads).find((upload) => upload.missing === true)
+  const gone = Object.values(uploads).find((upload) => {
+    return upload.missing === true
+  })
 
   if (gone) {
     throw new Error(`File missing: ${gone.originalName}`)

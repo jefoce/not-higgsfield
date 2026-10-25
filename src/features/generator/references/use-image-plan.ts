@@ -34,7 +34,9 @@ export function useImagePlan(presetId: string, ids: string[]): ReferencePlan | n
         .catch(() => {})
     }, 400)
 
-    return () => window.clearTimeout(timer)
+    return () => {
+      return window.clearTimeout(timer)
+    }
   }, [presetId, key, answerKey])
 
   // A changed list or preset never shows the previous plan while the new one loads.

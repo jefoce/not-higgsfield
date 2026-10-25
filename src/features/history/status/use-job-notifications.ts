@@ -109,7 +109,9 @@ function showChanges(records: GenerationRecord[]): void {
   const first = records.at(0)
 
   if (!isNil(first)) {
-    window.setTimeout(() => scrollToRecord(first.id), HISTORY_SCROLL_DELAY_MS)
+    window.setTimeout(() => {
+      return scrollToRecord(first.id)
+    }, HISTORY_SCROLL_DELAY_MS)
   }
 }
 
@@ -119,7 +121,9 @@ function notifyHidden(title: string, body: string): void {
   }
 
   void getPlatform()
-    .then((platform) => platform.notify(title, body))
+    .then((platform) => {
+      return platform.notify(title, body)
+    })
     .catch(() => {})
 }
 
@@ -162,10 +166,9 @@ export function useJobNotifications(params: JobNotificationParams): void {
       return
     }
 
-    const changes = records.filter(
-      (record) =>
-        SUMMARY_STATUSES.includes(record.status) && Date.parse(record.updatedAt) > lastSeen,
-    )
+    const changes = records.filter((record) => {
+      return SUMMARY_STATUSES.includes(record.status) && Date.parse(record.updatedAt) > lastSeen
+    })
 
     if (changes.length === 0) {
       return
@@ -173,14 +176,23 @@ export function useJobNotifications(params: JobNotificationParams): void {
 
     toast(summaryText(changes), {
       duration: 10_000,
-      action: { label: 'Show', onClick: () => showChanges(changes) },
+      action: {
+        label: 'Show',
+        onClick: () => {
+          return showChanges(changes)
+        },
+      },
     })
   }, [isLoading, records])
 
   useEffect(() => {
     const before = previous.current
 
-    previous.current = new Map(records.map((record) => [record.id, record.status]))
+    previous.current = new Map(
+      records.map((record) => {
+        return [record.id, record.status]
+      }),
+    )
 
     if (!before) {
       return
@@ -198,7 +210,12 @@ export function useJobNotifications(params: JobNotificationParams): void {
       if (record.status === 'completed') {
         toast.success('Video ready', {
           description: body,
-          action: { label: 'Show', onClick: () => scrollToRecord(record.id) },
+          action: {
+            label: 'Show',
+            onClick: () => {
+              return scrollToRecord(record.id)
+            },
+          },
         })
 
         notifyHidden('Video ready', body)

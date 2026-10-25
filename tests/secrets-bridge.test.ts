@@ -180,7 +180,11 @@ describe('secrets bridge failures', () => {
     const line = request(sent)
 
     reply(input, { id: line.id + 1, ok: true, value: 'wrong' })
-    await new Promise((resolve) => setTimeout(resolve, 20))
+
+    await new Promise((resolve) => {
+      return setTimeout(resolve, 20)
+    })
+
     reply(input, { id: line.id, ok: true, value: 'right' })
 
     await expect(pending).resolves.toBe('right')

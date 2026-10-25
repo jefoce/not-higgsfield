@@ -26,11 +26,17 @@ export function MediaRow(props: MediaRowProps) {
   const isSelected = selectedIndex >= 0
   const isDisabled = !isSelected && isAtMax
 
-  const handlePreview = () => openPreview({ items, index: previewIndex, actions })
+  const handlePreview = () => {
+    return openPreview({ items, index: previewIndex, actions })
+  }
 
-  const handleDelete = () => props.onDelete(item)
+  const handleDelete = () => {
+    return props.onDelete(item)
+  }
 
-  const handleSelect = () => props.onSelect(item)
+  const handleSelect = () => {
+    return props.onSelect(item)
+  }
 
   const handlePreviewAction = item.missing === true ? undefined : handlePreview
   const selectIndex = isSelected ? selectedIndex : undefined

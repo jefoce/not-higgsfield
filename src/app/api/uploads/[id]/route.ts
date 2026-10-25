@@ -11,7 +11,11 @@ export async function DELETE(request: Request, { params }: IdRouteContext) {
     const { id } = await params
     const active = await listActiveGenerations()
 
-    if (active.some((record) => inputIds(record.input).includes(id))) {
+    if (
+      active.some((record) => {
+        return inputIds(record.input).includes(id)
+      })
+    ) {
       throw new UploadError(409, 'Used by a running generation')
     }
 

@@ -59,7 +59,10 @@ export function uploadFilesWithProgress(
 
     xhr.open('POST', '/api/uploads')
     xhr.responseType = 'json'
-    xhr.upload.onprogress = (event) => onProgress(event.loaded, event.total)
+
+    xhr.upload.onprogress = (event) => {
+      return onProgress(event.loaded, event.total)
+    }
 
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
@@ -71,9 +74,22 @@ export function uploadFilesWithProgress(
       reject(new Error(serverErrorText(xhr)))
     }
 
-    xhr.onerror = () => reject(new Error('Upload failed'))
-    xhr.onabort = () => reject(new DOMException('Upload cancelled', 'AbortError'))
-    signal?.addEventListener('abort', () => xhr.abort(), { once: true })
+    xhr.onerror = () => {
+      return reject(new Error('Upload failed'))
+    }
+
+    xhr.onabort = () => {
+      return reject(new DOMException('Upload cancelled', 'AbortError'))
+    }
+
+    signal?.addEventListener(
+      'abort',
+      () => {
+        return xhr.abort()
+      },
+      { once: true },
+    )
+
     xhr.send(form)
   })
 }

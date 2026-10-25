@@ -24,7 +24,9 @@ function unavailableFor(option: AspectChoice, preset: ModelPreset): Resolution[]
     return []
   }
 
-  return preset.resolutions.filter((candidate) => !isNil(preset.outputSizes?.[candidate]?.[option]))
+  return preset.resolutions.filter((candidate) => {
+    return !isNil(preset.outputSizes?.[candidate]?.[option])
+  })
 }
 
 function aspectLabel(option: AspectChoice): string {
@@ -44,7 +46,9 @@ export function AspectOption(props: AspectOptionProps) {
 
   const reason = isReason ? null : `Only at ${onlyAt.join(', ')}`
 
-  const handleSelect = (): void => props.onSelect(option)
+  const handleSelect = (): void => {
+    return props.onSelect(option)
+  }
 
   return (
     <Tooltip content={reason}>

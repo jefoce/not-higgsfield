@@ -8,8 +8,9 @@ export interface GeneratorDraft extends Omit<GenerationInput, 'prompt'> {
 }
 
 /** Active mode prompt. */
-export const promptFor = (state: Pick<GeneratorDraft, 'prompts' | 'tab'>): string =>
-  state.prompts[state.tab]
+export const promptFor = (state: Pick<GeneratorDraft, 'prompts' | 'tab'>): string => {
+  return state.prompts[state.tab]
+}
 
 /** Plain GenerationInput snapshot of the draft, without actions or upload cache. */
 export function inputFromState(state: GeneratorDraft): GenerationInput {

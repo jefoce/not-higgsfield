@@ -19,7 +19,9 @@ const DIALOG_TIMEOUT = 10 * 60_000
 type Picker = 'zenity' | 'kdialog'
 
 export const linux: SystemAdapter = {
-  canChooseFiles: async () => !isNil(await picker()),
+  canChooseFiles: async () => {
+    return !isNil(await picker())
+  },
 
   async chooseFiles({ kinds, multiple: isMultiple, prompt }) {
     const tool = await picker()
@@ -76,7 +78,9 @@ function extensions(kinds: readonly MediaKind[]): string[] {
   return acceptForKinds(kinds)
     .split(',')
     .filter(Boolean)
-    .map((ext) => ext.slice(1))
+    .map((ext) => {
+      return ext.slice(1)
+    })
 }
 
 interface FilesArgsParams {
@@ -87,7 +91,12 @@ interface FilesArgsParams {
 
 function zenityFiles(params: FilesArgsParams): string[] {
   const { files, multiple: isMultiple, prompt } = params
-  const patterns = files.map((ext) => `*.${ext}`).join(' ')
+
+  const patterns = files
+    .map((ext) => {
+      return `*.${ext}`
+    })
+    .join(' ')
 
   const args = ['--file-selection', `--title=${prompt}`, `--file-filter=Media | ${patterns}`]
 
@@ -100,7 +109,12 @@ function zenityFiles(params: FilesArgsParams): string[] {
 
 function kdialogFiles(params: FilesArgsParams): string[] {
   const { files, multiple: isMultiple, prompt } = params
-  const patterns = files.map((ext) => `*.${ext}`).join(' ')
+
+  const patterns = files
+    .map((ext) => {
+      return `*.${ext}`
+    })
+    .join(' ')
 
   const args = ['--getopenfilename', os.homedir(), `${patterns}|Media`, '--title', prompt]
 
@@ -114,7 +128,9 @@ function kdialogFiles(params: FilesArgsParams): string[] {
 function lines(stdout: string): string[] {
   return stdout
     .split('\n')
-    .map((line) => line.trim())
+    .map((line) => {
+      return line.trim()
+    })
     .filter(Boolean)
 }
 
@@ -132,8 +148,12 @@ async function picker(): Promise<Picker | null> {
 
 async function hasCommand(name: string): Promise<boolean> {
   return run('which', [name], { timeout: 5_000 }).then(
-    () => true,
-    () => false,
+    () => {
+      return true
+    },
+    () => {
+      return false
+    },
   )
 }
 

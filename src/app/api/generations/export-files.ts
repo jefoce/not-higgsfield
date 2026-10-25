@@ -8,8 +8,12 @@ export async function videoSource(id: string): Promise<string | null> {
   const source = downloadPaths(id).video
 
   const isFile = await fs.stat(source).then(
-    (stats) => stats.isFile(),
-    () => false,
+    (stats) => {
+      return stats.isFile()
+    },
+    () => {
+      return false
+    },
   )
 
   if (isFile) {

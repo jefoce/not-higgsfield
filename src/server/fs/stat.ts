@@ -4,8 +4,12 @@ import fs from 'node:fs/promises'
 
 export async function exists(file: string): Promise<boolean> {
   return fs.stat(file).then(
-    () => true,
-    () => false,
+    () => {
+      return true
+    },
+    () => {
+      return false
+    },
   )
 }
 

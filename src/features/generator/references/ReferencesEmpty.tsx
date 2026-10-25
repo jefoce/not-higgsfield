@@ -18,7 +18,10 @@ interface ReferencesEmptyProps {
 /** Drop target shown when no references are attached. */
 export function ReferencesEmpty(props: ReferencesEmptyProps) {
   const { preset, dropProps, dragging: isDragging } = props
-  const kinds = MEDIA_KINDS.filter((kind) => preset.references[kind] > 0)
+
+  const kinds = MEDIA_KINDS.filter((kind) => {
+    return preset.references[kind] > 0
+  })
 
   return (
     <button
@@ -31,24 +34,28 @@ export function ReferencesEmpty(props: ReferencesEmptyProps) {
       )}
     >
       <span className="mb-3 flex">
-        {REFERENCE_ICONS.map((Icon, index) => (
-          <span
-            /* eslint-disable-next-line react/no-array-index-key -- static list */
-            key={index}
-            className={cn(
-              'flex size-9 items-center justify-center rounded-full border border-white/50 bg-white/4 text-fg-2 backdrop-blur-xs linux:bg-surface-2',
-              index > 0 && '-mx-1',
-            )}
-          >
-            <Icon size={16} />
-          </span>
-        ))}
+        {REFERENCE_ICONS.map((Icon, index) => {
+          return (
+            <span
+              /* eslint-disable-next-line react/no-array-index-key -- static list */
+              key={index}
+              className={cn(
+                'flex size-9 items-center justify-center rounded-full border border-white/50 bg-white/4 text-fg-2 backdrop-blur-xs linux:bg-surface-2',
+                index > 0 && '-mx-1',
+              )}
+            >
+              <Icon size={16} />
+            </span>
+          )
+        })}
       </span>
       <span className="text-sm font-medium text-fg-2">Add references</span>
       <span className="mt-1 text-xs font-medium text-fg-2">
         Up to{' '}
         {joinWords(
-          kinds.map((kind) => `${preset.references[kind]} ${KIND_PLURAL[kind]}`),
+          kinds.map((kind) => {
+            return `${preset.references[kind]} ${KIND_PLURAL[kind]}`
+          }),
           'and',
         )}
       </span>

@@ -31,16 +31,24 @@ const MODE_OPTIONS: readonly FilterOption<HistoryMode>[] = [
 
 const RESOLUTION_OPTIONS: readonly FilterOption<ResolutionFilter>[] = [
   { value: 'all', label: 'All' },
-  ...RESOLUTIONS.map((value) => ({ value, label: value })),
+  ...RESOLUTIONS.map((value) => {
+    return { value, label: value }
+  }),
 ]
 
 const ASPECT_OPTIONS: readonly FilterOption<AspectFilter>[] = [
   { value: 'all', label: 'All' },
   { value: 'auto', label: 'Auto' },
-  ...uniq(MODEL_PRESETS.flatMap((preset) => preset.aspectRatios)).map((value) => ({
-    value,
-    label: value,
-  })),
+  ...uniq(
+    MODEL_PRESETS.flatMap((preset) => {
+      return preset.aspectRatios
+    }),
+  ).map((value) => {
+    return {
+      value,
+      label: value,
+    }
+  }),
 ]
 
 const AUDIO_OPTIONS = [
@@ -51,10 +59,17 @@ const AUDIO_OPTIONS = [
 
 /** Status, mode, model, resolution, aspect and audio choice rows. */
 export function FilterChoices() {
-  const filters = useHistoryViewStore((state) => state.filters)
-  const setFilters = useHistoryViewStore((state) => state.setFilters)
+  const filters = useHistoryViewStore((state) => {
+    return state.filters
+  })
 
-  const handleStatusChange = (status: StatusFilter) => setFilters({ status })
+  const setFilters = useHistoryViewStore((state) => {
+    return state.setFilters
+  })
+
+  const handleStatusChange = (status: StatusFilter) => {
+    return setFilters({ status })
+  }
 
   const handleModeChange = (mode: HistoryMode) => {
     const isModeTab = mode === 'frames' || mode === 'references'
@@ -63,13 +78,21 @@ export function FilterChoices() {
     setFilters({ mode, tab })
   }
 
-  const handleModelChange = (model: string) => setFilters({ model })
+  const handleModelChange = (model: string) => {
+    return setFilters({ model })
+  }
 
-  const handleResolutionChange = (resolution: ResolutionFilter) => setFilters({ resolution })
+  const handleResolutionChange = (resolution: ResolutionFilter) => {
+    return setFilters({ resolution })
+  }
 
-  const handleAspectChange = (aspect: AspectFilter) => setFilters({ aspect })
+  const handleAspectChange = (aspect: AspectFilter) => {
+    return setFilters({ aspect })
+  }
 
-  const handleAudioChange = (audio: AudioFilter) => setFilters({ audio })
+  const handleAudioChange = (audio: AudioFilter) => {
+    return setFilters({ audio })
+  }
 
   return (
     <>
@@ -90,7 +113,9 @@ export function FilterChoices() {
         value={filters.model ?? 'all'}
         options={[
           { value: 'all', label: 'All' },
-          ...MODEL_PRESETS.map((preset) => ({ value: preset.id, label: preset.title })),
+          ...MODEL_PRESETS.map((preset) => {
+            return { value: preset.id, label: preset.title }
+          }),
         ]}
         onChange={handleModelChange}
       />

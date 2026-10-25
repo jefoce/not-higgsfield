@@ -8,8 +8,15 @@ import { FrameSlot } from './FrameSlot'
 
 /** Start/end slot grid for the Frames tab. */
 export function FrameSlots() {
-  const preset = getPreset(useGeneratorStore((state) => state.presetId))
-  const startId = useGeneratorStore((state) => state.frames.start)
+  const preset = getPreset(
+    useGeneratorStore((state) => {
+      return state.presetId
+    }),
+  )
+
+  const startId = useGeneratorStore((state) => {
+    return state.frames.start
+  })
 
   if (!preset.frames.start) {
     return null

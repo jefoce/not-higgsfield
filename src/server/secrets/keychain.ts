@@ -30,8 +30,12 @@ export async function keychainBackend(): Promise<SecretBackend | null> {
 
   return {
     kind: 'keychain' as const,
-    getAll: async () => readAll(Entry),
-    get: async (name: SecretName) => readAll(Entry)[name] ?? null,
+    getAll: async () => {
+      return readAll(Entry)
+    },
+    get: async (name: SecretName) => {
+      return readAll(Entry)[name] ?? null
+    },
     set: async (name: SecretName, value: string) => {
       const values = readAll(Entry)
 

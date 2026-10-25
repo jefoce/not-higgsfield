@@ -7,11 +7,17 @@ import { batchGenerations, type BatchResult } from '@/lib/api/generations'
 /** Runs the same batch action in chunks the server accepts. */
 export async function batchAction(ids: string[], body: Dict<unknown>): Promise<BatchResult> {
   const results = await Promise.all(
-    chunk(ids, HISTORY_BATCH_MAX).map((part) => batchGenerations(part, body)),
+    chunk(ids, HISTORY_BATCH_MAX).map((part) => {
+      return batchGenerations(part, body)
+    }),
   )
 
   return {
-    done: results.flatMap((result) => result.done),
-    skipped: results.flatMap((result) => result.skipped),
+    done: results.flatMap((result) => {
+      return result.done
+    }),
+    skipped: results.flatMap((result) => {
+      return result.skipped
+    }),
   }
 }

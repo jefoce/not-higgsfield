@@ -40,11 +40,13 @@ interface MockState {
   mockBody: Map<string, unknown>
 }
 
-const mockState = globalState<MockState>('mock', () => ({
-  mockStart: new Map(),
-  mockPrompt: new Map(),
-  mockBody: new Map(),
-}))
+const mockState = globalState<MockState>('mock', () => {
+  return {
+    mockStart: new Map(),
+    mockPrompt: new Map(),
+    mockBody: new Map(),
+  }
+})
 
 /** Mock OpenRouter adapter. Runs the whole pipeline without provider calls. */
 export function createMockProvider(): VideoProvider {
@@ -170,8 +172,12 @@ async function assertMockFetch(link: string): Promise<void> {
     method: 'HEAD',
     signal: AbortSignal.timeout(FETCH_TIMEOUTS.meta),
   })
-    .then((res) => res.status)
-    .catch(() => 0)
+    .then((res) => {
+      return res.status
+    })
+    .catch(() => {
+      return 0
+    })
 
   if (status !== 200) {
     const message = `Mock provider could not fetch ${link}`

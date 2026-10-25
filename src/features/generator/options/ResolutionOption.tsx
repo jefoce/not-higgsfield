@@ -23,7 +23,9 @@ interface ResolutionOptionProps {
 export function ResolutionOption(props: ResolutionOptionProps) {
   const { option, isSelected, rate, listRate, discount } = props
 
-  const handleSelect = (): void => props.onSelect(option)
+  const handleSelect = (): void => {
+    return props.onSelect(option)
+  }
 
   return (
     <PopoverClose asChild>

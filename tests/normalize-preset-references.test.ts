@@ -50,12 +50,19 @@ describe('normalizeForPreset references', () => {
 
   it('drops the tenth image when the preset image limit is nine', () => {
     const seedance = getPreset('seedance-2.0')
-    const ids = Array.from({ length: 10 }, (_, i) => `i${i}`)
+
+    const ids = Array.from({ length: 10 }, (_, i) => {
+      return `i${i}`
+    })
 
     const result = normalizeForPreset({
       input: input({ presetId: 'seedance-2.0', references: ids }),
       preset: seedance,
-      uploads: uploadsOf(...ids.map((id) => upload(id, 'image'))),
+      uploads: uploadsOf(
+        ...ids.map((id) => {
+          return upload(id, 'image')
+        }),
+      ),
     })
 
     expect(result.input.references).toEqual(ids.slice(0, 9))
@@ -68,9 +75,15 @@ describe('normalizeForPreset unknown references', () => {
     const seedance = getPreset('seedance-2.0')
 
     const ids = [
-      ...Array.from({ length: 9 }, (_, i) => `i${i}`),
-      ...Array.from({ length: 3 }, (_, i) => `v${i}`),
-      ...Array.from({ length: 3 }, (_, i) => `a${i}`),
+      ...Array.from({ length: 9 }, (_, i) => {
+        return `i${i}`
+      }),
+      ...Array.from({ length: 3 }, (_, i) => {
+        return `v${i}`
+      }),
+      ...Array.from({ length: 3 }, (_, i) => {
+        return `a${i}`
+      }),
     ]
 
     const result = normalizeForPreset({
@@ -87,15 +100,27 @@ describe('normalizeForPreset unknown references', () => {
     const seedance = getPreset('seedance-2.0')
 
     const ids = [
-      ...Array.from({ length: 9 }, (_, i) => `i${i}`),
-      ...Array.from({ length: 3 }, (_, i) => `v${i}`),
-      ...Array.from({ length: 3 }, (_, i) => `a${i}`),
+      ...Array.from({ length: 9 }, (_, i) => {
+        return `i${i}`
+      }),
+      ...Array.from({ length: 3 }, (_, i) => {
+        return `v${i}`
+      }),
+      ...Array.from({ length: 3 }, (_, i) => {
+        return `a${i}`
+      }),
     ]
 
     const uploads = uploadsOf(
-      ...Array.from({ length: 9 }, (_, i) => upload(`i${i}`, 'image')),
-      ...Array.from({ length: 3 }, (_, i) => upload(`v${i}`, 'video', { durationSec: 5 })),
-      ...Array.from({ length: 3 }, (_, i) => upload(`a${i}`, 'audio', { durationSec: 3 })),
+      ...Array.from({ length: 9 }, (_, i) => {
+        return upload(`i${i}`, 'image')
+      }),
+      ...Array.from({ length: 3 }, (_, i) => {
+        return upload(`v${i}`, 'video', { durationSec: 5 })
+      }),
+      ...Array.from({ length: 3 }, (_, i) => {
+        return upload(`a${i}`, 'audio', { durationSec: 3 })
+      }),
     )
 
     const result = normalizeForPreset({
@@ -112,10 +137,15 @@ describe('normalizeForPreset unknown references', () => {
 describe('normalizeForPreset Seedance migration', () => {
   it('normalizes a Wan draft for Seedance 2.0', () => {
     const seedance = getPreset('seedance-2.0')
-    const images = Array.from({ length: 10 }, (_, i) => `i${i}`)
+
+    const images = Array.from({ length: 10 }, (_, i) => {
+      return `i${i}`
+    })
 
     const uploads = uploadsOf(
-      ...images.map((id) => upload(id, 'image')),
+      ...images.map((id) => {
+        return upload(id, 'image')
+      }),
       upload('v', 'video', { durationSec: 10 }),
       upload('a', 'audio', { durationSec: 3 }),
     )

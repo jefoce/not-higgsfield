@@ -84,9 +84,13 @@ async function isAlive(owner: LockInfo): Promise<boolean> {
 
   const res = await fetch(`http://127.0.0.1:${owner.port}/api/health`, {
     signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
-  }).catch(() => null)
+  }).catch(() => {
+    return null
+  })
 
-  const body = (await res?.json().catch(() => null)) as HealthResponse | null
+  const body = (await res?.json().catch(() => {
+    return null
+  })) as HealthResponse | null
 
   return body?.app === 'not-higgsfield' && body.pid === owner.pid
 }

@@ -9,13 +9,13 @@ import { skuKey } from '@/core/pricing'
 
 /** Every key the preset can produce for its allowed inputs. */
 function pricingKeys(preset: ModelPreset): string[] {
-  return preset.resolutions.flatMap((resolution) =>
-    [true, false].flatMap((isAudio) =>
-      [true, false].map((hasVideoInput) =>
-        skuKey(primaryBinding(preset).pricing, { resolution, audio: isAudio, hasVideoInput }),
-      ),
-    ),
-  )
+  return preset.resolutions.flatMap((resolution) => {
+    return [true, false].flatMap((isAudio) => {
+      return [true, false].map((hasVideoInput) => {
+        return skuKey(primaryBinding(preset).pricing, { resolution, audio: isAudio, hasVideoInput })
+      })
+    })
+  })
 }
 
 /** Per-family expectations the contract pins. */
@@ -106,8 +106,13 @@ describe('preset contract', () => {
   })
 
   it('has unique ids and slugs', () => {
-    const ids = MODEL_PRESETS.map((preset) => preset.id)
-    const slugs = MODEL_PRESETS.map((preset) => primaryBinding(preset).modelId)
+    const ids = MODEL_PRESETS.map((preset) => {
+      return preset.id
+    })
+
+    const slugs = MODEL_PRESETS.map((preset) => {
+      return primaryBinding(preset).modelId
+    })
 
     expect(new Set(ids).size).toBe(ids.length)
     expect(new Set(slugs).size).toBe(slugs.length)

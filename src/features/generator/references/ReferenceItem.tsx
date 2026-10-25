@@ -66,14 +66,22 @@ export function ReferenceItem(props: ReferenceItemProps) {
     })
   }
 
-  const handleRemoveAction = (item: UploadItem): void => props.onRemove(item.id)
+  const handleRemoveAction = (item: UploadItem): void => {
+    return props.onRemove(item.id)
+  }
 
-  const handleLabel = (item: UploadItem): string | null => referenceLabel(slots, item)
+  const handleLabel = (item: UploadItem): string | null => {
+    return referenceLabel(slots, item)
+  }
 
-  const handleRemove = (): void => props.onRemove(id)
+  const handleRemove = (): void => {
+    return props.onRemove(id)
+  }
 
   const handlePreview = (): void => {
-    const index = previewUploads.findIndex((item) => item.id === id)
+    const index = previewUploads.findIndex((item) => {
+      return item.id === id
+    })
 
     openPreview({
       items: previewUploads,

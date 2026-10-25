@@ -14,12 +14,20 @@ const root = await mkdtemp(path.join(os.tmpdir(), 'nh-export-batch-'))
 process.env.STORAGE_ROOT = root
 delete process.env.APP_TOKEN
 
-const session = vi.hoisted(() => ({ required: true }))
+const session = vi.hoisted(() => {
+  return { required: true }
+})
 
-vi.mock('@/server/session', () => ({
-  sessionRequired: () => session.required,
-  hasSession: () => true,
-}))
+vi.mock('@/server/session', () => {
+  return {
+    sessionRequired: () => {
+      return session.required
+    },
+    hasSession: () => {
+      return true
+    },
+  }
+})
 
 const { POST } = await import('@/app/api/generations/export-batch/route')
 
@@ -67,8 +75,8 @@ async function write(item: GenerationRecord): Promise<void> {
   await writeFile(path.join(downloads, `${item.id}.mp4`), videoBytes)
 }
 
-const exportRequest = (body: unknown): Request =>
-  new Request('http://127.0.0.1:3000/api/generations/export-batch', {
+const exportRequest = (body: unknown): Request => {
+  return new Request('http://127.0.0.1:3000/api/generations/export-batch', {
     method: 'POST',
     headers: {
       host: '127.0.0.1:3000',
@@ -77,6 +85,7 @@ const exportRequest = (body: unknown): Request =>
     },
     body: JSON.stringify(body),
   })
+}
 
 const item = record(randomUUID(), 'A cat!')
 

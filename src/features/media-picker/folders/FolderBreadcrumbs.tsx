@@ -15,7 +15,9 @@ export function FolderBreadcrumbs(props: FolderBreadcrumbsProps) {
   const { folderName, sub } = props
   const segments = sub.split('/').filter(Boolean)
 
-  const handleRoot = () => props.onNavigate('')
+  const handleRoot = () => {
+    return props.onNavigate('')
+  }
 
   const isRoot = isEmpty(segments)
   const rootClass = isRoot ? 'shrink-0 text-fg' : 'shrink-0 transition hover:text-fg'

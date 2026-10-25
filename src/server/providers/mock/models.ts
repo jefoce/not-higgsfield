@@ -26,7 +26,9 @@ function staticModel(preset: ModelPreset): ProviderModel {
 function allDurations(preset: ModelPreset): number[] {
   const { min, max } = preset.duration
 
-  return Array.from({ length: max - min + 1 }, (_, index) => min + index)
+  return Array.from({ length: max - min + 1 }, (_, index) => {
+    return min + index
+  })
 }
 
 function frameImages(preset: ModelPreset): readonly string[] | null {

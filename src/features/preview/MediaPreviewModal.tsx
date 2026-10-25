@@ -19,7 +19,10 @@ function handleOpenChange(isOpen: boolean): void {
 
 /** Full-size media preview with header, navigation and opener actions. */
 export function MediaPreviewModal() {
-  const request = usePreviewStore((state) => state.request)
+  const request = usePreviewStore((state) => {
+    return state.request
+  })
+
   const [lastRequest, setLastRequest] = useState(request)
   const [index, setIndex] = useState(request?.index ?? 0)
   const { acquire, release } = usePlayerSlot()
@@ -40,7 +43,9 @@ export function MediaPreviewModal() {
 
     acquire(playerId)
 
-    return () => release(playerId)
+    return () => {
+      return release(playerId)
+    }
   }, [acquire, item, playerId, release])
 
   useEffect(() => {
@@ -50,17 +55,23 @@ export function MediaPreviewModal() {
 
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'ArrowLeft') {
-        setIndex((current) => Math.max(0, current - 1))
+        setIndex((current) => {
+          return Math.max(0, current - 1)
+        })
       }
 
       if (event.key === 'ArrowRight') {
-        setIndex((current) => Math.min(items.length - 1, current + 1))
+        setIndex((current) => {
+          return Math.min(items.length - 1, current + 1)
+        })
       }
     }
 
     window.addEventListener('keydown', onKey)
 
-    return () => window.removeEventListener('keydown', onKey)
+    return () => {
+      return window.removeEventListener('keydown', onKey)
+    }
   }, [items.length, request])
 
   const handleRun = (key: ActionKey) => {
@@ -75,11 +86,15 @@ export function MediaPreviewModal() {
   }
 
   const handlePrevious = () => {
-    setIndex((current) => Math.max(0, current - 1))
+    setIndex((current) => {
+      return Math.max(0, current - 1)
+    })
   }
 
   const handleNext = () => {
-    setIndex((current) => Math.min(items.length - 1, current + 1))
+    setIndex((current) => {
+      return Math.min(items.length - 1, current + 1)
+    })
   }
 
   if (!request) {

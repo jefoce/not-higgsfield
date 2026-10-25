@@ -52,13 +52,21 @@ export function useHoverPlay(params: UseHoverPlayParams): HoverPlayHandlers {
     [acquire, isEnabled, id, videoRef],
   )
 
-  const handleHoverEnter = useCallback(() => setInside(pointerInside, true), [setInside])
+  const handleHoverEnter = useCallback(() => {
+    return setInside(pointerInside, true)
+  }, [setInside])
 
-  const handleHoverLeave = useCallback(() => setInside(pointerInside, false), [setInside])
+  const handleHoverLeave = useCallback(() => {
+    return setInside(pointerInside, false)
+  }, [setInside])
 
-  const handleFocus = useCallback(() => setInside(focusInside, true), [setInside])
+  const handleFocus = useCallback(() => {
+    return setInside(focusInside, true)
+  }, [setInside])
 
-  const handleBlur = useCallback(() => setInside(focusInside, false), [setInside])
+  const handleBlur = useCallback(() => {
+    return setInside(focusInside, false)
+  }, [setInside])
 
   useEffect(() => {
     const element = videoRef.current

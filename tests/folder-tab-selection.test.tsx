@@ -6,28 +6,42 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { FolderTab } from '@/features/media-picker/folders/FolderTab'
 import { closePreview, usePreviewStore } from '@/features/preview/preview-store'
 
-const mocks = vi.hoisted(() => ({
-  fetchFolderFiles: vi.fn(),
-  linkFolderFile: vi.fn(),
-}))
+const mocks = vi.hoisted(() => {
+  return {
+    fetchFolderFiles: vi.fn(),
+    linkFolderFile: vi.fn(),
+  }
+})
 
-vi.mock('@/lib/api/folders', () => ({
-  fetchFolderFiles: mocks.fetchFolderFiles,
-  linkFolderFile: mocks.linkFolderFile,
-}))
+vi.mock('@/lib/api/folders', () => {
+  return {
+    fetchFolderFiles: mocks.fetchFolderFiles,
+    linkFolderFile: mocks.linkFolderFile,
+  }
+})
 
-vi.mock('@/lib/api/media-urls', () => ({ thumbUrl: () => '/thumb' }))
-
-vi.mock('swr', () => ({
-  default: () => ({
-    data: {
-      path: '',
-      dirs: [],
-      files: [{ name: 'clip.mp4', rel: 'clip.mp4', kind: 'video', sizeBytes: 1, mtimeMs: 1 }],
+vi.mock('@/lib/api/media-urls', () => {
+  return {
+    thumbUrl: () => {
+      return '/thumb'
     },
-    isLoading: false,
-  }),
-}))
+  }
+})
+
+vi.mock('swr', () => {
+  return {
+    default: () => {
+      return {
+        data: {
+          path: '',
+          dirs: [],
+          files: [{ name: 'clip.mp4', rel: 'clip.mp4', kind: 'video', sizeBytes: 1, mtimeMs: 1 }],
+        },
+        isLoading: false,
+      }
+    },
+  }
+})
 
 afterEach(() => {
   cleanup()
@@ -131,7 +145,9 @@ describe('FolderTab selection', () => {
       throw new Error('preview request missing')
     }
 
-    act(() => request.actions?.select?.(item))
+    act(() => {
+      return request.actions?.select?.(item)
+    })
 
     expect(mocks.linkFolderFile).not.toHaveBeenCalled()
     expect(onPickFile).not.toHaveBeenCalled()

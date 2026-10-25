@@ -40,8 +40,16 @@ describe('validateInput reference counts', () => {
   })
 
   it('rejects too many images', () => {
-    const images = Array.from({ length: 11 }, (_, i) => `img${i}`)
-    const uploads = uploadsOf(...images.map((id) => upload(id, 'image')))
+    const images = Array.from({ length: 11 }, (_, i) => {
+      return `img${i}`
+    })
+
+    const uploads = uploadsOf(
+      ...images.map((id) => {
+        return upload(id, 'image')
+      }),
+    )
+
     const result = validateInput({ input: input({ references: images }), uploads, preset })
 
     expect(result.errors).toContain('Too many images (11, max 10)')
@@ -52,7 +60,11 @@ describe('validateInput reference counts', () => {
 
     const result = validateInput({
       input: input({ presetId: 'seedance-2.0', references: ids }),
-      uploads: uploadsOf(...ids.map((id) => upload(id, 'video', { durationSec: 2 }))),
+      uploads: uploadsOf(
+        ...ids.map((id) => {
+          return upload(id, 'video', { durationSec: 2 })
+        }),
+      ),
       preset: getPreset('seedance-2.0'),
     })
 

@@ -21,11 +21,17 @@ const ICONS = { list: List, grid: Grid2x2 }
 
 /** List and grid switch for the history feed. */
 export function ViewToggle() {
-  const view = useHistoryViewStore((state) => state.view)
-  const setView = useHistoryViewStore((state) => state.setView)
+  const view = useHistoryViewStore((state) => {
+    return state.view
+  })
 
-  const handleSelect = (event: MouseEvent<HTMLButtonElement>) =>
-    setView(event.currentTarget.value as HistoryView)
+  const setView = useHistoryViewStore((state) => {
+    return state.setView
+  })
+
+  const handleSelect = (event: MouseEvent<HTMLButtonElement>) => {
+    return setView(event.currentTarget.value as HistoryView)
+  }
 
   return (
     <div

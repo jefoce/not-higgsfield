@@ -55,7 +55,9 @@ export async function streamFile(params: StreamFileParams): Promise<Response> {
 }
 
 async function statFile(absPath: string): Promise<Stats | null> {
-  const stats = await fs.stat(absPath).catch(() => null)
+  const stats = await fs.stat(absPath).catch(() => {
+    return null
+  })
 
   if (isNil(stats) || !stats.isFile()) {
     return null
@@ -203,7 +205,9 @@ function isNotModified(header: string | null, etag: string): boolean {
 
   const opaque = etag.replace(/^W\//, '')
 
-  return header.split(',').some((tag) => tag.trim().replace(/^W\//, '') === opaque)
+  return header.split(',').some((tag) => {
+    return tag.trim().replace(/^W\//, '') === opaque
+  })
 }
 
 function sanitizeName(name: string): string {

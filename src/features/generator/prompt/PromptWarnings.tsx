@@ -53,10 +53,12 @@ export function PromptWarnings(props: PromptWarningsProps) {
         </Chip>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-72 space-y-0.5 p-1">
-        {warnings.map((issue, index) => (
-          // eslint-disable-next-line react/no-array-index-key -- static list
-          <PromptWarningRow key={`${issue.type}-${index}`} issue={issue} onSelect={handleGo} />
-        ))}
+        {warnings.map((issue, index) => {
+          return (
+            // eslint-disable-next-line react/no-array-index-key -- static list
+            <PromptWarningRow key={`${issue.type}-${index}`} issue={issue} onSelect={handleGo} />
+          )
+        })}
       </PopoverContent>
     </Popover>
   )

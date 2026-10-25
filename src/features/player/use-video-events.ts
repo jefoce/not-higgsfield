@@ -28,7 +28,9 @@ export function useVideoEvents(params: UseVideoEventsParams): void {
     onPaused(video.paused)
     onMuted(video.muted)
 
-    const syncTime = () => onTime(video.currentTime)
+    const syncTime = () => {
+      return onTime(video.currentTime)
+    }
 
     const syncDuration = () => {
       const isDurationValid = Number.isFinite(video.duration)
@@ -37,9 +39,13 @@ export function useVideoEvents(params: UseVideoEventsParams): void {
       onDuration(duration)
     }
 
-    const syncPaused = () => onPaused(video.paused)
+    const syncPaused = () => {
+      return onPaused(video.paused)
+    }
 
-    const syncMuted = () => onMuted(video.muted)
+    const syncMuted = () => {
+      return onMuted(video.muted)
+    }
 
     video.addEventListener('timeupdate', syncTime)
     video.addEventListener('loadedmetadata', syncDuration)

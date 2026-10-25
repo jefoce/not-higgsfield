@@ -56,12 +56,19 @@ export function record(id: string, overrides: RecordOverrides = {}): GenerationR
 
 export const handleNoop = () => {}
 
-export const ids = () => [...useSelectionStore.getState().ids]
+export const ids = () => {
+  return [...useSelectionStore.getState().ids]
+}
 
-export const setSelection = (list: string[]) =>
-  act(() => useSelectionStore.getState().setMany(list, true))
+export const setSelection = (list: string[]) => {
+  return act(() => {
+    return useSelectionStore.getState().setMany(list, true)
+  })
+}
 
-export const setOrder = (list: string[]) => useSelectionStore.getState().setOrder(list)
+export const setOrder = (list: string[]) => {
+  return useSelectionStore.getState().setOrder(list)
+}
 
 export function tile(container: HTMLElement, id: string): HTMLElement {
   return required(

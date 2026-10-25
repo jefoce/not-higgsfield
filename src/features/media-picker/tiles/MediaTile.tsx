@@ -45,7 +45,9 @@ export function MediaTile(props: MediaTileProps) {
   const isBroken = brokenSrc === thumbSrc
   const mediaSrc = mediaUrl(mediaRef, item.mime)
 
-  const handleThumbError = () => setBrokenSrc(thumbSrc)
+  const handleThumbError = () => {
+    return setBrokenSrc(thumbSrc)
+  }
 
   return (
     <div

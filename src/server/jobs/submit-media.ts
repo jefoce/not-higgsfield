@@ -54,7 +54,10 @@ interface SendParams {
 /** Uploads url inputs two at a time with combined byte progress. */
 export async function uploadUrls(params: UploadUrlsParams): Promise<void> {
   const { id, uploads, transports, signal } = params
-  const targets = Object.values(uploads).filter((upload) => transports[upload.id] === 'url')
+
+  const targets = Object.values(uploads).filter((upload) => {
+    return transports[upload.id] === 'url'
+  })
 
   if (targets.length === 0) {
     return
@@ -72,16 +75,20 @@ export async function uploadUrls(params: UploadUrlsParams): Promise<void> {
     }
 
     lastWrite = now
-    const sent = sumBy(targets, (upload) => Math.min(sentBy.get(upload.id) ?? 0, upload.sizeBytes))
+
+    const sent = sumBy(targets, (upload) => {
+      return Math.min(sentBy.get(upload.id) ?? 0, upload.sizeBytes)
+    })
+
     let progress = 99
 
     if (total !== 0) {
       progress = Math.min(99, Math.round((sent / total) * 100))
     }
 
-    void saveProgress(id, progress).catch((error) =>
-      console.error(`[not-higgsfield] submit progress failed for ${id}`, error),
-    )
+    void saveProgress(id, progress).catch((error) => {
+      return console.error(`[not-higgsfield] submit progress failed for ${id}`, error)
+    })
   }
 
   for (const group of chunk(targets, 2)) {
@@ -113,20 +120,28 @@ export async function buildMedia(params: BuildMediaParams): Promise<BuiltMedia> 
 
   const remote = await Promise.all(
     items
-      .filter((upload) => transports[upload.id] === 'url')
-      .map(async (upload) => ({
-        id: upload.id,
-        kind: upload.kind,
-        url: await presignFor(upload),
-        bytes: 0,
-      })),
+      .filter((upload) => {
+        return transports[upload.id] === 'url'
+      })
+      .map(async (upload) => {
+        return {
+          id: upload.id,
+          kind: upload.kind,
+          url: await presignFor(upload),
+          bytes: 0,
+        }
+      }),
   )
 
-  const inline = items.filter((upload) => transports[upload.id] !== 'url')
+  const inline = items.filter((upload) => {
+    return transports[upload.id] !== 'url'
+  })
 
   const others = await Promise.all(
     inline
-      .filter((upload) => upload.kind !== 'image')
+      .filter((upload) => {
+        return upload.kind !== 'image'
+      })
       .map(async (upload) => {
         const { url, bytes } = await toDataUrl(upload)
 
@@ -135,21 +150,30 @@ export async function buildMedia(params: BuildMediaParams): Promise<BuiltMedia> 
   )
 
   const { plan, media: images } = await encodeImages({
-    uploads: inline.filter((upload) => upload.kind === 'image'),
+    uploads: inline.filter((upload) => {
+      return upload.kind === 'image'
+    }),
     preset,
     budgetBytes: IMAGE_BUDGET,
     baseBytes: sumBy(others, 'bytes'),
   })
 
-  const encoded = Object.entries(images).map(([id, image]) => ({
-    id,
-    kind: 'image' as const,
-    url: image.url,
-    bytes: image.bytes,
-  }))
+  const encoded = Object.entries(images).map(([id, image]) => {
+    return {
+      id,
+      kind: 'image' as const,
+      url: image.url,
+      bytes: image.bytes,
+    }
+  })
 
   const entries = [...remote, ...others, ...encoded]
-  const media = Object.fromEntries(entries.map(({ id, kind, url }) => [id, { id, kind, url }]))
+
+  const media = Object.fromEntries(
+    entries.map(({ id, kind, url }) => {
+      return [id, { id, kind, url }]
+    }),
+  )
 
   return { media, encodedBytes: sumBy(entries, 'bytes'), plan }
 }
@@ -160,32 +184,38 @@ export async function recordSent(id: string, plan: ReferencePlan): Promise<void>
     return
   }
 
-  const sent = new Map(plan.images.map((image) => [image.id, image]))
+  const sent = new Map(
+    plan.images.map((image) => {
+      return [image.id, image]
+    }),
+  )
 
-  await updateSubmit(id, (record) => ({
-    ...record,
-    inputsSnapshot: Object.fromEntries(
-      Object.entries(record.inputsSnapshot).map(([key, item]) => {
-        const image = sent.get(key)
+  await updateSubmit(id, (record) => {
+    return {
+      ...record,
+      inputsSnapshot: Object.fromEntries(
+        Object.entries(record.inputsSnapshot).map(([key, item]) => {
+          const image = sent.get(key)
 
-        if (!image) {
-          return [key, item]
-        }
+          if (!image) {
+            return [key, item]
+          }
 
-        return [
-          key,
-          {
-            ...item,
-            sentWidth: image.width,
-            sentHeight: image.height,
-            sentBytes: image.bytes,
-            format: image.format,
-            flattened: image.flattened,
-          },
-        ]
-      }),
-    ),
-  }))
+          return [
+            key,
+            {
+              ...item,
+              sentWidth: image.width,
+              sentHeight: image.height,
+              sentBytes: image.bytes,
+              format: image.format,
+              flattened: image.flattened,
+            },
+          ]
+        }),
+      ),
+    }
+  })
 }
 
 export async function send(params: SendParams): Promise<SubmittedJob> {
@@ -202,7 +232,9 @@ export async function send(params: SendParams): Promise<SubmittedJob> {
     }
 
     const retry = await buildMedia({ uploads, transports: base64Only(transports), preset }).catch(
-      () => null,
+      () => {
+        return null
+      },
     )
 
     const canFitBase64 = !isNil(retry) && retry.encodedBytes <= LIMIT_BYTES
@@ -233,7 +265,9 @@ async function markBase64(id: string): Promise<void> {
     const transport = { transport: 'base64' as const }
 
     const inputsSnapshot = Object.fromEntries(
-      Object.entries(record.inputsSnapshot).map(([key, item]) => [key, { ...item, ...transport }]),
+      Object.entries(record.inputsSnapshot).map(([key, item]) => {
+        return [key, { ...item, ...transport }]
+      }),
     )
 
     return { ...record, inputsSnapshot }

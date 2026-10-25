@@ -35,17 +35,24 @@ interface JsonDirStoreParams<T> {
 export function jsonDirStore<T extends HasId>(params: JsonDirStoreParams<T>): JsonDirStore<T> {
   const { key, dir, fileOf, schema } = params
 
-  const state = globalState<IndexState<T>>(key, () => ({
-    map: new Map(),
-    dirMtimeMs: -1,
-    loaded: false,
-  }))
+  const state = globalState<IndexState<T>>(key, () => {
+    return {
+      map: new Map(),
+      dirMtimeMs: -1,
+      loaded: false,
+    }
+  })
 
-  const dirMtime = (): Promise<number> =>
-    fs.stat(dir).then(
-      (stats) => stats.mtimeMs,
-      () => 0,
+  const dirMtime = (): Promise<number> => {
+    return fs.stat(dir).then(
+      (stats) => {
+        return stats.mtimeMs
+      },
+      () => {
+        return 0
+      },
     )
+  }
 
   async function load(): Promise<Map<string, T>> {
     const mtimeMs = await dirMtime()
@@ -57,11 +64,19 @@ export function jsonDirStore<T extends HasId>(params: JsonDirStoreParams<T>): Js
     const names = await listJsonFileNames(dir)
 
     const records: (T | null)[] = await Promise.all(
-      names.map((name) => readJson(path.join(dir, name), schema)),
+      names.map((name) => {
+        return readJson(path.join(dir, name), schema)
+      }),
     )
 
     state.map = new Map(
-      records.filter((record): record is T => !isNil(record)).map((record) => [record.id, record]),
+      records
+        .filter((record): record is T => {
+          return !isNil(record)
+        })
+        .map((record) => {
+          return [record.id, record]
+        }),
     )
 
     state.dirMtimeMs = mtimeMs

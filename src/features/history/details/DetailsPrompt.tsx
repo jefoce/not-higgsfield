@@ -16,7 +16,9 @@ interface DetailsPromptProps {
 export function DetailsPrompt(props: DetailsPromptProps) {
   const { record, plain } = props
 
-  const handleCopyPrompt = () => void copyText(plain, 'Prompt copied')
+  const handleCopyPrompt = () => {
+    return void copyText(plain, 'Prompt copied')
+  }
 
   return (
     <div className="flex min-h-0 shrink flex-col">

@@ -40,8 +40,14 @@ export const useGeneratorStore = create<GeneratorState>()(
   persist(createGeneratorState, {
     name: 'not-higgsfield:draft',
     version: 3,
-    partialize: (state) => omit(state, ['uploadsById', 'activeCount']),
-    migrate: () => defaults() as unknown as GeneratorState,
-    onRehydrateStorage: () => rehydrate,
+    partialize: (state) => {
+      return omit(state, ['uploadsById', 'activeCount'])
+    },
+    migrate: () => {
+      return defaults() as unknown as GeneratorState
+    },
+    onRehydrateStorage: () => {
+      return rehydrate
+    },
   }),
 )

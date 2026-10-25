@@ -21,7 +21,9 @@ interface SegmentedTabProps {
 export function SegmentedTab(props: SegmentedTabProps) {
   const { option, isActive, sizeClass } = props
 
-  const handleSelect = () => props.onValueChange(option.value)
+  const handleSelect = () => {
+    return props.onValueChange(option.value)
+  }
 
   return (
     <button

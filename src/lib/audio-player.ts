@@ -72,7 +72,9 @@ export function playAudio(src: string): void {
     time = 0
   }
 
-  void player.play().catch(() => notify())
+  void player.play().catch(() => {
+    return notify()
+  })
 }
 
 /** Duration of the loaded source in seconds, 0 when unknown. */
@@ -122,8 +124,12 @@ function subscribe(listener: Listener): () => void {
 export function useAudioPlaying(src: string): boolean {
   return useSyncExternalStore(
     subscribe,
-    () => isPlaying(src),
-    () => false,
+    () => {
+      return isPlaying(src)
+    },
+    () => {
+      return false
+    },
   )
 }
 
@@ -138,6 +144,8 @@ export function useAudioTime(src: string): number | null {
 
       return null
     },
-    () => null,
+    () => {
+      return null
+    },
   )
 }

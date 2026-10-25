@@ -58,11 +58,13 @@ interface OpenRouterVideoBody {
 const framePart = (
   media: MediaPayload,
   frameType: 'first_frame' | 'last_frame',
-): OpenRouterFramePart => ({
-  type: 'image_url',
-  image_url: { url: media.url },
-  frame_type: frameType,
-})
+): OpenRouterFramePart => {
+  return {
+    type: 'image_url',
+    image_url: { url: media.url },
+    frame_type: frameType,
+  }
+}
 
 const referencePart = (media: MediaPayload): OpenRouterReferencePart => {
   if (media.kind === 'image') {
@@ -167,7 +169,9 @@ const mediaFields = (params: BuildRequestBodyParams): Partial<OpenRouterVideoBod
     return {}
   }
 
-  const references = input.references.map((id) => referencePart(mediaPayload(media, id)))
+  const references = input.references.map((id) => {
+    return referencePart(mediaPayload(media, id))
+  })
 
   return { input_references: references }
 }

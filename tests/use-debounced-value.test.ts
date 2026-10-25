@@ -14,9 +14,14 @@ afterEach(() => {
 })
 
 function renderDebounced(initial: string) {
-  return renderHook((props: { value: string }) => useDebouncedValue(props.value, 100), {
-    initialProps: { value: initial },
-  })
+  return renderHook(
+    (props: { value: string }) => {
+      return useDebouncedValue(props.value, 100)
+    },
+    {
+      initialProps: { value: initial },
+    },
+  )
 }
 
 describe('useDebouncedValue', () => {

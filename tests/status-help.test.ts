@@ -5,10 +5,12 @@ import { STATUS_HELP, statusHelpKey, statusHelpText } from '@/core/status-help'
 
 type StatusInput = Pick<GenerationRecord, 'status' | 'submit' | 'download'>
 
-const state = (overrides: Partial<StatusInput> = {}): StatusInput => ({
-  status: 'submitting',
-  ...overrides,
-})
+const state = (overrides: Partial<StatusInput> = {}): StatusInput => {
+  return {
+    status: 'submitting',
+    ...overrides,
+  }
+}
 
 describe('status help', () => {
   it('covers every status with a label and help text', () => {

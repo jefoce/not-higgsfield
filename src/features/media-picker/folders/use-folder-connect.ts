@@ -62,9 +62,13 @@ export function useFolderConnect(params: UseFolderConnectParams): FolderConnect 
   const { isRunning: isAdding, run: runAdd } = useAsyncAction(addFolder)
   const { isRunning: isChoosing, run: runChoose } = useAsyncAction(chooseFolder)
 
-  const add = useCallback(() => void runAdd(), [runAdd])
+  const add = useCallback(() => {
+    return void runAdd()
+  }, [runAdd])
 
-  const chooseNative = useCallback(() => void runChoose(), [runChoose])
+  const chooseNative = useCallback(() => {
+    return void runChoose()
+  }, [runChoose])
 
   return { isAdding, isChoosing, add, chooseNative }
 }

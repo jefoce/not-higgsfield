@@ -2,7 +2,9 @@ import 'server-only'
 
 import { globalState } from '../global-state'
 
-const chains = globalState('locks', () => new Map<string, Promise<unknown>>())
+const chains = globalState('locks', () => {
+  return new Map<string, Promise<unknown>>()
+})
 
 /** Serializes work per key. The chain entry is removed when it drains. */
 export async function withLock<T>(key: string, fn: () => Promise<T>): Promise<T> {

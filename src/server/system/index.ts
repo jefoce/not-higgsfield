@@ -17,17 +17,32 @@ class DialogBusyError extends HttpError {
 }
 
 const ADAPTERS: Dict<SystemAdapter> = { darwin, win32, linux }
-const dialog = globalState('dialog', () => ({ open: false }))
+
+const dialog = globalState('dialog', () => {
+  return { open: false }
+})
 
 /** Returns the adapter for this OS, or the Linux fallback. */
 export function getSystem(): SystemAdapter {
   const adapter = ADAPTERS[process.platform] ?? linux
 
   return {
-    canChooseFiles: () => adapter.canChooseFiles(),
-    chooseFiles: (opts) => withDialog(() => adapter.chooseFiles(opts)),
-    chooseFolder: (opts) => withDialog(() => adapter.chooseFolder(opts)),
-    reveal: (path) => adapter.reveal(path),
+    canChooseFiles: () => {
+      return adapter.canChooseFiles()
+    },
+    chooseFiles: (opts) => {
+      return withDialog(() => {
+        return adapter.chooseFiles(opts)
+      })
+    },
+    chooseFolder: (opts) => {
+      return withDialog(() => {
+        return adapter.chooseFolder(opts)
+      })
+    },
+    reveal: (path) => {
+      return adapter.reveal(path)
+    },
   }
 }
 

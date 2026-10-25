@@ -10,7 +10,9 @@ export interface FolderCrumbButtonProps {
 export function FolderCrumbButton(props: FolderCrumbButtonProps) {
   const { label, path } = props
 
-  const handleSelect = () => props.onNavigate(path)
+  const handleSelect = () => {
+    return props.onNavigate(path)
+  }
 
   return (
     <span className="flex shrink-0 items-center gap-0.5">

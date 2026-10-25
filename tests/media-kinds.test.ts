@@ -14,7 +14,12 @@ describe('extensionsForKinds', () => {
   it('returns the extensions of the requested kinds without dots', () => {
     expect(extensionsForKinds(['image'])).toEqual(['jpg', 'jpeg', 'png', 'webp'])
     expect(extensionsForKinds(['video', 'audio'])).toContain('mp4')
-    expect(extensionsForKinds(['audio']).every((ext) => !ext.startsWith('.'))).toBe(true)
+
+    expect(
+      extensionsForKinds(['audio']).every((ext) => {
+        return !ext.startsWith('.')
+      }),
+    ).toBe(true)
   })
 
   it('uses preset formats when given', () => {
@@ -33,7 +38,12 @@ describe('acceptFiles', () => {
 
     const { accepted, skipped } = acceptFiles({ files, kinds: ['image'] })
 
-    expect(accepted.map((file) => file.name)).toEqual(['a.png'])
+    expect(
+      accepted.map((file) => {
+        return file.name
+      }),
+    ).toEqual(['a.png'])
+
     expect(skipped).toBe(2)
   })
 
@@ -49,7 +59,12 @@ describe('acceptFiles', () => {
       extensions: { video: ['mp4', 'mov'] },
     })
 
-    expect(accepted.map((file) => file.name)).toEqual(['b.mp4'])
+    expect(
+      accepted.map((file) => {
+        return file.name
+      }),
+    ).toEqual(['b.mp4'])
+
     expect(skipped).toBe(1)
   })
 })

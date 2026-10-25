@@ -69,7 +69,10 @@ export async function loadPriceDraft(raw: PriceInput): Promise<GenerationDraft> 
 /** Missing and unconfigured models fail loudly. Unverified ones proceed. */
 async function loadCatalogEntry(presetId: string): Promise<CatalogEntry | undefined> {
   const { entries } = await getModelCatalog()
-  const entry = entries.find((item) => item.presetId === presetId)
+
+  const entry = entries.find((item) => {
+    return item.presetId === presetId
+  })
 
   if (isNil(entry)) {
     return undefined
@@ -85,11 +88,18 @@ async function loadCatalogEntry(presetId: string): Promise<CatalogEntry | undefi
 /** Discounted and list totals for a validated draft. */
 export async function estimateGeneration(draft: GenerationDraft): Promise<GenerationEstimate> {
   const { preset, input, uploads } = draft
-  const binding = activeBinding(preset, (item) => getVideoProvider(item.provider).isConfigured())
+
+  const binding = activeBinding(preset, (item) => {
+    return getVideoProvider(item.provider).isConfigured()
+  })
+
   const pricing = await getVideoProvider(binding.provider).getPricing(preset)
 
   const hasVideoInput =
-    input.tab === 'references' && input.references.some((id) => uploads[id]?.kind === 'video')
+    input.tab === 'references' &&
+    input.references.some((id) => {
+      return uploads[id]?.kind === 'video'
+    })
 
   const ctx: PriceContext = {
     resolution: input.resolution,
@@ -141,7 +151,10 @@ export async function estimateGeneration(draft: GenerationDraft): Promise<Genera
 
 /** Canonical prompt slots from reference order. */
 function withCanonicalPrompt(input: GenerationInput, uploads: UploadsById): GenerationInput {
-  const { counts } = referenceSlots(input.references, (id) => uploads[id]?.kind)
+  const { counts } = referenceSlots(input.references, (id) => {
+    return uploads[id]?.kind
+  })
+
   const prompt = canonicalizePrompt(input.prompt, counts)
 
   if (prompt === input.prompt) {

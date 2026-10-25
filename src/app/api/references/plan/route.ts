@@ -32,11 +32,15 @@ export async function POST(request: Request) {
       return jsonError({ status: 400, error: 'Unknown model' })
     }
 
-    const items = await Promise.all(uniq(body.data.ids).map((id) => getUpload(id)))
-
-    const uploads = items.filter(
-      (item): item is UploadItem => !isNil(item) && item.kind === 'image' && item.missing !== true,
+    const items = await Promise.all(
+      uniq(body.data.ids).map((id) => {
+        return getUpload(id)
+      }),
     )
+
+    const uploads = items.filter((item): item is UploadItem => {
+      return !isNil(item) && item.kind === 'image' && item.missing !== true
+    })
 
     const { plan } = await encodeImages({
       uploads,

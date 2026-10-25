@@ -11,23 +11,34 @@ import { FilterChoices } from './FilterChoices'
 
 /** Prompt search, favorites switch, choice rows and reset. */
 export function FilterForm() {
-  const filters = useHistoryViewStore((state) => state.filters)
-  const setFilters = useHistoryViewStore((state) => state.setFilters)
-  const resetFilters = useHistoryViewStore((state) => state.resetFilters)
+  const filters = useHistoryViewStore((state) => {
+    return state.filters
+  })
+
+  const setFilters = useHistoryViewStore((state) => {
+    return state.setFilters
+  })
+
+  const resetFilters = useHistoryViewStore((state) => {
+    return state.resetFilters
+  })
+
   const [query, setQuery] = useState(filters.q ?? '')
 
-  const commitQuery = useMemo(
-    () =>
-      debounce((value: string) => {
-        const trimmed = value.trim()
-        const q = trimmed === '' ? undefined : trimmed
+  const commitQuery = useMemo(() => {
+    return debounce((value: string) => {
+      const trimmed = value.trim()
+      const q = trimmed === '' ? undefined : trimmed
 
-        setFilters({ q })
-      }, 250),
-    [setFilters],
-  )
+      setFilters({ q })
+    }, 250)
+  }, [setFilters])
 
-  useEffect(() => () => commitQuery.cancel(), [commitQuery])
+  useEffect(() => {
+    return () => {
+      return commitQuery.cancel()
+    }
+  }, [commitQuery])
 
   const handleReset = () => {
     commitQuery.cancel()

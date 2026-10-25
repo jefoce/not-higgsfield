@@ -16,9 +16,20 @@ import { randomSeed } from '../store/store-helpers'
 
 /** Random / fixed seed chip with its popover. Hidden when the model has no seed. */
 export function SeedChip() {
-  const seed = useGeneratorStore((state) => state.seed)
-  const setSeed = useGeneratorStore((state) => state.setSeed)
-  const preset = getPreset(useGeneratorStore((state) => state.presetId))
+  const seed = useGeneratorStore((state) => {
+    return state.seed
+  })
+
+  const setSeed = useGeneratorStore((state) => {
+    return state.setSeed
+  })
+
+  const preset = getPreset(
+    useGeneratorStore((state) => {
+      return state.presetId
+    }),
+  )
+
   const isRandom = isNil(seed)
 
   const handleRandomChange = (isChecked: boolean): void => {
@@ -29,9 +40,13 @@ export function SeedChip() {
     }
   }
 
-  const handleSeedChange = (value: number | null): void => setSeed(value ?? 0)
+  const handleSeedChange = (value: number | null): void => {
+    return setSeed(value ?? 0)
+  }
 
-  const handleRandomize = (): void => setSeed(randomSeed())
+  const handleRandomize = (): void => {
+    return setSeed(randomSeed())
+  }
 
   if (!preset.seed) {
     return null

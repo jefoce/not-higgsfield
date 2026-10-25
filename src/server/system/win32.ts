@@ -12,11 +12,15 @@ const run = promisify(execFile)
 const DIALOG_TIMEOUT = 10 * 60_000
 
 export const win32: SystemAdapter = {
-  canChooseFiles: async () => true,
+  canChooseFiles: async () => {
+    return true
+  },
 
   async chooseFiles({ kinds, multiple: isMultiple, prompt }) {
     const patterns = extensions(kinds)
-      .map((ext) => `*.${ext}`)
+      .map((ext) => {
+        return `*.${ext}`
+      })
       .join(';')
 
     const script = [
@@ -73,13 +77,17 @@ function extensions(kinds: readonly MediaKind[]): string[] {
   return acceptForKinds(kinds)
     .split(',')
     .filter(Boolean)
-    .map((ext) => ext.slice(1))
+    .map((ext) => {
+      return ext.slice(1)
+    })
 }
 
 function lines(stdout: string): string[] {
   return stdout
     .split(/\r?\n/)
-    .map((line) => line.trim())
+    .map((line) => {
+      return line.trim()
+    })
     .filter(Boolean)
 }
 

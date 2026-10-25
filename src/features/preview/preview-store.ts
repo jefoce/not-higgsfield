@@ -35,17 +35,22 @@ interface PreviewState {
   close: () => void
 }
 
-export const usePreviewStore = create<PreviewState>((set) => ({
-  request: null,
-  open: (request) =>
-    set({
-      request: {
-        ...request,
-        index: Math.min(Math.max(0, request.index), Math.max(0, request.items.length - 1)),
-      },
-    }),
-  close: () => set({ request: null }),
-}))
+export const usePreviewStore = create<PreviewState>((set) => {
+  return {
+    request: null,
+    open: (request) => {
+      return set({
+        request: {
+          ...request,
+          index: Math.min(Math.max(0, request.index), Math.max(0, request.items.length - 1)),
+        },
+      })
+    },
+    close: () => {
+      return set({ request: null })
+    },
+  }
+})
 
 /** Opens the media preview, replacing any current request. */
 export function openPreview(request: PreviewRequest): void {

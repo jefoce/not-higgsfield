@@ -27,7 +27,9 @@ export function usePickerConfirm(params: UsePickerConfirmParams) {
       const rels = selectedFolderRels.slice(0, request.max)
 
       const uploads = await Promise.all(
-        rels.map((rel) => linkFolderFile({ folderId: folder.id, relPath: rel })),
+        rels.map((rel) => {
+          return linkFolderFile({ folderId: folder.id, relPath: rel })
+        }),
       )
 
       request.onPick(uploads)

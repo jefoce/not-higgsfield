@@ -11,7 +11,9 @@ import { jsonDirStore } from './json-dir-store'
 const store = jsonDirStore<GenerationRecord>({
   key: 'generationIndex',
   dir: DOWNLOADS_DIR,
-  fileOf: (id) => downloadPaths(id).json,
+  fileOf: (id) => {
+    return downloadPaths(id).json
+  },
   schema: GenerationRecordSchema,
 })
 
@@ -58,7 +60,9 @@ export async function deleteGenerationFiles(id: string): Promise<void> {
 export async function listActiveGenerations(): Promise<GenerationRecord[]> {
   const records = await listGenerations()
 
-  return records.filter((record) => ACTIVE_STATUSES.includes(record.status))
+  return records.filter((record) => {
+    return ACTIVE_STATUSES.includes(record.status)
+  })
 }
 
 export async function getActiveCount(): Promise<number> {

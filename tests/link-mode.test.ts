@@ -9,7 +9,9 @@ import type { createLinkUpload as CreateLinkUpload } from '@/server/services/upl
 
 import { required } from './helpers/required'
 
-vi.mock('server-only', () => ({}))
+vi.mock('server-only', () => {
+  return {}
+})
 
 const ROOT = path.join(process.cwd(), '.cache', `link-mode-test-${process.pid}`)
 const UPLOADS = path.join(ROOT, 'uploads')

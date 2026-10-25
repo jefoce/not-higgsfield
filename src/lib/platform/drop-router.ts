@@ -96,10 +96,14 @@ async function start(): Promise<void> {
 }
 
 /** A path with an extension is a file candidate, anything else is likely a folder. */
-const looksLikeFile = (value: string): boolean => /\.[^\\/]+$/.test(value)
+const looksLikeFile = (value: string): boolean => {
+  return /\.[^\\/]+$/.test(value)
+}
 
 async function linkDropped(zone: DropZone, paths: string[]): Promise<void> {
-  const candidates = paths.map((path) => ({ name: path, type: '' }))
+  const candidates = paths.map((path) => {
+    return { name: path, type: '' }
+  })
 
   const { accepted, skipped } = acceptFiles({
     files: candidates,
@@ -107,7 +111,10 @@ async function linkDropped(zone: DropZone, paths: string[]): Promise<void> {
     extensions: zone.extensions?.(),
   })
 
-  const folders = candidates.filter((file) => !looksLikeFile(file.name)).length
+  const folders = candidates.filter((file) => {
+    return !looksLikeFile(file.name)
+  }).length
+
   const unsupported = skipped - folders
 
   if (folders > 0) {
@@ -120,7 +127,11 @@ async function linkDropped(zone: DropZone, paths: string[]): Promise<void> {
     toast(`Skipped ${unsupported} unsupported file${suffix}`)
   }
 
-  const items = await linkPaths(accepted.map((file) => file.name))
+  const items = await linkPaths(
+    accepted.map((file) => {
+      return file.name
+    }),
+  )
 
   if (items.length > 0) {
     zone.onUploaded(items)

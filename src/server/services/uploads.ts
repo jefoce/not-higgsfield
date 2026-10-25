@@ -60,7 +60,10 @@ export async function createFileUpload(params: CreateFileUploadParams): Promise<
 /** Links a disk file, falling back to hard link then copy, or reuses an existing link. */
 export async function createLinkUpload(params: LinkUploadParams): Promise<UploadItem> {
   const requested = await resolveRequested(params)
-  const stats = await fs.stat(requested).catch(() => null)
+
+  const stats = await fs.stat(requested).catch(() => {
+    return null
+  })
 
   if (!stats) {
     throw new UploadError(404, 'File not found')
@@ -118,10 +121,20 @@ export async function createLinkUpload(params: LinkUploadParams): Promise<Upload
 
 /** Loads only uploads referenced by the normalized input. */
 export async function loadUploads(input: GenerationInput): Promise<UploadsById> {
-  const items = await Promise.all(inputIds(input).map((id) => getUpload(id)))
+  const items = await Promise.all(
+    inputIds(input).map((id) => {
+      return getUpload(id)
+    }),
+  )
 
   return Object.fromEntries(
-    items.filter((item): item is UploadItem => !isNil(item)).map((item) => [item.id, item]),
+    items
+      .filter((item): item is UploadItem => {
+        return !isNil(item)
+      })
+      .map((item) => {
+        return [item.id, item]
+      }),
   )
 }
 
@@ -134,7 +147,10 @@ export async function createGenerationLinkUpload(generationId: string): Promise<
   }
 
   const video = downloadPaths(record.id).video
-  const stats = await fs.stat(video).catch(() => null)
+
+  const stats = await fs.stat(video).catch(() => {
+    return null
+  })
 
   if (isNil(stats) || !stats.isFile()) {
     throw new UploadError(404, 'Video file not found')
@@ -223,7 +239,9 @@ async function findLink(target: string): Promise<UploadItem | null> {
       continue
     }
 
-    const real = await fs.realpath(record.target).catch(() => null)
+    const real = await fs.realpath(record.target).catch(() => {
+      return null
+    })
 
     if (real === target) {
       return record
@@ -236,9 +254,9 @@ async function findLink(target: string): Promise<UploadItem | null> {
 async function sharesRemote(item: UploadItem): Promise<boolean> {
   const records = await listUploadRecords()
 
-  return records.some(
-    (record) => record.id !== item.id && record.remote?.sha256 === item.remote?.sha256,
-  )
+  return records.some((record) => {
+    return record.id !== item.id && record.remote?.sha256 === item.remote?.sha256
+  })
 }
 
 async function deleteRemote(key: string): Promise<void> {

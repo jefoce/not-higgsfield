@@ -12,30 +12,34 @@ const prime = getPreset('wan-3.0-prime')
 const seedance = getPreset('seedance-2.0')
 const seedance25 = getPreset('seedance-2.5')
 
-const draft = (presetId: string, duration: number, references: string[] = []): GenerationInput => ({
-  presetId,
-  tab: 'references',
-  prompt: 'A cat',
-  audio: true,
-  duration,
-  aspectRatio: '16:9',
-  resolution: '1080p',
-  frames: { start: null, end: null },
-  references,
-  seed: null,
-})
+const draft = (presetId: string, duration: number, references: string[] = []): GenerationInput => {
+  return {
+    presetId,
+    tab: 'references',
+    prompt: 'A cat',
+    audio: true,
+    duration,
+    aspectRatio: '16:9',
+    resolution: '1080p',
+    frames: { start: null, end: null },
+    references,
+    seed: null,
+  }
+}
 
-const videoReference = (id: string): UploadItem => ({
-  id,
-  source: 'file',
-  kind: 'video',
-  mime: 'video/mp4',
-  ext: 'mp4',
-  originalName: `${id}.mp4`,
-  sizeBytes: 1024,
-  durationSec: 7,
-  createdAt: '2026-10-20T00:00:00.000Z',
-})
+const videoReference = (id: string): UploadItem => {
+  return {
+    id,
+    source: 'file',
+    kind: 'video',
+    mime: 'video/mp4',
+    ext: 'mp4',
+    originalName: `${id}.mp4`,
+    sizeBytes: 1024,
+    durationSec: 7,
+    createdAt: '2026-10-20T00:00:00.000Z',
+  }
+}
 
 describe('billableSeconds', () => {
   it('bills Wan at the 5 second floor', () => {

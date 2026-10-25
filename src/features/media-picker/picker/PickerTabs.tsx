@@ -20,7 +20,9 @@ export interface PickerTabsProps {
 export function PickerTabs(props: PickerTabsProps) {
   const { folders, activeTab } = props
 
-  const handleUploadsTab = () => props.onTabChange('uploads')
+  const handleUploadsTab = () => {
+    return props.onTabChange('uploads')
+  }
 
   return (
     <div className="flex h-12 shrink-0 items-center gap-2">
@@ -33,15 +35,17 @@ export function PickerTabs(props: PickerTabsProps) {
           Uploads
         </button>
 
-        {folders.map((folder) => (
-          <FolderTabButton
-            key={folder.id}
-            folder={folder}
-            isActive={activeTab === folder.id}
-            onTabChange={props.onTabChange}
-            onDisconnectFolder={props.onDisconnectFolder}
-          />
-        ))}
+        {folders.map((folder) => {
+          return (
+            <FolderTabButton
+              key={folder.id}
+              folder={folder}
+              isActive={activeTab === folder.id}
+              onTabChange={props.onTabChange}
+              onDisconnectFolder={props.onDisconnectFolder}
+            />
+          )
+        })}
 
         <button
           type="button"

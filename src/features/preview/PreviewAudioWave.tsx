@@ -58,18 +58,20 @@ export function PreviewAudioWave(props: PreviewAudioWaveProps) {
       onKeyDown={handleKeyDown}
       className="flex h-20 w-full cursor-pointer items-center gap-px rounded-sm"
     >
-      {bars.map((height, index) => (
-        <span
-          /* eslint-disable-next-line react/no-array-index-key -- static list */
-          key={index}
-          style={{ height: `${height}%` }}
-          className={cn(
-            'min-w-px flex-1 rounded-full',
-            index / bars.length < played && 'bg-lime',
-            !(index / bars.length < played) && 'bg-fg-2/50',
-          )}
-        />
-      ))}
+      {bars.map((height, index) => {
+        return (
+          <span
+            /* eslint-disable-next-line react/no-array-index-key -- static list */
+            key={index}
+            style={{ height: `${height}%` }}
+            className={cn(
+              'min-w-px flex-1 rounded-full',
+              index / bars.length < played && 'bg-lime',
+              !(index / bars.length < played) && 'bg-fg-2/50',
+            )}
+          />
+        )
+      })}
     </div>
   )
 }

@@ -36,5 +36,7 @@ export function useAsyncAction<TArgs extends unknown[]>(
     }
   }, [])
 
-  return useMemo(() => ({ isRunning, run }), [isRunning, run])
+  return useMemo(() => {
+    return { isRunning, run }
+  }, [isRunning, run])
 }

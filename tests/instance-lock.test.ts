@@ -61,7 +61,13 @@ describe('acquireInstanceLock', () => {
 
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => ({ json: async () => ({ app: APP, pid: 4242 }) })),
+      vi.fn(async () => {
+        return {
+          json: async () => {
+            return { app: APP, pid: 4242 }
+          },
+        }
+      }),
     )
 
     const exit = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {

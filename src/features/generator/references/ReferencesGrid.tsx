@@ -34,11 +34,26 @@ interface ReferencesGridProps {
 /** Sortable reference grid with counters, drag reorder and upload progress. */
 export function ReferencesGrid(props: ReferencesGridProps) {
   const { preset, extensions, max, queue, dropProps, isDragging } = props
-  const references = useGeneratorStore((state) => state.references)
-  const uploadsById = useGeneratorStore((state) => state.uploadsById)
-  const handleSelectSlot = useGeneratorStore((state) => state.insertMention)
-  const handleReplace = useGeneratorStore((state) => state.replaceReference)
-  const handleRemove = useGeneratorStore((state) => state.removeReference)
+
+  const references = useGeneratorStore((state) => {
+    return state.references
+  })
+
+  const uploadsById = useGeneratorStore((state) => {
+    return state.uploadsById
+  })
+
+  const handleSelectSlot = useGeneratorStore((state) => {
+    return state.insertMention
+  })
+
+  const handleReplace = useGeneratorStore((state) => {
+    return state.replaceReference
+  })
+
+  const handleRemove = useGeneratorStore((state) => {
+    return state.removeReference
+  })
 
   const {
     activeId,
@@ -50,11 +65,15 @@ export function ReferencesGrid(props: ReferencesGridProps) {
     handleDragCancel,
   } = useReferencesDnd(references)
 
-  const { counts, slots } = referenceSlots(order, (id) => uploadsById[id]?.kind)
+  const { counts, slots } = referenceSlots(order, (id) => {
+    return uploadsById[id]?.kind
+  })
 
   const plan = useImagePlan(
     preset.id,
-    references.filter((id) => uploadsById[id]?.kind === 'image'),
+    references.filter((id) => {
+      return uploadsById[id]?.kind === 'image'
+    }),
   )
 
   const planned = keyBy(plan?.images ?? [], 'id')
@@ -80,25 +99,27 @@ export function ReferencesGrid(props: ReferencesGridProps) {
         <div className="grid grid-cols-4 justify-center gap-2">
           {max > 0 && <AddReferenceTile onPick={props.onPick} />}
           <SortableContext items={references} strategy={rectSortingStrategy}>
-            {references.map((id) => (
-              <ReferenceItem
-                key={id}
-                id={id}
-                upload={uploadsById[id]}
-                label={labelFor(slots, id)}
-                note={noteFor({ id, planned })}
-                previewUploads={previewUploads}
-                slots={slots}
-                extensions={extensions}
-                onSelectSlot={handleSelectSlot}
-                onReplace={handleReplace}
-                onRemove={handleRemove}
-              />
-            ))}
+            {references.map((id) => {
+              return (
+                <ReferenceItem
+                  key={id}
+                  id={id}
+                  upload={uploadsById[id]}
+                  label={labelFor(slots, id)}
+                  note={noteFor({ id, planned })}
+                  previewUploads={previewUploads}
+                  slots={slots}
+                  extensions={extensions}
+                  onSelectSlot={handleSelectSlot}
+                  onReplace={handleReplace}
+                  onRemove={handleRemove}
+                />
+              )
+            })}
           </SortableContext>
-          {queue.items.map((item) => (
-            <UploadProgressTile key={item.id} item={item} />
-          ))}
+          {queue.items.map((item) => {
+            return <UploadProgressTile key={item.id} item={item} />
+          })}
         </div>
       </div>
       <ReferenceDragOverlay

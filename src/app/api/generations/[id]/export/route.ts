@@ -71,7 +71,9 @@ async function exportVideo(params: ExportVideoParams): Promise<Response> {
     return jsonError({ status: 404, error: 'Video not found' })
   }
 
-  const existing = await fs.lstat(target).catch(() => null)
+  const existing = await fs.lstat(target).catch(() => {
+    return null
+  })
 
   if (existing && !existing.isFile()) {
     return jsonError({ status: 400, error: 'Target must be a regular file' })

@@ -60,7 +60,9 @@ export async function likeSelected(
   isFavorite: boolean,
 ): Promise<void> {
   const result = await batchAction(
-    selected.map((record) => record.id),
+    selected.map((record) => {
+      return record.id
+    }),
     { action: 'favorite', favorite: isFavorite },
   )
 
@@ -81,11 +83,16 @@ export function confirmDelete(selected: GenerationRecord[]): Promise<boolean> {
 
 export async function deleteSelected(selected: GenerationRecord[]): Promise<void> {
   const result = await batchAction(
-    selected.map((record) => record.id),
+    selected.map((record) => {
+      return record.id
+    }),
     { action: 'delete' },
   )
 
-  const skippedActive = result.skipped.filter((item) => item.reason === 'active').length
+  const skippedActive = result.skipped.filter((item) => {
+    return item.reason === 'active'
+  }).length
+
   const verb = skippedActive === 1 ? 'was' : 'were'
   const skippedText = `${skippedActive} still generating ${verb} skipped`
 

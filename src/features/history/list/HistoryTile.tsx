@@ -23,7 +23,11 @@ interface HistoryTileProps {
 export function HistoryTile(props: HistoryTileProps) {
   const { record } = props
   const isCompleted = record.status === 'completed'
-  const zoom = useHistoryViewStore((state) => state.zoom)
+
+  const zoom = useHistoryViewStore((state) => {
+    return state.zoom
+  })
+
   const tileWidth = zoomToTileWidth(zoom)
   const isCompact = zoomToGridColumns(zoom) >= 7 // dense rows shrink the status pill
   const deviceDpr = typeof window === 'undefined' ? 1 : window.devicePixelRatio
@@ -40,7 +44,9 @@ export function HistoryTile(props: HistoryTileProps) {
     onOpen: props.onOpen,
   })
 
-  const handleCancel = () => void cancelGeneration(record.id)
+  const handleCancel = () => {
+    return void cancelGeneration(record.id)
+  }
 
   const selectLabel = isSelecting ? 'Toggle selection' : 'Open video details'
 

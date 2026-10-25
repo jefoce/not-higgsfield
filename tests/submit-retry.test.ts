@@ -3,10 +3,12 @@ import { describe, expect, it, vi } from 'vitest'
 import { shouldRetryAsBase64 } from '@/server/jobs/submit-retry'
 import { ProviderError, type ProviderErrorKind } from '@/server/providers/provider-error'
 
-vi.mock('server-only', () => ({}))
+vi.mock('server-only', () => {
+  return {}
+})
 
-const providerError = (kind: ProviderErrorKind): ProviderError =>
-  new ProviderError({
+const providerError = (kind: ProviderErrorKind): ProviderError => {
+  return new ProviderError({
     providerId: 'openrouter',
     kind,
     message: 'Provider request failed',
@@ -14,6 +16,7 @@ const providerError = (kind: ProviderErrorKind): ProviderError =>
     status: 400,
     code: null,
   })
+}
 
 describe('shouldRetryAsBase64', () => {
   it('retries a provider url error', () => {

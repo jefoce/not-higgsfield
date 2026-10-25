@@ -11,13 +11,26 @@ import { useGeneratorStore } from '../store/store'
 
 /** Frames / References segment, References off when the preset has no inputs. */
 export function ModeTabs() {
-  const tab = useGeneratorStore((state) => state.tab)
-  const setTab = useGeneratorStore((state) => state.setTab)
-  const preset = getPreset(useGeneratorStore((state) => state.presetId))
+  const tab = useGeneratorStore((state) => {
+    return state.tab
+  })
+
+  const setTab = useGeneratorStore((state) => {
+    return state.setTab
+  })
+
+  const preset = getPreset(
+    useGeneratorStore((state) => {
+      return state.presetId
+    }),
+  )
+
   const refs = preset.references
   const isRefsDisabled = refs.image + refs.video + refs.audio === 0
 
-  const handleValueChange = (value: string): void => setTab(value as GeneratorTab)
+  const handleValueChange = (value: string): void => {
+    return setTab(value as GeneratorTab)
+  }
 
   useEffect(() => {
     if (isRefsDisabled && tab === 'references') {

@@ -67,11 +67,15 @@ describe('NumberInput', () => {
 
     expect(handleChanges).toHaveBeenLastCalledWith(3)
 
-    const messages = consoleError.mock.calls.map((args) => args.map(String).join(' '))
+    const messages = consoleError.mock.calls.map((args) => {
+      return args.map(String).join(' ')
+    })
 
-    expect(messages.some((message) => message.includes('Unknown event handler property'))).toBe(
-      false,
-    )
+    expect(
+      messages.some((message) => {
+        return message.includes('Unknown event handler property')
+      }),
+    ).toBe(false)
   })
 
   it('reports null when empty, then rounds and clamps on blur', () => {

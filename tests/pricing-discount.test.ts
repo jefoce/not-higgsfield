@@ -11,11 +11,12 @@ const WAN_SKUS = {
   duration_seconds_1080p: '0.2',
 }
 
-const response = (body: unknown): Response =>
-  new Response(JSON.stringify(body), {
+const response = (body: unknown): Response => {
+  return new Response(JSON.stringify(body), {
     status: 200,
     headers: { 'content-type': 'application/json' },
   })
+}
 
 function stubFetch(
   discount: unknown,

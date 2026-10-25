@@ -57,18 +57,20 @@ export function AudioReference(props: AudioReferenceProps) {
   return (
     <div className="flex size-full flex-col justify-between overflow-hidden rounded-xl bg-white/10 px-1.5 py-1">
       <span className="flex h-4 w-full items-end gap-px">
-        {bars.map((height, index) => (
-          <span
-            /* eslint-disable-next-line react/no-array-index-key -- static list */
-            key={index}
-            style={{ height: `${height}%` }}
-            className={cn(
-              'flex-1 rounded-full',
-              index / bars.length < played && 'bg-lime',
-              !(index / bars.length < played) && 'bg-fg-2/60',
-            )}
-          />
-        ))}
+        {bars.map((height, index) => {
+          return (
+            <span
+              /* eslint-disable-next-line react/no-array-index-key -- static list */
+              key={index}
+              style={{ height: `${height}%` }}
+              className={cn(
+                'flex-1 rounded-full',
+                index / bars.length < played && 'bg-lime',
+                !(index / bars.length < played) && 'bg-fg-2/60',
+              )}
+            />
+          )
+        })}
       </span>
       <span className="flex h-4 items-center justify-between">
         <button

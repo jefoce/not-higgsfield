@@ -19,10 +19,16 @@ export function mockDimensions(params: MockDimensionsParams): PixelSize {
   const { model, presetId, resolution, aspect } = params
 
   const preset =
-    MODEL_PRESETS.find((item) => primaryBinding(item).modelId === model) ??
-    MODEL_PRESETS.find((item) => item.id === presetId)
+    MODEL_PRESETS.find((item) => {
+      return primaryBinding(item).modelId === model
+    }) ??
+    MODEL_PRESETS.find((item) => {
+      return item.id === presetId
+    })
 
-  const res = preset?.resolutions.find((item) => item === resolution)
+  const res = preset?.resolutions.find((item) => {
+    return item === resolution
+  })
 
   if (isNil(preset) || isNil(res)) {
     return { width: 1280, height: 720 }
@@ -31,7 +37,9 @@ export function mockDimensions(params: MockDimensionsParams): PixelSize {
   let ratio: (typeof preset.aspectRatios)[number] | undefined
 
   if (aspect !== 'auto') {
-    ratio = preset.aspectRatios.find((item) => item === aspect)
+    ratio = preset.aspectRatios.find((item) => {
+      return item === aspect
+    })
   }
 
   return (

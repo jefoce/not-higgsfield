@@ -62,7 +62,13 @@ export function canCancelInGrace(
 export function inputIds(input: GenerationInput): string[] {
   const ids = [input.frames.start, input.frames.end, ...input.references]
 
-  return [...new Set(ids.filter((id): id is string => !isNil(id)))]
+  return [
+    ...new Set(
+      ids.filter((id): id is string => {
+        return !isNil(id)
+      }),
+    ),
+  ]
 }
 
 interface TransportsForParams {
@@ -75,14 +81,16 @@ export function transportsFor(params: TransportsForParams): Dict<ResolvedTranspo
   const { uploads, preset, remoteConfigured: isRemoteConfigured } = params
 
   return Object.fromEntries(
-    Object.values(uploads).map((upload) => [
-      upload.id,
-      resolveTransport({
-        binding: primaryBinding(preset),
-        kind: upload.kind,
-        remoteConfigured: isRemoteConfigured,
-      }),
-    ]),
+    Object.values(uploads).map((upload) => {
+      return [
+        upload.id,
+        resolveTransport({
+          binding: primaryBinding(preset),
+          kind: upload.kind,
+          remoteConfigured: isRemoteConfigured,
+        }),
+      ]
+    }),
   )
 }
 
@@ -104,7 +112,11 @@ export function withTransports(
 }
 
 export function base64Only(transports: Dict<ResolvedTransport>): Dict<ResolvedTransport> {
-  return Object.fromEntries(Object.keys(transports).map((id) => [id, 'base64'] as const))
+  return Object.fromEntries(
+    Object.keys(transports).map((id) => {
+      return [id, 'base64'] as const
+    }),
+  )
 }
 
 const JOB_STATUSES: JobStatus[] = [

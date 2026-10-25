@@ -11,7 +11,13 @@ import { __resetCanPlayCache, canPlay } from '@/lib/media-support'
 
 function stubDocument(supported: Dict<string>): void {
   vi.stubGlobal('document', {
-    createElement: () => ({ canPlayType: (mime: string) => supported[mime] ?? '' }),
+    createElement: () => {
+      return {
+        canPlayType: (mime: string) => {
+          return supported[mime] ?? ''
+        },
+      }
+    },
   })
 
   __resetCanPlayCache()
@@ -30,9 +36,13 @@ describe('canPlay', () => {
   })
 
   it('caches support per MIME type', () => {
-    const createElement = vi.fn(() => ({
-      canPlayType: (mime: string) => (mime === 'video/mp4' ? 'probably' : ''),
-    }))
+    const createElement = vi.fn(() => {
+      return {
+        canPlayType: (mime: string) => {
+          return mime === 'video/mp4' ? 'probably' : ''
+        },
+      }
+    })
 
     vi.stubGlobal('document', { createElement })
     __resetCanPlayCache()

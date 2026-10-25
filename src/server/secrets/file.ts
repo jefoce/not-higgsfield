@@ -22,7 +22,9 @@ export function fileBackend(): SecretBackend {
   return {
     kind: 'file' as const,
     getAll: readAll,
-    get: async (name: SecretName): Promise<string | null> => (await readAll())[name] ?? null,
+    get: async (name: SecretName): Promise<string | null> => {
+      return (await readAll())[name] ?? null
+    },
     set: async (name: SecretName, value: string): Promise<void> => {
       const values = await readAll()
 
@@ -44,7 +46,9 @@ export function fileBackend(): SecretBackend {
 
 /** Missing or group/other-readable files are treated as empty. */
 async function readAll(): Promise<Values> {
-  const stats = await fs.stat(FILE).catch(() => null)
+  const stats = await fs.stat(FILE).catch(() => {
+    return null
+  })
 
   if (!stats) {
     return {}

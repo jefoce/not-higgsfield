@@ -30,7 +30,10 @@ export interface PickerFolders {
 export function usePickerFolders(params: UsePickerFoldersParams): PickerFolders {
   const { activeTab, folders, onTabChange, onCommit } = params
   const { mutate } = useSWRConfig()
-  const activeFolder = folders.find((folder) => folder.id === activeTab)
+
+  const activeFolder = folders.find((folder) => {
+    return folder.id === activeTab
+  })
 
   const handleAdded = useCallback(
     (folder: FolderItem) => {
@@ -61,7 +64,9 @@ export function usePickerFolders(params: UsePickerFoldersParams): PickerFolders 
   )
 
   const handleDisconnect = useCallback(
-    (folderId: string) => void handleDisconnectSync(folderId),
+    (folderId: string) => {
+      return void handleDisconnectSync(folderId)
+    },
     [handleDisconnectSync],
   )
 

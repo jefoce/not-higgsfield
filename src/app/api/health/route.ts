@@ -15,23 +15,28 @@ export async function GET(request: Request) {
     assertLocalRequest(request, { session: false })
     const records = await listGenerations()
 
-    const grace = records.filter(
-      (record) => record.status === 'submitting' && record.submit?.stage === 'grace',
-    ).length
+    const grace = records.filter((record) => {
+      return record.status === 'submitting' && record.submit?.stage === 'grace'
+    }).length
 
-    const uploading = records.filter(
-      (record) => record.status === 'submitting' && record.submit?.stage === 'uploading',
-    ).length
+    const uploading = records.filter((record) => {
+      return record.status === 'submitting' && record.submit?.stage === 'uploading'
+    }).length
 
-    const generating = records.filter(
-      (record) =>
-        record.status === 'pending' || (record.status === 'in_progress' && isNil(record.download)),
-    ).length
+    const generating = records.filter((record) => {
+      return (
+        record.status === 'pending' || (record.status === 'in_progress' && isNil(record.download))
+      )
+    }).length
 
     const downloadingIds = new Set(
       records
-        .filter((record) => record.status === 'in_progress' && !isNil(record.download))
-        .map((record) => record.id),
+        .filter((record) => {
+          return record.status === 'in_progress' && !isNil(record.download)
+        })
+        .map((record) => {
+          return record.id
+        }),
     )
 
     for (const id of downloadQueueIds()) {

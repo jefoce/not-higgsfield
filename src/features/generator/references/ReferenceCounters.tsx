@@ -24,7 +24,9 @@ export function ReferenceCounters(props: ReferenceCountersProps) {
 
   return (
     <div className="mb-4 flex w-full items-center px-1.5">
-      {MEDIA_KINDS.filter((kind) => preset.references[kind] > 0).map((kind) => {
+      {MEDIA_KINDS.filter((kind) => {
+        return preset.references[kind] > 0
+      }).map((kind) => {
         const Icon = REFERENCE_ICONS[MEDIA_KINDS.indexOf(kind)]
 
         if (isNil(Icon)) {

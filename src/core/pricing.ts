@@ -39,7 +39,9 @@ export function skuKey(pricing: PricingRule, ctx: SkuContext): string {
     return true
   }
 
-  const rule = pricing.skuRules.find((item) => isMatch(item.when))
+  const rule = pricing.skuRules.find((item) => {
+    return isMatch(item.when)
+  })
 
   if (isNil(rule)) {
     return ''

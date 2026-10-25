@@ -23,7 +23,12 @@ export async function POST(request: Request) {
     }
 
     const paths = await getSystem().chooseFiles({ ...body.data, prompt: PROMPT })
-    const items = await Promise.all(paths.map((absPath) => createLinkUpload({ absPath })))
+
+    const items = await Promise.all(
+      paths.map((absPath) => {
+        return createLinkUpload({ absPath })
+      }),
+    )
 
     return Response.json(items, { status: 201 })
   } catch (error) {

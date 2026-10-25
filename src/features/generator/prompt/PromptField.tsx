@@ -47,16 +47,35 @@ interface PromptFieldProps {
 export function PromptField(props: PromptFieldProps) {
   const { warnings } = props
   const prompt = useGeneratorStore(promptFor)
-  const setPrompt = useGeneratorStore((state) => state.setPrompt)
-  const tab = useGeneratorStore((state) => state.tab)
-  const references = useGeneratorStore((state) => state.references)
-  const uploadsById = useGeneratorStore((state) => state.uploadsById)
 
-  const handleFocusSlot = useGeneratorStore((state) => state.focusSlot)
-  const items = useMemo(() => mentionItems({ references, uploadsById }), [references, uploadsById])
+  const setPrompt = useGeneratorStore((state) => {
+    return state.setPrompt
+  })
+
+  const tab = useGeneratorStore((state) => {
+    return state.tab
+  })
+
+  const references = useGeneratorStore((state) => {
+    return state.references
+  })
+
+  const uploadsById = useGeneratorStore((state) => {
+    return state.uploadsById
+  })
+
+  const handleFocusSlot = useGeneratorStore((state) => {
+    return state.focusSlot
+  })
+
+  const items = useMemo(() => {
+    return mentionItems({ references, uploadsById })
+  }, [references, uploadsById])
 
   const handleChange = useCallback(
-    (state: EditorState) => setPrompt(serializeEditor(state)),
+    (state: EditorState) => {
+      return setPrompt(serializeEditor(state))
+    },
     [setPrompt],
   )
 

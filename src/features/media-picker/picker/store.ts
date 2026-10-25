@@ -50,11 +50,17 @@ interface MediaPickerState {
 
 let nextId = 0
 
-export const useMediaPickerStore = create<MediaPickerState>((set) => ({
-  request: null,
-  open: (request) => set({ request: { ...request, id: (nextId += 1) } }),
-  close: () => set({ request: null }),
-}))
+export const useMediaPickerStore = create<MediaPickerState>((set) => {
+  return {
+    request: null,
+    open: (request) => {
+      return set({ request: { ...request, id: (nextId += 1) } })
+    },
+    close: () => {
+      return set({ request: null })
+    },
+  }
+})
 
 /** Opens the shared picker, replacing any current request. */
 export function openMediaPicker(request: PickerInput): void {

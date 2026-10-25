@@ -39,7 +39,9 @@ export async function POST(request: Request): Promise<Response> {
       return jsonError({ status: 400, error: 'Folder must be absolute' })
     }
 
-    const folder = await fs.lstat(dir).catch(() => null)
+    const folder = await fs.lstat(dir).catch(() => {
+      return null
+    })
 
     if (!folder || folder.isSymbolicLink() || !folder.isDirectory()) {
       return jsonError({ status: 400, error: 'Folder must be a real directory' })

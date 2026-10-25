@@ -7,7 +7,9 @@ import { secretsReady, secretStatus, setSecrets } from '@/server/secrets'
 
 const SecretValuesSchema = z.object(
   Object.fromEntries(
-    SECRET_NAMES.map((name) => [name, SECRET_SCHEMAS[name].nullable().optional()]),
+    SECRET_NAMES.map((name) => {
+      return [name, SECRET_SCHEMAS[name].nullable().optional()]
+    }),
   ),
 )
 

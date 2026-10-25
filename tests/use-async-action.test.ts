@@ -12,14 +12,15 @@ afterEach(() => {
 
 describe('useAsyncAction', () => {
   it('sets the busy flag while the action runs', async () => {
-    const action = vi.fn(
-      () =>
-        new Promise<void>((resolve) => {
-          resolveAction = resolve
-        }),
-    )
+    const action = vi.fn(() => {
+      return new Promise<void>((resolve) => {
+        resolveAction = resolve
+      })
+    })
 
-    const { result } = renderHook(() => useAsyncAction(action))
+    const { result } = renderHook(() => {
+      return useAsyncAction(action)
+    })
 
     act(() => {
       void result.current.run()
@@ -37,14 +38,15 @@ describe('useAsyncAction', () => {
   })
 
   it('ignores a call while one is running', async () => {
-    const action = vi.fn(
-      () =>
-        new Promise<void>((resolve) => {
-          resolveAction = resolve
-        }),
-    )
+    const action = vi.fn(() => {
+      return new Promise<void>((resolve) => {
+        resolveAction = resolve
+      })
+    })
 
-    const { result } = renderHook(() => useAsyncAction(action))
+    const { result } = renderHook(() => {
+      return useAsyncAction(action)
+    })
 
     await act(async () => {
       const first = result.current.run()
@@ -61,9 +63,14 @@ describe('useAsyncAction', () => {
     const first = vi.fn(async () => {})
     const second = vi.fn(async () => {})
 
-    const { result, rerender } = renderHook(({ action }) => useAsyncAction(action), {
-      initialProps: { action: first },
-    })
+    const { result, rerender } = renderHook(
+      ({ action }) => {
+        return useAsyncAction(action)
+      },
+      {
+        initialProps: { action: first },
+      },
+    )
 
     rerender({ action: second })
 

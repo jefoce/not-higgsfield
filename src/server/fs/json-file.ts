@@ -8,13 +8,19 @@ import type { ZodType } from 'zod'
 
 import { globalState } from '../global-state'
 
-const warnings = globalState<Set<string>>('jsonWarnings', () => new Set())
+const warnings = globalState<Set<string>>('jsonWarnings', () => {
+  return new Set()
+})
 
 /** Logs once per file path and mtime, so a bad file does not warn on every reload. */
 async function warnInvalid(file: string, message: string): Promise<void> {
   const mtimeMs = await fs.stat(file).then(
-    (stats) => stats.mtimeMs,
-    () => 0,
+    (stats) => {
+      return stats.mtimeMs
+    },
+    () => {
+      return 0
+    },
   )
 
   const key = `${file}:${mtimeMs}`
@@ -93,10 +99,18 @@ export async function removeFile(file: string): Promise<void> {
 }
 
 export async function listJsonFileNames(dir: string): Promise<string[]> {
-  const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => [])
+  const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => {
+    return []
+  })
 
   return entries
-    .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
-    .filter((entry) => !entry.name.includes('.tmp-'))
-    .map((entry) => entry.name)
+    .filter((entry) => {
+      return entry.isFile() && entry.name.endsWith('.json')
+    })
+    .filter((entry) => {
+      return !entry.name.includes('.tmp-')
+    })
+    .map((entry) => {
+      return entry.name
+    })
 }

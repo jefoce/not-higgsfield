@@ -12,20 +12,28 @@ const root = await mkdtemp(path.join(os.tmpdir(), 'nh-export-'))
 process.env.STORAGE_ROOT = root
 delete process.env.APP_TOKEN
 
-const session = vi.hoisted(() => ({ required: true }))
+const session = vi.hoisted(() => {
+  return { required: true }
+})
 
-vi.mock('@/server/session', () => ({
-  sessionRequired: () => session.required,
-  hasSession: () => true,
-}))
+vi.mock('@/server/session', () => {
+  return {
+    sessionRequired: () => {
+      return session.required
+    },
+    hasSession: () => {
+      return true
+    },
+  }
+})
 
 const { POST } = await import('@/app/api/generations/[id]/export/route')
 
 const id = randomUUID()
 const videoBytes = Buffer.from('fake-mp4-bytes')
 
-const exportRequest = (body: unknown, recordId = id): Request =>
-  new Request(`http://127.0.0.1:3000/api/generations/${recordId}/export`, {
+const exportRequest = (body: unknown, recordId = id): Request => {
+  return new Request(`http://127.0.0.1:3000/api/generations/${recordId}/export`, {
     method: 'POST',
     headers: {
       host: '127.0.0.1:3000',
@@ -34,8 +42,11 @@ const exportRequest = (body: unknown, recordId = id): Request =>
     },
     body: JSON.stringify(body),
   })
+}
 
-const context = (recordId = id) => ({ params: Promise.resolve({ id: recordId }) })
+const context = (recordId = id) => {
+  return { params: Promise.resolve({ id: recordId }) }
+}
 
 beforeAll(async () => {
   await mkdir(path.join(root, 'downloads'), { recursive: true })

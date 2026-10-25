@@ -13,25 +13,39 @@ import { StatusOverlay } from '@/features/history/status/StatusOverlay'
 import { handleNoop, ids, Observer, record, setOrder, setSelection, tile } from './helpers/history'
 import { required } from './helpers/required'
 
-const apiPost = vi.hoisted(() => vi.fn())
-const apiDelete = vi.hoisted(() => vi.fn())
-const confirm = vi.hoisted(() => vi.fn())
+const apiPost = vi.hoisted(() => {
+  return vi.fn()
+})
 
-vi.mock('@/lib/fetcher', () => ({
-  apiPost,
-  apiDelete,
-  apiPatch: vi.fn(),
-  fetcher: vi.fn(),
-  ApiError: class ApiError extends Error {
-    status = 0
-  },
-}))
+const apiDelete = vi.hoisted(() => {
+  return vi.fn()
+})
 
-vi.mock('@/lib/platform', () => ({
-  platform: { confirm, saveVideo: vi.fn(), saveVideos: vi.fn() },
-}))
+const confirm = vi.hoisted(() => {
+  return vi.fn()
+})
 
-vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
+vi.mock('@/lib/fetcher', () => {
+  return {
+    apiPost,
+    apiDelete,
+    apiPatch: vi.fn(),
+    fetcher: vi.fn(),
+    ApiError: class ApiError extends Error {
+      status = 0
+    },
+  }
+})
+
+vi.mock('@/lib/platform', () => {
+  return {
+    platform: { confirm, saveVideo: vi.fn(), saveVideos: vi.fn() },
+  }
+})
+
+vi.mock('sonner', () => {
+  return { toast: { success: vi.fn(), error: vi.fn() } }
+})
 
 beforeEach(() => {
   vi.stubGlobal('IntersectionObserver', Observer)
@@ -82,7 +96,10 @@ describe('portal clicks', () => {
 
     fireEvent.click(within(dialog).getByRole('button', { name: 'Delete' }))
 
-    await waitFor(() => expect(apiDelete).toHaveBeenCalledWith('/api/generations/b'))
+    await waitFor(() => {
+      return expect(apiDelete).toHaveBeenCalledWith('/api/generations/b')
+    })
+
     expect(ids()).toEqual(['a'])
   })
 

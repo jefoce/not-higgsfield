@@ -36,17 +36,29 @@ export function MoreMenu(props: MoreMenuProps) {
   const isCompleted = record.status === 'completed'
   const hasFullVideoRefs = getPreset(record.preset.id).references.video === 0
 
-  const handleCaptureLast = () => void captureFrame(record, 'last')
+  const handleCaptureLast = () => {
+    return void captureFrame(record, 'last')
+  }
 
-  const handleCaptureFirst = () => void captureFrame(record, 'first')
+  const handleCaptureFirst = () => {
+    return void captureFrame(record, 'first')
+  }
 
-  const handleAddReference = () => void addReference(record)
+  const handleAddReference = () => {
+    return void addReference(record)
+  }
 
-  const handleCopyPrompt = () => void copyPrompt(record)
+  const handleCopyPrompt = () => {
+    return void copyPrompt(record)
+  }
 
-  const handleCopySeed = () => void copySeed(record)
+  const handleCopySeed = () => {
+    return void copySeed(record)
+  }
 
-  const handleReveal = () => void revealRecord(record)
+  const handleReveal = () => {
+    return void revealRecord(record)
+  }
 
   const handleConfirmOpenChange = (isOpen: boolean): void => {
     confirmDialog.set(isOpen)

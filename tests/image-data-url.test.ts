@@ -101,7 +101,9 @@ function pixels(image: {
   return sharp(buffer)
     .raw()
     .toBuffer({ resolveWithObject: true })
-    .then(({ data, info }) => ({ data, width: info.width, channels: info.channels }))
+    .then(({ data, info }) => {
+      return { data, width: info.width, channels: info.channels }
+    })
 }
 
 describe('encodeImages sizing', () => {
@@ -236,8 +238,8 @@ describe('encodeImages formats', () => {
 describe('encodeImages limits', () => {
   it('moves 30 images to the same step when the budget shrinks', async () => {
     const sources = await Promise.all(
-      Array.from({ length: 30 }, () =>
-        sharp({
+      Array.from({ length: 30 }, () => {
+        return sharp({
           create: {
             width: 800,
             height: 600,
@@ -247,11 +249,16 @@ describe('encodeImages limits', () => {
           },
         })
           .jpeg()
-          .toBuffer(),
-      ),
+          .toBuffer()
+      }),
     )
 
-    const uploads = await Promise.all(sources.map((source) => fixture(source, '.jpg')))
+    const uploads = await Promise.all(
+      sources.map((source) => {
+        return fixture(source, '.jpg')
+      }),
+    )
+
     const full = await encodeImages({ uploads, preset: WAN_30, budgetBytes: BUDGET })
 
     const tight = await encodeImages({
@@ -275,11 +282,19 @@ describe('encodeImages limits', () => {
     await encodeImages({ uploads: [upload], preset: WAN_30, budgetBytes: BUDGET })
     const cached = await fs.readdir(uploadsDir)
 
-    expect(cached.some((name) => name.startsWith(`${upload.id}.encoded-`))).toBe(true)
+    expect(
+      cached.some((name) => {
+        return name.startsWith(`${upload.id}.encoded-`)
+      }),
+    ).toBe(true)
 
     await removeUpload(upload.id)
     const left = await fs.readdir(uploadsDir)
 
-    expect(left.some((name) => name.startsWith(`${upload.id}.encoded-`))).toBe(false)
+    expect(
+      left.some((name) => {
+        return name.startsWith(`${upload.id}.encoded-`)
+      }),
+    ).toBe(false)
   })
 })

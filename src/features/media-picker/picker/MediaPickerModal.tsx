@@ -15,7 +15,9 @@ function handleOpenChange(isOpen: boolean): void {
 
 /** Dialog shell, the body remounts per request so its state resets. */
 export function MediaPickerModal() {
-  const request = useMediaPickerStore((state) => state.request)
+  const request = useMediaPickerStore((state) => {
+    return state.request
+  })
 
   return (
     <Modal

@@ -16,22 +16,30 @@ import { DurationChip } from './DurationChip'
 /** Duration setting button and slider popover isCapped by reference video length. */
 export function DurationPopover() {
   const draft = useGeneratorStore(
-    useShallow((state) => ({
-      presetId: state.presetId,
-      tab: state.tab,
-      prompts: state.prompts,
-      audio: state.audio,
-      duration: state.duration,
-      aspectRatio: state.aspectRatio,
-      resolution: state.resolution,
-      frames: state.frames,
-      references: state.references,
-      seed: state.seed,
-    })),
+    useShallow((state) => {
+      return {
+        presetId: state.presetId,
+        tab: state.tab,
+        prompts: state.prompts,
+        audio: state.audio,
+        duration: state.duration,
+        aspectRatio: state.aspectRatio,
+        resolution: state.resolution,
+        frames: state.frames,
+        references: state.references,
+        seed: state.seed,
+      }
+    }),
   )
 
-  const uploadsById = useGeneratorStore((state) => state.uploadsById)
-  const handleDurationChange = useGeneratorStore((state) => state.setDuration)
+  const uploadsById = useGeneratorStore((state) => {
+    return state.uploadsById
+  })
+
+  const handleDurationChange = useGeneratorStore((state) => {
+    return state.setDuration
+  })
+
   const preset = getPreset(draft.presetId)
   const { max } = preset.duration
   const min = minDuration(preset)
@@ -42,7 +50,10 @@ export function DurationPopover() {
     preset,
   })
 
-  const chips = (preset.duration.options ?? []).filter((value) => value >= min && value <= max)
+  const chips = (preset.duration.options ?? []).filter((value) => {
+    return value >= min && value <= max
+  })
+
   const isFloored = min > preset.duration.min
 
   const totalVideo = referenceVideoSeconds({
@@ -81,16 +92,18 @@ export function DurationPopover() {
         {isCapped && <p className="text-xs text-fg-2">{limitText}</p>}
         {isFloored && <p className="text-xs text-fg-2">Minimum billed duration is {min}s</p>}
         <div className="flex flex-wrap gap-1.5">
-          {chips.map((value) => (
-            <DurationChip
-              key={value}
-              value={value}
-              duration={draft.duration}
-              limit={limit}
-              limitText={limitText}
-              onSelect={handleDurationChange}
-            />
-          ))}
+          {chips.map((value) => {
+            return (
+              <DurationChip
+                key={value}
+                value={value}
+                duration={draft.duration}
+                limit={limit}
+                limitText={limitText}
+                onSelect={handleDurationChange}
+              />
+            )
+          })}
         </div>
       </PopoverContent>
     </Popover>

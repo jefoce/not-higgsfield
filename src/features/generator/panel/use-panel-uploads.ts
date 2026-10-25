@@ -36,7 +36,9 @@ function route(items: UploadItem[]): void {
     slot = 'end'
   }
 
-  const image = items.find((item) => item.kind === 'image')
+  const image = items.find((item) => {
+    return item.kind === 'image'
+  })
 
   if (!image) {
     toast.error('Frames need an image')
@@ -56,9 +58,14 @@ function allowedKinds(): MediaKind[] {
   }
 
   const preset = getPreset(state.presetId)
-  const { counts } = referenceSlots(state.references, (id) => state.uploadsById[id]?.kind)
 
-  return MEDIA_KINDS.filter((kind) => counts[kind] < preset.references[kind])
+  const { counts } = referenceSlots(state.references, (id) => {
+    return state.uploadsById[id]?.kind
+  })
+
+  return MEDIA_KINDS.filter((kind) => {
+    return counts[kind] < preset.references[kind]
+  })
 }
 
 /** Preset formats for the active model. */
@@ -71,7 +78,9 @@ export function usePanelPaste() {
   const handlePasteFiles = (files: File[]): void => {
     void uploadFiles(files)
       .then(route)
-      .catch((error) => toastError(error))
+      .catch((error) => {
+        return toastError(error)
+      })
   }
 
   const { onPaste: handlePaste } = usePasteMedia({
@@ -90,17 +99,22 @@ export function usePanelPaste() {
  * Refreshes cached uploads for attached frames and references on focus.
  */
 export function useUploadsRefresh() {
-  const frames = useGeneratorStore((state) => state.frames)
-  const references = useGeneratorStore((state) => state.references)
+  const frames = useGeneratorStore((state) => {
+    return state.frames
+  })
 
-  const idsKey = useMemo(
-    () =>
-      [...new Set([frames.start, frames.end, ...references])]
-        .filter((id): id is string => Boolean(id))
-        .sort()
-        .join(','),
-    [frames.start, frames.end, references],
-  )
+  const references = useGeneratorStore((state) => {
+    return state.references
+  })
+
+  const idsKey = useMemo(() => {
+    return [...new Set([frames.start, frames.end, ...references])]
+      .filter((id): id is string => {
+        return Boolean(id)
+      })
+      .sort()
+      .join(',')
+  }, [frames.start, frames.end, references])
 
   useEffect(() => {
     const refresh = () => {
@@ -111,13 +125,19 @@ export function useUploadsRefresh() {
       }
 
       void fetchUploads({ ids })
-        .then((items) => useGeneratorStore.getState().upsertUploads(items))
-        .catch((error) => toastError(error))
+        .then((items) => {
+          return useGeneratorStore.getState().upsertUploads(items)
+        })
+        .catch((error) => {
+          return toastError(error)
+        })
     }
 
     refresh()
     window.addEventListener('focus', refresh)
 
-    return () => window.removeEventListener('focus', refresh)
+    return () => {
+      return window.removeEventListener('focus', refresh)
+    }
   }, [idsKey])
 }

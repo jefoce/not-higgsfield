@@ -21,7 +21,9 @@ export function useFolderBrowse(max: number) {
     (rel: string) => {
       setSelectedFolderRels((previous) => {
         if (previous.includes(rel)) {
-          return previous.filter((entry) => entry !== rel)
+          return previous.filter((entry) => {
+            return entry !== rel
+          })
         }
 
         if (previous.length >= max) {
