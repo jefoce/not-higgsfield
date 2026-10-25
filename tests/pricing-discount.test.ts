@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { getPreset } from '@/core/presets'
 import { primaryBinding } from '@/core/pricing'
+import type { Dict } from '@/core/utility-types'
 import { getPricing } from '@/server/providers/openrouter/pricing'
 
 const WAN_SKUS = {
@@ -22,7 +23,7 @@ function stubFetch(
     endpointsFail?: boolean
     modelsFail?: boolean
     id?: string
-    skus?: Record<string, string>
+    skus?: Dict<string>
   } = {},
 ) {
   vi.stubGlobal(

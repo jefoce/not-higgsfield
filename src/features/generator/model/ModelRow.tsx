@@ -7,6 +7,7 @@ import type { CatalogEntry } from '@/core/catalog'
 import { minDuration } from '@/core/presets'
 import type { ModelPreset, PresetIcon } from '@/core/presets/types'
 import { formatRate, pricePerSec } from '@/core/pricing'
+import type { Dict } from '@/core/utility-types'
 import { useModelEntry } from '@/lib/api/models'
 import { cn } from '@/lib/cn'
 import { Price } from '@/ui/Price'
@@ -39,7 +40,7 @@ const PRESET_ICONS: Record<PresetIcon, LucideIcon> = {
 }
 
 /** Cheapest effective per-second rate across the model's resolutions. */
-function fromRate(preset: ModelPreset, skus?: Record<string, number>): number | null {
+function fromRate(preset: ModelPreset, skus?: Dict<number>): number | null {
   const ctx = {
     aspect: preset.defaultAspectRatio,
     audio: preset.audio.default,
@@ -59,7 +60,7 @@ function fromRate(preset: ModelPreset, skus?: Record<string, number>): number | 
 
 interface ListRateParams {
   preset: ModelPreset
-  skus: Record<string, number> | undefined
+  skus: Dict<number> | undefined
   discount: number
 }
 

@@ -2,12 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import { getPreset } from '@/core/presets'
 import type { GenerationInput } from '@/core/schemas/generation-record'
+import type { Dict } from '@/core/utility-types'
 import { buildRequestBody } from '@/server/providers/openrouter/body'
 import type { ResolvedMedia } from '@/server/providers/types'
 
 const preset = getPreset('wan-3.0')
 
-const media: Record<string, ResolvedMedia> = {
+const media: Dict<ResolvedMedia> = {
   start: { id: 'start', kind: 'image', url: 'data:image/png;base64,START' },
   end: { id: 'end', kind: 'image', url: 'data:image/png;base64,END' },
   img: { id: 'img', kind: 'image', url: 'data:image/png;base64,IMG' },

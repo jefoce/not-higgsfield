@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { Dict } from '@/core/utility-types'
+
 import { HttpError } from '../errors'
 import { globalState } from '../global-state'
 import { darwin } from './darwin'
@@ -14,7 +16,7 @@ class DialogBusyError extends HttpError {
   }
 }
 
-const ADAPTERS: Record<string, SystemAdapter> = { darwin, win32, linux }
+const ADAPTERS: Dict<SystemAdapter> = { darwin, win32, linux }
 const dialog = globalState('dialog', () => ({ open: false }))
 
 /** Returns the adapter for this OS, or the Linux fallback. */

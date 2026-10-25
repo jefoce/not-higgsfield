@@ -1,3 +1,4 @@
+import type { UploadsById } from '@/core/media-types'
 import type { AspectChoice, Resolution } from '@/core/presets/types'
 import type { RefSlot } from '@/core/prompt-tokens'
 import type { GenerationInput, GeneratorTab } from '@/core/schemas/generation-record'
@@ -10,7 +11,7 @@ type MentionInserter = (slot: RefSlot) => void
 type SlotFocuser = (slot: RefSlot, occurrence: number) => void
 
 export interface GeneratorState extends GeneratorDraft {
-  uploadsById: Record<string, UploadItem>
+  uploadsById: UploadsById
   activeCount: number
   setActiveCount: (count: number) => void
   setPreset: (id: string) => void

@@ -2,7 +2,7 @@ import { isNil, sumBy } from 'lodash-es'
 
 import { maxDurationFor } from './duration-limits'
 import { KIND_TITLE, MEDIA_KINDS } from './media-kinds'
-import type { MediaKind, MediaKindCounts } from './media-types'
+import type { MediaKind, MediaKindCounts, UploadsById } from './media-types'
 import type { ModelPreset } from './presets/types'
 import { primaryBinding } from './pricing'
 import { missingSlots, referenceSlots } from './prompt-tokens'
@@ -29,7 +29,7 @@ interface CheckRefDurationsParams {
 
 interface CollectReferencesParams {
   input: GenerationInput
-  uploads: Record<string, UploadItem>
+  uploads: UploadsById
   preset: ModelPreset
   errors: string[]
 }

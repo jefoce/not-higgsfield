@@ -1,5 +1,6 @@
 import type { MediaKind, MediaKindCounts } from '../media-types'
 import type { VideoProviderId } from '../providers/types'
+import type { Dict } from '../utility-types'
 
 export const RESOLUTIONS = ['480p', '720p', '768p', '1080p', '2K', '4K'] as const
 export type Resolution = (typeof RESOLUTIONS)[number]
@@ -48,7 +49,7 @@ export interface ReferenceLimits {
   alpha?: boolean
 }
 
-export type SkuTable = Readonly<Record<string, number>>
+export type SkuTable = Readonly<Dict<number>>
 export type ResolutionTiers = Readonly<Partial<Record<Resolution, string>>>
 
 type SizeByAspect = Partial<Record<AspectRatio, `${number}x${number}`>>

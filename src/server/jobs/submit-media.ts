@@ -3,13 +3,13 @@ import 'server-only'
 import { chunk, isNil, sumBy } from 'lodash-es'
 
 import { MAX_REQUEST_MB, REQUEST_RESERVE_MB } from '@/core/constants'
-import type { ReferencePlan } from '@/core/media-types'
+import type { ReferencePlan, UploadsById } from '@/core/media-types'
 import type { ModelPreset } from '@/core/presets/types'
 import { recordProvider } from '@/core/providers/registry'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
-import type { UploadItem } from '@/core/schemas/upload-item'
 import { base64Only } from '@/core/submit-state'
 import type { ResolvedTransport } from '@/core/transport'
+import type { Dict } from '@/core/utility-types'
 
 import { encodeImages } from '../media/image-data-url'
 import { toDataUrl } from '../media/to-data-url'
@@ -22,26 +22,24 @@ import { shouldRetryAsBase64 } from './submit-retry'
 const LIMIT_BYTES = MAX_REQUEST_MB * 1024 * 1024
 const IMAGE_BUDGET = LIMIT_BYTES - REQUEST_RESERVE_MB * 1024 * 1024
 
-type Uploads = Record<string, UploadItem>
-
-type Transports = Record<string, ResolvedTransport>
+type Transports = Dict<ResolvedTransport>
 
 /** Media built for one submit request. */
 export interface BuiltMedia {
-  media: Record<string, ResolvedMedia>
+  media: Dict<ResolvedMedia>
   encodedBytes: number
   plan: ReferencePlan
 }
 
 interface UploadUrlsParams {
   id: string
-  uploads: Uploads
+  uploads: UploadsById
   transports: Transports
   signal?: AbortSignal
 }
 
 interface BuildMediaParams {
-  uploads: Uploads
+  uploads: UploadsById
   transports: Transports
   preset: ModelPreset
 }
@@ -49,7 +47,7 @@ interface BuildMediaParams {
 interface SendParams {
   record: GenerationRecord
   preset: ModelPreset
-  uploads: Uploads
+  uploads: UploadsById
   transports: Transports
   built: BuiltMedia
 }

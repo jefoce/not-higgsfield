@@ -10,6 +10,7 @@ import type {
   SkuCondition,
   SkuContext,
 } from './presets/types'
+import type { Dict } from './utility-types'
 
 export interface PriceContext {
   resolution: Resolution
@@ -55,7 +56,7 @@ export function skuKey(pricing: PricingRule, ctx: SkuContext): string {
 interface PricePerSecParams {
   preset: ModelPreset
   ctx: PriceContext
-  skus?: Record<string, number>
+  skus?: Dict<number>
 }
 
 const rawRate = (params: PricePerSecParams): number | null => {
@@ -126,7 +127,7 @@ interface EstimatePriceParams {
   ctx: PriceContext
   duration: number
   referenceSeconds: number
-  skus?: Record<string, number>
+  skus?: Dict<number>
 }
 
 /** Output plus billed reference seconds, or null when the SKU is missing. */

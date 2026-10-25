@@ -4,6 +4,7 @@ import { useRef } from 'react'
 import { TriangleAlert } from 'lucide-react'
 
 import type { RefSlot } from '@/core/prompt-tokens'
+import type { Dict } from '@/core/utility-types'
 import type { ValidationIssue } from '@/core/validation-types'
 import { useBoolean } from '@/lib/use-boolean'
 import { Chip } from '@/ui/Chip'
@@ -20,7 +21,7 @@ interface PromptWarningsProps {
 export function PromptWarnings(props: PromptWarningsProps) {
   const { warnings } = props
   const warningsPopover = useBoolean()
-  const occurrences = useRef<Record<string, number>>({})
+  const occurrences = useRef<Dict<number>>({})
 
   const handleOpenChange = (isOpen: boolean): void => {
     warningsPopover.set(isOpen)

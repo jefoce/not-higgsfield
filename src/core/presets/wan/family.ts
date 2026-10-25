@@ -1,4 +1,5 @@
 import { VIDEO_PROVIDER_IDS } from '../../providers/types'
+import type { Dict } from '../../utility-types'
 import { perSecondPricing } from '../helpers'
 import type { ModelPreset } from '../types'
 
@@ -60,7 +61,7 @@ interface WanPresetParams {
   id: string
   title: string
   modelId: string
-  fallback: Record<string, number>
+  fallback: Dict<number>
 }
 
 export function wanPreset(params: WanPresetParams): ModelPreset {

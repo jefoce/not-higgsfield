@@ -6,6 +6,8 @@ import path from 'node:path'
 import { isNil } from 'lodash-es'
 import type { ZodType } from 'zod'
 
+import type { HasId } from '@/core/utility-types'
+
 import { listJsonFileNames, readJson } from '../fs/json-file'
 import { globalState } from '../global-state'
 
@@ -15,11 +17,7 @@ interface IndexState<T> {
   loaded: boolean
 }
 
-interface Identified {
-  id: string
-}
-
-export interface JsonDirStore<T extends Identified> {
+export interface JsonDirStore<T extends HasId> {
   list(): Promise<T[]>
   get(id: string): Promise<T | null>
   remember(item: T): Promise<void>
@@ -34,7 +32,7 @@ interface JsonDirStoreParams<T> {
 }
 
 /** Indexes `<id>.json` files in one directory, reloading when its mtime changes. */
-export function jsonDirStore<T extends Identified>(params: JsonDirStoreParams<T>): JsonDirStore<T> {
+export function jsonDirStore<T extends HasId>(params: JsonDirStoreParams<T>): JsonDirStore<T> {
   const { key, dir, fileOf, schema } = params
 
   const state = globalState<IndexState<T>>(key, () => ({

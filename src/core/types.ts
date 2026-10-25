@@ -1,6 +1,7 @@
 import type { AspectChoice, Resolution } from './presets/types'
 import type { GenerationRecord, GeneratorTab, JobStatus } from './schemas/generation-record'
 import type { SecretName } from './secret-names'
+import type { Dict } from './utility-types'
 
 /** Start and end frame data URLs. */
 export interface FrameSlots {
@@ -88,8 +89,8 @@ export interface GenerationEstimate {
 
 /** Live and list SKU rates for one preset. */
 export interface PricingInfo {
-  skus: Record<string, number>
-  listSkus: Record<string, number>
+  skus: Dict<number>
+  listSkus: Dict<number>
   discount: number
   source: 'live' | 'fallback' | 'mock'
   fetchedAt: string

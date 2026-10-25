@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest'
 import * as bounds from '@/core/constants'
 import { MODEL_PRESETS } from '@/core/presets'
 import { STATUS_HELP } from '@/core/status-help'
+import type { Dict } from '@/core/utility-types'
 
 import { required } from './helpers/required'
 
@@ -51,7 +52,7 @@ function rowLabels(cells: string[]): string[] {
 
 describe('bounds table', () => {
   it('keeps the bounds table equal to the constants', () => {
-    const expected: Record<string, number | string> = {
+    const expected: Dict<number | string> = {
       MAX_ACTIVE_JOBS: bounds.MAX_ACTIVE_JOBS,
       MAX_REQUEST_MB: bounds.MAX_REQUEST_MB,
       MAX_INLINE_MEDIA_MB: bounds.MAX_INLINE_MEDIA_MB,

@@ -3,11 +3,11 @@ import { z } from 'zod'
 
 import { SEED_MAX } from './constants'
 import { KIND_PLURAL } from './media-kinds'
+import type { UploadsById } from './media-types'
 import { minDuration } from './presets'
 import type { ModelPreset } from './presets/types'
 import { slotLabel } from './prompt-tokens'
 import { FrameSlotsSchema, type GenerationInput } from './schemas/generation-record'
-import type { UploadItem } from './schemas/upload-item'
 import { validateReferences } from './validation-references'
 import {
   validateFrames,
@@ -80,7 +80,7 @@ const DEFAULT_CONTEXT: ValidationContext = { modelStatus: 'unverified', modelRea
 
 interface ValidateInputParams {
   input: GenerationInput
-  uploads: Record<string, UploadItem>
+  uploads: UploadsById
   preset: ModelPreset
   ctx?: ValidationContext
 }

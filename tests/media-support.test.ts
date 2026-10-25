@@ -5,10 +5,11 @@ import path from 'node:path'
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { Dict } from '@/core/utility-types'
 import { mediaUrl } from '@/lib/api/media-urls'
 import { __resetCanPlayCache, canPlay } from '@/lib/media-support'
 
-function stubDocument(supported: Record<string, string>): void {
+function stubDocument(supported: Dict<string>): void {
   vi.stubGlobal('document', {
     createElement: () => ({ canPlayType: (mime: string) => supported[mime] ?? '' }),
   })

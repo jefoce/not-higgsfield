@@ -5,6 +5,7 @@ import type { ModelPreset } from '@/core/presets/types'
 import type { VideoProviderId } from '@/core/providers/types'
 import type { GenerationInput, JobStatus } from '@/core/schemas/generation-record'
 import type { PricingInfo, TestResult } from '@/core/types'
+import type { Dict } from '@/core/utility-types'
 
 export interface ProviderModel {
   modelId: string
@@ -31,7 +32,7 @@ export interface ResolvedMedia {
 export interface SubmitJobParams {
   preset: ModelPreset
   input: GenerationInput
-  media: Readonly<Record<string, ResolvedMedia>>
+  media: Readonly<Dict<ResolvedMedia>>
 }
 
 export interface SubmittedJob {

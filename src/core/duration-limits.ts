@@ -1,19 +1,19 @@
 import { isNil } from 'lodash-es'
 
+import type { UploadsById } from './media-types'
 import { minDuration } from './presets'
 import type { ModelPreset } from './presets/types'
 import type { GenerationInput } from './schemas/generation-record'
-import type { UploadItem } from './schemas/upload-item'
 
 interface ReferenceDurationLimitParams {
   references: readonly string[]
-  uploads: Record<string, UploadItem>
+  uploads: UploadsById
   preset: ModelPreset
 }
 
 interface ReferenceVideoSecondsParams {
   references: readonly string[]
-  uploads: Record<string, UploadItem>
+  uploads: UploadsById
 }
 
 /** Total seconds of kept video references. */
@@ -52,7 +52,7 @@ export function durationLimitFor(params: ReferenceDurationLimitParams): number {
 
 interface MaxDurationForParams {
   input: GenerationInput
-  uploads: Record<string, UploadItem>
+  uploads: UploadsById
   preset: ModelPreset
 }
 

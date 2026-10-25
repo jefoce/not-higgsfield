@@ -1,6 +1,11 @@
 import type { PixelSize } from './geometry'
+import type { UploadItem } from './schemas/upload-item'
+import type { Dict } from './utility-types'
 
 export type MediaKind = 'image' | 'video' | 'audio'
+
+/** Uploads keyed by upload id. */
+export type UploadsById = Dict<UploadItem>
 
 /** Count per media kind. */
 export interface MediaKindCounts {

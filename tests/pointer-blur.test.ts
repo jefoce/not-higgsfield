@@ -2,6 +2,7 @@
 import { cleanup, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { Dict } from '@/core/utility-types'
 import { usePointerBlur } from '@/lib/use-pointer-blur'
 
 beforeEach(() => {
@@ -18,7 +19,7 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-function mountControl(attributes: Record<string, string> = {}): HTMLElement {
+function mountControl(attributes: Dict<string> = {}): HTMLElement {
   const button = document.createElement('button')
 
   for (const [name, value] of Object.entries(attributes)) {

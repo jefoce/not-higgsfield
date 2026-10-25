@@ -25,6 +25,7 @@ import {
   slotLabel,
   slotToken,
 } from '@/core/prompt-tokens'
+import type { Dict } from '@/core/utility-types'
 import { thumbUrl } from '@/lib/api/media-urls'
 
 import { useGeneratorStore } from '../store/store'
@@ -33,7 +34,7 @@ import type { GeneratorState } from '../store/store-state'
 
 const LABEL = /^(Image|Video|Audio) (\d+)$/
 
-function slotFromData(data?: Record<string, BeautifulMentionsItemData>): RefSlot | null {
+function slotFromData(data?: Dict<BeautifulMentionsItemData>): RefSlot | null {
   const kind = MEDIA_KINDS.find((item) => item === String(data?.kind ?? ''))
   const n = Number(data?.n)
 
@@ -45,10 +46,7 @@ function slotFromData(data?: Record<string, BeautifulMentionsItemData>): RefSlot
 }
 
 /** Slot stored on a mention node, falling back to its label. */
-export function mentionSlot(
-  value: string,
-  data?: Record<string, BeautifulMentionsItemData>,
-): RefSlot {
+export function mentionSlot(value: string, data?: Dict<BeautifulMentionsItemData>): RefSlot {
   const fromData = slotFromData(data)
 
   if (!isNil(fromData)) {

@@ -1,8 +1,10 @@
 import { isNil } from 'lodash-es'
 
+import type { Dict } from '@/core/utility-types'
+
 type QueryValue = string | number | boolean | null | undefined
 
-export type QueryParams = Record<string, QueryValue>
+export type QueryParams = Dict<QueryValue>
 
 /**
  * Adds only defined, non-empty values to a URL.

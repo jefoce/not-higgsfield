@@ -4,11 +4,12 @@ import { isNil } from 'lodash-es'
 import useSWR from 'swr'
 
 import type { BrowseResult } from '@/core/media-types'
+import type { Dict } from '@/core/utility-types'
 import { fetchSystemCapabilities } from '@/lib/api/system'
 import { Button } from '@/ui/Button'
 import { Switch } from '@/ui/form/Switch'
 
-const NATIVE_LABELS: Record<string, string> = { darwin: 'Finder', win32: 'Explorer' }
+const NATIVE_LABELS: Dict<string> = { darwin: 'Finder', win32: 'Explorer' }
 
 const nativeLabel = (platform: string): string => NATIVE_LABELS[platform] ?? 'Files'
 

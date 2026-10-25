@@ -2,6 +2,7 @@ import { isNil } from 'lodash-es'
 
 import { isNonEmptyString } from './guards'
 import type { MediaKind } from './media-types'
+import type { Dict } from './utility-types'
 
 export const MEDIA_KINDS = ['image', 'video', 'audio'] as const satisfies readonly MediaKind[]
 
@@ -28,7 +29,7 @@ const EXTENSIONS: Record<MediaKind, readonly string[]> = {
   audio: ['mp3', 'wav', 'm4a', 'aac', 'ogg'],
 }
 
-const MIME_TYPES: Record<string, string> = {
+const MIME_TYPES: Dict<string> = {
   jpg: 'image/jpeg',
   jpeg: 'image/jpeg',
   png: 'image/png',

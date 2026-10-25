@@ -3,6 +3,7 @@ import { PassThrough } from 'node:stream'
 import { isNil } from 'lodash-es'
 import { describe, expect, it, vi } from 'vitest'
 
+import type { Dict } from '@/core/utility-types'
 import {
   __resetSecretsForTests,
   __setSecretsBackendForTests,
@@ -50,7 +51,7 @@ function request(sent: string[]): SentLine {
   return JSON.parse(line.slice(BRIDGE_PREFIX.length))
 }
 
-function reply(input: PassThrough, payload: Record<string, unknown>) {
+function reply(input: PassThrough, payload: Dict<unknown>) {
   input.write(`${JSON.stringify(payload)}\n`)
 }
 

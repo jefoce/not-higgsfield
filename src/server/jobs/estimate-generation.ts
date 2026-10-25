@@ -4,6 +4,7 @@ import { isNil } from 'lodash-es'
 
 import type { CatalogEntry } from '@/core/catalog'
 import { referenceVideoSeconds } from '@/core/duration-limits'
+import type { UploadsById } from '@/core/media-types'
 import { inputForSubmit } from '@/core/normalize-input'
 import { getPreset } from '@/core/presets'
 import { activeBinding } from '@/core/presets/bindings'
@@ -11,7 +12,6 @@ import type { ModelPreset } from '@/core/presets/types'
 import { estimatePrice, type PriceContext, type PriceEstimate } from '@/core/pricing'
 import { canonicalizePrompt, referenceSlots } from '@/core/prompt-tokens'
 import type { GenerationInput } from '@/core/schemas/generation-record'
-import type { UploadItem } from '@/core/schemas/upload-item'
 import type { GenerationEstimate } from '@/core/types'
 import { type PriceInput, validateInput } from '@/core/validation'
 
@@ -25,7 +25,7 @@ import { loadUploads } from './run-submit'
 export interface GenerationDraft {
   preset: ModelPreset
   input: GenerationInput
-  uploads: Record<string, UploadItem>
+  uploads: UploadsById
 }
 
 /** Validates one draft and loads only its referenced uploads. */
@@ -140,10 +140,7 @@ export async function estimateGeneration(draft: GenerationDraft): Promise<Genera
 }
 
 /** Canonical prompt slots from reference order. */
-function withCanonicalPrompt(
-  input: GenerationInput,
-  uploads: Record<string, UploadItem>,
-): GenerationInput {
+function withCanonicalPrompt(input: GenerationInput, uploads: UploadsById): GenerationInput {
   const { counts } = referenceSlots(input.references, (id) => uploads[id]?.kind)
   const prompt = canonicalizePrompt(input.prompt, counts)
 

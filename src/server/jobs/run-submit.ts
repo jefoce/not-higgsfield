@@ -4,11 +4,13 @@ import { isNil } from 'lodash-es'
 
 import { MAX_REQUEST_MB } from '@/core/constants'
 import { isNonEmptyString } from '@/core/guards'
+import type { UploadsById } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
 import type { GenerationInput, GenerationRecord } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { graceDelayMs, inputIds, transportsFor, withTransports } from '@/core/submit-state'
 import type { ResolvedTransport } from '@/core/transport'
+import type { Dict } from '@/core/utility-types'
 
 import { ProviderError } from '../providers/provider-error'
 import type { SubmittedJob } from '../providers/types'
@@ -27,8 +29,8 @@ const LIMIT_BYTES = MAX_REQUEST_MB * 1024 * 1024
 
 interface Prepared {
   record: GenerationRecord
-  uploads: Record<string, UploadItem>
-  transports: Record<string, ResolvedTransport>
+  uploads: UploadsById
+  transports: Dict<ResolvedTransport>
 }
 
 /** Uploads url inputs, then submits once. Failures are stored. */
@@ -178,7 +180,7 @@ async function fail(id: string, error: unknown): Promise<void> {
 }
 
 /** Loads only uploads referenced by the normalized input. */
-export async function loadUploads(input: GenerationInput): Promise<Record<string, UploadItem>> {
+export async function loadUploads(input: GenerationInput): Promise<UploadsById> {
   const items = await Promise.all(inputIds(input).map((id) => getUpload(id)))
 
   return Object.fromEntries(

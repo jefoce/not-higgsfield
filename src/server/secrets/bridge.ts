@@ -6,6 +6,7 @@ import { isBoolean, isNil, isString, isUndefined } from 'lodash-es'
 
 import { isNonEmptyString, isRecord } from '@/core/guards'
 import { SECRET_NAMES, type SecretName } from '@/core/secret-names'
+import type { Dict } from '@/core/utility-types'
 
 import type { SecretBackend } from './types'
 
@@ -125,7 +126,7 @@ function parseReply(line: string): Reply | null {
   return null
 }
 
-function parseReplyObject(line: string): Record<string, unknown> | null {
+function parseReplyObject(line: string): Dict<unknown> | null {
   if (!line.startsWith('{')) {
     return null
   }

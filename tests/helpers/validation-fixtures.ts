@@ -1,4 +1,4 @@
-import type { MediaKind } from '@/core/media-types'
+import type { MediaKind, UploadsById } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
 import type { GenerationInput } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
@@ -54,6 +54,6 @@ export function input(overrides: Partial<GenerationInput> = {}): GenerationInput
   }
 }
 
-export function uploadsOf(...items: UploadItem[]): Record<string, UploadItem> {
+export function uploadsOf(...items: UploadItem[]): UploadsById {
   return Object.fromEntries(items.map((item) => [item.id, item]))
 }

@@ -8,6 +8,7 @@ import type {
 import { isNil } from 'lodash-es'
 
 import { slotLabel } from '@/core/prompt-tokens'
+import type { Dict } from '@/core/utility-types'
 import { thumbUrl } from '@/lib/api/media-urls'
 import { cn } from '@/lib/cn'
 
@@ -19,7 +20,7 @@ import { ReferenceIcon } from './ReferenceIcon'
 /** Inline slot chip, resolved live to the attached upload. */
 export const ReferenceChip = forwardRef<
   HTMLSpanElement,
-  BeautifulMentionComponentProps<Record<string, BeautifulMentionsItemData>>
+  BeautifulMentionComponentProps<Dict<BeautifulMentionsItemData>>
 >(function ReferenceChip(props, ref) {
   const { value, data, className, classNameFocused, 'data-beautiful-mention': mentionAttr } = props
   const slot = mentionSlot(value, data)

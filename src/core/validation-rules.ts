@@ -2,6 +2,7 @@ import { isNil } from 'lodash-es'
 
 import { LOW_RES_MIN_PX, MAX_ACTIVE_JOBS, MAX_INLINE_MEDIA_MB } from './constants'
 import { isNonEmptyString } from './guards'
+import type { UploadsById } from './media-types'
 import { aspectAllowed } from './output-size'
 import type { ModelPreset } from './presets/types'
 import { primaryBinding } from './pricing'
@@ -22,7 +23,7 @@ const byteLimit = MAX_INLINE_MEDIA_MB * 1024 * 1024
 interface CheckUploadParams {
   id: string | null
   role: string
-  uploads: Record<string, UploadItem>
+  uploads: UploadsById
   errors: string[]
 }
 
@@ -191,7 +192,7 @@ export function validateLimits(params: ValidateWithContextParams): RuleResult {
 }
 
 /** Uploads attached by the active tab, in rule order. */
-function attachedMedia(input: GenerationInput, uploads: Record<string, UploadItem>): UploadItem[] {
+function attachedMedia(input: GenerationInput, uploads: UploadsById): UploadItem[] {
   if (input.tab === 'references') {
     return input.references
       .map((id) => uploads[id])

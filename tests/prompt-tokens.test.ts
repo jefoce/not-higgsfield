@@ -15,6 +15,7 @@ import {
   slotLabel,
   slotToken,
 } from '@/core/prompt-tokens'
+import type { Dict } from '@/core/utility-types'
 
 const counts = (image = 0, video = 0, audio = 0): Record<MediaKind, number> => ({
   image,
@@ -137,7 +138,7 @@ describe('canonicalizePrompt', () => {
 })
 
 describe('referenceSlots', () => {
-  const kinds: Record<string, MediaKind> = { i1: 'image', i2: 'image', v1: 'video', a1: 'audio' }
+  const kinds: Dict<MediaKind> = { i1: 'image', i2: 'image', v1: 'video', a1: 'audio' }
 
   const kindOf = (id: string): MediaKind | undefined => kinds[id]
 

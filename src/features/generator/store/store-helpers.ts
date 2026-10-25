@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { SEED_MAX } from '@/core/constants'
 import { maxDurationFor } from '@/core/duration-limits'
 import { isNonEmptyString } from '@/core/guards'
-import type { MediaKind, MediaKindCounts } from '@/core/media-types'
+import type { MediaKind, MediaKindCounts, UploadsById } from '@/core/media-types'
 import { minDuration } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
 import { idForSlot, referenceSlots, type RefSlot } from '@/core/prompt-tokens'
@@ -14,7 +14,7 @@ import { formatSecondsExact } from '@/lib/format'
 
 interface ReferenceState {
   references: string[]
-  uploadsById: Record<string, UploadItem>
+  uploadsById: UploadsById
 }
 
 export const randomSeed = (): number => Math.floor(Math.random() * (SEED_MAX + 1))
@@ -38,7 +38,7 @@ export function uploadForSlot(state: ReferenceState, slot: RefSlot): UploadItem 
 
 interface ClampReferenceDurationParams {
   input: GenerationInput
-  uploads: Record<string, UploadItem>
+  uploads: UploadsById
   preset: ModelPreset
 }
 
@@ -73,7 +73,7 @@ export function clampReferenceDuration(params: ClampReferenceDurationParams): nu
 
 export function kindCounts(
   ids: readonly string[],
-  uploads: Record<string, UploadItem>,
+  uploads: UploadsById,
 ): Record<MediaKind, number> {
   const counts: Record<MediaKind, number> = { image: 0, video: 0, audio: 0 }
 

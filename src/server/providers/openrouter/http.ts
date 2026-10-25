@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import { PROVIDER_RAW_MAX_CHARS } from '@/core/constants'
 import { isNonEmptyString, isRecord } from '@/core/guards'
+import type { Dict } from '@/core/utility-types'
 
 import { getSecret } from '../../secrets'
 import { OpenRouterError } from './error'
@@ -68,7 +69,7 @@ export async function request(params: RequestParams): Promise<Response> {
   }
 }
 
-export function headers(isJson: boolean): Record<string, string> {
+export function headers(isJson: boolean): Dict<string> {
   const key = getSecret('OPENROUTER_API_KEY')
 
   if (!isNonEmptyString(key)) {
@@ -79,7 +80,7 @@ export function headers(isJson: boolean): Record<string, string> {
     })
   }
 
-  const result: Record<string, string> = {
+  const result: Dict<string> = {
     Authorization: `Bearer ${key}`,
     'HTTP-Referer': 'http://localhost:3000',
     'X-Title': 'Not Higgsfield',
@@ -127,7 +128,7 @@ function errorCode(error: unknown): unknown {
 }
 
 function providerDetail(error: unknown): string {
-  let meta: Record<string, unknown> | null = null
+  let meta: Dict<unknown> | null = null
 
   if (isRecord(error) && isRecord(error.metadata)) {
     meta = error.metadata
@@ -188,7 +189,7 @@ function normalizeBase(input: string, status: number): NormalizedError {
   return { message, code }
 }
 
-function innerError(message: string): Record<string, unknown> | null {
+function innerError(message: string): Dict<unknown> | null {
   if (!message.startsWith('{')) {
     return null
   }

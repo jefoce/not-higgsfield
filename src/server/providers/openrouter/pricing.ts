@@ -7,6 +7,7 @@ import { FETCH_TIMEOUTS, PRICING_FALLBACK_TTL_MS } from '@/core/constants'
 import type { ModelPreset } from '@/core/presets/types'
 import { primaryBinding } from '@/core/pricing'
 import type { PricingInfo } from '@/core/types'
+import type { Dict } from '@/core/utility-types'
 
 import { onSecretsChange } from '../../secrets'
 import { createTtlCache, type TtlLoadResult } from '../../sync/ttl-cache'
@@ -84,7 +85,7 @@ async function fetchPricing(preset: ModelPreset): Promise<PricingInfo> {
   }
 }
 
-async function fetchListSkus(preset: ModelPreset): Promise<Record<string, number> | null> {
+async function fetchListSkus(preset: ModelPreset): Promise<Dict<number> | null> {
   try {
     const res = await fetch(MODELS_URL, {
       cache: 'no-store',
@@ -144,8 +145,8 @@ async function fetchDiscount(preset: ModelPreset): Promise<number> {
 }
 
 /** Keeps six significant digits so sub-cent token rates keep their precision. */
-function applyDiscount(listSkus: Record<string, number>, discount: number): Record<string, number> {
-  const skus: Record<string, number> = {}
+function applyDiscount(listSkus: Dict<number>, discount: number): Dict<number> {
+  const skus: Dict<number> = {}
 
   for (const [key, value] of Object.entries(listSkus)) {
     skus[key] = Number((value * (1 - discount)).toPrecision(6))
@@ -155,12 +156,12 @@ function applyDiscount(listSkus: Record<string, number>, discount: number): Reco
 }
 
 /** Converts every SKU value to a number, dropping non-finite entries. */
-function readSkus(skus: Record<string, unknown> | undefined): Record<string, number> | null {
+function readSkus(skus: Dict<unknown> | undefined): Dict<number> | null {
   if (!skus) {
     return null
   }
 
-  const result: Record<string, number> = {}
+  const result: Dict<number> = {}
 
   for (const [key, raw] of Object.entries(skus)) {
     const value = Number(raw)

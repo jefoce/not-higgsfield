@@ -8,6 +8,7 @@ import { activeBinding } from '@/core/presets/bindings'
 import type { ModelPreset, ProviderBinding } from '@/core/presets/types'
 import { renderPromptForApi } from '@/core/prompt-tokens'
 import type { GenerationInput } from '@/core/schemas/generation-record'
+import type { Dict } from '@/core/utility-types'
 
 import { getSecret } from '../../secrets'
 
@@ -78,7 +79,7 @@ const referencePart = (media: MediaPayload): OpenRouterReferencePart => {
 interface BuildRequestBodyParams {
   input: GenerationInput
   preset: ModelPreset
-  media: Record<string, MediaPayload>
+  media: Dict<MediaPayload>
 }
 
 const audioFields = (params: BuildRequestBodyParams): Partial<OpenRouterVideoBody> => {
@@ -122,7 +123,7 @@ const aspectFields = (params: BuildRequestBodyParams): Partial<OpenRouterVideoBo
   return { aspect_ratio: input.aspectRatio }
 }
 
-const mediaPayload = (media: Record<string, MediaPayload>, id: string): MediaPayload => {
+const mediaPayload = (media: Dict<MediaPayload>, id: string): MediaPayload => {
   const payload = media[id]
 
   if (isNil(payload)) {

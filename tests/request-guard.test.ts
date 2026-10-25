@@ -1,12 +1,13 @@
 import { isNil } from 'lodash-es'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import type { Dict } from '@/core/utility-types'
 import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 
 const URL_LOCAL = 'http://127.0.0.1:3000/api/test'
 
 function makeRequest(
-  headers: Record<string, string>,
+  headers: Dict<string>,
   init: { method?: string; body?: string } = {},
 ): Request {
   return new Request(URL_LOCAL, {

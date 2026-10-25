@@ -6,6 +6,7 @@ import { IMAGE_MAX_ENCODED_MB, IMAGE_MAX_SIDE_PX, IMAGE_STEPS } from '@/core/con
 import type { ReferencePlan } from '@/core/media-types'
 import type { ModelPreset, ReferenceLimits } from '@/core/presets/types'
 import type { UploadItem } from '@/core/schemas/upload-item'
+import type { Dict } from '@/core/utility-types'
 
 import { HttpError } from '../errors'
 import { uploadPaths } from '../paths'
@@ -31,7 +32,7 @@ export interface EncodeImagesParams {
 
 export interface EncodedImages {
   plan: ReferencePlan
-  media: Record<string, EncodedImage>
+  media: Dict<EncodedImage>
 }
 
 /** Plain failure when even the last ladder step does not fit. */

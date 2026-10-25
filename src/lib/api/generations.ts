@@ -12,6 +12,7 @@ import type {
   GenerationListResult,
   HistoryFilters,
 } from '@/core/types'
+import type { Dict } from '@/core/utility-types'
 import { apiDelete, apiPatch, apiPost, fetcher } from '@/lib/fetcher'
 import type { GenerationEstimateKey } from '@/lib/swr-keys'
 
@@ -40,10 +41,7 @@ export interface BatchResult {
   skipped: BatchSkip[]
 }
 
-export function batchGenerations(
-  ids: string[],
-  body: Record<string, unknown>,
-): Promise<BatchResult> {
+export function batchGenerations(ids: string[], body: Dict<unknown>): Promise<BatchResult> {
   return apiPost<BatchResult>('/api/generations/batch', { ...body, ids })
 }
 

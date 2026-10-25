@@ -2,11 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import { MODEL_PRESETS } from '@/core/presets'
 import { primaryBinding, skuKey } from '@/core/pricing'
+import type { Dict } from '@/core/utility-types'
 
 import { required } from './helpers/required'
 
 /** Keys recorded from the per-preset key functions before the SKU rules replaced them. */
-const EXPECTED: Record<string, Record<string, string>> = {
+const EXPECTED: Dict<Dict<string>> = {
   'wan-3.0': {
     '480p|true|true': 'duration_seconds_480p',
     '480p|true|false': 'duration_seconds_480p',

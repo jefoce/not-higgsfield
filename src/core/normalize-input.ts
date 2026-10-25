@@ -3,12 +3,11 @@ import { clamp, isNil } from 'lodash-es'
 import { durationLimitFor } from './duration-limits'
 import { isNonEmptyString } from './guards'
 import { MEDIA_KINDS } from './media-kinds'
-import type { MediaKindCounts } from './media-types'
+import type { MediaKindCounts, UploadsById } from './media-types'
 import { aspectAllowed } from './output-size'
 import { minDuration } from './presets'
 import type { AspectChoice, ModelPreset, Resolution } from './presets/types'
 import type { GenerationInput } from './schemas/generation-record'
-import type { UploadItem } from './schemas/upload-item'
 import type { FrameSlots } from './types'
 
 /** Drop media belonging to the inactive tab. Returns a new object. */
@@ -78,7 +77,7 @@ const referencesDisabled = (preset: ModelPreset): boolean =>
 interface TrimReferencesParams {
   ids: string[]
   preset: ModelPreset
-  uploads: Record<string, UploadItem>
+  uploads: UploadsById
 }
 
 interface TrimReferencesResult {
@@ -123,7 +122,7 @@ function trimReferences(params: TrimReferencesParams): TrimReferencesResult {
 interface NormalizeForPresetParams {
   input: GenerationInput
   preset: ModelPreset
-  uploads?: Record<string, UploadItem>
+  uploads?: UploadsById
 }
 
 interface NormalizedInput {

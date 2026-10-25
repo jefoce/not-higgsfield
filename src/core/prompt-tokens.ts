@@ -4,6 +4,7 @@ import { isNonEmptyString } from './guards'
 import { KIND_TITLE } from './media-kinds'
 import type { MediaKind, MediaKindCounts } from './media-types'
 import type { ModelPreset } from './presets/types'
+import type { Dict } from './utility-types'
 
 export interface RefSlot {
   kind: MediaKind
@@ -22,7 +23,7 @@ interface PromptSlotPart {
 
 export type PromptPart = PromptTextPart | PromptSlotPart
 
-const KIND_WORD: Record<string, MediaKind> = {
+const KIND_WORD: Dict<MediaKind> = {
   image: 'image',
   img: 'image',
   video: 'video',

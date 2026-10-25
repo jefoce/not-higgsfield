@@ -2,6 +2,7 @@ import { isNil } from 'lodash-es'
 
 import { GRACE_STALE_MS } from './constants'
 import { isNonEmptyString } from './guards'
+import type { UploadsById } from './media-types'
 import type { ModelPreset } from './presets/types'
 import { primaryBinding } from './pricing'
 import type {
@@ -10,8 +11,8 @@ import type {
   InputSnapshot,
   JobStatus,
 } from './schemas/generation-record'
-import type { UploadItem } from './schemas/upload-item'
 import { type ResolvedTransport, resolveTransport } from './transport'
+import type { Dict } from './utility-types'
 
 function parseNotBefore(notBefore: string | undefined): number {
   if (!isNonEmptyString(notBefore)) {
@@ -65,12 +66,12 @@ export function inputIds(input: GenerationInput): string[] {
 }
 
 interface TransportsForParams {
-  uploads: Record<string, UploadItem>
+  uploads: UploadsById
   preset: ModelPreset
   remoteConfigured: boolean
 }
 
-export function transportsFor(params: TransportsForParams): Record<string, ResolvedTransport> {
+export function transportsFor(params: TransportsForParams): Dict<ResolvedTransport> {
   const { uploads, preset, remoteConfigured: isRemoteConfigured } = params
 
   return Object.fromEntries(
@@ -87,7 +88,7 @@ export function transportsFor(params: TransportsForParams): Record<string, Resol
 
 export function withTransports(
   snapshot: InputSnapshot,
-  transports: Record<string, ResolvedTransport>,
+  transports: Dict<ResolvedTransport>,
 ): InputSnapshot {
   return Object.fromEntries(
     Object.entries(snapshot).map(([id, item]) => {
@@ -102,9 +103,7 @@ export function withTransports(
   )
 }
 
-export function base64Only(
-  transports: Record<string, ResolvedTransport>,
-): Record<string, ResolvedTransport> {
+export function base64Only(transports: Dict<ResolvedTransport>): Dict<ResolvedTransport> {
   return Object.fromEntries(Object.keys(transports).map((id) => [id, 'base64'] as const))
 }
 

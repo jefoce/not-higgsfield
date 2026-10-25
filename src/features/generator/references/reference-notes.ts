@@ -1,12 +1,13 @@
 import { isNil } from 'lodash-es'
 
-import type { ReferencePlanImage } from '@/core/media-types'
+import type { ReferencePlanImage, UploadsById } from '@/core/media-types'
 import { type RefSlot, slotLabel } from '@/core/prompt-tokens'
 import type { UploadItem } from '@/core/schemas/upload-item'
+import type { Dict } from '@/core/utility-types'
 
 interface NoteForParams {
   id: string
-  planned: Record<string, ReferencePlanImage>
+  planned: Dict<ReferencePlanImage>
 }
 
 /** Downscale note for an attached image, if the plan has one. */
@@ -41,10 +42,7 @@ export function labelFor(slots: Map<string, RefSlot>, id: string): string | unde
 }
 
 /** Uploads for the attached references, in order. */
-export function referenceUploads(
-  references: string[],
-  uploadsById: Record<string, UploadItem>,
-): UploadItem[] {
+export function referenceUploads(references: string[], uploadsById: UploadsById): UploadItem[] {
   return references.flatMap((id) => {
     const upload = uploadsById[id]
 
