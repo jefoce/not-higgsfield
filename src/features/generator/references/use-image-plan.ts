@@ -38,5 +38,9 @@ export function useImagePlan(presetId: string, ids: string[]): ReferencePlan | n
   }, [presetId, key, answerKey])
 
   // A changed list or preset never shows the previous plan while the new one loads.
-  return answer?.key === answerKey ? answer.plan : null
+  if (answer?.key === answerKey) {
+    return answer.plan
+  }
+
+  return null
 }

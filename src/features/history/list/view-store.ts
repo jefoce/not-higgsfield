@@ -76,7 +76,9 @@ export function countActiveFilters(filters: ViewFilters): number {
   })
 
   const favorites = filters.favorite === true ? 1 : 0
-  const query = Boolean(filters.q?.trim()) ? 1 : 0
+  const isQuery = Boolean(filters.q?.trim())
+
+  const query = isQuery ? 1 : 0
 
   return active.length + favorites + query
 }

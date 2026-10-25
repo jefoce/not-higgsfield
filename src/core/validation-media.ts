@@ -9,8 +9,15 @@ const MB = 1024 * 1024
 /** Whole seconds stay plain, fractions keep up to two decimals. */
 export const seconds = (value: number): string => String(Number(value.toFixed(2)))
 
-const joinOr = (items: readonly string[]): string =>
-  items.length < 2 ? (items[0] ?? '') : `${items.slice(0, -1).join(', ')} or ${items.at(-1)}`
+const joinOr = (items: readonly string[]): string => {
+  const [first] = items
+
+  if (items.length < 2) {
+    return first ?? ''
+  }
+
+  return `${items.slice(0, -1).join(', ')} or ${items.at(-1)}`
+}
 
 const formatRatio = (ratio: number): string => String(Number(ratio.toFixed(1)))
 

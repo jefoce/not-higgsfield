@@ -89,7 +89,11 @@ export function pricePerSec(params: PricePerSecParams): number | null {
   }
 
   if (pricing.kind === 'perSecond') {
-    return pricing.unit === 'cents' ? raw / 100 : raw
+    if (pricing.unit === 'cents') {
+      return raw / 100
+    }
+
+    return raw
   }
 
   const aspect = ctx.aspect === 'auto' ? preset.defaultAspectRatio : ctx.aspect

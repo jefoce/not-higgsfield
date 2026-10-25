@@ -87,10 +87,12 @@ export function validateInput(params: ValidateInputParams): ValidationResult {
   const parsed = buildInputSchema(preset).safeParse(input)
 
   if (!parsed.success) {
-    const errors = parsed.error.issues.map(
-      (issue) =>
-        `${issue.path.join('.') === '' ? 'input' : issue.path.join('.')}: ${issue.message}`,
-    )
+    const errors = parsed.error.issues.map((issue) => {
+      const field = issue.path.join('.')
+      const label = field === '' ? 'input' : field
+
+      return `${label}: ${issue.message}`
+    })
 
     return { ok: false, errors: [...status.errors, ...errors], warnings: [] }
   }

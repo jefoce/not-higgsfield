@@ -252,5 +252,9 @@ function requireStore(): ObjectStore {
 function linkTtlSec(): number {
   const value = Number(process.env.REMOTE_LINK_TTL_SEC)
 
-  return Number.isFinite(value) && value > 0 ? value : REMOTE_LINK_TTL_SEC
+  if (Number.isFinite(value) && value > 0) {
+    return value
+  }
+
+  return REMOTE_LINK_TTL_SEC
 }

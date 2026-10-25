@@ -63,5 +63,9 @@ export async function flattenColor(source: string): Promise<FlattenColor> {
   const luminance =
     (0.2126 * (red / count) + 0.7152 * (green / count) + 0.0722 * (blue / count)) / 255
 
-  return luminance > FLATTEN_LUMINANCE ? FLATTEN_LIGHT : FLATTEN_BACKGROUND
+  if (luminance > FLATTEN_LUMINANCE) {
+    return FLATTEN_LIGHT
+  }
+
+  return FLATTEN_BACKGROUND
 }

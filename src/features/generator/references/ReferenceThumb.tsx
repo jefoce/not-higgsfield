@@ -93,7 +93,11 @@ function thumbTitle(params: ThumbTitleParams): string {
   const { name, label, isBroken, isMissing } = params
 
   if (isBroken) {
-    return isMissing ? `File missing: ${name}` : 'File deleted'
+    if (isMissing) {
+      return `File missing: ${name}`
+    }
+
+    return 'File deleted'
   }
 
   if (!isNil(label) && label !== '') {
@@ -110,7 +114,11 @@ function thumbOverlay(params: ThumbOverlayParams): string {
     return 'hidden'
   }
 
-  return isBroken ? 'flex' : 'hidden group-hover:flex'
+  if (isBroken) {
+    return 'flex'
+  }
+
+  return 'hidden group-hover:flex'
 }
 
 function thumbMedia(params: ThumbMediaParams): ThumbMedia {
@@ -121,12 +129,28 @@ function thumbMedia(params: ThumbMediaParams): ThumbMedia {
     audioSrc = mediaUrl(`uploads/${upload.id}`, upload.mime)
   }
 
-  const imageSrc =
-    isNil(upload) || isAudio ? null : thumbUrl({ ref: `uploads/${upload.id}`, w: 320 })
+  const isImageSrc = isNil(upload) || isAudio
+  let imageSrc: string | null = null
 
-  const videoDuration = isVideo && !isNil(upload?.durationSec) ? upload.durationSec : null
+  if (!isImageSrc && !isNil(upload)) {
+    imageSrc = thumbUrl({ ref: `uploads/${upload.id}`, w: 320 })
+  }
+
+  let videoDuration: number | null = null
+
+  if (isVideo) {
+    videoDuration = upload?.durationSec ?? null
+  }
 
   return { audioSrc, imageSrc, videoDuration }
+}
+
+function thumbContent(title: string, note?: string): string {
+  if (isNil(note) || note === '') {
+    return title
+  }
+
+  return `${title} \u00b7 ${note}`
 }
 
 function thumbText(params: ThumbTextParams): ThumbText {
@@ -134,17 +158,19 @@ function thumbText(params: ThumbTextParams): ThumbText {
   const name = upload?.originalName ?? label ?? 'reference'
   const title = thumbTitle({ name, label, isBroken, isMissing })
   const overlayClass = thumbOverlay({ isBroken, isLifted })
+  const content = thumbContent(title, note)
 
   const tileClass = cn(
     'group relative cursor-grab rounded-xl active:cursor-grabbing',
-    isAudio ? 'col-span-2 aspect-[2.12/1]' : 'aspect-square',
+    isAudio && 'col-span-2 aspect-[2.12/1]',
+    !isAudio && 'aspect-square',
     isLifted && 'cursor-grabbing shadow-2xl',
   )
 
   return {
     name,
     previewLabel: label ?? name,
-    content: isNil(note) || note === '' ? title : `${title} \u00b7 ${note}`,
+    content,
     overlayClass,
     tileClass,
     isPreviewShown: isOpenable && !isLifted,
@@ -182,12 +208,14 @@ export function ReferenceThumb(props: ReferenceThumbProps) {
     isOpenable,
   })
 
+  const audioUpload = isAudio ? upload : undefined
+
   return (
     <Tooltip content={content}>
       <div className={tileClass}>
         <ReferenceThumbBody
           imageSrc={imageSrc}
-          audioUpload={isAudio ? upload : undefined}
+          audioUpload={audioUpload}
           audioSrc={audioSrc}
           name={name}
           previewLabel={previewLabel}

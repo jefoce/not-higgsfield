@@ -53,7 +53,11 @@ export function kindFromExt(ext: string): MediaKind | null {
 export function kindFromName(name: string): MediaKind | null {
   const dot = name.lastIndexOf('.')
 
-  return dot < 0 ? null : kindFromExt(name.slice(dot + 1))
+  if (dot < 0) {
+    return null
+  }
+
+  return kindFromExt(name.slice(dot + 1))
 }
 
 const ABSOLUTE_PATH = /^(?:\/|[A-Za-z]:[\\/])/
@@ -83,7 +87,11 @@ export function pastedPath(params: PastedPathParams): string | null {
     return null
   }
 
-  return extensionAllowed({ kind, ext: extWithDot(path), extensions }) ? path : null
+  if (extensionAllowed({ kind, ext: extWithDot(path), extensions })) {
+    return path
+  }
+
+  return null
 }
 
 interface ExtensionAllowedParams {
@@ -107,7 +115,11 @@ export function kindFromFile(file: FileInfo): MediaKind | null {
 
   const ext = Object.entries(MIME_TYPES).find(([, mime]) => mime === file.type)?.[0]
 
-  return isNil(ext) || ext === '' ? null : kindFromExt(ext)
+  if (isNil(ext) || ext === '') {
+    return null
+  }
+
+  return kindFromExt(ext)
 }
 
 /** True when the kind has no filter or the extension is listed. */
@@ -163,7 +175,9 @@ export function extensionsForKinds(
 ): string[] {
   return kinds.flatMap((kind) => {
     const custom = extensions?.[kind]
-    const list = !isNil(custom) && custom.length > 0 ? custom : EXTENSIONS[kind]
+    const isList = !isNil(custom) && custom.length > 0
+
+    const list = isList ? custom : EXTENSIONS[kind]
 
     return list.map(normalizeExt)
   })
@@ -183,5 +197,9 @@ function extensionOf(file: FileInfo): string {
 export function extWithDot(name: string): string {
   const dot = name.lastIndexOf('.')
 
-  return dot < 0 ? '' : name.slice(dot).toLowerCase()
+  if (dot < 0) {
+    return ''
+  }
+
+  return name.slice(dot).toLowerCase()
 }

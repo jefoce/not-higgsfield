@@ -100,7 +100,11 @@ export async function listUploads(params: ListUploadsParams = {}): Promise<Uploa
 export async function getUpload(id: string): Promise<UploadItem | null> {
   const record = await getUploadRecord(id)
 
-  return record ? withMissing(record) : null
+  if (record) {
+    return withMissing(record)
+  }
+
+  return null
 }
 
 /** Unlinks the media file and the json, then forgets the index entry. */
@@ -123,10 +127,11 @@ async function pathExists(file: string): Promise<boolean> {
 async function withMissing(item: UploadItem): Promise<UploadItem> {
   const mode = item.linkMode ?? 'symlink'
 
-  const check =
-    item.source === 'link' && !isNil(item.target) && item.target !== '' && mode === 'symlink'
-      ? item.target
-      : uploadPaths(item.id, item.ext).media
+  let check = uploadPaths(item.id, item.ext).media
+
+  if (item.source === 'link' && !isNil(item.target) && item.target !== '' && mode === 'symlink') {
+    check = item.target
+  }
 
   const hasFile = await pathExists(check)
 

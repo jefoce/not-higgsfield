@@ -108,7 +108,11 @@ async function fetchListSkus(preset: ModelPreset): Promise<Record<string, number
 
     const model = parsed.data.data.find((item) => item.id === primaryBinding(preset).modelId)
 
-    return model ? readSkus(model.pricing_skus) : null
+    if (model) {
+      return readSkus(model.pricing_skus)
+    }
+
+    return null
   } catch {
     return null
   }
@@ -134,7 +138,11 @@ async function fetchDiscount(preset: ModelPreset): Promise<number> {
     // Reads the first endpoint. Each model has one provider today, add per-endpoint pricing before a second provider.
     const raw = parsed.data.data.endpoints[0]?.pricing?.discount
 
-    return !isNil(raw) && raw >= 0 && raw <= 1 ? raw : 0
+    if (!isNil(raw) && raw >= 0 && raw <= 1) {
+      return raw
+    }
+
+    return 0
   } catch {
     return 0
   }
@@ -167,5 +175,9 @@ function readSkus(skus: Record<string, unknown> | undefined): Record<string, num
     }
   }
 
-  return isEmpty(result) ? null : result
+  if (isEmpty(result)) {
+    return null
+  }
+
+  return result
 }

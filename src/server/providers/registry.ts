@@ -28,7 +28,14 @@ export function getVideoProvider(id: VideoProviderId = DEFAULT_PROVIDER_ID): Vid
     return existing
   }
 
-  const provider = isMockProvider(id) ? createMockProvider() : FACTORIES[id]()
+  const isProvider = isMockProvider(id)
+  let provider: VideoProvider
+
+  if (isProvider) {
+    provider = createMockProvider()
+  } else {
+    provider = FACTORIES[id]()
+  }
 
   providers.set(id, provider)
 

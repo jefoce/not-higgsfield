@@ -93,36 +93,60 @@ export function headers(isJson: boolean): Record<string, string> {
 /** Provider detail from `error.metadata`, never headers or the request body. */
 export async function errorFromResponse(res: Response): Promise<OpenRouterError> {
   const payload: unknown = await res.json().catch(() => null)
-  const error = isRecord(payload) ? payload.error : undefined
+  const isError = isRecord(payload)
+
+  const error = isError ? payload.error : undefined
   const normalized = normalizeBase(readErrorMessage(error) ?? res.statusText, res.status)
   const detail = providerDetail(error)
   const base = normalized.message === '' ? `HTTP ${res.status}` : normalized.message
+  const message = detail === '' ? base : `${base} (${detail})`
 
   return new OpenRouterError({
-    message: detail === '' ? base : `${base} (${detail})`,
+    message,
     status: res.status,
     code: normalized.code ?? codeValue(errorCode(error)),
   })
 }
 
 function readErrorMessage(error: unknown): string | null {
-  return isRecord(error) && isString(error.message) ? error.message : null
+  if (isRecord(error) && isString(error.message)) {
+    return error.message
+  }
+
+  return null
 }
 
 function errorCode(error: unknown): unknown {
-  return isRecord(error) ? error.code : undefined
+  if (isRecord(error)) {
+    return error.code
+  }
+
+  return undefined
 }
 
 function providerDetail(error: unknown): string {
-  const meta = isRecord(error) && isRecord(error.metadata) ? error.metadata : null
+  let meta: Record<string, unknown> | null = null
+
+  if (isRecord(error) && isRecord(error.metadata)) {
+    meta = error.metadata
+  }
 
   if (isNil(meta)) {
     return ''
   }
 
-  const rawText = isString(meta.raw) ? meta.raw : null
+  let rawText: string | null = null
+
+  if (isString(meta.raw)) {
+    rawText = meta.raw
+  }
+
   const raw = rawText?.slice(0, PROVIDER_RAW_MAX_CHARS) ?? null
-  const provider = isString(meta.provider_name) ? meta.provider_name : null
+  let provider: string | null = null
+
+  if (isString(meta.provider_name)) {
+    provider = meta.provider_name
+  }
 
   return [provider, raw].filter(Boolean).join(': ')
 }
@@ -151,7 +175,12 @@ function normalizeBase(input: string, status: number): NormalizedError {
     }
 
     code = codeValue(error.code) ?? code
-    message = isString(error.message) ? error.message : ''
+
+    if (isString(error.message)) {
+      message = error.message
+    } else {
+      message = ''
+    }
   }
 
   return { message, code }
@@ -169,12 +198,20 @@ function innerError(message: string): Record<string, unknown> | null {
       return null
     }
 
-    return isRecord(parsed.error) ? parsed.error : parsed
+    if (isRecord(parsed.error)) {
+      return parsed.error
+    }
+
+    return parsed
   } catch {
     return null
   }
 }
 
 function codeValue(value: unknown): string | undefined {
-  return isString(value) || typeof value === 'number' ? String(value) : undefined
+  if (isString(value) || typeof value === 'number') {
+    return String(value)
+  }
+
+  return undefined
 }

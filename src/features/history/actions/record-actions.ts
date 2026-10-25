@@ -53,7 +53,11 @@ export async function cancelGeneration(id: string): Promise<void> {
 const extensionOf = (name: string): string => {
   const dot = name.lastIndexOf('.')
 
-  return dot > 0 ? name.slice(dot + 1).toLowerCase() : ''
+  if (dot > 0) {
+    return name.slice(dot + 1).toLowerCase()
+  }
+
+  return ''
 }
 
 interface GhostUploadsParams {

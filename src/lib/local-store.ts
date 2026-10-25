@@ -32,7 +32,9 @@ export function readLocal<T>(key: string, schema: ZodType<T>): LocalRead<T> {
     const parsed: unknown = JSON.parse(raw)
     const result = schema.safeParse(parsed)
 
-    return { ok: true, value: result.success ? result.data : null }
+    const value = result.success ? result.data : null
+
+    return { ok: true, value }
   } catch {
     return { ok: true, value: null }
   }

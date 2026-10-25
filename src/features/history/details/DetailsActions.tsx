@@ -29,7 +29,13 @@ export function DetailsActions(props: DetailsActionsProps) {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const handleConfirmOpenChange = setIsConfirmOpen
   const isFailed = record.status === 'failed'
-  const friendly = isFailed ? recordError(record) : null
+  let friendly: ReturnType<typeof recordError> = null
+
+  if (isFailed) {
+    friendly = recordError(record)
+  }
+
+  const timeNow = isActive ? now : undefined
 
   const handleReuse = useCallback(() => void rerunRecord(record), [record])
 
@@ -44,7 +50,7 @@ export function DetailsActions(props: DetailsActionsProps) {
       <div className="relative mt-auto h-6 shrink-0">
         <div className="flex h-6 items-center justify-between text-xs text-fg-2 transition-opacity duration-150 group-hover/card:pointer-events-none group-hover/card:opacity-0 group-has-focus-visible/card:pointer-events-none group-has-focus-visible/card:opacity-0 group-has-data-[state=open]/card:pointer-events-none group-has-data-[state=open]/card:opacity-0">
           <span>{formatDate(record.createdAt)}</span>
-          <span className="tabular-nums">{totalTime(record, isActive ? now : undefined)}</span>
+          <span className="tabular-nums">{totalTime(record, timeNow)}</span>
         </div>
         <div className="pointer-events-none absolute inset-0 flex h-6 items-center gap-1.5 opacity-0 transition-opacity duration-150 group-hover/card:pointer-events-auto group-hover/card:opacity-100 group-has-focus-visible/card:pointer-events-auto group-has-focus-visible/card:opacity-100 group-has-data-[state=open]/card:pointer-events-auto group-has-data-[state=open]/card:opacity-100">
           <Button
@@ -66,7 +72,7 @@ export function DetailsActions(props: DetailsActionsProps) {
             onDownload={handleDownload}
             onFavorite={handleFavorite}
           />
-          {isFailed ? (
+          {isFailed && (
             <button
               type="button"
               aria-label="Remove"
@@ -75,7 +81,8 @@ export function DetailsActions(props: DetailsActionsProps) {
             >
               <Trash2 size={14} aria-hidden />
             </button>
-          ) : (
+          )}
+          {!isFailed && (
             <MoreMenu
               record={record}
               onDeleted={handleDeleted}

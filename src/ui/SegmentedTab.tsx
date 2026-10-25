@@ -35,7 +35,8 @@ export function SegmentedTab(props: SegmentedTabProps) {
         'relative inline-flex items-center justify-center rounded-control font-semibold transition',
         'disabled:pointer-events-none disabled:opacity-40',
         sizeClass,
-        isActive ? 'text-fg' : 'text-fg-2 hover:text-fg',
+        isActive && 'text-fg',
+        !isActive && 'text-fg-2 hover:text-fg',
       )}
     >
       {isActive && <span className="absolute inset-0.5 rounded-control bg-white/10" aria-hidden />}

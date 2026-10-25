@@ -49,7 +49,8 @@ export function ViewToggle() {
             onClick={handleSelect}
             className={cn(
               'inline-flex h-8 w-16 items-center justify-center gap-1.5 rounded-lg border border-transparent text-xs font-semibold transition',
-              isActive ? 'bg-surface text-fg' : 'text-fg-2 hover:text-fg',
+              isActive && 'bg-surface text-fg',
+              !isActive && 'text-fg-2 hover:text-fg',
             )}
           >
             <Icon size={14} aria-hidden />

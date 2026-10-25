@@ -65,6 +65,8 @@ export function SecretSection(props: SecretSectionProps) {
     void platform.openExternal(creditsUrl).catch(() => {})
   }, [creditsUrl])
 
+  const title = isReady ? undefined : 'Save a key first'
+
   return (
     <section ref={sectionRef} className="space-y-3">
       <div className="flex items-baseline justify-between gap-2">
@@ -91,7 +93,7 @@ export function SecretSection(props: SecretSectionProps) {
       />
       {warning}
       <div className="flex items-center gap-3">
-        <span title={isReady ? undefined : 'Save a key first'}>
+        <span title={title}>
           <Button
             size="sm"
             variant="outline"

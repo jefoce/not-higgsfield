@@ -11,7 +11,9 @@ export function canPlay(mime: string): boolean {
   let isSupported = cache.get(mime)
 
   if (isNil(isSupported)) {
-    const element = document.createElement(mime.startsWith('audio/') ? 'audio' : 'video')
+    const isAudio = mime.startsWith('audio/')
+    const tag = isAudio ? 'audio' : 'video'
+    const element = document.createElement(tag)
 
     isSupported = element.canPlayType(mime) !== ''
     cache.set(mime, isSupported)

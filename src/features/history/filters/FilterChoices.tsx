@@ -55,8 +55,12 @@ export function FilterChoices() {
   )
 
   const handleModeChange = useCallback(
-    (mode: NonNullable<ViewFilters['mode']>) =>
-      setFilters({ mode, tab: mode === 'frames' || mode === 'references' ? mode : 'all' }),
+    (mode: NonNullable<ViewFilters['mode']>) => {
+      const isModeTab = mode === 'frames' || mode === 'references'
+      const tab = isModeTab ? mode : 'all'
+
+      setFilters({ mode, tab })
+    },
     [setFilters],
   )
 

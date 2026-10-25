@@ -28,16 +28,18 @@ export function HeartButton(props: HeartButtonProps) {
     [record],
   )
 
+  const label = record.favorite ? 'Remove favorite' : 'Favorite'
+
   return (
     <button
       type="button"
-      aria-label={record.favorite ? 'Remove favorite' : 'Favorite'}
+      aria-label={label}
       onClick={handleFavorite}
       className={cn(
         ROUND_BUTTON_CLASSES,
-        record.favorite
-          ? 'bg-linear-[180deg] from-favorite/[0.22] to-favorite/[0.08] text-favorite'
-          : 'bg-black/50 text-white hover:bg-black/70',
+        record.favorite &&
+          'bg-linear-[180deg] from-favorite/[0.22] to-favorite/[0.08] text-favorite',
+        !record.favorite && 'bg-black/50 text-white hover:bg-black/70',
         className,
       )}
     >

@@ -28,8 +28,10 @@ export function ModeTabs() {
     }
   }, [isRefsDisabled, tab, setTab])
 
+  const tooltip = isRefsDisabled ? `Not supported by ${preset.title}` : null
+
   return (
-    <Tooltip content={isRefsDisabled ? `Not supported by ${preset.title}` : null}>
+    <Tooltip content={tooltip}>
       <span className="mb-4 block">
         <SegmentedTabs
           options={[

@@ -8,7 +8,7 @@ import { inputForSubmit } from '@/core/normalize-input'
 import { getPreset } from '@/core/presets'
 import { activeBinding } from '@/core/presets/bindings'
 import type { ModelPreset } from '@/core/presets/types'
-import { estimatePrice, type PriceContext } from '@/core/pricing'
+import { estimatePrice, type PriceContext, type PriceEstimate } from '@/core/pricing'
 import { canonicalizePrompt, referenceSlots } from '@/core/prompt-tokens'
 import type { GenerationInput } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
@@ -118,16 +118,17 @@ export async function estimateGeneration(draft: GenerationDraft): Promise<Genera
     }
   }
 
-  const list =
-    pricing.discount > 0
-      ? estimatePrice({
-          preset,
-          ctx,
-          duration: input.duration,
-          referenceSeconds: refSeconds,
-          skus: pricing.listSkus,
-        })
-      : null
+  let list: PriceEstimate | null = null
+
+  if (pricing.discount > 0) {
+    list = estimatePrice({
+      preset,
+      ctx,
+      duration: input.duration,
+      referenceSeconds: refSeconds,
+      skus: pricing.listSkus,
+    })
+  }
 
   return {
     estimatedUsd: estimate.estimatedUsd,

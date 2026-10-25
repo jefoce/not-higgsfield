@@ -15,7 +15,9 @@ interface ThumbUrlParams {
 export function mediaUrl(ref: string, mime?: string): string {
   const [pathRef = ref, query = ''] = ref.split('?')
   const base = `/api/media/${encodeRef(pathRef)}`
-  const plainUrl = isEmpty(query) ? base : `${base}?${query}`
+  const isPlainUrl = isEmpty(query)
+
+  const plainUrl = isPlainUrl ? base : `${base}?${query}`
 
   if (isNil(mime) || mime === '' || canPlay(mime)) {
     return plainUrl
@@ -44,7 +46,11 @@ export function thumbUrl(params: ThumbUrlParams): string {
 export function downloadMediaUrl(file: string, isDownload = false): string {
   const base = `/api/media/downloads/${file}`
 
-  return isDownload ? `${base}?download=1` : base
+  if (isDownload) {
+    return `${base}?download=1`
+  }
+
+  return base
 }
 
 export function uploadThumbUrl(id: string, width = 160): string {

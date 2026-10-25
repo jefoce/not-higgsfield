@@ -31,10 +31,19 @@ export function MediaTileAudio(props: MediaTileAudioProps) {
   const audioBars = waveBars(item.originalName, AUDIO_BARS)
   const isAudioPlaying = useAudioPlaying(audioSrc)
   const elapsed = useAudioTime(audioSrc)
-  const total = item.durationSec ?? (currentSrc() === audioSrc ? currentDuration() : 0)
-  const playedRatio = !isNil(elapsed) && total > 0 ? elapsed / total : 0
+  let total = item.durationSec ?? 0
+
+  if (isNil(item.durationSec) && currentSrc() === audioSrc) {
+    total = currentDuration()
+  }
+
+  const isPlayedRatio = !isNil(elapsed) && total > 0
+
+  const playedRatio = isPlayedRatio ? elapsed / total : 0
   const played = Math.min(1, playedRatio)
-  const badgeOffset = item.source === 'link' || isMissing ? 'pt-6' : ''
+  const isBadgeOffset = item.source === 'link' || isMissing
+
+  const badgeOffset = isBadgeOffset ? 'pt-6' : ''
 
   const handleAudioClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
@@ -48,6 +57,9 @@ export function MediaTileAudio(props: MediaTileAudioProps) {
     },
     [isAudioPlaying, audioSrc],
   )
+
+  const PlayIcon = isAudioPlaying ? Pause : Play
+  const playLabel = isAudioPlaying ? 'Pause' : 'Play'
 
   return (
     <>
@@ -67,7 +79,8 @@ export function MediaTileAudio(props: MediaTileAudioProps) {
             style={{ height: `${height}%` }}
             className={cn(
               'min-w-px flex-1 rounded-full',
-              index / audioBars.length < played ? 'bg-lime' : 'bg-fg-2/50',
+              index / audioBars.length < played && 'bg-lime',
+              !(index / audioBars.length < played) && 'bg-fg-2/50',
             )}
           />
         ))}
@@ -75,15 +88,11 @@ export function MediaTileAudio(props: MediaTileAudioProps) {
       <button
         type="button"
         onClick={handleAudioClick}
-        aria-label={`${isAudioPlaying ? 'Pause' : 'Play'} ${item.originalName}`}
+        aria-label={`${playLabel} ${item.originalName}`}
         disabled={isMissing}
         className="absolute right-2 bottom-2 z-20 flex size-7 items-center justify-center rounded-full border border-white/10 bg-black/50 text-fg backdrop-blur-sm transition hover:bg-black/70 disabled:opacity-40"
       >
-        {isAudioPlaying ? (
-          <Pause size={14} className="fill-current" aria-hidden />
-        ) : (
-          <Play size={14} className="fill-current" aria-hidden />
-        )}
+        <PlayIcon size={14} className="fill-current" aria-hidden />
       </button>
     </>
   )

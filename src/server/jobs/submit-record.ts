@@ -20,7 +20,11 @@ export async function updateSubmit(
 
     const next = patch(record)
 
-    return next ? saveGeneration(next) : null
+    if (next) {
+      return saveGeneration(next)
+    }
+
+    return null
   })
 }
 

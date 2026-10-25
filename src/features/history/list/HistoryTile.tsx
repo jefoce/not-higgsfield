@@ -44,11 +44,13 @@ export function HistoryTile(props: HistoryTileProps) {
 
   const handleCancel = useCallback(() => void cancelGeneration(record.id), [record.id])
 
+  const selectLabel = isSelecting ? 'Toggle selection' : 'Open video details'
+
   return (
     <div
       role="button"
       tabIndex={0}
-      aria-label={isSelecting ? 'Toggle selection' : 'Open video details'}
+      aria-label={selectLabel}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       className="group/card relative cursor-pointer overflow-hidden rounded-2xl bg-surface outline-none select-none"
@@ -60,7 +62,7 @@ export function HistoryTile(props: HistoryTileProps) {
     >
       {isCompleted && <SelectionCheckbox id={record.id} />}
 
-      {isCompleted ? (
+      {isCompleted && (
         <LazyVideo
           id={record.id}
           src={videoSrc(record)}
@@ -70,7 +72,8 @@ export function HistoryTile(props: HistoryTileProps) {
           hoverPlay
           className="size-full"
         />
-      ) : (
+      )}
+      {!isCompleted && (
         <div className="size-full">
           <StatusOverlay
             record={record}

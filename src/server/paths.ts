@@ -12,7 +12,16 @@ const envRoot = process.env.STORAGE_ROOT?.trim()
 const defaultRoot = path.join(os.homedir(), '.not-higgsfield')
 
 /** Same root for browser and desktop. STORAGE_ROOT overrides it (tests, custom setups). */
-export const STORAGE_ROOT = isNil(envRoot) || envRoot === '' ? defaultRoot : path.resolve(envRoot)
+export const STORAGE_ROOT = storageRoot()
+
+function storageRoot(): string {
+  if (isNil(envRoot) || envRoot === '') {
+    return defaultRoot
+  }
+
+  return path.resolve(envRoot)
+}
+
 const LOGS_DIR = path.join(STORAGE_ROOT, 'logs')
 
 export const LOCK_FILE = path.join(STORAGE_ROOT, 'server.lock')

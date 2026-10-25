@@ -8,7 +8,11 @@ import { platform } from '@/lib/platform'
 import { revalidateHistory } from '../list/history-pages'
 import { batchAction } from './batch-actions'
 
-const pluralVideos = (count: number): string => `${count} ${count === 1 ? 'video' : 'videos'}`
+const pluralVideos = (count: number): string => {
+  const word = count === 1 ? 'video' : 'videos'
+
+  return `${count} ${word}`
+}
 
 /** Saves one or many completed videos, platform dialogs own the prompts. */
 export async function downloadSelected(selected: GenerationRecord[]): Promise<void> {
@@ -39,11 +43,12 @@ export async function downloadSelected(selected: GenerationRecord[]): Promise<vo
       return
     }
 
-    toast.success(
+    const startedText =
       result.saved === 1
         ? 'Download started'
-        : `${result.saved} downloads started. Allow multiple downloads if asked.`,
-    )
+        : `${result.saved} downloads started. Allow multiple downloads if asked.`
+
+    toast.success(startedText)
   } catch (error) {
     toast.error(errorMessage(error))
   }
@@ -58,15 +63,18 @@ export async function likeSelected(
     { action: 'favorite', favorite: isFavorite },
   )
 
-  toast.success(isFavorite ? `Liked ${result.done.length}` : `Unliked ${result.done.length}`)
+  const text = isFavorite ? `Liked ${result.done.length}` : `Unliked ${result.done.length}`
+
+  toast.success(text)
   await revalidateHistory()
 }
 
 export function confirmDelete(selected: GenerationRecord[]): Promise<boolean> {
   const count = selected.length
+  const suffix = count === 1 ? '' : 's'
 
   return platform.confirm(
-    `Delete ${count} video${count === 1 ? '' : 's'}? The files are removed from your computer.`,
+    `Delete ${count} video${suffix}? The files are removed from your computer.`,
   )
 }
 
@@ -77,16 +85,20 @@ export async function deleteSelected(selected: GenerationRecord[]): Promise<void
   )
 
   const skippedActive = result.skipped.filter((item) => item.reason === 'active').length
-  const skippedText = `${skippedActive} still generating ${skippedActive === 1 ? 'was' : 'were'} skipped`
+  const verb = skippedActive === 1 ? 'was' : 'were'
+  const skippedText = `${skippedActive} still generating ${verb} skipped`
 
   if (result.done.length > 0) {
-    toast.success(
+    const successText =
       skippedActive > 0
         ? `Deleted ${result.done.length}. ${skippedText}.`
-        : `Deleted ${result.done.length}`,
-    )
+        : `Deleted ${result.done.length}`
+
+    toast.success(successText)
   } else {
-    toast.error(skippedActive > 0 ? `Nothing deleted. ${skippedText}.` : 'Nothing deleted')
+    const errorText = skippedActive > 0 ? `Nothing deleted. ${skippedText}.` : 'Nothing deleted'
+
+    toast.error(errorText)
   }
 
   await revalidateHistory()

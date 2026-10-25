@@ -17,7 +17,12 @@ interface PreviewHeaderProps {
 /** Name, source badge and size/length metadata for the current item. */
 export function PreviewHeader(props: PreviewHeaderProps) {
   const { item, actions } = props
-  const label = item ? (actions?.label?.(item) ?? KIND_TITLE[item.kind]) : 'File missing'
+  let label = 'File missing'
+
+  if (!isNil(item)) {
+    label = actions?.label?.(item) ?? KIND_TITLE[item.kind]
+  }
+
   const isLink = item?.source === 'link'
 
   return (

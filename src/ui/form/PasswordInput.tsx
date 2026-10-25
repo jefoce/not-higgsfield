@@ -17,11 +17,16 @@ export const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
 
     const handleToggleRevealed = useCallback(() => setIsRevealed((isCurrent) => !isCurrent), [])
 
+    const canReveal = isRevealed && !isValueEmpty
+    const inputType = canReveal ? 'text' : 'password'
+    const RevealIcon = isRevealed ? EyeOff : Eye
+    const revealLabel = isRevealed ? 'Hide value' : 'Show value'
+
     return (
       <div className="relative flex-1">
         <Input
           ref={ref}
-          type={isRevealed && !isValueEmpty ? 'text' : 'password'}
+          type={inputType}
           autoComplete="off"
           spellCheck={false}
           disabled={isDisabled}
@@ -34,10 +39,10 @@ export const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
             type="button"
             onClick={handleToggleRevealed}
             disabled={isValueEmpty}
-            aria-label={isRevealed ? 'Hide value' : 'Show value'}
+            aria-label={revealLabel}
             className="absolute inset-y-0 right-0 flex w-8 items-center justify-center text-fg-2 hover:text-fg disabled:opacity-30"
           >
-            {isRevealed ? <EyeOff size={13} /> : <Eye size={13} />}
+            <RevealIcon size={13} />
           </button>
         )}
       </div>

@@ -30,7 +30,12 @@ export function useVideoEvents(params: UseVideoEventsParams): void {
 
     const syncTime = () => onTime(video.currentTime)
 
-    const syncDuration = () => onDuration(Number.isFinite(video.duration) ? video.duration : 0)
+    const syncDuration = () => {
+      const isDurationValid = Number.isFinite(video.duration)
+      const duration = isDurationValid ? video.duration : 0
+
+      onDuration(duration)
+    }
 
     const syncPaused = () => onPaused(video.paused)
 

@@ -23,7 +23,11 @@ export function referenceVideoSeconds(params: ReferenceVideoSecondsParams): numb
   return references.reduce((sum, id) => {
     const upload = uploads[id]
 
-    return upload?.kind === 'video' ? sum + (upload.durationSec ?? 0) : sum
+    if (upload?.kind === 'video') {
+      return sum + (upload.durationSec ?? 0)
+    }
+
+    return sum
   }, 0)
 }
 

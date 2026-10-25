@@ -8,10 +8,7 @@ import path from 'node:path'
 import { isNil, isString } from 'lodash-es'
 
 import { FETCH_TIMEOUTS, MOCK_GENERATE_MS, MOCK_QUEUE_MS } from '@/core/constants'
-import type { PixelSize } from '@/core/geometry'
 import { isRecord } from '@/core/guards'
-import { outputSize } from '@/core/output-size'
-import { MODEL_PRESETS } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
 import { primaryBinding } from '@/core/pricing'
 import { asJobStatus } from '@/core/submit-state'
@@ -34,6 +31,7 @@ import type {
   SubmittedJob,
   VideoProvider,
 } from '../types'
+import { mockDimensions } from './dimensions'
 import { listModels } from './models'
 
 interface MockState {
@@ -150,11 +148,17 @@ async function mockSubmit(body: unknown): Promise<MockSubmitResult> {
   }
 
   const shouldFail = JSON.stringify(body).includes('[fail]')
-  const id = `${shouldFail ? 'mockfail' : 'mock'}-${randomUUID()}`
+  const prefix = shouldFail ? 'mockfail' : 'mock'
+  const id = `${prefix}-${randomUUID()}`
   const prompt = field(body, 'prompt')
+  let promptText = ''
+
+  if (isString(prompt)) {
+    promptText = prompt
+  }
 
   mockState.mockStart.set(id, Date.now())
-  mockState.mockPrompt.set(id, isString(prompt) ? prompt : '')
+  mockState.mockPrompt.set(id, promptText)
   mockState.mockBody.set(id, body)
 
   return { id, status: 'pending' }
@@ -234,9 +238,18 @@ function mockStarted(id: string, submittedAt?: string): number {
     return stored
   }
 
-  const parsed = isNil(submittedAt) || submittedAt === '' ? Number.NaN : Date.parse(submittedAt)
+  const isParsed = isNil(submittedAt) || submittedAt === ''
+  let parsed = Number.NaN
 
-  return Number.isFinite(parsed) ? parsed : Date.now()
+  if (!isParsed) {
+    parsed = Date.parse(submittedAt)
+  }
+
+  if (Number.isFinite(parsed)) {
+    return parsed
+  }
+
+  return Date.now()
 }
 
 async function mockContent(id: string, fallback?: ContentFallback): Promise<Response> {
@@ -263,37 +276,6 @@ async function mockContent(id: string, fallback?: ContentFallback): Promise<Resp
   } finally {
     await fs.unlink(file).catch(() => {})
   }
-}
-
-interface MockDimensionsParams {
-  model: unknown
-  presetId: unknown
-  resolution: unknown
-  aspect: unknown
-}
-
-/** Sizes the mock from the model slug or preset id, falling back to 720p 16:9. */
-function mockDimensions(params: MockDimensionsParams): PixelSize {
-  const { model, presetId, resolution, aspect } = params
-
-  const preset =
-    MODEL_PRESETS.find((item) => primaryBinding(item).modelId === model) ??
-    MODEL_PRESETS.find((item) => item.id === presetId)
-
-  const res = preset?.resolutions.find((item) => item === resolution)
-
-  if (isNil(preset) || isNil(res)) {
-    return { width: 1280, height: 720 }
-  }
-
-  const ratio = aspect === 'auto' ? undefined : preset.aspectRatios.find((item) => item === aspect)
-
-  return (
-    outputSize({ preset, resolution: res, aspect: ratio ?? preset.defaultAspectRatio }) ?? {
-      width: 1280,
-      height: 720,
-    }
-  )
 }
 
 function field(body: unknown, key: string): unknown {

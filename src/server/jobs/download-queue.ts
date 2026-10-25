@@ -244,10 +244,12 @@ async function saveRetry(record: GenerationRecord, error: unknown): Promise<void
     downloads.failures.delete(record.id)
   }
 
+  const status = isFailed ? 'failed' : 'in_progress'
+
   await saveGeneration({
     ...record,
     download: undefined,
-    status: isFailed ? 'failed' : 'in_progress',
+    status,
     error: `Download failed: ${message}`,
   })
 }

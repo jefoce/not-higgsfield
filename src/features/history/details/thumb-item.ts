@@ -42,7 +42,11 @@ function sentNote(item: InputSnapshot[string] | undefined): string | undefined {
     return undefined
   }
 
-  const formatLabel = isNil(format) ? 'image' : format.toUpperCase()
+  let formatLabel = 'image'
+
+  if (!isNil(format)) {
+    formatLabel = format.toUpperCase()
+  }
 
   return `Sent as ${formatLabel} ${sentWidth}x${sentHeight}, ${formatBytes(sentBytes)}`
 }
@@ -88,8 +92,13 @@ export function thumbItems(record: GenerationRecord): ThumbItem[] {
 
     for (const id of references) {
       const slot = slots.get(id)
+      let label = 'Reference'
 
-      items.push(thumbItem({ snapshot, id, label: slot ? slotLabel(slot) : 'Reference' }))
+      if (!isNil(slot)) {
+        label = slotLabel(slot)
+      }
+
+      items.push(thumbItem({ snapshot, id, label }))
     }
   }
 

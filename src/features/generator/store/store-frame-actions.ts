@@ -29,10 +29,9 @@ export function createFrameActions(set: SetState): FrameActions {
           uploadsById = { ...state.uploadsById, [upload.id]: upload }
         }
 
-        const aspectRatio =
-          shouldClearStart && state.aspectRatio === 'auto'
-            ? preset.defaultAspectRatio
-            : state.aspectRatio
+        const isAspectRatio = shouldClearStart && state.aspectRatio === 'auto'
+
+        const aspectRatio = isAspectRatio ? preset.defaultAspectRatio : state.aspectRatio
 
         return { frames, uploadsById, aspectRatio }
       }),

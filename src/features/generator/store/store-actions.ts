@@ -40,6 +40,32 @@ interface NormalizedDraftParams {
   overrides?: Partial<GenerationInput>
 }
 
+interface NextTabStateParams {
+  state: GeneratorState
+  preset: ModelPreset
+  tab: GeneratorState['tab']
+}
+
+function nextTabState(params: NextTabStateParams): Partial<GeneratorState> {
+  const { state, preset, tab } = params
+
+  const isInvalid =
+    state.aspectRatio === 'auto' &&
+    (tab !== 'frames' || isNil(state.frames.start) || state.frames.start === '')
+
+  const aspectRatio = isInvalid ? preset.defaultAspectRatio : state.aspectRatio
+
+  return {
+    tab,
+    aspectRatio,
+    duration: clampReferenceDuration({
+      input: inputFromState({ ...state, tab }),
+      uploads: state.uploadsById,
+      preset,
+    }),
+  }
+}
+
 /** Normalizes a draft to the preset, toasts the notes and drops the per-tab prompt. */
 function normalizedDraft(params: NormalizedDraftParams): Partial<GeneratorState> {
   const { state, preset, overrides } = params
@@ -77,24 +103,7 @@ export const createGeneratorState: StateCreator<
 
       return normalizedDraft({ state, preset })
     }),
-  setTab: (tab) =>
-    set((state) => {
-      const preset = getPreset(state.presetId)
-
-      const isInvalid =
-        state.aspectRatio === 'auto' &&
-        (tab !== 'frames' || isNil(state.frames.start) || state.frames.start === '')
-
-      return {
-        tab,
-        aspectRatio: isInvalid ? preset.defaultAspectRatio : state.aspectRatio,
-        duration: clampReferenceDuration({
-          input: inputFromState({ ...state, tab }),
-          uploads: state.uploadsById,
-          preset,
-        }),
-      }
-    }),
+  setTab: (tab) => set((state) => nextTabState({ state, preset: getPreset(state.presetId), tab })),
   setPrompt: (text) => set((state) => ({ prompts: { ...state.prompts, [state.tab]: text } })),
   setAudio: (isAudio) => set({ audio: isAudio }),
   setDuration: (duration) =>
@@ -120,7 +129,9 @@ export const createGeneratorState: StateCreator<
       const isAllowed =
         state.tab === 'frames' && Boolean(state.frames.start) && preset.autoAspectWithFrames
 
-      return { aspectRatio: isAllowed ? aspectRatio : preset.defaultAspectRatio }
+      const nextAspectRatio = isAllowed ? aspectRatio : preset.defaultAspectRatio
+
+      return { aspectRatio: nextAspectRatio }
     }),
   setResolution: (resolution) =>
     set((state) =>
@@ -131,7 +142,14 @@ export const createGeneratorState: StateCreator<
   insertMention: (slot) => mentionInserter?.(slot),
   focusSlot: (slot, occurrence) => slotFocuser?.(slot, occurrence),
   setSeed: (seed) => set({ seed: clampSeed(seed) }),
-  toggleSeedLock: () => set((state) => ({ seed: isNil(state.seed) ? randomSeed() : null })),
+  toggleSeedLock: () =>
+    set((state) => {
+      if (isNil(state.seed)) {
+        return { seed: randomSeed() }
+      }
+
+      return { seed: null }
+    }),
   ...createLoadActions(set, get),
   reset: () => set({ ...defaults() }),
   registerMentionInserter: (fn) => {

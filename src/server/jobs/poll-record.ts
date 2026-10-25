@@ -99,12 +99,14 @@ function prepareNext(params: PrepareNextParams): PreparedRecord {
     jobFields.startedAt = now
   }
 
+  const error = status === 'failed' ? record.error : undefined
+
   const next = applyUsageCost({
     record: {
       ...record,
       status,
       job: jobFields,
-      error: status === 'failed' ? record.error : undefined,
+      error,
     },
     job,
   })

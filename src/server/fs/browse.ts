@@ -18,7 +18,12 @@ export interface BrowseInput {
 }
 
 export async function browseDirectories(input: BrowseInput): Promise<BrowseResult> {
-  const requested = isNil(input.path) || input.path.trim() === '' ? os.homedir() : input.path
+  const isRequested = isNil(input.path) || input.path.trim() === ''
+  let requested = os.homedir()
+
+  if (!isRequested) {
+    requested = input.path ?? ''
+  }
 
   if (!path.isAbsolute(requested)) {
     throw new BrowseError(400, 'Path must be absolute')
@@ -49,7 +54,11 @@ export async function browseDirectories(input: BrowseInput): Promise<BrowseResul
     ['asc'],
   )
 
-  const parent = real === path.parse(real).root ? null : path.dirname(real)
+  let parent: string | null = path.dirname(real)
+
+  if (real === path.parse(real).root) {
+    parent = null
+  }
 
   return { path: real, parent, dirs }
 }

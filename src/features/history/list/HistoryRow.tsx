@@ -82,7 +82,7 @@ export function HistoryRow(props: HistoryRowProps) {
       >
         {isCompleted && <SelectionCheckbox id={record.id} />}
 
-        {isCompleted ? (
+        {isCompleted && (
           <LazyVideo
             id={record.id}
             src={videoSrc(record)}
@@ -92,9 +92,8 @@ export function HistoryRow(props: HistoryRowProps) {
             interactive={!isSelecting || isSelected}
             className="size-full"
           />
-        ) : (
-          <StatusOverlay record={record} fill onCancel={handleCancel} />
         )}
+        {!isCompleted && <StatusOverlay record={record} fill onCancel={handleCancel} />}
 
         {isSelected && (
           <span

@@ -54,7 +54,9 @@ const sizedAspect = (width: number | undefined, height: number | undefined): str
 export function recordAspect(record: GenerationRecord): string {
   const output = record.output
   const start = record.input.frames.start
-  const frame = isNil(start) ? undefined : record.inputsSnapshot[start]
+  const isFrame = isNil(start)
+
+  const frame = isFrame ? undefined : record.inputsSnapshot[start]
   const aspect = record.input.aspectRatio
 
   const sized =
@@ -92,7 +94,8 @@ export function posterSrc(record: GenerationRecord, widthPx = PREVIEW_WIDTH): st
 
 /** Poster sized for the rendered media width in device pixels. */
 export function posterForWidth(record: GenerationRecord, mediaWidth: number): string | undefined {
-  const dpr = Math.max(typeof window === 'undefined' ? 1 : window.devicePixelRatio, 1)
+  const dprValue = typeof window === 'undefined' ? 1 : window.devicePixelRatio
+  const dpr = Math.max(dprValue, 1)
   const width = mediaWidth > 0 ? Math.ceil((mediaWidth * dpr) / 80) * 80 : undefined
 
   return posterSrc(record, width)

@@ -1,3 +1,5 @@
+import { isNil } from 'lodash-es'
+
 import type { FolderItem } from '@/core/schemas/folder-item'
 import type { UploadItem } from '@/core/schemas/upload-item'
 
@@ -10,9 +12,13 @@ export const isDesktop = (): boolean =>
 
 /** Desktop module is loaded only inside the app, so the browser bundle never contains Tauri code. */
 export function getPlatform(): Promise<Platform> {
-  instance ??= isDesktop()
-    ? import('./desktop').then((module) => module.desktopPlatform)
-    : import('./browser').then((module) => module.browserPlatform)
+  if (isNil(instance)) {
+    if (isDesktop()) {
+      instance = import('./desktop').then((module) => module.desktopPlatform)
+    } else {
+      instance = import('./browser').then((module) => module.browserPlatform)
+    }
+  }
 
   return instance
 }

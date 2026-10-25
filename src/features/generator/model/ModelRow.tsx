@@ -21,7 +21,11 @@ function quality(preset: ModelPreset): string {
     return ''
   }
 
-  return first === last ? first : `${first}-${last}`
+  if (first === last) {
+    return first
+  }
+
+  return `${first}-${last}`
 }
 
 /** Badge shows the billable range. Quick chips still use `duration.options`. */
@@ -46,7 +50,11 @@ function fromRate(preset: ModelPreset, skus?: Record<string, number>): number | 
     .map((resolution) => pricePerSec({ preset, ctx: { ...ctx, resolution }, skus }))
     .filter((rate): rate is number => !isNil(rate))
 
-  return rates.length > 0 ? Math.min(...rates) : null
+  if (rates.length > 0) {
+    return Math.min(...rates)
+  }
+
+  return null
 }
 
 interface ListRateParams {
@@ -141,7 +149,7 @@ export function ModelRow(props: ModelRowProps) {
         </span>
       </span>
       <span className="flex size-3.5 shrink-0 items-center justify-center">
-        <Check size={14} className={cn('text-lime', isSelected ? undefined : 'invisible')} />
+        <Check size={14} className={cn('text-lime', !isSelected && 'invisible')} />
       </span>
     </button>
   )

@@ -41,8 +41,10 @@ export function DurationChip(props: DurationChipProps) {
 
   const handleSelect = useCallback((): void => onSelect(value), [onSelect, value])
 
+  const tooltip = isOverLimit ? limitText : null
+
   return (
-    <Tooltip content={isOverLimit ? limitText : null}>
+    <Tooltip content={tooltip}>
       <span className="inline-flex">
         <PopoverClose asChild>
           <button

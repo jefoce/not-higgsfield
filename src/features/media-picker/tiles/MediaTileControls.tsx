@@ -56,7 +56,8 @@ export function MediaTileControls(props: MediaTileControlsProps) {
         aria-pressed={isSelected}
         className={cn(
           'absolute inset-0 z-10 size-full rounded-lg',
-          isBlocked ? 'cursor-not-allowed' : 'cursor-pointer',
+          isBlocked && 'cursor-not-allowed',
+          !isBlocked && 'cursor-pointer',
         )}
       />
 

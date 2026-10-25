@@ -153,7 +153,15 @@ function looseSlot(match: RegExpExecArray, counts: SlotCounts): RefSlot | null {
 
 /** Stored form for parts (chips -> "@Image 1"). */
 export function serializeParts(parts: readonly PromptPart[]): string {
-  return parts.map((part) => (part.type === 'text' ? part.text : slotToken(part.slot))).join('')
+  return parts
+    .map((part) => {
+      if (part.type === 'text') {
+        return part.text
+      }
+
+      return slotToken(part.slot)
+    })
+    .join('')
 }
 
 /** Unique slots mentioned in a stored prompt (canonical form only). */

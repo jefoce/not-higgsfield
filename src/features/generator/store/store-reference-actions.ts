@@ -53,7 +53,13 @@ export function createReferenceActions(set: SetState): ReferenceActions {
       set((state) => {
         const uploadsById = { ...state.uploadsById, [upload.id]: upload }
         const index = state.references.indexOf(id)
-        const swapped = state.references.map((ref) => (ref === id ? upload.id : ref))
+
+        const swapped = state.references.map((ref) => {
+          const nextRef = ref === id ? upload.id : ref
+
+          return nextRef
+        })
+
         let candidates = swapped
 
         if (index < 0) {

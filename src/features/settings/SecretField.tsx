@@ -51,7 +51,9 @@ function descriptionFor(params: DescriptionParams): ReactNode {
   const { isRemoved, isReadOnly, isStored, value, hint } = params
 
   if (isRemoved && !isReadOnly) {
-    const removedLabel = isEmpty(hint) ? 'stored key' : `•••• ${hint}`
+    const isHintEmpty = isEmpty(hint)
+
+    const removedLabel = isHintEmpty ? 'stored key' : `•••• ${hint}`
 
     return (
       <p className="text-xxs text-fg-2">
@@ -80,7 +82,9 @@ export function SecretField(props: SecretFieldProps) {
   }
 
   const hasHint = !isEmpty(status.hint)
-  const placeholder = status.set && hasHint ? `•••• ${status.hint}` : 'Not set'
+  const isPlaceholder = status.set && hasHint
+
+  const placeholder = isPlaceholder ? `•••• ${status.hint}` : 'Not set'
 
   const description = descriptionFor({
     isRemoved,
@@ -100,6 +104,8 @@ export function SecretField(props: SecretFieldProps) {
     [name, onChange],
   )
 
+  const removeLabel = isRemoved ? 'Undo' : 'Remove'
+
   return (
     <Field
       id={name}
@@ -116,7 +122,7 @@ export function SecretField(props: SecretFieldProps) {
             onClick={handleRemove}
             className="h-9 shrink-0 rounded-lg border border-line px-2.5 text-xs text-fg-2 hover:bg-hover hover:text-fg aria-pressed:border-danger/40 aria-pressed:text-danger"
           >
-            {isRemoved ? 'Undo' : 'Remove'}
+            {removeLabel}
           </button>
         )
       }

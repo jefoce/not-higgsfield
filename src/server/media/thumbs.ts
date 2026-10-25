@@ -52,11 +52,9 @@ export async function getThumbnail(input: ThumbInput): Promise<ThumbResult> {
 
   const requestedWidth = Math.round(input.width)
 
-  const width = clamp(
-    requestedWidth === 0 || Number.isNaN(requestedWidth) ? THUMB_WIDTH : requestedWidth,
-    32,
-    1280,
-  )
+  const isWidthInvalid = requestedWidth === 0 || Number.isNaN(requestedWidth)
+  const widthValue = isWidthInvalid ? THUMB_WIDTH : requestedWidth
+  const width = clamp(widthValue, 32, 1280)
 
   const hash = createHash('sha1').update(`${input.ref}:${input.mtimeMs}:${width}`).digest('hex')
   const filePath = path.join(THUMBS_DIR, `${hash}.webp`)

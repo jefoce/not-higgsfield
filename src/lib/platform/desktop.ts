@@ -93,11 +93,12 @@ export const desktopPlatform: Platform = {
 
   saveVideos: async (records: GenerationRecord[]) => {
     const count = records.length
+    const suffix = count === 1 ? '' : 's'
 
     const dir = await open({
       directory: true,
       multiple: false,
-      title: `Choose a folder for ${count} video${count === 1 ? '' : 's'}`,
+      title: `Choose a folder for ${count} video${suffix}`,
     })
 
     if (isNil(dir) || Array.isArray(dir)) {

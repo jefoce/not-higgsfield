@@ -111,7 +111,9 @@ function rangeResponse(params: RangeResponseParams): Response {
     return new Response(null, { status: 416, headers })
   }
 
-  headers.set('Content-Length', String(range ? range.end - range.start + 1 : size))
+  const length = range ? range.end - range.start + 1 : size
+
+  headers.set('Content-Length', String(length))
 
   if (range) {
     headers.set('Content-Range', `bytes ${range.start}-${range.end}/${size}`)
@@ -171,7 +173,11 @@ interface ParseBoundsParams {
 function parseBounds(params: ParseBoundsParams): Range | null {
   const { rawStart, rawEnd, size } = params
   const start = Number(rawStart)
-  const end = rawEnd === '' ? size - 1 : Number(rawEnd)
+  let end = Number(rawEnd)
+
+  if (rawEnd === '') {
+    end = size - 1
+  }
 
   if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end)) {
     return null

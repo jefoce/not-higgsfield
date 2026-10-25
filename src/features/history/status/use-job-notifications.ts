@@ -45,10 +45,18 @@ function readLastSeen(): number | null {
 
   const at = Date.parse(value)
 
-  return Number.isFinite(at) ? at : null
+  if (Number.isFinite(at)) {
+    return at
+  }
+
+  return null
 }
 
-const pluralVideos = (count: number): string => `${count} ${count === 1 ? 'video' : 'videos'}`
+const pluralVideos = (count: number): string => {
+  const word = count === 1 ? 'video' : 'videos'
+
+  return `${count} ${word}`
+}
 
 function summaryText(records: GenerationRecord[]): string {
   const counts = countBy(records, 'status')
@@ -58,17 +66,17 @@ function summaryText(records: GenerationRecord[]): string {
   const parts: string[] = []
 
   if (completed > 0) {
+    const verb = completed === 1 ? 'is' : 'are'
+
     parts.push(
-      `${pluralVideos(completed)} finished while the app was closed and ${
-        completed === 1 ? 'is' : 'are'
-      } downloading.`,
+      `${pluralVideos(completed)} finished while the app was closed and ${verb} downloading.`,
     )
   }
 
   if (expired > 0) {
-    parts.push(
-      `${pluralVideos(expired)} expired before ${expired === 1 ? 'it' : 'they'} could be downloaded.`,
-    )
+    const pronoun = expired === 1 ? 'it' : 'they'
+
+    parts.push(`${pluralVideos(expired)} expired before ${pronoun} could be downloaded.`)
   }
 
   if (failed > 0) {
@@ -85,7 +93,11 @@ function showChanges(records: GenerationRecord[]): void {
   store.resetFilters()
 
   const buckets = new Set(
-    records.map((record) => (record.status === 'completed' ? 'done' : 'failed')),
+    records.map((record) => {
+      const bucket = record.status === 'completed' ? 'done' : 'failed'
+
+      return bucket
+    }),
   )
 
   if (buckets.size === 1) {
@@ -129,8 +141,10 @@ export function useJobNotifications(params: JobNotificationParams): void {
   }, [])
 
   useEffect(() => {
-    document.title =
+    const title =
       activeCount > 0 ? `(${activeCount}) Generating \u00b7 Not Higgsfield` : 'Not Higgsfield'
+
+    document.title = title
   }, [activeCount])
 
   useEffect(() => {

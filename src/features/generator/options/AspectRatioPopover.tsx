@@ -40,6 +40,8 @@ export function AspectRatioPopover() {
     [setAspectRatio],
   )
 
+  const label = aspectRatio === 'auto' ? 'Auto' : aspectRatio
+
   return (
     <Popover onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
@@ -48,7 +50,7 @@ export function AspectRatioPopover() {
           className="flex h-10 flex-1 items-center gap-1 rounded-md bg-surface px-3 text-sm font-medium text-fg hover:bg-white/6"
         >
           <RatioIcon ratio={aspectRatio} size={16} />
-          {aspectRatio === 'auto' ? 'Auto' : aspectRatio}
+          {label}
         </button>
       </PopoverTrigger>
       <PopoverContent align="center" className="w-40 space-y-1">

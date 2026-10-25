@@ -39,7 +39,8 @@ export function SortableReference(props: SortableReferenceProps) {
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn(
-        isAudio ? 'col-span-2 aspect-[2.12/1]' : 'aspect-square',
+        isAudio && 'col-span-2 aspect-[2.12/1]',
+        !isAudio && 'aspect-square',
         isDragging && 'rounded-xl opacity-30 outline-1 outline-lime/60 outline-dashed',
       )}
       {...attributes}

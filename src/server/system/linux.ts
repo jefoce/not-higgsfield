@@ -30,10 +30,13 @@ export const linux: SystemAdapter = {
 
     const files = extensions(kinds)
 
-    const args =
-      tool === 'zenity'
-        ? zenityFiles({ files, multiple: isMultiple, prompt })
-        : kdialogFiles({ files, multiple: isMultiple, prompt })
+    let args: string[]
+
+    if (tool === 'zenity') {
+      args = zenityFiles({ files, multiple: isMultiple, prompt })
+    } else {
+      args = kdialogFiles({ files, multiple: isMultiple, prompt })
+    }
 
     const { stdout } = await dialog(tool, args)
 
@@ -57,7 +60,11 @@ export const linux: SystemAdapter = {
 
     const picked = stdout.trim()
 
-    return picked === '' ? null : picked
+    if (picked === '') {
+      return null
+    }
+
+    return picked
   },
 
   async reveal(file) {

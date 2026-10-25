@@ -26,14 +26,20 @@ export function noteFor(params: NoteForParams): string | undefined {
     return size
   }
 
-  return `${size} \u00b7 Transparent, sent on ${image.flattened === '#ffffff' ? 'white' : 'dark'}`
+  const background = image.flattened === '#ffffff' ? 'white' : 'dark'
+
+  return `${size} \u00b7 Transparent, sent on ${background}`
 }
 
 /** Slot label for an attached reference. */
 export function labelFor(slots: Map<string, RefSlot>, id: string): string | undefined {
   const slot = slots.get(id)
 
-  return slot ? slotLabel(slot) : undefined
+  if (slot) {
+    return slotLabel(slot)
+  }
+
+  return undefined
 }
 
 /** Uploads for the attached references, in order. */

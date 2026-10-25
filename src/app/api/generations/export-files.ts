@@ -12,7 +12,11 @@ export async function videoSource(id: string): Promise<string | null> {
     () => false,
   )
 
-  return isFile ? source : null
+  if (isFile) {
+    return source
+  }
+
+  return null
 }
 
 /** Copies without overwriting. False when the target already exists. */

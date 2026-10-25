@@ -45,10 +45,18 @@ function normalizeAspect(params: NormalizeAspectParams): GenerationInput['aspect
   const { aspect, preset, resolution } = params
 
   if (aspect === 'auto') {
-    return preset.autoAspectWithFrames ? 'auto' : preset.defaultAspectRatio
+    if (preset.autoAspectWithFrames) {
+      return 'auto'
+    }
+
+    return preset.defaultAspectRatio
   }
 
-  return aspectAllowed({ preset, resolution, aspect }) ? aspect : preset.defaultAspectRatio
+  if (aspectAllowed({ preset, resolution, aspect })) {
+    return aspect
+  }
+
+  return preset.defaultAspectRatio
 }
 
 function normalizeFrames(frames: FrameSlots, preset: ModelPreset): FrameSlots {
@@ -101,9 +109,12 @@ function trimReferences(params: TrimReferencesParams): TrimReferencesResult {
     return false
   })
 
-  const notes = MEDIA_KINDS.filter((kind) => removed[kind] > 0).map(
-    (kind) => `Removed ${removed[kind]} ${kind} reference${removed[kind] === 1 ? '' : 's'}`,
-  )
+  const notes = MEDIA_KINDS.filter((kind) => removed[kind] > 0).map((kind) => {
+    const count = removed[kind]
+    const suffix = count === 1 ? '' : 's'
+
+    return `Removed ${count} ${kind} reference${suffix}`
+  })
 
   return { references, notes }
 }
@@ -164,6 +175,8 @@ export function normalizeForPreset(params: NormalizeForPresetParams): Normalized
     notes.push(`Aspect set to ${aspectRatio}`)
   }
 
+  const hasAudio = preset.audio.supported ? input.audio : false
+
   return {
     input: {
       ...input,
@@ -172,7 +185,7 @@ export function normalizeForPreset(params: NormalizeForPresetParams): Normalized
       duration,
       resolution,
       aspectRatio,
-      audio: preset.audio.supported ? input.audio : false,
+      audio: hasAudio,
       frames: normalizeFrames(input.frames, preset),
       references,
     },

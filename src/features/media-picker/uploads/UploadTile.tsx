@@ -20,6 +20,22 @@ export interface UploadTileProps {
   onUploaded: (items: UploadItem[]) => void
 }
 
+function uploadLabelFor(progress: number | null): string {
+  if (isNil(progress)) {
+    return 'Upload file'
+  }
+
+  return `Uploading ${progress}%`
+}
+
+function progressPercent(sent: number, total: number): number {
+  if (total <= 0) {
+    return 0
+  }
+
+  return Math.round((sent / total) * 100)
+}
+
 /** Dashed upload tile backed by a hidden file input. */
 export function UploadTile(props: UploadTileProps) {
   const { kinds, max, extensions, onUploaded } = props
@@ -37,9 +53,8 @@ export function UploadTile(props: UploadTileProps) {
 
       setProgress(0)
 
-      const handleProgress = (sent: number, total: number) => {
-        setProgress(total > 0 ? Math.round((sent / total) * 100) : 0)
-      }
+      const handleProgress = (sent: number, total: number) =>
+        setProgress(progressPercent(sent, total))
 
       try {
         const items = await uploadFilesWithProgress({ files, onProgress: handleProgress })
@@ -74,6 +89,8 @@ export function UploadTile(props: UploadTileProps) {
     [handleFiles],
   )
 
+  const uploadLabel = uploadLabelFor(progress)
+
   return (
     <div
       className={cn(
@@ -97,7 +114,7 @@ export function UploadTile(props: UploadTileProps) {
         <span className="flex size-10 items-center justify-center rounded-full bg-white/10">
           <CloudUpload className="size-5" aria-hidden />
         </span>
-        <span>{isNil(progress) ? 'Upload file' : `Uploading ${progress}%`}</span>
+        <span>{uploadLabel}</span>
       </button>
       <input
         id={fileInputId}

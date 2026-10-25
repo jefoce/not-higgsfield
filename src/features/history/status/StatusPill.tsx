@@ -19,6 +19,7 @@ export function StatusPill(props: StatusPillProps) {
   const { label, help, tone, isCompact } = props
   const isRed = tone === 'red'
   const spinnerClass = tone === 'gray' ? '[animation-duration:1.6s]' : undefined
+  const spinnerTone = tone === 'lime' ? 'lime' : 'muted'
 
   return (
     <Tooltip content={statusHelpText(help)}>
@@ -26,11 +27,8 @@ export function StatusPill(props: StatusPillProps) {
         tabIndex={0}
         className={cn(PILL_CLASSES, TONE_TEXT[tone], isCompact && PILL_COMPACT_CLASSES)}
       >
-        {isRed ? (
-          <AlertCircle size={16} className="shrink-0" aria-hidden />
-        ) : (
-          <Spinner size={16} tone={tone === 'lime' ? 'lime' : 'muted'} className={spinnerClass} />
-        )}
+        {isRed && <AlertCircle size={16} className="shrink-0" aria-hidden />}
+        {!isRed && <Spinner size={16} tone={spinnerTone} className={spinnerClass} />}
         <span className="min-w-0 truncate">{label}</span>
       </div>
     </Tooltip>

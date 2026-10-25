@@ -42,10 +42,12 @@ export async function POST(request: Request) {
     const items: UploadItem[] = []
 
     for (const file of files) {
+      const originalName = file.name === '' ? `pasted-${Date.now()}.png` : file.name
+
       items.push(
         await createFileUpload({
           bytes: new Uint8Array(await file.arrayBuffer()),
-          originalName: file.name === '' ? `pasted-${Date.now()}.png` : file.name,
+          originalName,
         }),
       )
     }

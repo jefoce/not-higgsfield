@@ -49,6 +49,8 @@ export function ModelPicker() {
     [setPreset],
   )
 
+  const side = isWide ? 'right' : 'bottom'
+
   return (
     <div className="mt-4">
       <Popover open={isOpen} onOpenChange={handleOpenChange}>
@@ -70,7 +72,7 @@ export function ModelPicker() {
           </button>
         </PopoverTrigger>
         <PopoverContent
-          side={isWide ? 'right' : 'bottom'}
+          side={side}
           align="start"
           sideOffset={12}
           collisionPadding={16}

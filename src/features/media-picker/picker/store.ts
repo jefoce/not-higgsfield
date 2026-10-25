@@ -35,7 +35,11 @@ export function extensionsFromLimits(
     return [[kind, formats] as const]
   })
 
-  return isEmpty(entries) ? undefined : Object.fromEntries(entries)
+  if (isEmpty(entries)) {
+    return undefined
+  }
+
+  return Object.fromEntries(entries)
 }
 
 type PickerInput = Omit<PickerRequest, 'id'>

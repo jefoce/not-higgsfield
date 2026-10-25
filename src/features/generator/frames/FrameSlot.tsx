@@ -60,7 +60,11 @@ function slotTooltip(params: SlotTooltipParams): string | undefined {
     return disabledReason
   }
 
-  return isBroken ? 'File missing' : undefined
+  if (isBroken) {
+    return 'File missing'
+  }
+
+  return undefined
 }
 
 /** One frame drop slot with preview, replace and remove actions. */
@@ -68,9 +72,13 @@ export function FrameSlot(props: FrameSlotProps) {
   const { slot, disabled: isDisabled = false, disabledReason } = props
   const frameId = useGeneratorStore((state) => state.frames[slot])
 
-  const upload = useGeneratorStore((state) =>
-    isNil(frameId) || frameId === '' ? undefined : state.uploadsById[frameId],
-  )
+  const upload = useGeneratorStore((state) => {
+    if (isNil(frameId) || frameId === '') {
+      return
+    }
+
+    return state.uploadsById[frameId]
+  })
 
   const setFrame = useGeneratorStore((state) => state.setFrame)
   const preset = getPreset(useGeneratorStore((state) => state.presetId))

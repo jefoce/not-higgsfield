@@ -36,6 +36,8 @@ export function FolderFileTile(props: FolderFileTileProps) {
     [file, onExpand],
   )
 
+  const BrokenIcon = file.kind === 'video' ? Film : ImageIcon
+
   return (
     <div
       title={file.name}
@@ -60,11 +62,7 @@ export function FolderFileTile(props: FolderFileTileProps) {
 
       {!isAudio && isBroken && (
         <span className="flex size-full items-center justify-center bg-white/5 text-fg-2">
-          {file.kind === 'video' ? (
-            <Film size={24} aria-hidden />
-          ) : (
-            <ImageIcon size={24} aria-hidden />
-          )}
+          <BrokenIcon size={24} aria-hidden />
         </span>
       )}
 

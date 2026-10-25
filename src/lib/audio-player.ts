@@ -1,6 +1,7 @@
 'use client'
 
 import { useSyncExternalStore } from 'react'
+import { isNil } from 'lodash-es'
 
 type Listener = () => void
 
@@ -21,7 +22,12 @@ function notify(): void {
 
 function syncTime(): void {
   time = audio?.currentTime ?? 0
-  length = audio && Number.isFinite(audio.duration) ? audio.duration : 0
+  length = 0
+
+  if (!isNil(audio) && Number.isFinite(audio.duration)) {
+    length = audio.duration
+  }
+
   notify()
 }
 
@@ -86,7 +92,9 @@ export function seekAudio(seconds: number): void {
     return
   }
 
-  const max = Number.isFinite(player.duration) ? player.duration : length
+  const isMax = Number.isFinite(player.duration)
+
+  const max = isMax ? player.duration : length
 
   player.currentTime = Math.min(Math.max(seconds, 0), max)
   syncTime()
@@ -123,7 +131,13 @@ export function useAudioPlaying(src: string): boolean {
 export function useAudioTime(src: string): number | null {
   return useSyncExternalStore(
     subscribe,
-    () => (current === src && src !== '' ? time : null),
+    () => {
+      if (current === src && src !== '') {
+        return time
+      }
+
+      return null
+    },
     () => null,
   )
 }

@@ -144,7 +144,11 @@ interface Cursor {
   id: string
 }
 
-function parseCursor(cursor: string): Cursor {
+function parseCursor(cursor: string | null | undefined): Cursor | null {
+  if (isNil(cursor) || cursor === '') {
+    return null
+  }
+
   const sep = cursor.lastIndexOf('|')
 
   if (sep < 0) {
@@ -173,17 +177,21 @@ export function paginate(params: PaginateParams): HistoryPage {
   const { records, cursor, limit } = params
   const truncatedLimit = Math.trunc(limit)
 
-  const requestedSize =
-    truncatedLimit === 0 || Number.isNaN(truncatedLimit) ? HISTORY_PAGE_SIZE : truncatedLimit
+  const isRequestedSize = truncatedLimit === 0 || Number.isNaN(truncatedLimit)
+
+  const requestedSize = isRequestedSize ? HISTORY_PAGE_SIZE : truncatedLimit
 
   const size = clamp(requestedSize, 1, HISTORY_MAX_PAGE_SIZE)
-  const at = isNil(cursor) || cursor === '' ? null : parseCursor(cursor)
-  const remaining = at ? records.filter((record) => isAfter(record, at)) : records
+  const at = parseCursor(cursor)
+  const remaining = records.filter((record) => isNil(at) || isAfter(record, at))
   const items = remaining.slice(0, size)
   const last = items.at(-1)
-  const nextCursor = remaining.length > size && last ? `${last.createdAt}|${last.id}` : null
 
-  return { items, nextCursor }
+  if (isNil(last) || remaining.length <= size) {
+    return { items, nextCursor: null }
+  }
+
+  return { items, nextCursor: `${last.createdAt}|${last.id}` }
 }
 
 export function countActive(records: GenerationRecord[]): number {

@@ -83,7 +83,11 @@ function countSetSecrets(params: CountSetSecretsParams): number {
       return false
     }
 
-    return isUndefined(edit) ? status?.keys[name].set === true : true
+    if (isUndefined(edit)) {
+      return status?.keys[name].set === true
+    }
+
+    return true
   }).length
 }
 

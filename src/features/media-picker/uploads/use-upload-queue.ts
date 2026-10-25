@@ -48,7 +48,13 @@ async function runUpload(params: RunUploadParams): Promise<void> {
     const uploaded = await uploadFilesWithProgress({
       files: [entry.file],
       onProgress: (sent, total) => {
-        patch({ progress: total > 0 ? Math.round((sent / total) * 100) : 0 })
+        if (total <= 0) {
+          patch({ progress: 0 })
+
+          return
+        }
+
+        patch({ progress: Math.round((sent / total) * 100) })
       },
       signal: controller.signal,
     })

@@ -68,7 +68,7 @@ export function StatusOverlay(props: StatusOverlayProps) {
     >
       <GlowLayers tone={tone} />
 
-      {tone === 'red' ? (
+      {tone === 'red' && (
         <FailedStatus
           id={record.id}
           isCompact={isCompact}
@@ -80,7 +80,8 @@ export function StatusOverlay(props: StatusOverlayProps) {
           line={line}
           onRerun={handleRerun}
         />
-      ) : (
+      )}
+      {tone !== 'red' && (
         <ActiveStatus
           record={record}
           isCompact={isCompact}

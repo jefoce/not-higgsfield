@@ -24,6 +24,7 @@ export function FrameSlotCard(props: FrameSlotCardProps) {
   const { label, upload, hasFrame, isBroken, isPreviewable, isDisabled, onPress, onRemove } = props
   const handleCardPress = onPress
   const handleCardRemove = onRemove
+  const previewLabel = isPreviewable ? `Preview ${label.toLowerCase()}` : label
 
   return (
     <div
@@ -37,7 +38,7 @@ export function FrameSlotCard(props: FrameSlotCardProps) {
           type="button"
           disabled={isDisabled}
           onClick={handleCardPress}
-          aria-label={isPreviewable ? `Preview ${label.toLowerCase()}` : label}
+          aria-label={previewLabel}
           className="absolute inset-0 z-0 size-full cursor-pointer disabled:cursor-not-allowed"
         />
 
@@ -87,7 +88,8 @@ export function FrameSlotCard(props: FrameSlotCardProps) {
           aria-label={`Remove ${label.toLowerCase()}`}
           className={cn(
             'absolute -top-1.5 -right-1.5 z-20 size-6 items-center justify-center rounded-full bg-black/70 text-fg backdrop-blur-sm hover:bg-black',
-            isBroken ? 'flex' : 'hidden group-hover:flex',
+            isBroken && 'flex',
+            !isBroken && 'hidden group-hover:flex',
           )}
         >
           <X size={12} />

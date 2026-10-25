@@ -38,9 +38,8 @@ export function FilterChoice<T extends string>(props: FilterChoiceProps<T>) {
             onClick={handleSelect}
             className={cn(
               'h-8 rounded-lg px-2 text-sm transition',
-              option.value === value
-                ? 'bg-white/10 text-fg'
-                : 'text-fg-2 hover:bg-hover hover:text-fg',
+              option.value === value && 'bg-white/10 text-fg',
+              !(option.value === value) && 'text-fg-2 hover:bg-hover hover:text-fg',
             )}
           >
             {option.label}

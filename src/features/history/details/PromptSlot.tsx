@@ -28,9 +28,8 @@ export function PromptSlot(props: PromptSlotProps) {
       title={item?.originalName ?? label}
       className="mx-0.5 inline-flex items-center gap-1 rounded-sm bg-lime/10 px-0.5 align-middle text-xs font-medium text-lime"
     >
-      {slot.kind === 'audio' ? (
-        <Music size={12} />
-      ) : (
+      {slot.kind === 'audio' && <Music size={12} />}
+      {slot.kind !== 'audio' && (
         /* eslint-disable-next-line @next/next/no-img-element -- 16px mention thumb */
         <img src={uploadThumb(id, 64)} alt="" className="size-4 rounded-xs object-cover" />
       )}

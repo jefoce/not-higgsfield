@@ -81,10 +81,12 @@ async function load(): Promise<void> {
   } catch (error) {
     console.error('[not-higgsfield] secrets load failed', error)
 
-    state.loadError =
+    const loadError =
       error instanceof KeychainUnavailableError
         ? 'Keys could not be saved. The system keychain is unavailable.'
         : 'Keychain access was denied or timed out'
+
+    state.loadError = loadError
   } finally {
     state.loaded = true
 
@@ -239,7 +241,13 @@ export function secretStatus(): SecretStatus {
 }
 
 /** Short values reveal too much in the last four characters. */
-const hintFor = (value: string): string | null => (value.length < 12 ? null : value.slice(-4))
+const hintFor = (value: string): string | null => {
+  if (value.length < 12) {
+    return null
+  }
+
+  return value.slice(-4)
+}
 
 /** Fires after a save. Returns an unsubscribe function. */
 export function onSecretsChange(listener: () => void): () => void {

@@ -118,7 +118,11 @@ export function statusHelpKey(
 
   const stage = record.submit?.stage
 
-  return stage === 'uploading' || stage === 'sending' ? stage : 'processing'
+  if (stage === 'uploading' || stage === 'sending') {
+    return stage
+  }
+
+  return 'processing'
 }
 
 /** Tooltip text: what is happening plus cancel, charge and quit safety. */

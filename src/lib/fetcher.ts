@@ -80,23 +80,31 @@ export async function apiRequest<T>(url: string, init?: RequestInit): Promise<T>
   return readJson<T>(response)
 }
 
+function bodyValue(body: unknown): string | undefined {
+  if (isUndefined(body)) {
+    return undefined
+  }
+
+  return JSON.stringify(body)
+}
+
 export function apiPost<T>(url: string, body?: unknown): Promise<T> {
   return apiRequest<T>(url, {
     method: 'POST',
-    body: isUndefined(body) ? undefined : JSON.stringify(body),
+    body: bodyValue(body),
   })
 }
 
 export function apiPatch<T>(url: string, body?: unknown): Promise<T> {
   return apiRequest<T>(url, {
     method: 'PATCH',
-    body: isUndefined(body) ? undefined : JSON.stringify(body),
+    body: bodyValue(body),
   })
 }
 
 export function apiDelete<T>(url: string, body?: unknown): Promise<T> {
   return apiRequest<T>(url, {
     method: 'DELETE',
-    body: isUndefined(body) ? undefined : JSON.stringify(body),
+    body: bodyValue(body),
   })
 }

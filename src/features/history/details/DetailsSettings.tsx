@@ -16,6 +16,7 @@ export function DetailsSettings(props: DetailsSettingsProps) {
   const { record } = props
   const AudioIcon = record.input.audio ? Volume2 : VolumeX
   const aspect = record.input.aspectRatio === 'auto' ? 'Auto' : record.input.aspectRatio
+  const audioLabel = record.input.audio ? 'Audio on' : 'Audio off'
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -33,7 +34,7 @@ export function DetailsSettings(props: DetailsSettingsProps) {
       </span>
       <span className={SETTING_CLASSES}>
         <AudioIcon size={14} className="text-fg-2" aria-hidden />
-        {record.input.audio ? 'Audio on' : 'Audio off'}
+        {audioLabel}
       </span>
     </div>
   )

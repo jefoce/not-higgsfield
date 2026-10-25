@@ -38,7 +38,11 @@ function zoneAt(x: number, y: number): string | null {
   const element = document.elementFromPoint(x, y)?.closest<HTMLElement>('[data-drop-zone]')
   const id = element?.dataset.dropZone ?? null
 
-  return !isNil(id) && zones.has(id) ? id : null
+  if (!isNil(id) && zones.has(id)) {
+    return id
+  }
+
+  return null
 }
 
 function setHovered(id: string | null): void {
@@ -111,7 +115,9 @@ async function linkDropped(zone: DropZone, paths: string[]): Promise<void> {
   }
 
   if (unsupported > 0) {
-    toast(`Skipped ${unsupported} unsupported file${unsupported === 1 ? '' : 's'}`)
+    const suffix = unsupported === 1 ? '' : 's'
+
+    toast(`Skipped ${unsupported} unsupported file${suffix}`)
   }
 
   const items = await linkPaths(accepted.map((file) => file.name))

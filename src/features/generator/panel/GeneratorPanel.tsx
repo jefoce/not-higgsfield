@@ -53,6 +53,8 @@ export function GeneratorPanel() {
     return <div className="h-full" />
   }
 
+  const Body = tab === 'frames' ? FrameSlots : ReferencesBox
+
   return (
     <div
       className="flex max-h-full min-h-0 flex-col overflow-hidden rounded-panel"
@@ -84,7 +86,9 @@ export function GeneratorPanel() {
           </div>
         </div>
         <ModeTabs />
-        <div className="mb-4">{tab === 'frames' ? <FrameSlots /> : <ReferencesBox />}</div>
+        <div className="mb-4">
+          <Body />
+        </div>
         <PromptField onSubmit={handleSubmit} warnings={validation.warnings} />
         <ModelPicker />
         <SettingsRow />

@@ -27,7 +27,8 @@ export function PreviewBody(props: PreviewBodyProps) {
   }
 
   const ref = item.previewRef ?? `uploads/${item.id}`
-  const src = mediaUrl(ref, item.kind === 'image' ? undefined : item.mime)
+  const mime = item.kind === 'image' ? undefined : item.mime
+  const src = mediaUrl(ref, mime)
 
   if (item.kind === 'video') {
     return (

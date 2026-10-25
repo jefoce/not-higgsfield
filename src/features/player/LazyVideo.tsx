@@ -44,6 +44,14 @@ function fitClass(videoFit: 'cover' | 'contain', isFullscreen: boolean): string 
   return 'object-cover'
 }
 
+function tabIndexFor(isInteractive: boolean): number {
+  if (isInteractive) {
+    return 0
+  }
+
+  return -1
+}
+
 /**
  * Poster-only until the user plays it and the slot is active.
  * Only two videos stay loaded across the app. Hover mode keeps the slot on leave.
@@ -92,7 +100,7 @@ export function LazyVideo(props: LazyVideoProps) {
   const shouldShowControls = isInteractive && !isHoverPlay
   const rootHandlers = shouldShowControls ? inputHandlers : NO_HANDLERS
   const rootStyle: CSSProperties = { aspectRatio: aspect }
-  const tabIndex = isInteractive ? 0 : -1
+  const tabIndex = tabIndexFor(isInteractive)
 
   return (
     <div
@@ -107,7 +115,7 @@ export function LazyVideo(props: LazyVideoProps) {
         className,
       )}
     >
-      {isSlotActive ? (
+      {isSlotActive && (
         <LazyVideoPlayer
           videoRef={videoRef}
           video={video}
@@ -117,7 +125,8 @@ export function LazyVideo(props: LazyVideoProps) {
           fit={fit}
           showControls={shouldShowControls}
         />
-      ) : (
+      )}
+      {!isSlotActive && (
         <LazyVideoPoster
           poster={poster}
           alt={alt}

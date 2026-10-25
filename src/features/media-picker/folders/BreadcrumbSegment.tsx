@@ -15,14 +15,12 @@ export function BreadcrumbSegment(props: BreadcrumbSegmentProps) {
 
   const handleSelect = useCallback(() => onNavigate(target), [onNavigate, target])
 
+  const currentClass = isCurrent ? 'shrink-0 text-fg' : 'shrink-0 transition hover:text-fg'
+
   return (
     <Fragment>
       <span className="shrink-0 text-fg-3">/</span>
-      <button
-        type="button"
-        onClick={handleSelect}
-        className={isCurrent ? 'shrink-0 text-fg' : 'shrink-0 transition hover:text-fg'}
-      >
+      <button type="button" onClick={handleSelect} className={currentClass}>
         {label}
       </button>
     </Fragment>

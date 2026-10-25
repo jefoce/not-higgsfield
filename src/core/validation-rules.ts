@@ -202,16 +202,19 @@ function attachedMedia(input: GenerationInput, uploads: Record<string, UploadIte
       .filter((upload): upload is UploadItem => Boolean(upload))
   }
 
-  const start =
-    isNil(input.frames.start) || input.frames.start === '' ? undefined : uploads[input.frames.start]
+  const startId = input.frames.start
+  const endId = input.frames.end
+  let start: UploadItem | undefined
 
-  const end =
-    isNil(input.frames.start) ||
-    input.frames.start === '' ||
-    isNil(input.frames.end) ||
-    input.frames.end === ''
-      ? undefined
-      : uploads[input.frames.end]
+  if (!isNil(startId) && startId !== '') {
+    start = uploads[startId]
+  }
+
+  let end: UploadItem | undefined
+
+  if (!isNil(startId) && startId !== '' && !isNil(endId) && endId !== '') {
+    end = uploads[endId]
+  }
 
   return [start, end].filter((upload): upload is UploadItem => Boolean(upload))
 }

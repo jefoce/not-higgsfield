@@ -1,4 +1,4 @@
-import { isEmpty, isNil } from 'lodash-es'
+import { isNil } from 'lodash-es'
 
 import type { BrowseResult, FolderListing, MediaKind } from '@/core/media-types'
 import type { FolderItem } from '@/core/schemas/folder-item'
@@ -26,17 +26,23 @@ interface FetchFolderFilesParams {
 
 export function fetchFolderFiles(params: FetchFolderFilesParams): Promise<FolderListing> {
   const { folderId, sub = '', kinds } = params
+  const subQuery = sub === '' ? undefined : sub
+  let kindQuery: string | undefined
+
+  if (!isNil(kinds) && kinds.length > 0) {
+    kindQuery = kinds.join(',')
+  }
 
   return fetcher<FolderListing>(
     withQuery(`/api/folders/${encodeURIComponent(folderId)}/files`, {
-      sub: isEmpty(sub) ? undefined : sub,
-      kind: isNil(kinds) || kinds.length === 0 ? undefined : kinds.join(','),
+      sub: subQuery,
+      kind: kindQuery,
     }),
   )
 }
 
 export function browseDirs(path?: string, isHidden = false): Promise<BrowseResult> {
-  return fetcher<BrowseResult>(
-    withQuery('/api/fs/browse', { path, hidden: isHidden ? '1' : undefined }),
-  )
+  const hidden = isHidden ? '1' : undefined
+
+  return fetcher<BrowseResult>(withQuery('/api/fs/browse', { path, hidden }))
 }

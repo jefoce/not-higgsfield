@@ -22,7 +22,9 @@ interface MediaRowProps {
 export function MediaRow(props: MediaRowProps) {
   const { item, items, previewIndex, actions, selectedIndex, isAtMax, onSelect, onDelete } = props
   const stamp = new Date(item.createdAt).getTime()
-  const version = Number.isNaN(stamp) ? item.id : stamp
+  const isVersion = Number.isNaN(stamp)
+
+  const version = isVersion ? item.id : stamp
   const isSelected = selectedIndex >= 0
   const isDisabled = !isSelected && isAtMax
 
@@ -36,6 +38,7 @@ export function MediaRow(props: MediaRowProps) {
   const handleSelect = useCallback(() => onSelect(item), [item, onSelect])
 
   const handlePreviewAction = item.missing === true ? undefined : handlePreview
+  const selectIndex = isSelected ? selectedIndex : undefined
 
   return (
     <MediaTile
@@ -43,7 +46,7 @@ export function MediaRow(props: MediaRowProps) {
       mediaRef={`uploads/${item.id}`}
       thumbVersion={version}
       selected={isSelected}
-      selectIndex={isSelected ? selectedIndex : undefined}
+      selectIndex={selectIndex}
       disabled={isDisabled}
       missing={item.missing}
       onDelete={handleDelete}

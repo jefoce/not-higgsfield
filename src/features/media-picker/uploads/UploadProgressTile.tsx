@@ -25,39 +25,6 @@ export function UploadProgressTile(props: UploadProgressTileProps) {
   const { item, onRetry: handleRetry, onDismiss: handleDismiss } = props
   const hasError = !isNil(item.error) && item.error !== ''
 
-  const content = hasError ? (
-    <>
-      <span className="line-clamp-2 text-xxs break-all text-danger">{item.file.name}</span>
-      <span className="text-xxs text-danger">Failed</span>
-      <div className="flex items-center gap-1">
-        {!isNil(handleRetry) && (
-          <button
-            type="button"
-            onClick={handleRetry}
-            className="rounded-sm px-1.5 py-0.5 text-xxs font-medium text-fg transition hover:bg-white/10"
-          >
-            Retry
-          </button>
-        )}
-        {!isNil(handleDismiss) && (
-          <button
-            type="button"
-            onClick={handleDismiss}
-            aria-label="Dismiss upload"
-            className="rounded-sm p-0.5 text-fg-2 transition hover:bg-white/10 hover:text-fg"
-          >
-            <X className="size-3" />
-          </button>
-        )}
-      </div>
-    </>
-  ) : (
-    <>
-      <ProgressRing value={item.progress} />
-      <span className="line-clamp-2 text-xxs break-all text-fg-2">{item.file.name}</span>
-    </>
-  )
-
   return (
     <div
       className={cn(
@@ -65,7 +32,39 @@ export function UploadProgressTile(props: UploadProgressTileProps) {
         hasError && 'border-danger/50 bg-danger/10',
       )}
     >
-      {content}
+      {hasError && (
+        <>
+          <span className="line-clamp-2 text-xxs break-all text-danger">{item.file.name}</span>
+          <span className="text-xxs text-danger">Failed</span>
+          <div className="flex items-center gap-1">
+            {!isNil(handleRetry) && (
+              <button
+                type="button"
+                onClick={handleRetry}
+                className="rounded-sm px-1.5 py-0.5 text-xxs font-medium text-fg transition hover:bg-white/10"
+              >
+                Retry
+              </button>
+            )}
+            {!isNil(handleDismiss) && (
+              <button
+                type="button"
+                onClick={handleDismiss}
+                aria-label="Dismiss upload"
+                className="rounded-sm p-0.5 text-fg-2 transition hover:bg-white/10 hover:text-fg"
+              >
+                <X className="size-3" />
+              </button>
+            )}
+          </div>
+        </>
+      )}
+      {!hasError && (
+        <>
+          <ProgressRing value={item.progress} />
+          <span className="line-clamp-2 text-xxs break-all text-fg-2">{item.file.name}</span>
+        </>
+      )}
     </div>
   )
 }

@@ -28,12 +28,22 @@ function unavailableFor(option: AspectChoice, preset: ModelPreset): Resolution[]
   return preset.resolutions.filter((candidate) => !isNil(preset.outputSizes?.[candidate]?.[option]))
 }
 
+function aspectLabel(option: AspectChoice): string {
+  if (option === 'auto') {
+    return 'Auto'
+  }
+
+  return option
+}
+
 /** One aspect choice with its price availability and tooltip. */
 export function AspectOption(props: AspectOptionProps) {
   const { option, selected, preset, resolution, onSelect } = props
   const isAllowed = option === 'auto' || aspectAllowed({ preset, resolution, aspect: option })
   const onlyAt = unavailableFor(option, preset)
-  const reason = isAllowed || onlyAt.length === 0 ? null : `Only at ${onlyAt.join(', ')}`
+  const isReason = isAllowed || onlyAt.length === 0
+
+  const reason = isReason ? null : `Only at ${onlyAt.join(', ')}`
 
   const handleSelect = useCallback((): void => onSelect(option), [onSelect, option])
 
@@ -48,12 +58,13 @@ export function AspectOption(props: AspectOptionProps) {
             className={cn(
               'flex min-h-9 w-full items-center gap-2 rounded-lg p-2 text-sm font-medium',
               !isAllowed && 'cursor-not-allowed opacity-40',
-              option === selected ? 'text-lime' : 'text-fg',
+              option === selected && 'text-lime',
+              !(option === selected) && 'text-fg',
               isAllowed && option !== selected && 'hover:bg-white/5',
             )}
           >
             <RatioIcon ratio={option} />
-            {option === 'auto' ? 'Auto' : option}
+            {aspectLabel(option)}
             {option === selected && <Check size={14} className="ml-auto" />}
           </button>
         </PopoverClose>

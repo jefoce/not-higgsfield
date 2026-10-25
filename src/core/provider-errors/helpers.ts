@@ -33,7 +33,9 @@ function parameterName(raw: string): string | null {
 export function settingTitle(provider: string, raw: string): string {
   const name = parameterName(raw)
 
-  return isNil(name) || name === ''
-    ? `${provider} rejected a setting.`
-    : `${provider} rejected a setting: ${name}.`
+  if (isNil(name) || name === '') {
+    return `${provider} rejected a setting.`
+  }
+
+  return `${provider} rejected a setting: ${name}.`
 }

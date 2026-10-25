@@ -29,12 +29,14 @@ function devFfmpegPath(): string {
     const specifier = ['ffmpeg-static', 'package.json'].join('/')
     const pkgPath: string = Reflect.apply(req.resolve, req, [specifier])
 
-    const binary = path.join(
-      path.dirname(pkgPath),
-      process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg',
-    )
+    const binaryName = process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg'
+    const binary = path.join(path.dirname(pkgPath), binaryName)
 
-    return existsSync(binary) ? binary : ''
+    if (existsSync(binary)) {
+      return binary
+    }
+
+    return ''
   } catch {
     return ''
   }
@@ -47,7 +49,11 @@ function ffmpegPath(): string {
 
   const configured = process.env.FFMPEG_PATH?.trim() ?? ''
 
-  resolvedPath = isEmpty(configured) ? devFfmpegPath() : configured
+  if (isEmpty(configured)) {
+    resolvedPath = devFfmpegPath()
+  } else {
+    resolvedPath = configured
+  }
 
   return resolvedPath
 }

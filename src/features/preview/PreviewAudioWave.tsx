@@ -35,7 +35,10 @@ export function PreviewAudioWave(props: PreviewAudioWaveProps) {
     (event: KeyboardEvent<HTMLDivElement>) => {
       if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
         event.preventDefault()
-        seekAudio(at + (event.key === 'ArrowLeft' ? -5 : 5))
+
+        const delta = event.key === 'ArrowLeft' ? -5 : 5
+
+        seekAudio(at + delta)
 
         return
       }
@@ -68,7 +71,8 @@ export function PreviewAudioWave(props: PreviewAudioWaveProps) {
           style={{ height: `${height}%` }}
           className={cn(
             'min-w-px flex-1 rounded-full',
-            index / bars.length < played ? 'bg-lime' : 'bg-fg-2/50',
+            index / bars.length < played && 'bg-lime',
+            !(index / bars.length < played) && 'bg-fg-2/50',
           )}
         />
       ))}

@@ -7,9 +7,17 @@ import type { GenerationInput, GenerationRecord, JobStatus } from './schemas/gen
 import type { UploadItem } from './schemas/upload-item'
 import { type ResolvedTransport, resolveTransport } from './transport'
 
+function parseNotBefore(notBefore: string | undefined): number {
+  if (isNil(notBefore) || notBefore === '') {
+    return Number.NaN
+  }
+
+  return Date.parse(notBefore)
+}
+
 /** Remaining grace delay in ms. A missing, invalid or past notBefore is 0. */
 export function graceDelayMs(notBefore: string | undefined, now = Date.now()): number {
-  const at = isNil(notBefore) || notBefore === '' ? Number.NaN : Date.parse(notBefore)
+  const at = parseNotBefore(notBefore)
 
   if (!Number.isFinite(at)) {
     return 0
@@ -27,8 +35,7 @@ export function isStaleGrace(
     return false
   }
 
-  const notBefore = record.submit.notBefore
-  const at = isNil(notBefore) || notBefore === '' ? Number.NaN : Date.parse(notBefore)
+  const at = parseNotBefore(record.submit.notBefore)
 
   return Number.isFinite(at) && now - at > GRACE_STALE_MS
 }
@@ -106,5 +113,9 @@ const JOB_STATUSES: JobStatus[] = [
 ]
 
 export function asJobStatus(value: string): JobStatus | null {
-  return JOB_STATUSES.includes(value as JobStatus) ? (value as JobStatus) : null
+  if (JOB_STATUSES.includes(value as JobStatus)) {
+    return value as JobStatus
+  }
+
+  return null
 }

@@ -70,33 +70,35 @@ export function UploadsGrid(props: UploadsGridProps) {
             onDismiss={handleDismiss}
           />
         ))}
-        {canChooseFiles ? (
+        {canChooseFiles && (
           <ChooseDiskTile
             kinds={kinds}
             max={max}
             extensions={extensions}
             onUploaded={handleUploaded}
           />
-        ) : (
+        )}
+        {!canChooseFiles && (
           <UploadTile kinds={kinds} max={max} extensions={extensions} onUploaded={handleUploaded} />
         )}
-        {isLoading
-          ? SKELETON.map((key) => (
-              <div key={key} className="aspect-square animate-pulse rounded-lg bg-surface-2" />
-            ))
-          : items.map((item, previewIndex) => (
-              <MediaRow
-                key={item.id}
-                item={item}
-                items={items}
-                previewIndex={previewIndex}
-                actions={actions}
-                selectedIndex={selectedIds.indexOf(item.id)}
-                isAtMax={isMaxReached}
-                onSelect={handleSelect}
-                onDelete={handleDelete}
-              />
-            ))}
+        {isLoading &&
+          SKELETON.map((key) => (
+            <div key={key} className="aspect-square animate-pulse rounded-lg bg-surface-2" />
+          ))}
+        {!isLoading &&
+          items.map((item, previewIndex) => (
+            <MediaRow
+              key={item.id}
+              item={item}
+              items={items}
+              previewIndex={previewIndex}
+              actions={actions}
+              selectedIndex={selectedIds.indexOf(item.id)}
+              isAtMax={isMaxReached}
+              onSelect={handleSelect}
+              onDelete={handleDelete}
+            />
+          ))}
         {!isLoading && isEmpty(items) && (
           <p className="col-span-full py-8 text-center text-sm text-fg-2">No uploads yet</p>
         )}

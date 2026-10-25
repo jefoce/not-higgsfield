@@ -21,14 +21,29 @@ export function withQuery(base: string, params: Record<string, string | undefine
 
   const qs = query.toString()
 
-  return isEmpty(qs) ? base : `${base}?${qs}`
+  if (isEmpty(qs)) {
+    return base
+  }
+
+  return `${base}?${qs}`
 }
 
 export function fetchUploads(params: FetchUploadsParams = {}): Promise<UploadItem[]> {
+  let kindQuery: string | undefined
+  let idsQuery: string | undefined
+
+  if (!isNil(params.kinds) && params.kinds.length > 0) {
+    kindQuery = params.kinds.join(',')
+  }
+
+  if (!isNil(params.ids) && params.ids.length > 0) {
+    idsQuery = params.ids.join(',')
+  }
+
   return fetcher<UploadItem[]>(
     withQuery('/api/uploads', {
-      kind: isNil(params.kinds) || params.kinds.length === 0 ? undefined : params.kinds.join(','),
-      ids: isNil(params.ids) || params.ids.length === 0 ? undefined : params.ids.join(','),
+      kind: kindQuery,
+      ids: idsQuery,
     }),
   )
 }
@@ -86,7 +101,9 @@ interface UploadErrorBody {
 
 function serverErrorText(xhr: XMLHttpRequest): string {
   const body = xhr.response as UploadErrorBody | null
-  const text = isEmpty(xhr.statusText) ? `Upload failed (${xhr.status})` : xhr.statusText
+  const isText = isEmpty(xhr.statusText)
+
+  const text = isText ? `Upload failed (${xhr.status})` : xhr.statusText
 
   return body?.error ?? text
 }

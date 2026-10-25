@@ -56,7 +56,9 @@ function uploadDropped(params: UploadDroppedParams): void {
   })
 
   if (skipped > 0) {
-    toast(`Skipped ${skipped} unsupported file${skipped === 1 ? '' : 's'}`)
+    const suffix = skipped === 1 ? '' : 's'
+
+    toast(`Skipped ${skipped} unsupported file${suffix}`)
   }
 
   if (isEmpty(accepted)) {
@@ -160,7 +162,9 @@ export function useDropUpload(params: DropUploadParams): UseDropUpload {
 
   const zone = { 'data-drop-zone': id }
   const handlers = { ...zone, onDragEnter, onDragOver, onDragLeave, onDrop }
-  const dropProps = isDesktop() ? zone : handlers
+  const isDropProps = isDesktop()
+
+  const dropProps = isDropProps ? zone : handlers
 
   return { dragging: isEnabled && isDragging, dropProps }
 }

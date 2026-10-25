@@ -85,7 +85,8 @@ export function jsonDirStore<T extends Identified>(params: JsonDirStoreParams<T>
       return Array.from((await load()).values())
     },
     async get(id) {
-      const cached = state.loaded ? state.map.get(id) : undefined
+      const map = state.loaded ? state.map : null
+      const cached = map?.get(id)
 
       if (cached) {
         return cached

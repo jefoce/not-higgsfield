@@ -20,8 +20,9 @@ export function FilterForm() {
     () =>
       debounce((value: string) => {
         const trimmed = value.trim()
+        const q = trimmed === '' ? undefined : trimmed
 
-        setFilters({ q: trimmed === '' ? undefined : trimmed })
+        setFilters({ q })
       }, 250),
     [setFilters],
   )

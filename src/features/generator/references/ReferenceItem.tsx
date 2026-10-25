@@ -25,6 +25,17 @@ interface ReferenceItemProps {
   onRemove: (id: string) => void
 }
 
+/** Slot label for a reference id, or null when the id has no slot. */
+function referenceLabel(slots: Map<string, RefSlot>, item: UploadItem): string | null {
+  const slot = slots.get(item.id)
+
+  if (!slot) {
+    return null
+  }
+
+  return slotLabel(slot)
+}
+
 /** One reference cell with preview, replace and remove handlers. */
 export function ReferenceItem(props: ReferenceItemProps) {
   const {
@@ -69,11 +80,7 @@ export function ReferenceItem(props: ReferenceItemProps) {
 
   const handleRemoveAction = (item: UploadItem): void => onRemove(item.id)
 
-  const handleLabel = (item: UploadItem): string | null => {
-    const slot = slots.get(item.id)
-
-    return slot ? slotLabel(slot) : null
-  }
+  const handleLabel = (item: UploadItem): string | null => referenceLabel(slots, item)
 
   const handleRemove = useCallback((): void => onRemove(id), [id, onRemove])
 

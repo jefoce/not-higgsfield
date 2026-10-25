@@ -25,17 +25,27 @@ function handleTopUp(): void {
 export function CreditsPopover() {
   const { credits, refresh, isLoading } = useCredits()
 
-  const money = (value: number | null | undefined) => (isNil(value) ? '--' : formatUsd(value))
+  const money = (value: number | null | undefined): string => {
+    if (isNil(value)) {
+      return '--'
+    }
 
-  const keyLimit = isNil(credits?.keyLimitRemaining)
+    return formatUsd(value)
+  }
+
+  const isKeyLimit = isNil(credits?.keyLimitRemaining)
+
+  const keyLimit = isKeyLimit
     ? 'No key limit'
     : `${money(credits.keyLimitRemaining)} / ${money(credits.keyLimit)}`
 
   const handleRefresh = useCallback((): void => refresh(true), [refresh])
 
+  const balance = credits?.balance
+
   return (
     <div className="space-y-3">
-      {isNil(credits?.balance) ? (
+      {isNil(balance) && (
         <button
           type="button"
           onClick={handleOpenSettings}
@@ -43,9 +53,8 @@ export function CreditsPopover() {
         >
           Add a management key to see account balance
         </button>
-      ) : (
-        <CreditsRow label="Balance" value={formatUsd(credits.balance)} />
       )}
+      {!isNil(balance) && <CreditsRow label="Balance" value={formatUsd(balance)} />}
 
       <CreditsRow label="Key limit" value={keyLimit} muted={isNil(credits?.keyLimitRemaining)} />
       <CreditsRow label="Spent today" value={money(credits?.usageDaily)} />

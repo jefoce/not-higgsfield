@@ -11,10 +11,11 @@ interface MediaTileBrokenPreviewProps {
 /** Fallback icon when a thumbnail fails. */
 export function MediaTileBrokenPreview(props: MediaTileBrokenPreviewProps) {
   const { kind } = props
+  const Icon = kind === 'video' ? Film : ImageIcon
 
   return (
     <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/5 text-fg-2">
-      {kind === 'video' ? <Film size={24} aria-hidden /> : <ImageIcon size={24} aria-hidden />}
+      <Icon size={24} aria-hidden />
     </span>
   )
 }

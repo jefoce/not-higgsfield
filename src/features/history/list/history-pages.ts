@@ -23,10 +23,16 @@ export function patchPage(params: PatchPageParams): GenerationListResult {
     return page
   }
 
+  let items = page.items
+
+  if (hasMatch) {
+    items = page.items.map((item) => byId.get(item.id) ?? item)
+  }
+
   return {
     ...page,
     activeCount,
-    items: hasMatch ? page.items.map((item) => byId.get(item.id) ?? item) : page.items,
+    items,
   }
 }
 

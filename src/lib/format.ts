@@ -12,13 +12,23 @@ const DATE_FORMAT = new Intl.DateTimeFormat('en-US', {
 /** "October 20, 2026, 01:44" */
 export function formatDate(iso: string): string {
   return DATE_FORMAT.formatToParts(new Date(iso))
-    .map((part) => (part.type === 'literal' && part.value.trim() === 'at' ? ', ' : part.value))
+    .map((part) => {
+      if (part.type === 'literal' && part.value.trim() === 'at') {
+        return ', '
+      }
+
+      return part.value
+    })
     .join('')
 }
 
 /** Integer seconds stay short, e.g. "5s" or "5.5s". */
 export function formatSecondsShort(seconds: number): string {
-  return Number.isInteger(seconds) ? `${seconds}s` : `${Number(seconds.toFixed(1))}s`
+  if (Number.isInteger(seconds)) {
+    return `${seconds}s`
+  }
+
+  return `${Number(seconds.toFixed(1))}s`
 }
 
 /** Up to two decimals, trailing zeros dropped, e.g. "15.02s" or "15s". */
@@ -57,7 +67,13 @@ export function formatBytes(bytes: number): string {
     unit += 1
   }
 
-  const rounded = unit === 0 ? Math.round(value) : Math.round(value * 10) / 10
+  let rounded: number
+
+  if (unit === 0) {
+    rounded = Math.round(value)
+  } else {
+    rounded = Math.round(value * 10) / 10
+  }
 
   return `${rounded} ${BYTE_UNITS[unit]}`
 }

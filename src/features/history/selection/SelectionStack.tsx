@@ -34,11 +34,12 @@ export function SelectionStack(props: SelectionStackProps) {
               zIndex: 3 - index,
             }}
           >
-            {isNil(poster) ? (
+            {isNil(poster) && (
               <span className="flex size-full items-center justify-center text-fg-2">
                 <StackIcon record={record} />
               </span>
-            ) : (
+            )}
+            {!isNil(poster) && (
               // eslint-disable-next-line @next/next/no-img-element -- 32px poster thumb
               <img src={poster} alt="" className="size-full object-cover" />
             )}

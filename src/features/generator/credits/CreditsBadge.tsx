@@ -69,11 +69,10 @@ export function CreditsBadge() {
             className="inline-flex h-7 items-center gap-1.5 rounded-lg border border-white/8 bg-white/2 px-2 text-xs font-medium"
           >
             <Wallet size={12} className="text-fg-2" />
-            {isLoading ? (
+            {isLoading && (
               <span className="inline-block h-3 w-8 animate-pulse rounded-sm bg-white/10" />
-            ) : (
-              <span className={tone}>{text}</span>
             )}
+            {!isLoading && <span className={tone}>{text}</span>}
           </button>
         </PopoverTrigger>
       </Tooltip>

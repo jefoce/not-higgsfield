@@ -30,8 +30,15 @@ export function PreviewAudio(props: PreviewAudioProps) {
   const { item, src } = props
   const isPlaying = useAudioPlaying(src)
   const elapsed = useAudioTime(src)
-  const total = item.durationSec ?? (currentSrc() === src ? currentDuration() : 0)
-  const progress = isNil(elapsed) || total === 0 ? 0 : elapsed / total
+  let total = item.durationSec ?? 0
+
+  if (isNil(item.durationSec) && currentSrc() === src) {
+    total = currentDuration()
+  }
+
+  const isProgress = isNil(elapsed) || total === 0
+
+  const progress = isProgress ? 0 : elapsed / total
   const played = Math.min(1, progress)
   const bars = waveBars(item.originalName, AUDIO_BARS)
   const at = elapsed ?? 0
@@ -54,6 +61,9 @@ export function PreviewAudio(props: PreviewAudioProps) {
     }
   }, [src])
 
+  const PlayIcon = isPlaying ? Pause : Play
+  const playLabel = isPlaying ? 'Pause' : 'Play'
+
   return (
     <div className="flex w-full max-w-2xl flex-col gap-3 rounded-2xl bg-surface p-4">
       <span className="truncate text-sm font-semibold">{item.originalName}</span>
@@ -64,14 +74,10 @@ export function PreviewAudio(props: PreviewAudioProps) {
         <button
           type="button"
           onClick={handleToggle}
-          aria-label={`${isPlaying ? 'Pause' : 'Play'} ${item.originalName}`}
+          aria-label={`${playLabel} ${item.originalName}`}
           className="flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/40 text-fg backdrop-blur-sm transition hover:bg-black/60"
         >
-          {isPlaying ? (
-            <Pause size={16} className="fill-current" aria-hidden />
-          ) : (
-            <Play size={16} className="fill-current" aria-hidden />
-          )}
+          <PlayIcon size={16} className="fill-current" aria-hidden />
         </button>
         <span className="text-xs text-fg-2 tabular-nums">
           {formatClock(elapsed ?? 0)} / {formatClock(total)}

@@ -39,7 +39,8 @@ export function ReferenceCounters(props: ReferenceCountersProps) {
           <span
             className={cn(
               'inline-flex items-center gap-0.5 text-xs tabular-nums',
-              hasHint ? 'font-semibold text-info' : 'text-fg-2',
+              hasHint && 'font-semibold text-info',
+              !hasHint && 'text-fg-2',
             )}
           >
             {hasHint && <Minimize2 size={12} className="shrink-0" aria-hidden />}
@@ -50,15 +51,14 @@ export function ReferenceCounters(props: ReferenceCountersProps) {
         return (
           <span key={kind} className="flex min-w-0 flex-1 items-center justify-center gap-1">
             <Icon size={12} className="shrink-0 text-fg-2" aria-hidden />
-            {hasHint && plan ? (
+            {hasHint && !isNil(plan) && (
               <Tooltip
                 content={`Images will be sent at up to ${plan.maxSide} px to fit the request size. Remove some images to send them at 4K.`}
               >
                 {counter}
               </Tooltip>
-            ) : (
-              counter
             )}
+            {(!hasHint || isNil(plan)) && counter}
           </span>
         )
       })}

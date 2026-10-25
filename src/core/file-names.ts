@@ -11,7 +11,11 @@ export function promptSlug(record: Pick<GenerationRecord, 'input' | 'preset'>): 
     .replaceAll(/^-+|-+$/g, '')
     .slice(0, 60)
 
-  return slug === '' ? 'video' : slug
+  if (slug === '') {
+    return 'video'
+  }
+
+  return slug
 }
 
 /** Batch export name: prompt slug plus 6 id characters. */

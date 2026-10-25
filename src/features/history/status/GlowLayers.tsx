@@ -10,14 +10,18 @@ export function GlowLayers(props: GlowLayersProps) {
 
   return (
     <>
-      {(['lime', 'gray', 'red'] as const).map((name) => (
-        <div
-          key={name}
-          aria-hidden
-          className={`${GLOW_CLASSES[name]} pointer-events-none absolute inset-0 transition-opacity duration-600`}
-          style={{ opacity: tone === name ? 1 : 0 }}
-        />
-      ))}
+      {(['lime', 'gray', 'red'] as const).map((name) => {
+        const opacity = tone === name ? 1 : 0
+
+        return (
+          <div
+            key={name}
+            aria-hidden
+            className={`${GLOW_CLASSES[name]} pointer-events-none absolute inset-0 transition-opacity duration-600`}
+            style={{ opacity }}
+          />
+        )
+      })}
     </>
   )
 }

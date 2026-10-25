@@ -21,7 +21,9 @@ export async function GET(request: Request, { params }: PathRouteContext) {
     }
 
     const parsedWidth = Number.parseInt(new URL(request.url).searchParams.get('w') ?? '', 10)
-    const requested = Number.isNaN(parsedWidth) || parsedWidth === 0 ? THUMB_WIDTH : parsedWidth
+    const isRequested = Number.isNaN(parsedWidth) || parsedWidth === 0
+
+    const requested = isRequested ? THUMB_WIDTH : parsedWidth
     const width = Math.min(1280, Math.ceil(clamp(requested, 32, 1280) / 80) * 80)
 
     const thumb = await getThumbnail({

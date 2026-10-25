@@ -76,6 +76,8 @@ export function PickerBody(props: PickerBodyProps) {
 
   useEffect(() => () => pauseAudio(), [])
 
+  const selectedCount = isFolderTab ? selectedFolderRels.length : selection.selected.length
+
   return (
     <>
       <div className="relative flex h-full min-h-0 flex-col" {...upload.dropProps}>
@@ -106,7 +108,7 @@ export function PickerBody(props: PickerBodyProps) {
 
         <PickerFooter
           max={request.max}
-          selectedCount={isFolderTab ? selectedFolderRels.length : selection.selected.length}
+          selectedCount={selectedCount}
           isBusy={foldersState.isBusy || isAddingFolderFiles}
           onConfirm={handleConfirm}
         />

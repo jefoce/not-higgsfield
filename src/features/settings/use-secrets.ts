@@ -30,7 +30,11 @@ export function useSecrets() {
   } = useSWR<SecretStatus>(SECRETS_KEY, fetchSecrets, {
     revalidateOnFocus: false,
     // Poll while the parent app waits on a keychain prompt.
-    refreshInterval: (latest) => (latest?.loading === true ? 2000 : 0),
+    refreshInterval: (latest) => {
+      const interval = latest?.loading === true ? 2000 : 0
+
+      return interval
+    },
   })
 
   return { status: data, isLoading, refresh: () => refresh() }
@@ -58,17 +62,18 @@ export function testLine(target: SettingsSection, result: TestResult): TestMessa
   }
 
   if ((STORAGE_PROVIDER_IDS as readonly string[]).includes(target)) {
-    return {
-      tone: 'ok',
-      text: result.mock === true ? 'Upload, read, delete OK (mock)' : 'Upload, read, delete OK',
-    }
+    const text = result.mock === true ? 'Upload, read, delete OK (mock)' : 'Upload, read, delete OK'
+
+    return { tone: 'ok', text }
   }
 
   if (!isNil(result.label) && result.label !== '') {
     return { tone: 'ok', text: `Key works (label: "${result.label}")` }
   }
 
-  return { tone: 'ok', text: result.mock === true ? 'Key works (mock)' : 'Key works' }
+  const text = result.mock === true ? 'Key works (mock)' : 'Key works'
+
+  return { tone: 'ok', text }
 }
 
 /** Footer text for the active backend. */

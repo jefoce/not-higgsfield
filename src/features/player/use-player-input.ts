@@ -44,7 +44,10 @@ export function usePlayerInput(params: UsePlayerInputParams): PlayerInputHandler
     }
 
     event.preventDefault()
-    video.seekBy(event.key === 'ArrowLeft' ? -5 : 5)
+
+    const delta = event.key === 'ArrowLeft' ? -5 : 5
+
+    video.seekBy(delta)
   }
 
   const onClick = (event: MouseEvent<HTMLDivElement>) => {

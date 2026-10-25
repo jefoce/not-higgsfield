@@ -56,7 +56,11 @@ export const win32: SystemAdapter = {
 
     const picked = stdout.trim()
 
-    return picked === '' ? null : picked
+    if (picked === '') {
+      return null
+    }
+
+    return picked
   },
 
   async reveal(path) {

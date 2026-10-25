@@ -39,7 +39,11 @@ export function statusLabel(record: GenerationRecord): string {
   const base = STATUS_HELP[statusHelpKey(record)].label
   const progress = record.submit?.stage === 'uploading' ? record.submit.progress : undefined
 
-  return isNil(progress) ? base : `${base} ${progress}%`
+  if (isNil(progress)) {
+    return base
+  }
+
+  return `${base} ${progress}%`
 }
 
 /** Gray while a submit stage or download is running, otherwise the status tone. */
@@ -64,7 +68,11 @@ export function statusLine(
     return friendly.hint
   }
 
-  return record.status === 'cancelled' ? CANCELLED_TEXT : null
+  if (record.status === 'cancelled') {
+    return CANCELLED_TEXT
+  }
+
+  return null
 }
 
 /** True while a submit is inside its cancel grace window. */

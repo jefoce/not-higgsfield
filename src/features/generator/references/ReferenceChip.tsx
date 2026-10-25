@@ -5,6 +5,7 @@ import type {
   BeautifulMentionComponentProps,
   BeautifulMentionsItemData,
 } from 'lexical-beautiful-mentions'
+import { isNil } from 'lodash-es'
 
 import { slotLabel } from '@/core/prompt-tokens'
 import { thumbUrl } from '@/lib/api/media-urls'
@@ -33,21 +34,21 @@ export const ReferenceChip = forwardRef<
       title={title}
       className={cn(
         'inline-flex items-center gap-1 rounded-sm px-0.5 align-middle text-xs font-medium',
-        upload ? 'bg-lime/10 text-lime' : 'bg-danger/10 text-danger',
+        upload && 'bg-lime/10 text-lime',
+        !upload && 'bg-danger/10 text-danger',
         className,
         classNameFocused,
       )}
     >
-      {upload && slot.kind !== 'audio' ? (
+      {!isNil(upload) && slot.kind !== 'audio' && (
         // eslint-disable-next-line @next/next/no-img-element -- pre-sized upload thumb
         <img
           src={thumbUrl({ ref: `uploads/${upload.id}`, w: 32 })}
           alt=""
           className="size-4 rounded-xs object-cover"
         />
-      ) : (
-        <ReferenceIcon kind={slot.kind} size={12} />
       )}
+      {(isNil(upload) || slot.kind === 'audio') && <ReferenceIcon kind={slot.kind} size={12} />}
       <span>@{label}</span>
     </span>
   )

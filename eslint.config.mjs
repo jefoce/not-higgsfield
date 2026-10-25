@@ -15,6 +15,28 @@ const PRESET_IDS = /^(wan-3\.0|wan-3\.0-prime|seedance-2\.0|seedance-2\.5)$/
 
 const restrict = (...groups) => ['error', ...groups.flat()]
 
+const BRANCH_TYPES =
+  '/^(JSXElement|JSXFragment|CallExpression|NewExpression|AwaitExpression|ArrowFunctionExpression|FunctionExpression|ObjectExpression|ArrayExpression|ConditionalExpression|LogicalExpression|AssignmentExpression|SequenceExpression|TaggedTemplateExpression|SpreadElement)$/'
+
+const TEST_TYPES =
+  '/^(CallExpression|NewExpression|AwaitExpression|LogicalExpression|ConditionalExpression|AssignmentExpression|SequenceExpression)$/'
+
+export const TERNARY_SELECTORS = [
+  {
+    selector: 'ConditionalExpression:not(VariableDeclarator > ConditionalExpression)',
+    message: 'Ternaries only as a const value: const label = isOpen ? "Close" : "Open".',
+  },
+  {
+    selector: `ConditionalExpression[consequent.type=${BRANCH_TYPES}], ConditionalExpression[alternate.type=${BRANCH_TYPES}]`,
+    message:
+      'Ternary branches are plain values. Render components with && or an early return, compute values in their own const.',
+  },
+  {
+    selector: `ConditionalExpression[test.type=${TEST_TYPES}]`,
+    message: 'Ternary condition is one simple check. Name it first: const isReady = a && b.',
+  },
+]
+
 // Shared so the secrets, route and component blocks keep these checks.
 const SHARED_SELECTORS = [
   {
@@ -30,11 +52,7 @@ const SHARED_SELECTORS = [
       "BinaryExpression[operator=/^[!=]==?$/][left.type='UnaryExpression'][left.operator='typeof'] > Literal[value=/^(string|boolean|function)$/]",
     message: 'Use isString / isBoolean / isFunction from lodash-es.',
   },
-  {
-    selector:
-      'ConditionalExpression > :matches(ArrowFunctionExpression, FunctionExpression, ObjectExpression, ArrayExpression, ConditionalExpression, AwaitExpression, AssignmentExpression, SequenceExpression, CallExpression[arguments.length>1])',
-    message: 'Keep ternaries to simple values. Extract a named handler, variable or early return.',
-  },
+  ...TERNARY_SELECTORS,
 ]
 
 const MODULE_SELECTORS = [

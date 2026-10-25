@@ -58,7 +58,9 @@ interface CacheFileParams {
 const cacheFile = (params: CacheFileParams): string => {
   const { id, step, format } = params
 
-  return `${cacheStem(id, step)}.${format === 'jpeg' ? 'jpg' : 'png'}`
+  const ext = format === 'jpeg' ? 'jpg' : 'png'
+
+  return `${cacheStem(id, step)}.${ext}`
 }
 
 export function toEncoded(record: CacheRecord, data: Buffer): EncodedImage {

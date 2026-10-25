@@ -18,5 +18,9 @@ export function resolveTransport(params: ResolveTransportParams): ResolvedTransp
     return transport
   }
 
-  return isRemoteConfigured ? 'url' : 'base64'
+  if (isRemoteConfigured) {
+    return 'url'
+  }
+
+  return 'base64'
 }

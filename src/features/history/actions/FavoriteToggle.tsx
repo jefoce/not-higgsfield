@@ -11,10 +11,15 @@ export function FavoriteToggle() {
   const filters = useHistoryViewStore((state) => state.filters)
   const setFilters = useHistoryViewStore((state) => state.setFilters)
 
-  const handleToggle = useCallback(
-    () => setFilters({ favorite: filters.favorite === true ? undefined : true }),
-    [filters.favorite, setFilters],
-  )
+  const handleToggle = useCallback(() => {
+    if (filters.favorite === true) {
+      setFilters({ favorite: undefined })
+
+      return
+    }
+
+    setFilters({ favorite: true })
+  }, [filters.favorite, setFilters])
 
   return (
     <button
@@ -28,13 +33,15 @@ export function FavoriteToggle() {
       <span
         className={cn(
           'relative h-4 w-7 rounded-full transition-colors',
-          filters.favorite === true ? 'bg-lime' : 'bg-white/15',
+          filters.favorite === true && 'bg-lime',
+          !(filters.favorite === true) && 'bg-white/15',
         )}
       >
         <span
           className={cn(
             'absolute top-0.5 size-3 rounded-full bg-page transition-transform',
-            filters.favorite === true ? 'left-3.5' : 'left-0.5',
+            filters.favorite === true && 'left-3.5',
+            !(filters.favorite === true) && 'left-0.5',
           )}
         />
       </span>

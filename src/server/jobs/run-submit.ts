@@ -193,7 +193,11 @@ export function submitError(error: unknown): string {
     return formatError(error)
   }
 
-  return error instanceof Error ? error.message : 'Submit failed'
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  return 'Submit failed'
 }
 
 function formatError(error: ProviderError): string {
@@ -201,5 +205,9 @@ function formatError(error: ProviderError): string {
   const message = error.message === '' ? `HTTP ${error.status}` : error.message
   const isCodeUseful = !isNil(code) && code !== '' && code !== String(error.status)
 
-  return isCodeUseful ? `${code}: ${message}` : message
+  if (isCodeUseful) {
+    return `${code}: ${message}`
+  }
+
+  return message
 }

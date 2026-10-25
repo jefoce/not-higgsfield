@@ -53,7 +53,8 @@ export function SelectionToolbar(props: SelectionToolbarProps) {
       aria-hidden={!isActive}
       className={cn(
         'absolute bottom-6 left-1/2 z-40 flex h-14 -translate-x-1/2 items-center gap-1.5 rounded-2xl border border-line-strong bg-surface-2/95 p-2 shadow-selection backdrop-blur-sm transition duration-150 ease-out motion-reduce:transition-none',
-        isActive ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0',
+        isActive && 'translate-y-0 opacity-100',
+        !isActive && 'translate-y-2 opacity-0',
         !isActive && 'pointer-events-none',
       )}
     >

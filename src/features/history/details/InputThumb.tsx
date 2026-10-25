@@ -39,7 +39,9 @@ export function InputThumb(props: InputThumbProps) {
 
   const title = `${item.label} \u00b7 ${item.name}`
   const sent = item.sent
-  const content = isNil(sent) || sent === '' ? title : `${title} \u00b7 ${sent}`
+  const isContent = isNil(sent) || sent === ''
+
+  const content = isContent ? title : `${title} \u00b7 ${sent}`
 
   return (
     <Tooltip content={content}>
@@ -50,14 +52,16 @@ export function InputThumb(props: InputThumbProps) {
         onKeyDown={handleKeyDown}
         className={cn(
           'group relative size-10 cursor-pointer overflow-hidden rounded-lg border border-line bg-subtle transition-transform hover:z-10 hover:scale-125 hover:rotate-0',
-          index % 2 === 0 ? '-rotate-[5deg]' : 'rotate-[5deg]',
+          index % 2 === 0 && '-rotate-[5deg]',
+          !(index % 2 === 0) && 'rotate-[5deg]',
         )}
       >
-        {isBroken || item.missing ? (
+        {(isBroken || item.missing) && (
           <span className="flex size-full items-center justify-center text-xs font-medium text-fg-2">
             {initial}
           </span>
-        ) : (
+        )}
+        {!isBroken && !item.missing && (
           // eslint-disable-next-line @next/next/no-img-element -- pre-sized upload thumb
           <img
             src={uploadThumb(item.id)}

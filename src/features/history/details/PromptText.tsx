@@ -16,15 +16,19 @@ export function PromptText(props: PromptTextProps) {
 
   return (
     <>
-      {parsePromptParts(prompt, counts).map((part, index) =>
-        part.type === 'text' ? (
-          // eslint-disable-next-line react/no-array-index-key -- static list
-          <span key={index}>{part.text}</span>
-        ) : (
+      {parsePromptParts(prompt, counts).map((part, index) => {
+        if (part.type === 'text') {
+          return (
+            // eslint-disable-next-line react/no-array-index-key -- static list
+            <span key={index}>{part.text}</span>
+          )
+        }
+
+        return (
           // eslint-disable-next-line react/no-array-index-key -- static list
           <PromptSlot key={index} slot={part.slot} record={record} />
-        ),
-      )}
+        )
+      })}
     </>
   )
 }

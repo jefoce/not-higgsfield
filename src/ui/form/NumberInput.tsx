@@ -19,7 +19,13 @@ interface NumberInputProps extends Omit<InputProps, 'value' | 'onChange' | 'type
   max?: number
 }
 
-const format = (value: number | null): string => (isNil(value) ? '' : String(value))
+const format = (value: number | null): string => {
+  if (isNil(value)) {
+    return ''
+  }
+
+  return String(value)
+}
 
 const parse = (text: string): number | null => {
   if (text.trim() === '') {
@@ -28,7 +34,11 @@ const parse = (text: string): number | null => {
 
   const value = Number(text)
 
-  return Number.isFinite(value) ? value : null
+  if (Number.isFinite(value)) {
+    return value
+  }
+
+  return null
 }
 
 /** Number input that reports null when empty and rounds/clamps on blur. */

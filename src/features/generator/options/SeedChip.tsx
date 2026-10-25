@@ -24,7 +24,11 @@ export function SeedChip() {
 
   const handleRandomChange = useCallback(
     (isChecked: boolean): void => {
-      setSeed(isChecked ? null : randomSeed())
+      if (isChecked) {
+        setSeed(null)
+      } else {
+        setSeed(randomSeed())
+      }
     },
     [setSeed],
   )
@@ -40,13 +44,16 @@ export function SeedChip() {
     return null
   }
 
+  const SeedIcon = isRandom ? Dices : Lock
+  const label = isRandom ? 'Random' : seed
+
   return (
     <Popover>
       <Tooltip content="Provider may not guarantee identical results">
         <PopoverTrigger asChild>
           <Chip>
-            {isRandom ? <Dices size={14} aria-hidden /> : <Lock size={14} aria-hidden />}
-            {isRandom ? 'Random' : seed}
+            <SeedIcon size={14} aria-hidden />
+            {label}
           </Chip>
         </PopoverTrigger>
       </Tooltip>

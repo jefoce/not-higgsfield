@@ -118,7 +118,11 @@ function parseReply(line: string): Reply | null {
 
   const reply = parsed as Partial<Reply>
 
-  return hasReplyShape(reply) ? (reply as Reply) : null
+  if (hasReplyShape(reply)) {
+    return reply as Reply
+  }
+
+  return null
 }
 
 function parseReplyObject(line: string): Record<string, unknown> | null {
@@ -129,7 +133,11 @@ function parseReplyObject(line: string): Record<string, unknown> | null {
   try {
     const parsed: unknown = JSON.parse(line)
 
-    return isRecord(parsed) ? parsed : null
+    if (isRecord(parsed)) {
+      return parsed
+    }
+
+    return null
   } catch {
     return null
   }

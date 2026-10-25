@@ -47,6 +47,8 @@ export function ChooseDiskTile(props: ChooseDiskTileProps) {
 
   const handlePick = useCallback(() => void pick(), [pick])
 
+  const label = isBusy ? 'Choosing...' : 'Choose from disk'
+
   return (
     <button
       type="button"
@@ -55,9 +57,10 @@ export function ChooseDiskTile(props: ChooseDiskTileProps) {
       className="flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-divider bg-white/2 text-xs font-medium text-fg-2 transition hover:bg-white/4 disabled:opacity-60"
     >
       <span className="flex size-10 items-center justify-center rounded-full bg-white/10">
-        {isBusy ? <Spinner size={16} /> : <FolderOpen className="size-5" aria-hidden />}
+        {isBusy && <Spinner size={16} />}
+        {!isBusy && <FolderOpen className="size-5" aria-hidden />}
       </span>
-      <span>{isBusy ? 'Choosing...' : 'Choose from disk'}</span>
+      <span>{label}</span>
     </button>
   )
 }

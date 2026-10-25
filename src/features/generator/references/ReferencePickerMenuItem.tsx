@@ -8,6 +8,18 @@ import { cn } from '@/lib/cn'
 
 import { ReferenceIcon } from './ReferenceIcon'
 
+function hasThumbSrc(thumbSrc: string | null): boolean {
+  return !isNil(thumbSrc) && thumbSrc !== ''
+}
+
+function dataSelectedValue(isSelected: boolean | undefined): true | undefined {
+  if (isSelected === true) {
+    return true
+  }
+
+  return
+}
+
 /** One typeahead row: thumb plus slot label. */
 export const ReferencePickerMenuItem = forwardRef<HTMLLIElement, BeautifulMentionsMenuItemProps>(
   function ReferencePickerMenuItem(props, ref) {
@@ -23,14 +35,18 @@ export const ReferencePickerMenuItem = forwardRef<HTMLLIElement, BeautifulMentio
 
     const thumb = item.data?.thumb
     const kind = item.data?.kind
-    const thumbSrc = isString(thumb) ? thumb : null
+    const isThumbSrc = isString(thumb)
+
+    const thumbSrc = isThumbSrc ? thumb : null
+    const iconKind = kind ?? 'image'
+    const hasThumb = hasThumbSrc(thumbSrc)
 
     return (
       <li
         ref={ref}
         tabIndex={tabIndex}
         role="menuitem"
-        data-selected={Boolean(selected) ? true : undefined}
+        data-selected={dataSelectedValue(selected)}
         aria-label={`Choose ${item.displayValue}`}
         onClick={handleClick}
         onMouseDown={handleMouseDown}
@@ -41,12 +57,11 @@ export const ReferencePickerMenuItem = forwardRef<HTMLLIElement, BeautifulMentio
           className,
         )}
       >
-        {isNil(thumbSrc) || thumbSrc === '' ? (
-          <ReferenceIcon kind={kind === 'video' || kind === 'audio' ? kind : 'image'} size={14} />
-        ) : (
+        {hasThumb && (
           // eslint-disable-next-line @next/next/no-img-element -- pre-sized upload thumb
-          <img src={thumbSrc} alt="" className="size-6 rounded-sm object-cover" />
+          <img src={thumbSrc ?? undefined} alt="" className="size-6 rounded-sm object-cover" />
         )}
+        {!hasThumb && <ReferenceIcon kind={iconKind} size={14} />}
         <span className="shrink-0 font-medium">{item.displayValue}</span>
       </li>
     )

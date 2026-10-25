@@ -110,12 +110,17 @@ export function mentionItems(
     for (let n = 1; n <= counts[kind]; n += 1) {
       const slot = { kind, n }
       const upload = uploadForSlot(state, slot)
+      let thumb: string | null = null
+
+      if (!isNil(upload) && kind !== 'audio') {
+        thumb = thumbUrl({ ref: `uploads/${upload.id}`, w: 32 })
+      }
 
       items.push({
         value: slotLabel(slot),
         kind,
         n,
-        thumb: upload && kind !== 'audio' ? thumbUrl({ ref: `uploads/${upload.id}`, w: 32 }) : null,
+        thumb,
       })
     }
   }

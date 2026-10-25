@@ -44,9 +44,11 @@ async function handle(request: Request, keyParts: string[]): Promise<Response> {
       opts: { cacheControl: 'private, max-age=0, must-revalidate' },
     })
 
-    return response.status === 404
-      ? jsonError({ status: 404, error: 'Object not found' })
-      : response
+    if (response.status === 404) {
+      return jsonError({ status: 404, error: 'Object not found' })
+    }
+
+    return response
   } catch (error) {
     return errorResponse(error)
   }

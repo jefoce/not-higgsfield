@@ -44,7 +44,9 @@ function handlePastedFiles(params: PastedFilesParams): void {
   })
 
   if (skipped > 0) {
-    toast(`Skipped ${skipped} unsupported file${skipped === 1 ? '' : 's'}`)
+    const suffix = skipped === 1 ? '' : 's'
+
+    toast(`Skipped ${skipped} unsupported file${suffix}`)
   }
 
   if (isEmpty(accepted)) {

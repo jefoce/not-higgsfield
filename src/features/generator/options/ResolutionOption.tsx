@@ -33,23 +33,25 @@ export function ResolutionOption(props: ResolutionOptionProps) {
         onClick={handleSelect}
         className={cn(
           'flex min-h-9 w-full items-center gap-2 rounded-lg p-2 text-sm font-medium',
-          isSelected ? 'text-lime' : 'text-fg hover:bg-white/5',
+          isSelected && 'text-lime',
+          !isSelected && 'text-fg hover:bg-white/5',
         )}
       >
         <span className="flex min-w-0 flex-1 items-center gap-2">
           <span className="shrink-0">{option}</span>
-          {isNil(rate) ? (
+          {isNil(rate) && (
             <Tooltip content="Price varies for this model">
               <span className="ml-auto text-xs text-fg-2 tabular-nums">--</span>
             </Tooltip>
-          ) : (
+          )}
+          {!isNil(rate) && (
             <span className="ml-auto shrink-0 text-xs">
               <Price current={rate} list={listRate} discount={discount} format={formatRate} />
             </span>
           )}
         </span>
         <span className="flex size-3.5 shrink-0 items-center justify-center">
-          <Check size={14} className={cn('text-lime', isSelected ? undefined : 'invisible')} />
+          <Check size={14} className={cn('text-lime', !isSelected && 'invisible')} />
         </span>
       </button>
     </PopoverClose>

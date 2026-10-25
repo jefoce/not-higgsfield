@@ -47,7 +47,7 @@ export function HistoryModal(props: HistoryModalProps) {
       {!isNil(record) && (
         <div className="flex h-full min-h-0 gap-3">
           <div className="relative aspect-video w-full min-w-0 flex-1 self-center overflow-hidden rounded-2xl bg-black">
-            {record.status === 'completed' ? (
+            {record.status === 'completed' && (
               <LazyVideo
                 id={`modal-${record.id}`}
                 src={videoSrc(record)}
@@ -56,7 +56,8 @@ export function HistoryModal(props: HistoryModalProps) {
                 videoFit="contain"
                 className="size-full"
               />
-            ) : (
+            )}
+            {record.status !== 'completed' && (
               <StatusOverlay record={record} fill onCancel={handleCancel} />
             )}
           </div>

@@ -30,11 +30,16 @@ export function MoreMenuRow(props: MoreMenuRowProps) {
       onSelect={handleSelect}
       className={cn(
         MENU_ITEM_CLASSES,
-        isDestructive ? 'text-danger data-[highlighted]:bg-danger/10' : 'text-fg',
+        isDestructive && 'text-danger data-[highlighted]:bg-danger/10',
+        !isDestructive && 'text-fg',
       )}
     >
       <span
-        className={cn('flex shrink-0 items-center', isDestructive ? 'text-danger' : 'text-fg-2')}
+        className={cn(
+          'flex shrink-0 items-center',
+          isDestructive && 'text-danger',
+          !isDestructive && 'text-fg-2',
+        )}
       >
         {icon}
       </span>

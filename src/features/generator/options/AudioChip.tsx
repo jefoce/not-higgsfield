@@ -20,10 +20,13 @@ export function AudioChip() {
     return null
   }
 
+  const AudioIcon = isAudio ? Volume2 : VolumeX
+  const label = isAudio ? 'On' : 'Off'
+
   return (
     <Chip onClick={handleToggle} aria-pressed={isAudio}>
-      {isAudio ? <Volume2 size={14} aria-hidden /> : <VolumeX size={14} aria-hidden />}
-      {isAudio ? 'On' : 'Off'}
+      <AudioIcon size={14} aria-hidden />
+      {label}
     </Chip>
   )
 }

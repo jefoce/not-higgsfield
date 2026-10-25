@@ -55,6 +55,11 @@ export function MoreMenu(props: MoreMenuProps) {
     }
   }, [record])
 
+  const triggerClass =
+    variant === 'panel'
+      ? 'inline-flex h-8 w-8 items-center justify-center rounded-lg border border-line text-fg-2 transition hover:bg-hover'
+      : ROUND_BUTTON_CLASSES
+
   return (
     <>
       <DropdownMenuPrimitive.Root>
@@ -63,12 +68,7 @@ export function MoreMenu(props: MoreMenuProps) {
             type="button"
             aria-label="More actions"
             data-card-menu
-            className={cn(
-              variant === 'panel'
-                ? 'inline-flex h-8 w-8 items-center justify-center rounded-lg border border-line text-fg-2 transition hover:bg-hover'
-                : ROUND_BUTTON_CLASSES,
-              className,
-            )}
+            className={cn(triggerClass, className)}
           >
             <MoreHorizontal size={16} aria-hidden />
           </button>

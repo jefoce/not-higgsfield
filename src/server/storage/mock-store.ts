@@ -97,7 +97,11 @@ export function mockObjectPath(key: string): string | null {
   const root = mockDir()
   const resolved = path.resolve(root, key)
 
-  return resolved.startsWith(`${root}${path.sep}`) ? resolved : null
+  if (resolved.startsWith(`${root}${path.sep}`)) {
+    return resolved
+  }
+
+  return null
 }
 
 /** Validates expiry and the per-process HMAC without exposing the secret. */
@@ -186,5 +190,9 @@ function sign(key: string, exp: number): string {
 function numberFromEnv(name: string, fallback: number): number {
   const value = Number(process.env[name])
 
-  return Number.isFinite(value) && value > 0 ? value : fallback
+  if (Number.isFinite(value) && value > 0) {
+    return value
+  }
+
+  return fallback
 }

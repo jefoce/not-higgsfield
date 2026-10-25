@@ -62,11 +62,14 @@ export async function GET(request: Request) {
       })
     }
 
+    const hasFavorite = !isNil(query.data.favorite)
+    const hasFavoriteValue = hasFavorite ? true : undefined
+
     const filtered = sortRecords(
       applyFilters(records, {
         q: query.data.q,
         model: query.data.model,
-        favorite: isNil(query.data.favorite) ? undefined : true,
+        favorite: hasFavoriteValue,
         status: query.data.status,
         tab: query.data.tab,
         mode: query.data.mode,

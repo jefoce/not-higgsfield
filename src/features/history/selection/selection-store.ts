@@ -44,7 +44,12 @@ export const useSelectionStore = create<SelectionState>()((set, get) => ({
 
   selectRange: (toId) => {
     const { anchorId, order } = get()
-    const from = isNil(anchorId) ? -1 : order.indexOf(anchorId)
+    let from = -1
+
+    if (!isNil(anchorId)) {
+      from = order.indexOf(anchorId)
+    }
+
     const to = order.indexOf(toId)
 
     if (from === -1 || to === -1) {
@@ -90,10 +95,10 @@ export const useSelectionStore = create<SelectionState>()((set, get) => ({
     set((state) => {
       const ids = new Set([...state.ids].filter((id) => existing.has(id)))
 
-      const anchorId =
+      const isAnchorId =
         !isNil(state.anchorId) && state.anchorId !== '' && existing.has(state.anchorId)
-          ? state.anchorId
-          : null
+
+      const anchorId = isAnchorId ? state.anchorId : null
 
       if (ids.size === state.ids.size && anchorId === state.anchorId) {
         return state

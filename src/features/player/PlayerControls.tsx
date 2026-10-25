@@ -47,6 +47,13 @@ export function PlayerControls(props: PlayerControlsProps) {
     [video],
   )
 
+  const PlayIcon = isPaused ? Play : Pause
+  const MuteIcon = isMuted ? VolumeX : Volume2
+  const FullscreenIcon = isFullscreen ? Minimize : Maximize
+  const playLabel = isPaused ? 'Play' : 'Pause'
+  const muteLabel = isMuted ? 'Unmute' : 'Mute'
+  const fullscreenLabel = isFullscreen ? 'Exit fullscreen' : 'Fullscreen'
+
   return (
     <div
       onClick={handleStopPropagation}
@@ -70,34 +77,30 @@ export function PlayerControls(props: PlayerControlsProps) {
       <div className="flex items-center gap-1.5 text-xs text-white/80">
         <button
           type="button"
-          aria-label={isPaused ? 'Play' : 'Pause'}
+          aria-label={playLabel}
           onClick={handleTogglePlay}
           className={CONTROL_BUTTON_CLASSES}
         >
-          {isPaused ? (
-            <Play size={16} className="fill-current" aria-hidden />
-          ) : (
-            <Pause size={16} className="fill-current" aria-hidden />
-          )}
+          <PlayIcon size={16} className="fill-current" aria-hidden />
         </button>
         <button
           type="button"
-          aria-label={isMuted ? 'Unmute' : 'Mute'}
+          aria-label={muteLabel}
           onClick={handleToggleMute}
           className={CONTROL_BUTTON_CLASSES}
         >
-          {isMuted ? <VolumeX size={16} aria-hidden /> : <Volume2 size={16} aria-hidden />}
+          <MuteIcon size={16} aria-hidden />
         </button>
         <span className="ml-1 tabular-nums">
           {formatClock(time)} / {formatClock(duration)}
         </span>
         <button
           type="button"
-          aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+          aria-label={fullscreenLabel}
           onClick={handleToggleFullscreen}
           className={cn(CONTROL_BUTTON_CLASSES, 'ml-auto')}
         >
-          {isFullscreen ? <Minimize size={16} aria-hidden /> : <Maximize size={16} aria-hidden />}
+          <FullscreenIcon size={16} aria-hidden />
         </button>
       </div>
     </div>

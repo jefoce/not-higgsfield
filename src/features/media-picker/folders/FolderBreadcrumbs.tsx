@@ -18,13 +18,12 @@ export function FolderBreadcrumbs(props: FolderBreadcrumbsProps) {
 
   const handleRoot = useCallback(() => handleNavigate(''), [handleNavigate])
 
+  const isRoot = isEmpty(segments)
+  const rootClass = isRoot ? 'shrink-0 text-fg' : 'shrink-0 transition hover:text-fg'
+
   return (
     <nav className="flex min-w-0 scrollbar-none items-center gap-1 overflow-x-auto text-xs text-fg-2 [&::-webkit-scrollbar]:hidden">
-      <button
-        type="button"
-        onClick={handleRoot}
-        className={isEmpty(segments) ? 'shrink-0 text-fg' : 'shrink-0 transition hover:text-fg'}
-      >
+      <button type="button" onClick={handleRoot} className={rootClass}>
         {folderName}
       </button>
       {segments.map((segment, index) => {

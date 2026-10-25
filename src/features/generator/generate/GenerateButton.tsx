@@ -11,9 +11,11 @@ import { Tooltip } from '@/ui/Tooltip'
 
 /** Surface classes for the disabled or active button. */
 function surfaceClass(isDisabled: boolean): string {
-  return isDisabled
-    ? 'bg-disabled-surface text-disabled'
-    : 'bg-[radial-gradient(circle,var(--color-lime-hi)_40%,var(--color-lime))] text-on-lime shadow-[inset_0_-3px_rgba(0,0,0,0.43)] hover:opacity-80 active:scale-[0.97] active:opacity-60'
+  if (isDisabled) {
+    return 'bg-disabled-surface text-disabled'
+  }
+
+  return 'bg-[radial-gradient(circle,var(--color-lime-hi)_40%,var(--color-lime))] text-on-lime shadow-[inset_0_-3px_rgba(0,0,0,0.43)] hover:opacity-80 active:scale-[0.97] active:opacity-60'
 }
 
 interface GenerateButtonProps {
@@ -25,6 +27,14 @@ interface GenerateButtonProps {
   price: number | null
   listPrice: number | null
   discount: number
+}
+
+function disabledTooltip(isDisabled: boolean, error?: string): string | null {
+  if (isDisabled) {
+    return error ?? null
+  }
+
+  return null
 }
 
 /** Primary generate action with price, validation tooltip and in-flight spinner. */
@@ -42,9 +52,10 @@ export function GenerateButton(props: GenerateButtonProps) {
 
   const isBusy = isGenerating || isPriceLoading
   const spinnerTone = isDisabled ? 'muted' : 'onAccent'
+  const tooltip = disabledTooltip(isDisabled, error)
 
   return (
-    <Tooltip content={isDisabled ? error : null}>
+    <Tooltip content={tooltip}>
       <span className="block w-full">
         <button
           type="button"
@@ -58,7 +69,8 @@ export function GenerateButton(props: GenerateButtonProps) {
           )}
         >
           Generate
-          {isBusy ? <Spinner size={16} tone={spinnerTone} /> : <Sparkles size={20} />}
+          {isBusy && <Spinner size={16} tone={spinnerTone} />}
+          {!isBusy && <Sparkles size={20} />}
           {!isNil(price) && !isDisabled && !isBusy && (
             <Price
               current={price}

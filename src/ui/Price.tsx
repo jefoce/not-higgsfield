@@ -51,13 +51,12 @@ export function Price(props: PriceProps) {
 
   const classes = TONE_CLASSES[tone]
   const isDiscounted = discount > 0
+  const currentClass = isDiscounted ? classes.current : classes.currentFlat
 
   return (
     <span className="inline-flex items-baseline gap-1 whitespace-nowrap tabular-nums">
       {!isNil(list) && list !== current && <span className={classes.list}>{format(list)}</span>}
-      <span className={isDiscounted ? classes.current : classes.currentFlat}>
-        {format(current)}
-      </span>
+      <span className={currentClass}>{format(current)}</span>
       {shouldShowDiscountLabel && isDiscounted && (
         <span className={classes.discount}>{discountLabel(discount)}</span>
       )}

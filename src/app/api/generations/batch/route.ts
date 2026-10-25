@@ -69,7 +69,11 @@ async function runAction(params: RunActionParams): Promise<SkipReason | null> {
 async function favoriteOne(id: string, isFavorite: boolean): Promise<SkipReason | null> {
   const saved = await setFavorite(id, isFavorite)
 
-  return saved ? null : 'not_found'
+  if (saved) {
+    return null
+  }
+
+  return 'not_found'
 }
 
 async function deleteOne(id: string): Promise<SkipReason | null> {

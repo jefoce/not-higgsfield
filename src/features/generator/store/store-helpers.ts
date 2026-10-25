@@ -28,7 +28,11 @@ export function uploadForSlot(state: ReferenceState, slot: RefSlot): UploadItem 
   const { slots } = referenceSlots(state.references, (id) => state.uploadsById[id]?.kind)
   const id = idForSlot(slots, slot)
 
-  return isNil(id) || id === '' ? undefined : state.uploadsById[id]
+  if (isNil(id) || id === '') {
+    return undefined
+  }
+
+  return state.uploadsById[id]
 }
 
 interface ClampReferenceDurationParams {
@@ -50,7 +54,11 @@ export function clampReferenceDuration(params: ClampReferenceDurationParams): nu
   const totalVideo = sumBy(input.references, (id) => {
     const upload = uploads[id]
 
-    return upload?.kind === 'video' ? (upload.durationSec ?? 0) : 0
+    if (upload?.kind === 'video') {
+      return upload.durationSec ?? 0
+    }
+
+    return 0
   })
 
   if (duration < input.duration && totalVideo > 0) {

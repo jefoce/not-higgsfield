@@ -18,11 +18,20 @@ function matches(rule: Rule, raw: string): boolean {
 }
 
 function resolve(rule: Rule | HttpRule, raw: string): FriendlyError {
-  const title = isFunction(rule.title) ? rule.title(raw) : rule.title
+  let title: string
+
+  if (isFunction(rule.title)) {
+    title = rule.title(raw)
+  } else {
+    title = rule.title
+  }
+
   let hint: string | undefined
 
-  if (!isNil(rule.hint)) {
-    hint = isFunction(rule.hint) ? rule.hint(raw) : rule.hint
+  if (isFunction(rule.hint)) {
+    hint = rule.hint(raw)
+  } else {
+    hint = rule.hint
   }
 
   return { title, hint, kind: rule.kind, retry: rule.retry ?? false, raw }
@@ -60,7 +69,9 @@ export function friendlyError(params: FriendlyErrorParams): FriendlyError {
     return resolve(rule, raw)
   }
 
-  const http = isNil(httpCode) || isNil(httpRules) ? undefined : httpRules[httpCode]
+  const isHttp = isNil(httpCode) || isNil(httpRules)
+
+  const http = isHttp ? undefined : httpRules[httpCode]
 
   if (http) {
     return resolve(http, raw)

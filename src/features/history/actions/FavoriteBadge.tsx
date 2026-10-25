@@ -27,10 +27,12 @@ export function FavoriteBadge(props: FavoriteBadgeProps) {
     [record],
   )
 
+  const label = record.favorite ? 'Remove favorite' : 'Favorite'
+
   return (
     <button
       type="button"
-      aria-label={record.favorite ? 'Remove favorite' : 'Favorite'}
+      aria-label={label}
       onClick={handleFavorite}
       className="absolute top-3 right-3 inline-flex h-6 items-center gap-1 rounded-2xl border border-white/10 bg-black/25 bg-linear-[180deg] from-favorite/22 to-favorite/8 px-2 py-1 text-white backdrop-blur-sm transition-opacity group-hover/card:pointer-events-none group-hover/card:invisible group-hover/card:opacity-0 group-has-focus-visible/card:pointer-events-none group-has-focus-visible/card:invisible group-has-focus-visible/card:opacity-0 group-has-[[data-card-menu][data-state=open]]/card:pointer-events-none group-has-[[data-card-menu][data-state=open]]/card:invisible group-has-[[data-card-menu][data-state=open]]/card:opacity-0"
     >

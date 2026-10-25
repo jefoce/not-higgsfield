@@ -31,6 +31,7 @@ export function HistorySection() {
   const selected = records.find((record) => record.id === selectedId) ?? null
   const sentinel = useRef<HTMLDivElement>(null)
   const order = useMemo(() => records.filter(isSelectable).map((record) => record.id), [records])
+  const paddingClass = isSelecting ? 'pb-28' : 'pb-14'
 
   const handleOpen = useCallback((record: GenerationRecord) => setSelectedId(record.id), [])
 
@@ -85,14 +86,11 @@ export function HistorySection() {
   return (
     <section id="history-section" className="relative flex h-full flex-col overflow-hidden">
       <HistoryToolbar />
-      <div className={cn('flex-1 overflow-y-auto px-4', isSelecting ? 'pb-28' : 'pb-14')}>
+      <div className={cn('flex-1 overflow-y-auto px-4', paddingClass)}>
         {isLoading && isEmpty(records) && <SkeletonRows />}
         {!isLoading && isEmpty(records) && <EmptyState />}
-        {view === 'list' ? (
-          <HistoryList records={records} />
-        ) : (
-          <HistoryGrid records={records} onOpen={handleOpen} />
-        )}
+        {view === 'list' && <HistoryList records={records} />}
+        {view !== 'list' && <HistoryGrid records={records} onOpen={handleOpen} />}
         {hasMore && <div ref={sentinel} className="h-8" />}
       </div>
       <SelectionBar records={records} />

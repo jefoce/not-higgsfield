@@ -40,13 +40,15 @@ export function FailedStatus(props: FailedStatusProps) {
 
   return (
     <>
-      <div className={cn('absolute z-30', isCompact ? 'top-3 left-3' : 'top-4 left-4')}>
+      <div
+        className={cn('absolute z-30', isCompact && 'top-3 left-3', !isCompact && 'top-4 left-4')}
+      >
         <div
           className={cn(
             'transition-opacity duration-150',
-            isSelecting
-              ? 'pointer-events-none opacity-0'
-              : 'group-hover/card:pointer-events-none group-hover/card:opacity-0 group-has-[:focus-visible]/card:pointer-events-none group-has-[:focus-visible]/card:opacity-0',
+            isSelecting && 'pointer-events-none opacity-0',
+            !isSelecting &&
+              'group-hover/card:pointer-events-none group-hover/card:opacity-0 group-has-[:focus-visible]/card:pointer-events-none group-has-[:focus-visible]/card:opacity-0',
           )}
         >
           <StatusPill label={label} help={help} tone={tone} isCompact={isCompact} />

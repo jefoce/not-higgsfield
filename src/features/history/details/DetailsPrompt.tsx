@@ -41,9 +41,8 @@ export function DetailsPrompt(props: DetailsPromptProps) {
           <Copy size={13} aria-hidden />
         </button>
       </div>
-      {plain === '' ? (
-        <p className="pt-1 text-sm text-fg-2">No prompt</p>
-      ) : (
+      {plain === '' && <p className="pt-1 text-sm text-fg-2">No prompt</p>}
+      {plain !== '' && (
         <div className="max-h-40 min-h-0 overflow-y-auto">
           <p className="pt-1 text-sm whitespace-pre-wrap text-fg-2">
             <PromptText prompt={plain} record={record} />

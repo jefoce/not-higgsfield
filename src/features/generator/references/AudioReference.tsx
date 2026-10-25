@@ -30,8 +30,15 @@ export function AudioReference(props: AudioReferenceProps) {
   const { upload, src, name } = props
   const isPlaying = useAudioPlaying(src)
   const elapsed = useAudioTime(src)
-  const total = upload.durationSec ?? (currentSrc() === src ? currentDuration() : 0)
-  const played = !isNil(elapsed) && total > 0 ? elapsed / total : 0
+  let total = upload.durationSec ?? 0
+
+  if (isNil(upload.durationSec) && currentSrc() === src) {
+    total = currentDuration()
+  }
+
+  const isPlayed = !isNil(elapsed) && total > 0
+
+  const played = isPlayed ? elapsed / total : 0
   const bars = waveBars(upload.originalName, AUDIO_BARS)
 
   const handleTogglePlay = useCallback(
@@ -47,6 +54,9 @@ export function AudioReference(props: AudioReferenceProps) {
     [isPlaying, src],
   )
 
+  const PlayIcon = isPlaying ? Pause : Play
+  const playLabel = isPlaying ? 'Pause' : 'Play'
+
   return (
     <div className="flex size-full flex-col justify-between overflow-hidden rounded-xl bg-white/10 px-1.5 py-1">
       <span className="flex h-4 w-full items-end gap-px">
@@ -57,7 +67,8 @@ export function AudioReference(props: AudioReferenceProps) {
             style={{ height: `${height}%` }}
             className={cn(
               'flex-1 rounded-full',
-              index / bars.length < played ? 'bg-lime' : 'bg-fg-2/60',
+              index / bars.length < played && 'bg-lime',
+              !(index / bars.length < played) && 'bg-fg-2/60',
             )}
           />
         ))}
@@ -66,14 +77,10 @@ export function AudioReference(props: AudioReferenceProps) {
         <button
           type="button"
           onClick={handleTogglePlay}
-          aria-label={`${isPlaying ? 'Pause' : 'Play'} ${name}`}
+          aria-label={`${playLabel} ${name}`}
           className="flex size-4 items-center justify-center rounded-full bg-black/40 text-fg hover:bg-black/60"
         >
-          {isPlaying ? (
-            <Pause size={10} className="fill-current" aria-hidden />
-          ) : (
-            <Play size={10} className="fill-current" aria-hidden />
-          )}
+          <PlayIcon size={10} className="fill-current" aria-hidden />
         </button>
         <span className="text-xxs leading-none text-white/50 tabular-nums">
           {formatMediaDuration(elapsed ?? total, true)}

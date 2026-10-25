@@ -61,10 +61,10 @@ export function errorResponse(error: unknown): Response {
   }
 
   if (error instanceof ProviderError) {
-    return jsonError({
-      status: error.status === 0 || Number.isNaN(error.status) ? 502 : error.status,
-      error: error.message,
-    })
+    const isStatusInvalid = error.status === 0 || Number.isNaN(error.status)
+    const status = isStatusInvalid ? 502 : error.status
+
+    return jsonError({ status, error: error.message })
   }
 
   console.error('[not-higgsfield] unhandled route error', error)
@@ -76,8 +76,9 @@ export function errorResponse(error: unknown): Response {
 export function zodError(error: ZodError): Response {
   const details = error.issues.map((issue) => {
     const field = issue.path.join('.')
+    const fieldName = field === '' ? 'body' : field
 
-    return `${field === '' ? 'body' : field}: ${issue.message}`
+    return `${fieldName}: ${issue.message}`
   })
 
   return jsonError({ status: 400, error: 'Invalid request', details })

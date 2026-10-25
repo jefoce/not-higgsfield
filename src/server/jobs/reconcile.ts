@@ -81,5 +81,7 @@ export function needsInterruptFail(record: GenerationRecord): boolean {
 }
 
 export function interruptText(record: GenerationRecord): string {
-  return INTERRUPT_TEXT[record.submit?.stage === 'sending' ? 'sending' : 'uploading']
+  const stage = record.submit?.stage === 'sending' ? 'sending' : 'uploading'
+
+  return INTERRUPT_TEXT[stage]
 }

@@ -66,6 +66,10 @@ export async function updateUpload(
   return withLock(`upload:${id}`, async () => {
     const current = await loadUploadRecord(id)
 
-    return current ? saveUploadItem(patch(current)) : null
+    if (current) {
+      return saveUploadItem(patch(current))
+    }
+
+    return null
   })
 }
