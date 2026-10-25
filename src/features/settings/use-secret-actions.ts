@@ -1,10 +1,10 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { toast } from 'sonner'
 
 import { messageOf } from '@/core/errors'
 import { retrySecrets, testSecretTarget } from '@/lib/api/settings'
+import { toastError } from '@/lib/notify'
 import { useAsyncAction } from '@/lib/use-async-action'
 
 import { SETTINGS_SECTION_IDS, type SettingsSection } from './settings-store'
@@ -18,7 +18,7 @@ async function retrySecretsWithToast(): Promise<void> {
   try {
     await retrySecrets()
   } catch (error) {
-    toast.error(messageOf(error, 'Retry failed'))
+    toastError(error, 'Retry failed')
   }
 }
 

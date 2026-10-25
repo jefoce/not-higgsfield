@@ -1,12 +1,12 @@
 import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
-import { messageOf } from '@/core/errors'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { canCancelInGrace } from '@/core/submit-state'
 import { useGeneratorStore } from '@/features/generator/store/store'
 import { captureGenerationFrame, revealGeneration } from '@/lib/api/generations'
 import { linkGenerationFile } from '@/lib/api/uploads'
+import { copyText, toastError } from '@/lib/notify'
 
 import { cancelGeneration } from './record-actions'
 import { plainPrompt } from './record-view'
@@ -21,7 +21,7 @@ export async function captureFrame(record: GenerationRecord, at: 'first' | 'last
     store.setFrame('start', upload)
     toast.success('Start frame set')
   } catch (error) {
-    toast.error(messageOf(error))
+    toastError(error)
   }
 }
 
@@ -40,17 +40,12 @@ export async function addReference(record: GenerationRecord): Promise<void> {
       toast.error('Reference limit reached')
     }
   } catch (error) {
-    toast.error(messageOf(error))
+    toastError(error)
   }
 }
 
 export async function copyPrompt(record: GenerationRecord): Promise<void> {
-  try {
-    await navigator.clipboard.writeText(plainPrompt(record))
-    toast.success('Prompt copied')
-  } catch {
-    toast.error('Copy failed')
-  }
+  await copyText(plainPrompt(record), 'Prompt copied')
 }
 
 export async function copySeed(record: GenerationRecord): Promise<void> {
@@ -62,19 +57,14 @@ export async function copySeed(record: GenerationRecord): Promise<void> {
     return
   }
 
-  try {
-    await navigator.clipboard.writeText(String(seed))
-    toast.success('Seed copied')
-  } catch {
-    toast.error('Copy failed')
-  }
+  await copyText(String(seed), 'Seed copied')
 }
 
 export async function revealRecord(record: GenerationRecord): Promise<void> {
   try {
     await revealGeneration(record.id)
   } catch (error) {
-    toast.error(messageOf(error))
+    toastError(error)
   }
 }
 

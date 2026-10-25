@@ -3,12 +3,12 @@
 import { compact, uniq } from 'lodash-es'
 import { toast } from 'sonner'
 
-import { messageOf } from '@/core/errors'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { useGeneratorStore } from '@/features/generator/store/store'
 import { cancelGenerationRequest, fetchUploadsByIds, setFavorite } from '@/lib/api/generations'
 import { ApiError } from '@/lib/fetcher'
+import { toastError } from '@/lib/notify'
 import { platform } from '@/lib/platform'
 import { refreshHistory } from '@/lib/swr-keys'
 
@@ -19,7 +19,7 @@ export async function saveRecordVideo(record: GenerationRecord): Promise<void> {
       toast.success('Video saved')
     }
   } catch (error) {
-    toast.error(messageOf(error))
+    toastError(error)
   }
 }
 
@@ -28,7 +28,7 @@ export async function toggleFavorite(record: GenerationRecord): Promise<void> {
     await setFavorite(record.id, !record.favorite)
     await refreshHistory()
   } catch (error) {
-    toast.error(messageOf(error))
+    toastError(error)
   }
 }
 
@@ -46,7 +46,7 @@ export async function cancelGeneration(id: string): Promise<void> {
       return
     }
 
-    toast.error(messageOf(error))
+    toastError(error)
   }
 }
 
@@ -126,6 +126,6 @@ export async function rerunRecord(record: GenerationRecord, presetId?: string): 
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   } catch (error) {
-    toast.error(messageOf(error))
+    toastError(error)
   }
 }

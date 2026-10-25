@@ -1,7 +1,6 @@
 import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
-import { messageOf } from '@/core/errors'
 import { referenceSlots, slotLabel } from '@/core/prompt-tokens'
 import type {
   GenerationRecord,
@@ -13,6 +12,7 @@ import { useGeneratorStore } from '@/features/generator/store/store'
 import { openPreview, type PreviewActions } from '@/features/preview/preview-store'
 import { fetchUploads } from '@/lib/api/uploads'
 import { formatBytes } from '@/lib/format'
+import { toastError } from '@/lib/notify'
 
 export interface ThumbItem {
   id: string
@@ -145,6 +145,6 @@ export async function openThumb(item: ThumbItem): Promise<void> {
 
     openPreview({ items: [upload], index: 0, actions: THUMB_ACTIONS })
   } catch (error) {
-    toast.error(messageOf(error))
+    toastError(error)
   }
 }

@@ -4,14 +4,13 @@ import { useId, useRef, useState } from 'react'
 import { isEmpty, isNil } from 'lodash-es'
 import { CloudUpload } from 'lucide-react'
 import type { ChangeEvent } from 'react'
-import { toast } from 'sonner'
 
-import { messageOf } from '@/core/errors'
 import { acceptForKinds, type KindExtensions } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { uploadFilesWithProgress } from '@/lib/api/uploads'
 import { cn } from '@/lib/cn'
+import { toastError } from '@/lib/notify'
 
 export interface UploadTileProps {
   kinds: MediaKind[]
@@ -60,7 +59,7 @@ export function UploadTile(props: UploadTileProps) {
 
       props.onUploaded(items)
     } catch (error) {
-      toast.error(messageOf(error))
+      toastError(error)
     } finally {
       setProgress(null)
     }

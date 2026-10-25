@@ -2,11 +2,10 @@
 
 import { useCallback } from 'react'
 import { isEmpty, isNil } from 'lodash-es'
-import { toast } from 'sonner'
 
-import { messageOf } from '@/core/errors'
 import type { FolderItem } from '@/core/schemas/folder-item'
 import { linkFolderFile } from '@/lib/api/uploads'
+import { toastError } from '@/lib/notify'
 import { useAsyncAction } from '@/lib/use-async-action'
 
 import { closeMediaPicker, type PickerRequest } from './store'
@@ -34,7 +33,7 @@ export function usePickerConfirm(params: UsePickerConfirmParams) {
       request.onPick(uploads)
       closeMediaPicker()
     } catch (error) {
-      toast.error(messageOf(error))
+      toastError(error)
     }
   }
 

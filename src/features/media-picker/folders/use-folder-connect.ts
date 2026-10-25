@@ -3,10 +3,10 @@
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 
-import { messageOf } from '@/core/errors'
 import type { BrowseResult } from '@/core/media-types'
 import type { FolderItem } from '@/core/schemas/folder-item'
 import { createFolder } from '@/lib/api/folders'
+import { toastError } from '@/lib/notify'
 import { getPlatform } from '@/lib/platform'
 import { useAsyncAction } from '@/lib/use-async-action'
 
@@ -39,7 +39,7 @@ export function useFolderConnect(params: UseFolderConnectParams): FolderConnect 
       onAdded(folder)
       onClose()
     } catch (error) {
-      toast.error(messageOf(error))
+      toastError(error)
     }
   }
 
@@ -55,7 +55,7 @@ export function useFolderConnect(params: UseFolderConnectParams): FolderConnect 
       onAdded(folder)
       onClose()
     } catch (error) {
-      toast.error(messageOf(error))
+      toastError(error)
     }
   }
 

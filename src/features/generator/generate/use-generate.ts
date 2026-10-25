@@ -3,7 +3,6 @@
 import { useCallback, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { messageOf } from '@/core/errors'
 import { inputForSubmit } from '@/core/normalize-input'
 import { getPreset } from '@/core/presets'
 import { friendlyError } from '@/core/provider-errors'
@@ -13,6 +12,7 @@ import { openSettings } from '@/features/settings/settings-store'
 import { refreshCredits } from '@/lib/api/credits'
 import { cancelGenerationRequest, createGeneration } from '@/lib/api/generations'
 import { ApiError } from '@/lib/fetcher'
+import { toastError } from '@/lib/notify'
 import { getPlatform } from '@/lib/platform'
 import { refreshHistory } from '@/lib/swr-keys'
 import { useAsyncAction } from '@/lib/use-async-action'
@@ -40,7 +40,7 @@ async function cancelGeneration(id: string): Promise<void> {
       return
     }
 
-    toast.error(messageOf(error))
+    toastError(error)
   }
 }
 

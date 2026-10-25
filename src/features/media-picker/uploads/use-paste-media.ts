@@ -5,11 +5,11 @@ import { isEmpty, isNil } from 'lodash-es'
 import type { ClipboardEvent } from 'react'
 import { toast } from 'sonner'
 
-import { messageOf } from '@/core/errors'
 import { acceptFiles, type KindExtensions, pastedPath } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { linkAbsPath } from '@/lib/api/uploads'
+import { toastError } from '@/lib/notify'
 
 export interface PasteMediaOptions {
   enabled: boolean
@@ -72,7 +72,7 @@ function handlePastedPath(event: PasteLike, params: PasteMediaOptions): void {
 
   void linkAbsPath(path)
     .then((item) => params.onUploaded([item]))
-    .catch((error) => toast.error(messageOf(error)))
+    .catch((error) => toastError(error))
 }
 
 interface PasteTarget {

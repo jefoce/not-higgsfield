@@ -1,9 +1,9 @@
 'use client'
 
 import { Copy } from 'lucide-react'
-import { toast } from 'sonner'
 
 import type { GenerationRecord } from '@/core/schemas/generation-record'
+import { copyText } from '@/lib/notify'
 
 import { PromptText } from './PromptText'
 
@@ -12,20 +12,11 @@ interface DetailsPromptProps {
   plain: string
 }
 
-async function copyText(text: string, label: string): Promise<void> {
-  try {
-    await navigator.clipboard.writeText(text)
-    toast.success(`${label} copied`)
-  } catch {
-    toast.error('Copy failed')
-  }
-}
-
 /** Prompt block with its copy button. */
 export function DetailsPrompt(props: DetailsPromptProps) {
   const { record, plain } = props
 
-  const handleCopyPrompt = () => void copyText(plain, 'Prompt')
+  const handleCopyPrompt = () => void copyText(plain, 'Prompt copied')
 
   return (
     <div className="flex min-h-0 shrink flex-col">

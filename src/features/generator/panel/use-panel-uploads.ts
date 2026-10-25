@@ -4,7 +4,6 @@ import { useEffect, useMemo } from 'react'
 import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
-import { messageOf } from '@/core/errors'
 import type { KindExtensions } from '@/core/media-kinds'
 import { MEDIA_KINDS } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
@@ -14,6 +13,7 @@ import type { UploadItem } from '@/core/schemas/upload-item'
 import { extensionsFromLimits } from '@/features/media-picker/picker/store'
 import { usePasteMedia } from '@/features/media-picker/uploads/use-paste-media'
 import { fetchUploads, uploadFiles } from '@/lib/api/uploads'
+import { toastError } from '@/lib/notify'
 
 import { useGeneratorStore } from '../store/store'
 
@@ -71,7 +71,7 @@ export function usePanelPaste() {
   const handlePasteFiles = (files: File[]): void => {
     void uploadFiles(files)
       .then(route)
-      .catch((error) => toast.error(messageOf(error)))
+      .catch((error) => toastError(error))
   }
 
   const { onPaste: handlePaste } = usePasteMedia({
@@ -112,7 +112,7 @@ export function useUploadsRefresh() {
 
       void fetchUploads({ ids })
         .then((items) => useGeneratorStore.getState().upsertUploads(items))
-        .catch((error) => toast.error(messageOf(error)))
+        .catch((error) => toastError(error))
     }
 
     refresh()

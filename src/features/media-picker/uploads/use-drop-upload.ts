@@ -5,11 +5,11 @@ import { isEmpty } from 'lodash-es'
 import type { DragEvent, RefObject } from 'react'
 import { toast } from 'sonner'
 
-import { messageOf } from '@/core/errors'
 import { acceptFiles, type KindExtensions } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { uploadFiles } from '@/lib/api/uploads'
+import { toastError } from '@/lib/notify'
 import { isDesktop } from '@/lib/platform'
 import { registerDropZone } from '@/lib/platform/drop-router'
 
@@ -73,7 +73,7 @@ function uploadDropped(params: UploadDroppedParams): void {
 
   void uploadFiles(accepted)
     .then((items) => onUploaded.current(items))
-    .catch((error) => toast.error(messageOf(error)))
+    .catch((error) => toastError(error))
 }
 
 interface UseDropUpload {

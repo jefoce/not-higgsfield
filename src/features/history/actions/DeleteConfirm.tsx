@@ -2,10 +2,10 @@
 
 import { toast } from 'sonner'
 
-import { messageOf } from '@/core/errors'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { deleteGeneration } from '@/lib/api/generations'
 import { ApiError } from '@/lib/fetcher'
+import { toastError } from '@/lib/notify'
 import { useAsyncAction } from '@/lib/use-async-action'
 import { Button } from '@/ui/Button'
 import { Modal } from '@/ui/Modal'
@@ -37,7 +37,7 @@ export function DeleteConfirm(props: DeleteConfirmProps) {
         return
       }
 
-      toast.error(messageOf(error))
+      toastError(error)
     }
   }
 

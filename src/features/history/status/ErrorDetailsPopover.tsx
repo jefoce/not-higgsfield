@@ -1,10 +1,10 @@
 'use client'
 
 import { Copy } from 'lucide-react'
-import { toast } from 'sonner'
 
 import type { FriendlyError } from '@/core/provider-errors/types'
 import { cn } from '@/lib/cn'
+import { copyText } from '@/lib/notify'
 import { Button } from '@/ui/Button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
 
@@ -18,12 +18,7 @@ export function ErrorDetailsPopover(props: ErrorDetailsPopoverProps) {
   const { error, className } = props
 
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(error.raw)
-      toast.success('Details copied')
-    } catch {
-      toast.error('Copy failed')
-    }
+    await copyText(error.raw, 'Details copied')
   }
 
   return (

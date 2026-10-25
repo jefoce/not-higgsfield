@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { isNil } from 'lodash-es'
-import { toast } from 'sonner'
 
-import { messageOf } from '@/core/errors'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
+import { toastError } from '@/lib/notify'
 
 import { confirmDelete, deleteSelected, downloadSelected, likeSelected } from './selection-actions'
 import { useSelectionStore } from './selection-store'
@@ -72,7 +71,7 @@ export function SelectionBar(props: SelectionBarProps) {
     try {
       await likeSelected(selected, !isAllLiked)
     } catch (error) {
-      toast.error(messageOf(error))
+      toastError(error)
     } finally {
       setBusy(null)
     }
@@ -91,7 +90,7 @@ export function SelectionBar(props: SelectionBarProps) {
       await deleteSelected(selected)
       handleClear()
     } catch (error) {
-      toast.error(messageOf(error))
+      toastError(error)
     } finally {
       setBusy(null)
     }

@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { isEmpty, isNull, isUndefined } from 'lodash-es'
 import { toast } from 'sonner'
 
-import { messageOf } from '@/core/errors'
 import { STORAGE_PROVIDERS, VIDEO_PROVIDERS } from '@/core/providers/registry'
 import type { StorageProviderId } from '@/core/providers/types'
 import type { SecretName } from '@/core/secret-names'
@@ -14,6 +13,7 @@ import { refreshCredits } from '@/lib/api/credits'
 import { refreshModels } from '@/lib/api/models'
 import { refreshRemoteStatus } from '@/lib/api/remote'
 import { saveSecrets } from '@/lib/api/settings'
+import { toastError } from '@/lib/notify'
 import { platform } from '@/lib/platform'
 import { useAsyncAction } from '@/lib/use-async-action'
 
@@ -162,7 +162,7 @@ export function useSettingsDraft(params: UseSettingsDraftParams): SettingsDraft 
       resetResults()
       toast.success('Settings saved')
     } catch (error) {
-      toast.error(messageOf(error, 'Save failed'))
+      toastError(error, 'Save failed')
     }
   }
 

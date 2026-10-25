@@ -3,9 +3,9 @@
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
-import { messageOf } from '@/core/errors'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { deleteUpload } from '@/lib/api/uploads'
+import { toastError } from '@/lib/notify'
 import { useAsyncAction } from '@/lib/use-async-action'
 
 interface UseDeleteUploadParams {
@@ -39,7 +39,7 @@ export function useDeleteUpload(params: UseDeleteUploadParams): DeleteUpload {
       toast.success('Upload deleted')
       setPending(null)
     } catch (error) {
-      toast.error(messageOf(error))
+      toastError(error)
     }
   }
 
