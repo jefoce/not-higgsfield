@@ -6,6 +6,27 @@ import path from 'node:path'
 
 import type { ZodType } from 'zod'
 
+import { globalState } from '../global-state'
+
+const warnings = globalState<Set<string>>('jsonWarnings', () => new Set())
+
+/** Logs once per file path and mtime, so a bad file does not warn on every reload. */
+async function warnInvalid(file: string, message: string): Promise<void> {
+  const mtimeMs = await fs.stat(file).then(
+    (stats) => stats.mtimeMs,
+    () => 0,
+  )
+
+  const key = `${file}:${mtimeMs}`
+
+  if (warnings.has(key)) {
+    return
+  }
+
+  warnings.add(key)
+  console.warn(message)
+}
+
 /** Returns null for missing or invalid files, never throws. */
 export async function readJson<T>(file: string, schema: ZodType<T>): Promise<T | null> {
   let text: string
@@ -32,7 +53,10 @@ export async function readJson<T>(file: string, schema: ZodType<T>): Promise<T |
 
   const first = parsed.error.issues[0]
 
-  console.warn(`[not-higgsfield] skipping invalid json ${file}: ${first?.message ?? 'invalid'}`)
+  await warnInvalid(
+    file,
+    `[not-higgsfield] skipping invalid json ${file}: ${first?.message ?? 'invalid'}`,
+  )
 
   return null
 }
