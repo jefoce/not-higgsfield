@@ -1,5 +1,39 @@
 # Decisions
 
+## 2026-10-25 - Every arrow function has a block body
+
+Decision: `arrow-body-style` is `['error', 'always']` in `src` and `tests`. Every arrow uses braces and an explicit `return`, including one-line `map`, `filter` and `catch` callbacks.
+
+Why: one shape everywhere. A block body reads top to bottom, and the writer never picks between an expression and a block. Prettier owns the layout.
+
+Rejected: expression bodies for one-line callbacks, and a length or comment exception.
+
+## 2026-10-25 - A function used by one hook is written inline
+
+Decision: a function used only by one hook is written inside the hook call. `local/inline-hook-callbacks` enforces it, with three rules: inline when one hook uses it once, module level when it captures nothing, keep the name when it is used twice. Hook results stay objects (`deletion.run`), not tuples.
+
+Why: one name per action. A separate action, a `run` alias and a handler make the reader connect three names. `const deletion = useAsyncAction(async () => { ... })` keeps the action at the call site and drops the indirection.
+
+Rejected: a named constant next to every hook call, and tuple results from hooks.
+
+## 2026-10-25 - `try` and `catch` stay native
+
+Decision: no `Result<T>` type and no `attempt` helper. Errors are caught with `try` and `catch`, ignored with `.catch(() => null)` when the value is not needed, and branched on with the typed error classes (`ProviderError`, `HttpError`, `ApiError`).
+
+Why: `T | Error` cannot separate a success from an error value, and a duck-typed `isError` reads ordinary objects as errors. `attempt` returns non-`Error` throws as success, forces `any` in its signature and hides which call failed.
+
+Revisit: only when a flow chains several fallible steps that each need their own message. Then use a discriminated union built from named interfaces, `{ ok: true, value } | { ok: false, error }`, not `T | Error`.
+
+Rejected: `Result<T>`, `isError`, `attempt` and a wrapper that converts every throw into a value.
+
+## 2026-10-25 - Linux turns blur off
+
+Decision: `layout.tsx` sets `data-os='linux'` before first paint from the user agent. `globals.css` removes `backdrop-filter` from every `backdrop-blur` element under that attribute, raises the glass token to a solid color, and offers a `linux:` background for translucent surfaces. A surface that needs blur to read gets that background.
+
+Why: WebKitGTK parses `backdrop-filter`, so an `@supports not` fallback never fires, then renders the blur wrong or not at all depending on GPU, compositing mode and version. Popovers at 75% opacity over content ghost, and low-alpha chips disappear. Detecting the platform once beats a feature query that lies.
+
+Rejected: an `@supports not (backdrop-filter: blur(1px))` fallback, a user-agent hack per component, and a runtime class toggle.
+
 ## 2026-10-25 - Ternaries carry one simple choice
 
 Decision: a ternary is allowed only as `const name = test ? a : b`. The test is one simple check, branches are plain values. Components are never rendered through a ternary, use `&&`, an early return or a component variable (`const Icon = isOn ? A : B`). `TERNARY_SELECTORS` enforces the rule in `src`, tests stay exempt.
