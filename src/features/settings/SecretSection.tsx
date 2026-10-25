@@ -58,12 +58,12 @@ export function SecretSection(props: SecretSectionProps) {
           {descriptor.label}
         </h3>
         <div className="flex items-baseline gap-3">
-          {description}
           {descriptor.links.map((link) => {
             return <ProviderLinkButton key={link.url} link={link} />
           })}
         </div>
       </div>
+      {!isNil(description) && <p className="text-xxs text-fg-3 -mt-2.5">{description}</p>}
       <SecretFields
         fields={descriptor.fields}
         keys={keys}
