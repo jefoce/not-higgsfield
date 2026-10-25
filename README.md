@@ -1,11 +1,11 @@
 <h1>
-  <img src="docs/header-light.svg#gh-light-mode-only" height="56" alt="Not Higgsfield">
-  <img src="docs/header-dark.svg#gh-dark-mode-only" height="56" alt="Not Higgsfield">
+  <img src="docs/images/header-light.svg#gh-light-mode-only" height="56" alt="Not Higgsfield">
+  <img src="docs/images/header-dark.svg#gh-dark-mode-only" height="56" alt="Not Higgsfield">
 </h1>
 
 > Make AI videos with today's most popular high-quality models on your own computer. Pay the model's price per second through your own OpenRouter key: no subscription, no markup. Every video stays on your computer with its settings and real cost.
 
-![Screenshot](docs/screenshot.png)
+![Screenshot](docs/images/screenshot.png)
 
 ## What you can do
 
