@@ -18,6 +18,8 @@ Two run modes, one server:
 | Browser | `pnpm dev` / `pnpm start` | none | none |
 | Desktop | Tauri spawns the Node sidecar | `APP_TOKEN` cookie | Tauri exits the sidecar via `PARENT_PID` watch |
 
+Updates run in the Rust shell. It reads `latest.json` from the GitHub release over HTTPS, checks the downloaded installer against the embedded public key, and installs only a version newer than the running one.
+
 ## 2. Code map
 
 | Path | Contents |
@@ -34,13 +36,13 @@ Two run modes, one server:
 | `src/server/boot.ts` | Composition root. Lock, secrets, queue wiring, poller, parent watch, ffmpeg. |
 | `src/server/config` | `isMockMode`, the app-wide dev switch shared by the provider and storage registries. |
 | `src/server/jobs` | `submit-queue`, `run-submit`, `submit-media`, `submit-record`, `poller`, `download-queue`, `reconcile`. |
-| `src/server/services` | Orchestration for routes and jobs: `credits`, `model-catalog`, `remote-inputs`, `upload-probe`, `uploads`, `connection-test`, `create-generation`, `estimate-generation`. |
+| `src/server/services` | Orchestration for routes and jobs: `credits`, `model-catalog`, `remote-inputs`, `remote-cap`, `upload-probe`, `uploads`, `connection-test`, `create-generation`, `estimate-generation`. |
 | `src/server/providers` | `VideoProvider` interface, registry, OpenRouter adapter, mock adapter, `ProviderError` kinds. |
 | `src/server/storage` | `ObjectStore` interface, registry, generic S3 store, R2 config, mock store, hashing. |
 | `src/server/repos` | `generations`, `uploads`, `folders`, `json-dir-store`. |
-| `src/server/sync` | `withLock`, the per-key serialization primitive, and `ttl-cache`, the `globalState` TTL cache. |
-| `src/server/media` | `image-data-url`, `to-data-url`, `thumbs`, `compat`, `ffmpeg`. |
-| `src/features` | UI grouped by feature: generator, history, media picker, preview, settings, player, studio. |
+| `src/server/sync` | `withLock`, the per-key serialization primitive, `createLimiter` for per-key caps, and `ttl-cache`, the `globalState` TTL cache. |
+| `src/server/media` | `image-data-url`, `image-encode`, `to-data-url`, `thumbs`, `compat`, `ffmpeg`. |
+| `src/features` | UI grouped by feature: generator, history, media picker, preview, settings, player, studio, updates. |
 | `src/features/generator` | `panel`, `store`, `references`, `frames`, `prompt`, `options`, `model`, `credits`, `generate`. |
 | `src/features/history` | `list`, `details`, `status`, `filters`, `selection`, `actions`. |
 | `src/features/media-picker` | `picker`, `uploads`, `folders`, `tiles`. |
@@ -48,10 +50,10 @@ Two run modes, one server:
 | `src/ui/form` | `Field`, `Input`, `NumberInput`, `PasswordInput`, `SearchInput`, `Switch`. |
 | `src/lib` | Client helpers, `platform/` (browser and desktop), drop router, media support. |
 | `src/lib/notify.ts` | `toastError` and `copyText`, the only toast helpers outside `src/features`. |
-| `src/lib/use-*.ts` | Shared hooks: `useBoolean`, `useAsyncAction`, `useDebouncedValue`. |
+| `src/lib/use-*.ts` | Shared hooks: `useBoolean`, `useAsyncAction`, `useDebouncedValue`, `useNow`, `useMediaQuery`, `usePointerBlur`. |
 | `src/lib/api` | Client functions for every route. The only place an API URL is written. |
 | `src/app` | Next routes and the page shell. |
-| `src-tauri` | Desktop shell, sidecar supervisor, window and settings. |
+| `src-tauri` | Desktop shell, sidecar supervisor, window, settings and `updater.rs`. |
 | `scripts` | `prepare-desktop.mjs`, `smoke-server.mjs`, `notices.mjs`. |
 | `tests` | Vitest suites. |
 
@@ -110,12 +112,12 @@ All records are JSON on disk. Names are uuid based: `<uuid>.json`, `<uuid>.mp4`,
 | File | Meaning | Writer |
 |---|---|---|
 | `server.lock` | PID, port, mode, start time | instance lock |
-| `desktop.json` | Desktop port, window bounds, one-time close hint flag | Tauri shell |
+| `desktop.json` | Desktop port, window bounds, close hint, `auto_check_updates` and `last_update_check`, written under one lock | Tauri shell |
 | `secrets.json` | 0600 fallback when no OS keychain exists | file secret backend |
 | `logs/server.log` | Sidecar log | Node server and Rust supervisor |
 | `runtime/<version>/` | Writable copy of the bundled Next server | Tauri shell on first launch |
 
-Desktop runs the sidecar from `runtime/<version>`, so Next cache writes never touch the signed bundle. The copy is staged and atomically renamed once per app version. Older versions are removed after a successful boot.
+Desktop runs the sidecar from `runtime/<version>`, so Next cache writes never touch the signed bundle. The copy holds a `.nh-build` stamp naming the bundled build. A missing or different stamp restages the copy, and the stamp is written last. Older versions are removed after a successful boot.
 
 ## 4. Generation lifecycle
 
@@ -209,6 +211,8 @@ Adding a model:
 
 The media caps use `createLimiter` (`src/server/sync/limiter.ts`). `globalState` keeps one singleton per process even when Next loads a module twice. `server.lock` prevents two servers from sharing one data folder. A live owner makes the new process exit with code 75, a stale lock is replaced.
 
+Update checks run 15 s after launch, then every 12 h while auto-check is on (`UPDATE_CHECK_DELAY_MS`, `UPDATE_CHECK_INTERVAL_MS`). The toast and Settings share one install action, which keeps the downloaded bytes for a retry after cancel.
+
 ## 9. Secrets and session
 
 Lookup order per key: environment variable, then the OS keychain or desktop bridge, then `secrets.json`. Env values are read-only in Settings. `getSecret` reads memory only, and `onSecretsChange` clears dependent caches such as the R2 store.
@@ -224,9 +228,10 @@ Browser mode has no session token. Desktop sets `APP_TOKEN`, opens `/api/session
 | Choose files or folder | file input fallback | native dialog plugin |
 | Drag and drop paths | web drop event | Tauri drag-drop events |
 | Notifications | Web Notification API | notification plugin |
-| Open links | `window.open` | opener plugin, openrouter.ai scoped |
+| Open links | `window.open` | opener plugin, scoped to `openrouter.ai`, `dash.cloudflare.com`, `github.com/jefoce/not-higgsfield*` |
 | Save video | download anchor | native save dialog |
 | Confirm discard | `window.confirm` | native confirm |
+| Updates | none | `update_info`, `update_check`, `update_install`, `update_set_auto`, `update_open_release` |
 
 Only `src/lib/platform/desktop.ts` imports Tauri packages. Features call the `Platform` interface.
 
@@ -243,6 +248,9 @@ Only `src/lib/platform/desktop.ts` imports Tauri packages. Features call the `Pl
 | `SHUTDOWN_SEND_WAIT_MS` | 60000 | Shutdown wait for an in-flight send |
 | `POLL_INTERVAL_MS` | 8000 | Job polling interval |
 | `HISTORY_POLL_MS` | 4000 | History refresh interval |
+| `CREDITS_POLL_MS` | 60000 | Credit balance refresh interval |
+| `UPDATE_CHECK_DELAY_MS` | 15000 | Delay before the first automatic update check |
+| `UPDATE_CHECK_INTERVAL_MS` | 43200000 | Automatic update check interval |
 | `MAX_JOB_AGE_MIN` | 360 | Age after which active jobs expire |
 | `MAX_DOWNLOAD_RETRIES` | 5 | Download attempts before failing |
 | `FETCH_TIMEOUTS.submit` | 300000 | Submit request timeout |
@@ -285,4 +293,4 @@ Routes throw `HttpError` with a status and a short message. `errorResponse` turn
 
 Job errors are stored on the record as `error`, never thrown to the UI after the request ended. Secrets and presigned URLs are never logged.
 
-`core/provider-errors.ts` turns the stored text into a plain title and hint at render time. Family tables for Wan and Seedance run first, then app errors, then OpenRouter HTTP codes. First match wins, specific codes before parent codes, and a family table never matches the other family. Raw text stays on the record, the failed card and status overlay show the plain text, and Details exposes the raw text with Copy. Records written before a table change pick up the new text without migration.
+`core/provider-errors/` turns the stored text into a plain title and hint at render time. Family tables for Wan and Seedance run first, then app errors, then OpenRouter HTTP codes. First match wins, specific codes before parent codes, and a family table never matches the other family. Raw text stays on the record, the failed card and status overlay show the plain text, and Details exposes the raw text with Copy. Records written before a table change pick up the new text without migration.
