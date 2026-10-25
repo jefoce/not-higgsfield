@@ -6,6 +6,7 @@ import {
   INLINE_FUNCTION_SELECTORS,
   MODULE_SELECTORS,
   SERVER_SELECTORS,
+  SHARED_SELECTORS,
   TERNARY_SELECTORS,
   TYPE_SELECTORS,
 } from '../eslint-rules/selectors.mjs'
@@ -192,6 +193,24 @@ tester.run('no-restricted-syntax server selectors', rule, {
       name: 'dynamic import',
       code: "async function load() { return import('./x') }",
       options: SERVER_SELECTORS,
+      errors: 1,
+    },
+  ],
+})
+
+tester.run('no-restricted-syntax shared selectors', rule, {
+  valid: [
+    {
+      name: 'finally callback without a return',
+      code: 'promise.finally(() => { cleanup() })',
+      options: SHARED_SELECTORS,
+    },
+  ],
+  invalid: [
+    {
+      name: 'finally callback returns a value',
+      code: 'promise.finally(() => { return cleanup() })',
+      options: SHARED_SELECTORS,
       errors: 1,
     },
   ],

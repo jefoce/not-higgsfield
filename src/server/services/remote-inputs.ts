@@ -186,7 +186,7 @@ export function putOnce(params: PutOnceParams): Promise<ObjectInfo> {
       onProgress: opts.onProgress ?? null,
     })
     .finally(() => {
-      return puts.delete(key)
+      puts.delete(key)
     })
 
   puts.set(key, job)

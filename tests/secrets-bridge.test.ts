@@ -182,7 +182,7 @@ describe('secrets bridge failures', () => {
     reply(input, { id: line.id + 1, ok: true, value: 'wrong' })
 
     await new Promise((resolve) => {
-      return setTimeout(resolve, 20)
+      setTimeout(resolve, 20)
     })
 
     reply(input, { id: line.id, ok: true, value: 'right' })

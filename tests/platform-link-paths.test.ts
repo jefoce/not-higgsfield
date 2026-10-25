@@ -24,7 +24,7 @@ describe('linkPaths', () => {
       peak = Math.max(peak, active)
 
       await new Promise((resolve) => {
-        return setTimeout(resolve, 5)
+        setTimeout(resolve, 5)
       })
 
       active -= 1

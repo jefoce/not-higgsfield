@@ -105,7 +105,7 @@ async function waitFor<T>(read: () => Promise<T | null>, timeoutMs = 2000): Prom
     }
 
     await new Promise((resolve) => {
-      return setTimeout(resolve, 20)
+      setTimeout(resolve, 20)
     })
   }
 

@@ -142,7 +142,7 @@ export async function waitForSendingDone(timeoutMs: number): Promise<boolean> {
 
   while (sendingCount() > 0 && Date.now() < deadline) {
     await new Promise((resolve) => {
-      return setTimeout(resolve, SUBMIT_YIELD_MS)
+      setTimeout(resolve, SUBMIT_YIELD_MS)
     })
   }
 

@@ -29,7 +29,7 @@ function clickDownload(url: string): void {
 
 function wait(ms: number): Promise<void> {
   return new Promise((resolve) => {
-    return setTimeout(resolve, ms)
+    setTimeout(resolve, ms)
   })
 }
 

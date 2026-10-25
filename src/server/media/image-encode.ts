@@ -58,7 +58,7 @@ export async function encodeAtStep(params: EncodeStepParams): Promise<EncodedIma
       return encodeUncached(params)
     })
     .finally(() => {
-      return inFlight.delete(key)
+      inFlight.delete(key)
     })
 
   inFlight.set(key, task)
@@ -138,7 +138,7 @@ async function opacityFor(upload: UploadItem, source: string): Promise<boolean> 
       return isOpaque
     })
     .finally(() => {
-      return opacityInFlight.delete(upload.id)
+      opacityInFlight.delete(upload.id)
     })
 
   opacityInFlight.set(upload.id, task)

@@ -39,6 +39,11 @@ export const SHARED_SELECTORS = [
       "BinaryExpression[operator=/^[!=]==?$/][left.type='UnaryExpression'][left.operator='typeof'] > Literal[value=/^(string|boolean|function)$/]",
     message: 'Use isString / isBoolean / isFunction from lodash-es.',
   },
+  {
+    selector:
+      "CallExpression[callee.property.name='finally'] > ArrowFunctionExpression > BlockStatement > ReturnStatement[argument]",
+    message: 'A finally callback returns nothing. Drop the return.',
+  },
   ...TERNARY_SELECTORS,
 ]
 

@@ -81,7 +81,7 @@ export async function getThumbnail(input: ThumbInput): Promise<ThumbResult> {
   }
 
   const task = createThumb({ input, hash, width, filePath }).finally(() => {
-    return inFlight.delete(hash)
+    inFlight.delete(hash)
   })
 
   inFlight.set(hash, task)

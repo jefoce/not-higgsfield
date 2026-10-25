@@ -164,6 +164,7 @@ export default defineConfig([
       'object-shorthand': 'error',
       'prefer-template': 'error',
       'no-param-reassign': 'error',
+      'no-promise-executor-return': 'error',
 
       // Size and nesting
       'max-depth': ['error', 3],

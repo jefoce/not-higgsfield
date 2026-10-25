@@ -27,7 +27,7 @@ async function measured<T>(run: () => Promise<T>, map: Map<string, number>, key:
   try {
     // Real encodes are fast, this keeps overlap observable.
     await new Promise((resolve) => {
-      return setTimeout(resolve, 15)
+      setTimeout(resolve, 15)
     })
 
     return await run()
