@@ -3,8 +3,8 @@ import { z } from 'zod'
 import { findPreset } from '@/core/presets'
 import { buildPriceInputSchema } from '@/core/validation'
 import { errorResponse, jsonError, zodError } from '@/server/http'
-import { estimateGeneration, loadPriceDraft } from '@/server/jobs/estimate-generation'
 import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
+import { estimateGeneration, loadPriceDraft } from '@/server/services/estimate-generation'
 
 export const dynamic = 'force-dynamic'
 

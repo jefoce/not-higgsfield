@@ -6,8 +6,7 @@ import { MAX_REQUEST_MB } from '@/core/constants'
 import { isNonEmptyString } from '@/core/guards'
 import type { UploadsById } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
-import type { GenerationInput, GenerationRecord } from '@/core/schemas/generation-record'
-import type { UploadItem } from '@/core/schemas/upload-item'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { graceDelayMs, inputIds, transportsFor, withTransports } from '@/core/submit-state'
 import type { ResolvedTransport } from '@/core/transport'
 import type { Dict } from '@/core/utility-types'
@@ -15,8 +14,8 @@ import type { Dict } from '@/core/utility-types'
 import { ProviderError } from '../providers/provider-error'
 import type { SubmittedJob } from '../providers/types'
 import { getGeneration, saveGeneration } from '../repos/generations'
-import { getUpload } from '../repos/uploads'
 import { secretsReady } from '../secrets'
+import { loadUploads } from '../services/uploads'
 import { getObjectStore } from '../storage/registry'
 import { withLock } from '../sync/lock'
 import { emitJobSent } from './job-events'
@@ -177,15 +176,6 @@ async function fail(id: string, error: unknown): Promise<void> {
 
     return { ...record, status: 'failed', error: submitError(error), submit: undefined }
   })
-}
-
-/** Loads only uploads referenced by the normalized input. */
-export async function loadUploads(input: GenerationInput): Promise<UploadsById> {
-  const items = await Promise.all(inputIds(input).map((id) => getUpload(id)))
-
-  return Object.fromEntries(
-    items.filter((item): item is UploadItem => !isNil(item)).map((item) => [item.id, item]),
-  )
 }
 
 /** Formats a stored failure without repeating the HTTP status. */

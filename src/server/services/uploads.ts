@@ -9,7 +9,10 @@ import { isNil, isString } from 'lodash-es'
 
 import { isNonEmptyString } from '@/core/guards'
 import { extWithDot, mimeFromExt } from '@/core/media-kinds'
+import type { UploadsById } from '@/core/media-types'
+import type { GenerationInput } from '@/core/schemas/generation-record'
 import type { LinkMode, UploadItem } from '@/core/schemas/upload-item'
+import { inputIds } from '@/core/submit-state'
 
 import { UploadError } from '../errors'
 import { removeFile, writeJsonAtomic } from '../fs/json-file'
@@ -20,7 +23,7 @@ import { downloadPaths, uploadPaths } from '../paths'
 import { getFolder } from '../repos/folders'
 import { getGeneration } from '../repos/generations'
 import { listUploadRecords, loadUploadRecord, rememberUpload } from '../repos/upload-record'
-import { deleteUploadFiles, saveFileUpload } from '../repos/uploads'
+import { deleteUploadFiles, getUpload, saveFileUpload } from '../repos/uploads'
 import { getObjectStore } from '../storage/registry'
 import { withLock } from '../sync/lock'
 import { assertSupported, probe } from './upload-probe'
@@ -111,6 +114,15 @@ export async function createLinkUpload(params: LinkUploadParams): Promise<Upload
   await rememberUpload(item)
 
   return item
+}
+
+/** Loads only uploads referenced by the normalized input. */
+export async function loadUploads(input: GenerationInput): Promise<UploadsById> {
+  const items = await Promise.all(inputIds(input).map((id) => getUpload(id)))
+
+  return Object.fromEntries(
+    items.filter((item): item is UploadItem => !isNil(item)).map((item) => [item.id, item]),
+  )
 }
 
 /** Symlinks a completed generation's mp4 as a video reference. */

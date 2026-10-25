@@ -7,10 +7,10 @@ import { findPreset } from '@/core/presets'
 import { ASPECT_RATIOS, RESOLUTIONS } from '@/core/presets/types'
 import { buildInputSchema } from '@/core/validation'
 import { errorResponse, jsonError, zodError } from '@/server/http'
-import { createGeneration } from '@/server/jobs/create-generation'
 import { listGenerations } from '@/server/repos/generations'
 import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 import { secretsReady } from '@/server/secrets'
+import { createGeneration } from '@/server/services/create-generation'
 
 export const dynamic = 'force-dynamic'
 

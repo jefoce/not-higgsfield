@@ -18,9 +18,9 @@ import { type PriceInput, validateInput } from '@/core/validation'
 import { ValidationError } from '../errors'
 import { getVideoProvider } from '../providers/registry'
 import { getActiveCount } from '../repos/generations'
-import { getModelCatalog } from '../services/model-catalog'
 import { getObjectStore } from '../storage/registry'
-import { loadUploads } from './run-submit'
+import { getModelCatalog } from './model-catalog'
+import { loadUploads } from './uploads'
 
 export interface GenerationDraft {
   preset: ModelPreset

@@ -13,11 +13,11 @@ import type {
   SnapshotItem,
 } from '@/core/schemas/generation-record'
 
+import { startSubmit } from '../jobs/submit-queue'
 import { encodeImages } from '../media/image-data-url'
 import { getVideoProvider } from '../providers/registry'
 import { saveGeneration } from '../repos/generations'
 import { estimateGeneration, loadDraft } from './estimate-generation'
-import { startSubmit } from './submit-queue'
 
 /** Validates, writes a grace record, then queues upload and submit in the background. */
 export async function createGeneration(raw: GenerationInput): Promise<GenerationRecord> {
