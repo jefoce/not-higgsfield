@@ -6,7 +6,8 @@ import { toast } from 'sonner'
 import { inputForSubmit } from '@/core/normalize-input'
 import { getPreset } from '@/core/presets'
 import { friendlyError } from '@/core/provider-errors'
-import { videoProviderDescriptor } from '@/core/providers/registry'
+import { recordProvider, videoProviderDescriptor } from '@/core/providers/registry'
+import { VIDEO_PROVIDER_IDS, type VideoProviderId } from '@/core/providers/types'
 import { openSettings } from '@/features/settings/settings-store'
 import { refreshCredits } from '@/lib/api/credits'
 import { cancelGenerationRequest, createGeneration } from '@/lib/api/generations'
@@ -46,16 +47,17 @@ interface ShowErrorParams {
   message: string
   presetId: string
   presetTitle: string
+  provider: VideoProviderId
 }
 
 /** Shows the plain error with the preset name, plus Settings when the key is missing. */
 function showError(params: ShowErrorParams): void {
-  const { message, presetId, presetTitle } = params
+  const { message, presetId, presetTitle, provider } = params
 
   const friendly = friendlyError({
     raw: message,
     family: getPreset(presetId).family,
-    httpRules: videoProviderDescriptor('openrouter').httpRules,
+    httpRules: videoProviderDescriptor(provider).httpRules,
   })
 
   const title = `${presetTitle}: ${friendly.title}`
@@ -98,6 +100,7 @@ export function useGenerate() {
           message: record.error ?? 'Submit failed',
           presetId: record.input.presetId,
           presetTitle: record.preset.title,
+          provider: recordProvider(record),
         })
       } else {
         toast.success('Generation starts in 10s', {
@@ -113,7 +116,13 @@ export function useGenerate() {
       const preset = getPreset(useGeneratorStore.getState().presetId)
 
       setError(message)
-      showError({ message, presetId: preset.id, presetTitle: preset.title })
+
+      showError({
+        message,
+        presetId: preset.id,
+        presetTitle: preset.title,
+        provider: VIDEO_PROVIDER_IDS[0],
+      })
 
       return null
     } finally {

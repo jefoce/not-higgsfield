@@ -9,6 +9,7 @@ import { getPreset } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
 import { estimatePrice, type PriceContext } from '@/core/pricing'
 import { canonicalizePrompt, referenceSlots } from '@/core/prompt-tokens'
+import { VIDEO_PROVIDER_IDS } from '@/core/providers/types'
 import type { GenerationEstimate, GenerationInput } from '@/core/types'
 import { type PriceInput, validateInput } from '@/core/validation'
 
@@ -60,7 +61,7 @@ export async function loadPriceDraft(raw: PriceInput): Promise<GenerationDraft> 
 /** Discounted and list totals for a validated draft. */
 export async function estimateGeneration(draft: GenerationDraft): Promise<GenerationEstimate> {
   const { preset, input, uploads } = draft
-  const pricing = await getVideoProvider().getPricing(preset)
+  const pricing = await getVideoProvider(VIDEO_PROVIDER_IDS[0]).getPricing(preset)
 
   const hasVideoInput =
     input.tab === 'references' && input.references.some((id) => uploads[id]?.kind === 'video')

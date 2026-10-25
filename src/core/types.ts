@@ -1,5 +1,6 @@
 import type { UploadItem } from './media-types'
 import type { AspectChoice, Resolution } from './presets/types'
+import type { VideoProviderId } from './providers/types'
 import type { SecretName } from './secret-names'
 
 export type GeneratorTab = 'frames' | 'references'
@@ -44,6 +45,9 @@ export interface GenerationRecord {
   createdAt: string
   updatedAt: string
   status: JobStatus
+
+  /** Provider that owns this job. Absent on old records, which use the default provider. */
+  provider?: VideoProviderId
   input: GenerationInput
   preset: { id: string; title: string; slug: string }
   inputsSnapshot: Record<
