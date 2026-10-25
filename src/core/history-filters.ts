@@ -1,12 +1,10 @@
 import { clamp, filter, isEmpty, isNil, orderBy } from 'lodash-es'
 
 import { HISTORY_MAX_PAGE_SIZE, HISTORY_PAGE_SIZE } from './constants'
-import type { GenerationRecord, JobStatus } from './schemas/generation-record'
-import { ACTIVE_STATUSES, type HistoryFilters } from './types'
+import type { GenerationInput, GenerationRecord, JobStatus } from './schemas/generation-record'
+import { ACTIVE_STATUSES, type HistoryFilters, type HistoryMode, type StatusFilter } from './types'
 
-type StatusFilter = NonNullable<HistoryFilters['status']>
-
-const hasMedia = (input: GenerationRecord['input']): boolean =>
+const hasMedia = (input: GenerationInput): boolean =>
   !isEmpty(input.frames.start) || !isEmpty(input.frames.end) || !isEmpty(input.references)
 
 const matchesStatus = (status: JobStatus, wanted: StatusFilter): boolean => {
@@ -25,7 +23,7 @@ const matchesStatus = (status: JobStatus, wanted: StatusFilter): boolean => {
   return status === 'failed' || status === 'cancelled' || status === 'expired'
 }
 
-const activeMode = (filters: HistoryFilters): HistoryFilters['mode'] | null => {
+const activeMode = (filters: HistoryFilters): HistoryMode | null => {
   const mode = filters.mode
 
   if (isNil(mode) || mode === 'all') {

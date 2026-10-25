@@ -1,4 +1,4 @@
-import type { GenerationRecord } from './schemas/generation-record'
+import type { JobStatus, RecordDownload, RecordSubmit } from './schemas/generation-record'
 
 export type StatusHelpKey =
   | 'processing'
@@ -94,7 +94,7 @@ export const STATUS_HELP: Record<StatusHelpKey, StatusHelp> = {
   },
 }
 
-const STATUS_KEYS: Record<GenerationRecord['status'], StatusHelpKey> = {
+const STATUS_KEYS: Record<JobStatus, StatusHelpKey> = {
   submitting: 'processing',
   pending: 'in_queue',
   in_progress: 'generating',
@@ -104,10 +104,14 @@ const STATUS_KEYS: Record<GenerationRecord['status'], StatusHelpKey> = {
   expired: 'expired',
 }
 
+interface StatusHelpRecord {
+  status: JobStatus
+  submit?: RecordSubmit
+  download?: RecordDownload
+}
+
 /** Current visual state, including submit stages and the download phase. */
-export function statusHelpKey(
-  record: Pick<GenerationRecord, 'status' | 'submit' | 'download'>,
-): StatusHelpKey {
+export function statusHelpKey(record: StatusHelpRecord): StatusHelpKey {
   if (record.download) {
     return 'downloading'
   }

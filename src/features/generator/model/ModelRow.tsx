@@ -3,8 +3,9 @@
 import { isNil } from 'lodash-es'
 import { AudioLines, Check, Clock, Diamond, type LucideIcon, Sparkles, Volume2 } from 'lucide-react'
 
+import type { CatalogEntry } from '@/core/catalog'
 import { minDuration } from '@/core/presets'
-import type { ModelPreset } from '@/core/presets/types'
+import type { ModelPreset, PresetIcon } from '@/core/presets/types'
 import { formatRate, pricePerSec } from '@/core/pricing'
 import { useModelEntry } from '@/lib/api/models'
 import { cn } from '@/lib/cn'
@@ -32,7 +33,7 @@ function duration(preset: ModelPreset): string {
   return `${minDuration(preset)}-${preset.duration.max}s`
 }
 
-const PRESET_ICONS: Record<ModelPreset['icon'], LucideIcon> = {
+const PRESET_ICONS: Record<PresetIcon, LucideIcon> = {
   sparkles: Sparkles,
   'audio-lines': AudioLines,
 }
@@ -79,11 +80,11 @@ interface RowData {
   reason: string | null
 }
 
-function isBlockedEntry(entry: ReturnType<typeof useModelEntry>): boolean {
+function isBlockedEntry(entry: CatalogEntry | null): boolean {
   return entry?.status === 'missing' || entry?.status === 'no_provider'
 }
 
-function rowData(preset: ModelPreset, entry: ReturnType<typeof useModelEntry>): RowData {
+function rowData(preset: ModelPreset, entry: CatalogEntry | null): RowData {
   const pricing = entry?.pricing
   const discount = pricing?.discount ?? 0
   const from = fromRate(preset, pricing?.skus)

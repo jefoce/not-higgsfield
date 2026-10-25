@@ -14,9 +14,11 @@ import { COMPAT_DIR } from '../paths'
 import { withLock } from '../sync/lock'
 import { probeMedia, runFfmpeg } from './ffmpeg'
 
+type CompatContentType = 'video/mp4' | 'audio/mp4'
+
 export interface CompatMedia {
   path: string
-  contentType: 'video/mp4' | 'audio/mp4'
+  contentType: CompatContentType
 }
 
 type PlayableKind = Exclude<MediaKind, 'image'>
@@ -61,7 +63,7 @@ export async function getCompatMedia(params: GetCompatMediaParams): Promise<Comp
   const key = createHash('sha1').update(ref).digest('hex')
   const filePath = path.join(COMPAT_DIR, `${key}.${ext}`)
   const failedPath = `${filePath}.failed`
-  const contentType: CompatMedia['contentType'] = kind === 'video' ? 'video/mp4' : 'audio/mp4'
+  const contentType: CompatContentType = kind === 'video' ? 'video/mp4' : 'audio/mp4'
 
   if (await isFresh(filePath, source.mtimeMs)) {
     await touch(filePath)

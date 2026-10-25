@@ -3,10 +3,10 @@ import { toast } from 'sonner'
 
 import { SEED_MAX } from '@/core/constants'
 import { maxDurationFor } from '@/core/duration-limits'
-import type { MediaKind } from '@/core/media-types'
+import type { MediaKind, MediaKindCounts } from '@/core/media-types'
 import { minDuration } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
-import { idForSlot, referenceSlots, type RefSlot, type SlotCounts } from '@/core/prompt-tokens'
+import { idForSlot, referenceSlots, type RefSlot } from '@/core/prompt-tokens'
 import type { GenerationInput } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { formatSecondsExact } from '@/lib/format'
@@ -19,7 +19,7 @@ interface ReferenceState {
 export const randomSeed = (): number => Math.floor(Math.random() * (SEED_MAX + 1))
 
 /** Attached references counted per kind in API order. */
-export function slotCounts(state: ReferenceState): SlotCounts {
+export function slotCounts(state: ReferenceState): MediaKindCounts {
   return referenceSlots(state.references, (id) => state.uploadsById[id]?.kind).counts
 }
 

@@ -51,11 +51,15 @@ const RecordPresetSchema = z.object({
   slug: z.string(),
 })
 
+export type RecordPreset = z.infer<typeof RecordPresetSchema>
+
 const RecordSubmitSchema = z.object({
   stage: z.enum(['grace', 'uploading', 'sending']),
   notBefore: z.string().optional(),
   progress: z.number().optional(),
 })
+
+export type RecordSubmit = z.infer<typeof RecordSubmitSchema>
 
 const RecordJobSchema = z.object({
   id: z.string(),
@@ -66,9 +70,13 @@ const RecordJobSchema = z.object({
   expiresAt: z.number().optional(),
 })
 
+export type RecordJob = z.infer<typeof RecordJobSchema>
+
 const RecordDownloadSchema = z.object({
   startedAt: z.string(),
 })
+
+export type RecordDownload = z.infer<typeof RecordDownloadSchema>
 
 const RecordOutputSchema = z.object({
   video: z.string(),
@@ -78,6 +86,8 @@ const RecordOutputSchema = z.object({
   durationSec: z.number().optional(),
   bytes: z.number().optional(),
 })
+
+export type RecordOutput = z.infer<typeof RecordOutputSchema>
 
 const SnapshotItemSchema = z.object({
   kind: MediaKindSchema,
@@ -94,7 +104,11 @@ const SnapshotItemSchema = z.object({
   flattened: z.enum(['#ffffff', '#1c1e20']).optional(),
 })
 
+export type SnapshotItem = z.infer<typeof SnapshotItemSchema>
+
 const InputSnapshotSchema = z.record(z.string(), SnapshotItemSchema)
+
+export type InputSnapshot = z.infer<typeof InputSnapshotSchema>
 
 const GenerationCostSchema = z.object({
   currency: z.literal('USD'),
@@ -105,6 +119,8 @@ const GenerationCostSchema = z.object({
   isByok: z.boolean().nullable(),
   billed: z.boolean().nullable(),
 })
+
+export type GenerationCost = z.infer<typeof GenerationCostSchema>
 
 /** One generation stored in `downloads/<uuid>.json`. */
 export const GenerationRecordSchema = z.object({

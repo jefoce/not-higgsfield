@@ -2,7 +2,11 @@ import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
 import { referenceSlots, slotLabel } from '@/core/prompt-tokens'
-import type { GenerationRecord } from '@/core/schemas/generation-record'
+import type {
+  GenerationRecord,
+  InputSnapshot,
+  SnapshotItem,
+} from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { useGeneratorStore } from '@/features/generator/store/store'
 import { openPreview, type PreviewActions } from '@/features/preview/preview-store'
@@ -18,12 +22,10 @@ export interface ThumbItem {
   sent?: string
 }
 
-type InputSnapshot = GenerationRecord['inputsSnapshot']
-
 const isFilled = (value: string | null | undefined): value is string =>
   !isNil(value) && value !== ''
 
-function sentNote(item: InputSnapshot[string] | undefined): string | undefined {
+function sentNote(item: SnapshotItem | undefined): string | undefined {
   if (isNil(item)) {
     return undefined
   }

@@ -31,7 +31,7 @@ export interface TransportByKind {
 
 type PresetFamily = 'wan' | 'seedance'
 
-type PresetIcon = 'sparkles' | 'audio-lines'
+export type PresetIcon = 'sparkles' | 'audio-lines'
 
 export interface ReferenceLimits {
   maxBytes?: number
@@ -52,6 +52,8 @@ export type SkuTable = Readonly<Record<string, number>>
 export type ResolutionTiers = Readonly<Partial<Record<Resolution, string>>>
 
 type SizeByAspect = Partial<Record<AspectRatio, `${number}x${number}`>>
+
+export type PresetReferenceLimits = Partial<Record<MediaKind, ReferenceLimits>>
 
 export interface SkuContext {
   resolution: Resolution
@@ -151,7 +153,7 @@ export interface ModelPreset {
   audio: PresetAudio
   frames: PresetFrames
   references: PresetReferences
-  referenceLimits?: Partial<Record<MediaKind, ReferenceLimits>>
+  referenceLimits?: PresetReferenceLimits
   maxInputPlusOutputSec: number | null
   promptMaxChars: number
   seed: boolean

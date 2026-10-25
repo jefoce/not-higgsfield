@@ -4,12 +4,13 @@ import { useEffect, useMemo } from 'react'
 import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
+import type { KindExtensions } from '@/core/media-kinds'
 import { MEDIA_KINDS } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
 import { referenceSlots } from '@/core/prompt-tokens'
 import type { UploadItem } from '@/core/schemas/upload-item'
-import { extensionsFromLimits, type PickerExtensions } from '@/features/media-picker/picker/store'
+import { extensionsFromLimits } from '@/features/media-picker/picker/store'
 import { usePasteMedia } from '@/features/media-picker/uploads/use-paste-media'
 import { fetchUploads, uploadFiles } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
@@ -61,7 +62,7 @@ function allowedKinds(): MediaKind[] {
 }
 
 /** Preset formats for the active model. */
-function allowedExtensions(): PickerExtensions | undefined {
+function allowedExtensions(): KindExtensions | undefined {
   return extensionsFromLimits(getPreset(useGeneratorStore.getState().presetId).referenceLimits)
 }
 

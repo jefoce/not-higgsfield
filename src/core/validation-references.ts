@@ -2,10 +2,10 @@ import { isNil, sumBy } from 'lodash-es'
 
 import { maxDurationFor } from './duration-limits'
 import { KIND_TITLE, MEDIA_KINDS } from './media-kinds'
-import type { MediaKind } from './media-types'
+import type { MediaKind, MediaKindCounts } from './media-types'
 import type { ModelPreset } from './presets/types'
 import { primaryBinding } from './pricing'
-import { missingSlots, referenceSlots, type SlotCounts } from './prompt-tokens'
+import { missingSlots, referenceSlots } from './prompt-tokens'
 import type { GenerationInput } from './schemas/generation-record'
 import type { UploadItem } from './schemas/upload-item'
 import { resolveTransport } from './transport'
@@ -60,7 +60,7 @@ const collectReferences = (params: CollectReferencesParams): UploadItem[] => {
 }
 
 interface CheckReferenceCountsParams {
-  counts: SlotCounts
+  counts: MediaKindCounts
   preset: ModelPreset
   errors: string[]
 }
@@ -102,7 +102,7 @@ const checkRemoteTransport = (params: CheckRemoteTransportParams): void => {
 
 interface CheckAudioVisualParams {
   audio: UploadItem[]
-  counts: SlotCounts
+  counts: MediaKindCounts
   preset: ModelPreset
   errors: string[]
 }

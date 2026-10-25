@@ -41,6 +41,8 @@ export const JobSchema = z
 
 export type VideoJobResponse = z.infer<typeof JobSchema>
 
+export type VideoJobUsage = z.infer<typeof UsageSchema>
+
 interface RequestParams {
   url: string
   init: RequestInit

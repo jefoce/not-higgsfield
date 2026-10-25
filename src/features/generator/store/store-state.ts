@@ -1,3 +1,4 @@
+import type { AspectChoice, Resolution } from '@/core/presets/types'
 import type { RefSlot } from '@/core/prompt-tokens'
 import type { GenerationInput, GeneratorTab } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
@@ -17,8 +18,8 @@ export interface GeneratorState extends GeneratorDraft {
   setPrompt: (text: string) => void
   setAudio: (audio: boolean) => void
   setDuration: (duration: number) => void
-  setAspectRatio: (aspectRatio: GenerationInput['aspectRatio']) => void
-  setResolution: (resolution: GenerationInput['resolution']) => void
+  setAspectRatio: (aspectRatio: AspectChoice) => void
+  setResolution: (resolution: Resolution) => void
   setFrame: (slot: 'start' | 'end', upload: UploadItem | null) => void
   addReferences: (uploads: UploadItem[]) => void
   replaceReference: (id: string, upload: UploadItem) => void

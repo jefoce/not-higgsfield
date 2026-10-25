@@ -16,16 +16,22 @@ export interface BatchSkip {
   reason: 'not_found' | 'active' | 'not_ready'
 }
 
+export type HistoryMode = 'all' | 'text' | 'frames' | 'references'
+export type StatusFilter = 'all' | 'done' | 'active' | 'failed'
+export type ResolutionFilter = Resolution | 'all'
+export type AspectFilter = AspectChoice | 'all'
+export type AudioFilter = 'any' | 'on' | 'off'
+
 export interface HistoryFilters {
   q?: string
   model?: string
   favorite?: boolean
-  status?: 'all' | 'done' | 'active' | 'failed'
+  status?: StatusFilter
   tab?: GeneratorTab | 'all'
-  mode?: 'all' | 'text' | 'frames' | 'references'
-  resolution?: Resolution | 'all'
-  aspect?: AspectChoice | 'all'
-  audio?: 'any' | 'on' | 'off'
+  mode?: HistoryMode
+  resolution?: ResolutionFilter
+  aspect?: AspectFilter
+  audio?: AudioFilter
 }
 
 export interface GenerationListResult {
@@ -61,9 +67,11 @@ export interface SecretKeyStatus {
   hint: string | null
 }
 
+export type SecretBackend = 'keychain' | 'file' | null
+
 /** Stored key status, without values. */
 export interface SecretStatus {
-  backend: 'keychain' | 'file' | null
+  backend: SecretBackend
   loading: boolean
   loadError: string | null
   keys: Record<SecretName, SecretKeyStatus>

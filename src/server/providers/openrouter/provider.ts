@@ -33,6 +33,7 @@ import {
   request,
   SubmitSchema,
   type VideoJobResponse,
+  type VideoJobUsage,
 } from './http'
 import { listModels } from './models'
 import { getPricing as getPresetPricing } from './pricing'
@@ -199,7 +200,7 @@ async function testConnection(): Promise<TestResult> {
   }
 }
 
-function toUsage(usage: VideoJobResponse['usage']): JobUsage | null {
+function toUsage(usage: VideoJobUsage | undefined): JobUsage | null {
   if (isNil(usage)) {
     return null
   }

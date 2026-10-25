@@ -1,14 +1,12 @@
 import { isNil } from 'lodash-es'
 
-import type { ReferencePlan } from '@/core/media-types'
+import type { ReferencePlanImage } from '@/core/media-types'
 import { type RefSlot, slotLabel } from '@/core/prompt-tokens'
 import type { UploadItem } from '@/core/schemas/upload-item'
 
-export type PlannedImage = ReferencePlan['images'][number]
-
 interface NoteForParams {
   id: string
-  planned: Record<string, PlannedImage>
+  planned: Record<string, ReferencePlanImage>
 }
 
 /** Downscale note for an attached image, if the plan has one. */

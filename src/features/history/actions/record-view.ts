@@ -1,25 +1,16 @@
 import { isNil } from 'lodash-es'
 
 import { POSTER_WIDTHS, PREVIEW_WIDTH } from '@/core/constants'
+import type { MediaKindCounts } from '@/core/media-types'
 import { findPreset } from '@/core/presets'
-import {
-  canonicalizePrompt,
-  referenceSlots,
-  type RefSlot,
-  type SlotCounts,
-} from '@/core/prompt-tokens'
+import { canonicalizePrompt, referenceSlots, type RefSlot } from '@/core/prompt-tokens'
 import { friendlyError } from '@/core/provider-errors'
 import type { FriendlyError } from '@/core/provider-errors/types'
 import { recordProvider, videoProviderDescriptor } from '@/core/providers/registry'
-import type { GenerationRecord } from '@/core/schemas/generation-record'
+import type { GenerationRecord, JobStatus } from '@/core/schemas/generation-record'
 import { downloadMediaUrl, thumbUrl, uploadThumbUrl } from '@/lib/api/media-urls'
 
-const SELECTABLE_STATUSES: readonly GenerationRecord['status'][] = [
-  'completed',
-  'failed',
-  'cancelled',
-  'expired',
-]
+const SELECTABLE_STATUSES: readonly JobStatus[] = ['completed', 'failed', 'cancelled', 'expired']
 
 /** Only terminal records can be selected, active work cannot be acted on. */
 export function isSelectable(record: GenerationRecord): boolean {
@@ -104,7 +95,7 @@ export function posterForWidth(record: GenerationRecord, mediaWidth: number): st
 export const uploadThumb = (id: string, width = 160): string => uploadThumbUrl(id, width)
 
 interface RecordSlots {
-  counts: SlotCounts
+  counts: MediaKindCounts
   slots: Map<string, RefSlot>
 }
 
@@ -114,7 +105,7 @@ export function recordSlots(record: GenerationRecord): RecordSlots {
 }
 
 /** Reference counts by kind for a record prompt. */
-export function recordCounts(record: GenerationRecord): SlotCounts {
+export function recordCounts(record: GenerationRecord): MediaKindCounts {
   return recordSlots(record).counts
 }
 

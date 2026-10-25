@@ -14,12 +14,14 @@ import { UPLOADS_DIR } from '../paths'
 /** Flatten color used for transparent images sent to models without alpha. */
 export type FlattenColor = typeof FLATTEN_BACKGROUND | typeof FLATTEN_LIGHT
 
+type ImageFormat = 'jpeg' | 'png'
+
 export interface EncodedImage {
   url: string
   bytes: number
   width: number
   height: number
-  format: 'jpeg' | 'png'
+  format: ImageFormat
   flattened?: FlattenColor
 }
 
@@ -52,7 +54,7 @@ export async function writeOpaque(id: string, isOpaque: boolean): Promise<void> 
 interface CacheFileParams {
   id: string
   step: number
-  format: CacheRecord['format']
+  format: ImageFormat
 }
 
 const cacheFile = (params: CacheFileParams): string => {

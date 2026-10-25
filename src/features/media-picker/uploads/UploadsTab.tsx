@@ -3,14 +3,13 @@
 import { isNil } from 'lodash-es'
 import useSWR from 'swr'
 
-import { extensionAllowed } from '@/core/media-kinds'
+import { extensionAllowed, type KindExtensions } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import type { PreviewActions } from '@/features/preview/preview-store'
 import { fetchUploads } from '@/lib/api/uploads'
 import { getPlatform } from '@/lib/platform'
 
-import type { PickerExtensions } from '../picker/store'
 import { DeleteUploadDialog } from './DeleteUploadDialog'
 import type { UploadProgressItem } from './UploadProgressTile'
 import { UploadsGrid } from './UploadsGrid'
@@ -19,7 +18,7 @@ import { useDeleteUpload } from './use-delete-upload'
 export interface UploadsTabProps {
   kinds: MediaKind[]
   max: number
-  extensions?: PickerExtensions
+  extensions?: KindExtensions
   selected: UploadItem[]
   onSelect: (item: UploadItem) => void
   onUploaded: (items: UploadItem[]) => void

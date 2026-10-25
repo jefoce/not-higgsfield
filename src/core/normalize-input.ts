@@ -5,7 +5,7 @@ import { MEDIA_KINDS } from './media-kinds'
 import type { MediaKindCounts } from './media-types'
 import { aspectAllowed } from './output-size'
 import { minDuration } from './presets'
-import type { ModelPreset } from './presets/types'
+import type { AspectChoice, ModelPreset, Resolution } from './presets/types'
 import type { GenerationInput } from './schemas/generation-record'
 import type { UploadItem } from './schemas/upload-item'
 import type { FrameSlots } from './types'
@@ -36,12 +36,12 @@ export const clampDuration = (params: ClampDurationParams): number => {
 }
 
 interface NormalizeAspectParams {
-  aspect: GenerationInput['aspectRatio']
+  aspect: AspectChoice
   preset: ModelPreset
-  resolution: GenerationInput['resolution']
+  resolution: Resolution
 }
 
-function normalizeAspect(params: NormalizeAspectParams): GenerationInput['aspectRatio'] {
+function normalizeAspect(params: NormalizeAspectParams): AspectChoice {
   const { aspect, preset, resolution } = params
 
   if (aspect === 'auto') {

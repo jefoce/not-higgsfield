@@ -4,7 +4,7 @@ import { isNil } from 'lodash-es'
 
 import { MAX_REQUEST_MB } from '@/core/constants'
 import { getPreset } from '@/core/presets'
-import type { GenerationRecord } from '@/core/schemas/generation-record'
+import type { GenerationInput, GenerationRecord } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { graceDelayMs, inputIds, transportsFor, withTransports } from '@/core/submit-state'
 import type { ResolvedTransport } from '@/core/transport'
@@ -177,9 +177,7 @@ async function fail(id: string, error: unknown): Promise<void> {
 }
 
 /** Loads only uploads referenced by the normalized input. */
-export async function loadUploads(
-  input: GenerationRecord['input'],
-): Promise<Record<string, UploadItem>> {
+export async function loadUploads(input: GenerationInput): Promise<Record<string, UploadItem>> {
   const items = await Promise.all(inputIds(input).map((id) => getUpload(id)))
 
   return Object.fromEntries(

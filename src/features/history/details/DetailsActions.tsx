@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { isNil } from 'lodash-es'
 import { Trash2 } from 'lucide-react'
 
+import type { FriendlyError } from '@/core/provider-errors/types'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { formatDate } from '@/lib/format'
 import { Button } from '@/ui/Button'
@@ -28,7 +29,7 @@ export function DetailsActions(props: DetailsActionsProps) {
   const { record, isActive, now } = props
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const isFailed = record.status === 'failed'
-  let friendly: ReturnType<typeof recordError> = null
+  let friendly: FriendlyError | null = null
 
   if (isFailed) {
     friendly = recordError(record)

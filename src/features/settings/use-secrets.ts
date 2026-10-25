@@ -6,15 +6,17 @@ import useSWR from 'swr'
 import { z } from 'zod'
 
 import { STORAGE_PROVIDER_IDS } from '@/core/providers/types'
-import type { SecretStatus, TestResult } from '@/core/types'
+import type { SecretBackend, SecretStatus, TestResult } from '@/core/types'
 import { fetchSecrets } from '@/lib/api/settings'
 import { readLocal, writeLocal } from '@/lib/local-store'
 import { SECRETS_KEY } from '@/lib/swr-keys'
 
 import { openSettings, type SettingsSection } from './settings-store'
 
+export type TestTone = 'ok' | 'error' | 'info'
+
 export interface TestMessage {
-  tone: 'ok' | 'error' | 'info'
+  tone: TestTone
   text: string
 }
 
@@ -77,7 +79,7 @@ export function testLine(target: SettingsSection, result: TestResult): TestMessa
 }
 
 /** Footer text for the active backend. */
-export function backendNote(backend: SecretStatus['backend'] | undefined): string | null {
+export function backendNote(backend: SecretBackend | undefined): string | null {
   if (backend === 'keychain') {
     return `Stored in ${keychainLabel()}`
   }

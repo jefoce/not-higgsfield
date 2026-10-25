@@ -120,6 +120,21 @@ const TYPE_SELECTORS = [
       "CallExpression[callee.object.name='z'] CallExpression[callee.object.name='z'][callee.property.name='object']",
     message: 'Name the inner schema (FooSchema) and reference it.',
   },
+  {
+    selector:
+      "TSIndexedAccessType:not(TSTypeAliasDeclaration > TSIndexedAccessType):not([indexType.type='TSNumberKeyword'])",
+    message: 'Use the named part type (RecordJob, PresetIcon) instead of X["key"].',
+  },
+  {
+    selector:
+      "TSTypeReference[typeName.name='ReturnType']:not(TSTypeAliasDeclaration > TSTypeReference)",
+    message: 'Name it once: type IntervalId = ReturnType<typeof setInterval>.',
+  },
+  {
+    selector:
+      "TSTypeAliasDeclaration[typeAnnotation.type='TSTypeReference']:not([typeAnnotation.typeArguments])",
+    message: 'No pure type aliases. Import the original type.',
+  },
 ]
 
 const localPlugin = {

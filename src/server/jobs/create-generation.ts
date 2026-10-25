@@ -5,7 +5,13 @@ import { randomInt, randomUUID } from 'node:crypto'
 import { MAX_REQUEST_MB, REQUEST_RESERVE_MB, SEED_MAX, SUBMIT_GRACE_MS } from '@/core/constants'
 import type { ReferencePlan } from '@/core/media-types'
 import { activeBinding } from '@/core/presets/bindings'
-import type { GenerationInput, GenerationRecord } from '@/core/schemas/generation-record'
+import type {
+  GenerationCost,
+  GenerationInput,
+  GenerationRecord,
+  InputSnapshot,
+  SnapshotItem,
+} from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
 
 import { encodeImages } from '../media/image-data-url'
@@ -28,6 +34,16 @@ export async function createGeneration(raw: GenerationInput): Promise<Generation
   const now = new Date().toISOString()
   const binding = activeBinding(preset, (item) => getVideoProvider(item.provider).isConfigured())
 
+  const cost: GenerationCost = {
+    currency: 'USD',
+    pricePerSec: estimate.pricePerSec,
+    priceSource: estimate.priceSource,
+    estimatedUsd: estimate.estimatedUsd,
+    actualUsd: null,
+    isByok: null,
+    billed: null,
+  }
+
   const record: GenerationRecord = {
     schemaVersion: 1,
     id: randomUUID(),
@@ -44,15 +60,7 @@ export async function createGeneration(raw: GenerationInput): Promise<Generation
     },
     seedUsed: input.seed ?? randomInt(0, SEED_MAX),
     favorite: false,
-    cost: {
-      currency: 'USD',
-      pricePerSec: estimate.pricePerSec,
-      priceSource: estimate.priceSource,
-      estimatedUsd: estimate.estimatedUsd,
-      actualUsd: null,
-      isByok: null,
-      billed: null,
-    },
+    cost,
   }
 
   const saved = await saveGeneration(record)
@@ -62,17 +70,14 @@ export async function createGeneration(raw: GenerationInput): Promise<Generation
   return saved
 }
 
-function snapshot(
-  uploads: Record<string, UploadItem>,
-  plan: ReferencePlan,
-): GenerationRecord['inputsSnapshot'] {
+function snapshot(uploads: Record<string, UploadItem>, plan: ReferencePlan): InputSnapshot {
   const sent = new Map(plan.images.map((image) => [image.id, image]))
 
   return Object.fromEntries(
     Object.values(uploads).map((upload) => {
       const image = sent.get(upload.id)
 
-      const item: GenerationRecord['inputsSnapshot'][string] = {
+      const item: SnapshotItem = {
         kind: upload.kind,
         originalName: upload.originalName,
         source: upload.source,

@@ -3,7 +3,12 @@ import { isNil } from 'lodash-es'
 import { GRACE_STALE_MS } from './constants'
 import type { ModelPreset } from './presets/types'
 import { primaryBinding } from './pricing'
-import type { GenerationInput, GenerationRecord, JobStatus } from './schemas/generation-record'
+import type {
+  GenerationInput,
+  GenerationRecord,
+  InputSnapshot,
+  JobStatus,
+} from './schemas/generation-record'
 import type { UploadItem } from './schemas/upload-item'
 import { type ResolvedTransport, resolveTransport } from './transport'
 
@@ -80,9 +85,9 @@ export function transportsFor(params: TransportsForParams): Record<string, Resol
 }
 
 export function withTransports(
-  snapshot: GenerationRecord['inputsSnapshot'],
+  snapshot: InputSnapshot,
   transports: Record<string, ResolvedTransport>,
-): GenerationRecord['inputsSnapshot'] {
+): InputSnapshot {
   return Object.fromEntries(
     Object.entries(snapshot).map(([id, item]) => {
       const transport = transports[id]

@@ -3,7 +3,7 @@ import 'server-only'
 import { isNil } from 'lodash-es'
 
 import { R2_NAMES, SECRET_NAMES, type SecretName } from '@/core/secret-names'
-import type { SecretSource, SecretStatus } from '@/core/types'
+import type { SecretKeyStatus, SecretSource, SecretStatus } from '@/core/types'
 
 import { HttpError } from '../errors'
 import { globalState } from '../global-state'
@@ -218,7 +218,7 @@ async function recoverFromSaveFailure(error: unknown): Promise<never> {
 
 /** Per-key status. Hints are the last four characters, never the value. */
 export function secretStatus(): SecretStatus {
-  const keys = {} as SecretStatus['keys']
+  const keys = {} as Record<SecretName, SecretKeyStatus>
 
   for (const name of SECRET_NAMES) {
     const entry = state.values.get(name)

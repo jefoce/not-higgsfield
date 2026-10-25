@@ -5,26 +5,24 @@ import { create } from 'zustand'
 
 import { type KindExtensions, MEDIA_KINDS } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
-import type { ModelPreset } from '@/core/presets/types'
+import type { PresetReferenceLimits } from '@/core/presets/types'
 import type { UploadItem } from '@/core/schemas/upload-item'
 
 type PickerTarget = 'frame-start' | 'frame-end' | 'references'
-
-export type PickerExtensions = KindExtensions
 
 export interface PickerRequest {
   id: number
   target: PickerTarget
   kinds: MediaKind[]
   max: number
-  extensions?: PickerExtensions
+  extensions?: KindExtensions
   onPick: (items: UploadItem[]) => void
 }
 
 /** Picker extensions from preset reference formats, ignoring kinds without a list. */
 export function extensionsFromLimits(
-  limits: ModelPreset['referenceLimits'],
-): PickerExtensions | undefined {
+  limits: PresetReferenceLimits | undefined,
+): KindExtensions | undefined {
   const entries = MEDIA_KINDS.flatMap((kind) => {
     const formats = limits?.[kind]?.formats
 

@@ -1,7 +1,12 @@
-import type { GenerationRecord } from './schemas/generation-record'
+import type { GenerationInput, GenerationRecord, RecordPreset } from './schemas/generation-record'
+
+interface PromptSlugRecord {
+  input: GenerationInput
+  preset: RecordPreset
+}
 
 /** File-safe name from the prompt, falling back to the preset. */
-export function promptSlug(record: Pick<GenerationRecord, 'input' | 'preset'>): string {
+export function promptSlug(record: PromptSlugRecord): string {
   const prompt = record.input.prompt.trim()
   const base = prompt === '' ? record.preset.slug : prompt
 

@@ -32,6 +32,10 @@ const CreditsDataSchema = z
 
 const CreditsSchema = z.object({ data: CreditsDataSchema }).loose()
 
+type KeyData = z.infer<typeof KeyDataSchema>
+
+type CreditsData = z.infer<typeof CreditsDataSchema>
+
 interface CacheEntry {
   info: ProviderAccount
   at: number
@@ -99,7 +103,7 @@ async function loadCredits(): Promise<ProviderAccount> {
   }
 }
 
-async function fetchKey(key: string): Promise<z.infer<typeof KeySchema>['data']> {
+async function fetchKey(key: string): Promise<KeyData> {
   const parsed = KeySchema.safeParse(await getJson(`${BASE_URL}/api/v1/key`, key))
 
   if (!parsed.success) {
@@ -109,7 +113,7 @@ async function fetchKey(key: string): Promise<z.infer<typeof KeySchema>['data']>
   return parsed.data.data
 }
 
-async function fetchCredits(key: string): Promise<z.infer<typeof CreditsSchema>['data']> {
+async function fetchCredits(key: string): Promise<CreditsData> {
   const parsed = CreditsSchema.safeParse(await getJson(`${BASE_URL}/api/v1/credits`, key))
 
   if (!parsed.success) {

@@ -3,11 +3,13 @@
 import { useCallback, useSyncExternalStore } from 'react'
 import { isNil } from 'lodash-es'
 
+type IntervalId = ReturnType<typeof setInterval>
+
 const TICK_MS = 1000
 
 const listeners = new Set<() => void>()
 let now = Date.now()
-let timer: ReturnType<typeof setInterval> | undefined
+let timer: IntervalId | undefined
 
 function emit(): void {
   now = Date.now()

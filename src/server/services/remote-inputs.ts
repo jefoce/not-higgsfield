@@ -5,7 +5,7 @@ import fs from 'node:fs/promises'
 import { groupBy, isNil } from 'lodash-es'
 
 import { REMOTE_LINK_TTL_SEC, REMOTE_UNUSED_DAYS } from '@/core/constants'
-import type { UploadItem } from '@/core/schemas/upload-item'
+import type { UploadItem, UploadRemote } from '@/core/schemas/upload-item'
 
 import { globalState } from '../global-state'
 import { uploadPaths } from '../paths'
@@ -16,10 +16,8 @@ import { type FileHash, hashFile } from '../storage/hash'
 import { getObjectStore } from '../storage/registry'
 import type { ObjectInfo, ObjectStore, ProgressCallback } from '../storage/types'
 
-type Remote = NonNullable<UploadItem['remote']>
-
 interface RemoteUpload extends UploadItem {
-  remote: Remote
+  remote: UploadRemote
 }
 
 interface SweepResult {
@@ -180,7 +178,7 @@ export function putOnce(params: PutOnceParams): Promise<ObjectInfo> {
   return job
 }
 
-async function saveRemote(id: string, remote: Remote): Promise<UploadItem> {
+async function saveRemote(id: string, remote: UploadRemote): Promise<UploadItem> {
   const saved = await updateUpload(id, (item) => ({ ...item, remote }))
 
   if (!saved) {
@@ -218,7 +216,7 @@ function sameObject(params: SameObjectParams): boolean {
 interface SameDigestParams {
   head: RemoteHead
   digest: FileHash
-  prev?: Remote
+  prev?: UploadRemote
 }
 
 function sameDigest(params: SameDigestParams): boolean {

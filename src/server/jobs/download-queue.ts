@@ -12,7 +12,7 @@ import { isNil } from 'lodash-es'
 import { FETCH_TIMEOUTS, MAX_DOWNLOAD_RETRIES } from '@/core/constants'
 import { COPY_EXPIRED_TEXT } from '@/core/provider-errors/app'
 import { recordProvider } from '@/core/providers/registry'
-import type { GenerationRecord } from '@/core/schemas/generation-record'
+import type { GenerationRecord, RecordOutput } from '@/core/schemas/generation-record'
 
 import { exists, isDiskFull } from '../fs/stat'
 import { globalState } from '../global-state'
@@ -199,7 +199,7 @@ async function completeDownload(params: CompleteDownloadParams): Promise<void> {
     .then((stat) => stat.size)
     .catch(() => null)
 
-  const output: NonNullable<GenerationRecord['output']> = {
+  const output: RecordOutput = {
     video: `${record.id}.mp4`,
   }
 

@@ -15,8 +15,6 @@ const ACCOUNT = 'secrets'
 
 type Values = Partial<Record<SecretName, string>>
 
-type KeyringEntry = Entry
-
 type EntryCtor = typeof Entry
 
 /** Keychain backend with one shared item, or null when the module is missing. */
@@ -86,7 +84,7 @@ function writeAll(Entry: EntryCtor, values: Values): void {
 /** Folds old per-key items into the shared item, then deletes them. */
 function migrate(Entry: EntryCtor): Values {
   const values: Values = {}
-  const old: KeyringEntry[] = []
+  const old: Entry[] = []
 
   for (const name of SECRET_NAMES) {
     const previous = new Entry(SERVICE, name)

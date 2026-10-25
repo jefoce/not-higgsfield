@@ -18,7 +18,7 @@ import { globalState } from '../../global-state'
 import { MOCK_REMOTE_PREFIX } from '../../local-url'
 import { makeTestVideo } from '../../media/ffmpeg'
 import { buildRequestBody } from '../openrouter/body'
-import type { VideoJobResponse } from '../openrouter/http'
+import type { VideoJobResponse, VideoJobUsage } from '../openrouter/http'
 import { ProviderError } from '../provider-error'
 import type {
   ContentFallback,
@@ -86,7 +86,7 @@ async function getJob(params: JobRef): Promise<JobSnapshot> {
   }
 }
 
-function toUsage(usage: VideoJobResponse['usage']): JobUsage | null {
+function toUsage(usage: VideoJobUsage | undefined): JobUsage | null {
   if (isNil(usage)) {
     return null
   }

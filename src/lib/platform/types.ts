@@ -4,7 +4,7 @@ import type { FolderItem } from '@/core/schemas/folder-item'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
 
-interface ChooseFilesParams {
+export interface ChooseFilesParams {
   kinds: MediaKind[]
   multiple: boolean
   extensions?: KindExtensions

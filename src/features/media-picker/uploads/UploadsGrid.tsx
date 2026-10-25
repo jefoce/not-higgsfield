@@ -2,12 +2,12 @@
 
 import { isEmpty } from 'lodash-es'
 
+import type { KindExtensions } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import type { PreviewActions } from '@/features/preview/preview-store'
 
 import { ChooseDiskTile } from '../folders/ChooseDiskTile'
-import type { PickerExtensions } from '../picker/store'
 import { MediaRow } from '../tiles/MediaRow'
 import { UploadingRow } from './UploadingRow'
 import type { UploadProgressItem } from './UploadProgressTile'
@@ -22,7 +22,7 @@ interface UploadsGridProps {
   canChooseFiles: boolean
   kinds: MediaKind[]
   max: number
-  extensions?: PickerExtensions
+  extensions?: KindExtensions
   actions: PreviewActions
   onUploaded: (items: UploadItem[]) => void
   onRetry?: (id: string) => void

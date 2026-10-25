@@ -5,9 +5,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 import { ZOOM_DEFAULT, ZOOM_STEPS } from '@/core/constants'
-import type { HistoryFilters } from '@/core/types'
-
-export type HistoryMode = 'all' | 'text' | 'frames' | 'references'
+import type { HistoryFilters, HistoryMode } from '@/core/types'
 
 /** HistoryFilters plus the mode query the list route understands. */
 export interface ViewFilters extends HistoryFilters {

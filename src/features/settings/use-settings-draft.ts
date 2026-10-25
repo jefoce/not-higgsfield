@@ -18,6 +18,7 @@ import { platform } from '@/lib/platform'
 
 import type { SettingsSection } from './settings-store'
 import { useSecretActions } from './use-secret-actions'
+import type { TestMessage } from './use-secrets'
 
 type Edits = Partial<Record<SecretName, string | null>>
 
@@ -50,6 +51,22 @@ interface ApplyChangeParams {
   current: Edits
   name: SecretName
   change: SecretChange
+}
+
+export interface SettingsDraft {
+  edits: Edits
+  results: Record<SettingsSection, TestMessage | null>
+  testing: SettingsSection | null
+  saving: boolean
+  retrying: boolean
+  canSave: boolean
+  ready: Record<SettingsSection, boolean>
+  valid: Record<StorageProviderId, boolean>
+  onFieldChange: (name: SecretName, change: SecretChange) => void
+  onClose: (shouldOpen: boolean) => Promise<void>
+  onTest: (target: SettingsSection) => Promise<void>
+  onRetry: () => Promise<void>
+  onSave: () => Promise<void>
 }
 
 interface CountSetSecretsParams {
@@ -127,7 +144,7 @@ function getDraftFlags(params: DraftFlagsParams): DraftFlags {
 }
 
 /** Draft edits, test results and save/close actions for the settings modal. */
-export function useSettingsDraft(params: UseSettingsDraftParams) {
+export function useSettingsDraft(params: UseSettingsDraftParams): SettingsDraft {
   const { status, mock: isMock, closeSettings } = params
   const [edits, setEdits] = useState<Edits>({})
   const [isSaving, setIsSaving] = useState(false)
@@ -197,5 +214,3 @@ export function useSettingsDraft(params: UseSettingsDraftParams) {
     onSave,
   }
 }
-
-export type SettingsDraft = ReturnType<typeof useSettingsDraft>

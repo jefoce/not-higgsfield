@@ -17,12 +17,11 @@ import {
 import { isNil } from 'lodash-es'
 
 import { kindFromTitle, MEDIA_KINDS } from '@/core/media-kinds'
-import type { MediaKind } from '@/core/media-types'
+import type { MediaKind, MediaKindCounts } from '@/core/media-types'
 import {
   parsePromptParts,
   type PromptPart,
   type RefSlot,
-  type SlotCounts,
   slotLabel,
   slotToken,
 } from '@/core/prompt-tokens'
@@ -181,7 +180,7 @@ export function buildEditor(prompt: string): void {
 }
 
 /** Converts literal slot labels in text nodes to mention chips. */
-export function $convertLiteralMentions(counts: SlotCounts): void {
+export function $convertLiteralMentions(counts: MediaKindCounts): void {
   if (useGeneratorStore.getState().tab !== 'references') {
     return
   }
@@ -205,6 +204,6 @@ export function $convertLiteralMentions(counts: SlotCounts): void {
 }
 
 /** Nodes for pasted text: slots become chips, other text stays plain. */
-export function $nodesFromText(text: string, counts: SlotCounts): LexicalNode[] {
+export function $nodesFromText(text: string, counts: MediaKindCounts): LexicalNode[] {
   return $partsToNodes(parsePromptParts(text, counts))
 }

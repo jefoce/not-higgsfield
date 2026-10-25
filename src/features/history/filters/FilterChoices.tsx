@@ -3,10 +3,16 @@
 import { uniq } from 'lodash-es'
 
 import { MODEL_PRESETS } from '@/core/presets'
-import type { AspectChoice, Resolution } from '@/core/presets/types'
 import { RESOLUTIONS } from '@/core/presets/types'
+import type {
+  AspectFilter,
+  AudioFilter,
+  HistoryMode,
+  ResolutionFilter,
+  StatusFilter,
+} from '@/core/types'
 
-import { type HistoryMode, useHistoryViewStore, type ViewFilters } from '../list/view-store'
+import { useHistoryViewStore } from '../list/view-store'
 import { FilterChoice, type FilterOption } from './FilterChoice'
 
 const STATUS_OPTIONS = [
@@ -23,12 +29,12 @@ const MODE_OPTIONS: readonly FilterOption<HistoryMode>[] = [
   { value: 'references', label: 'References' },
 ]
 
-const RESOLUTION_OPTIONS: readonly FilterOption<Resolution | 'all'>[] = [
+const RESOLUTION_OPTIONS: readonly FilterOption<ResolutionFilter>[] = [
   { value: 'all', label: 'All' },
   ...RESOLUTIONS.map((value) => ({ value, label: value })),
 ]
 
-const ASPECT_OPTIONS: readonly FilterOption<AspectChoice | 'all'>[] = [
+const ASPECT_OPTIONS: readonly FilterOption<AspectFilter>[] = [
   { value: 'all', label: 'All' },
   { value: 'auto', label: 'Auto' },
   ...uniq(MODEL_PRESETS.flatMap((preset) => preset.aspectRatios)).map((value) => ({
@@ -48,23 +54,22 @@ export function FilterChoices() {
   const filters = useHistoryViewStore((state) => state.filters)
   const setFilters = useHistoryViewStore((state) => state.setFilters)
 
-  const handleStatusChange = (status: NonNullable<ViewFilters['status']>) => setFilters({ status })
+  const handleStatusChange = (status: StatusFilter) => setFilters({ status })
 
-  const handleModeChange = (mode: NonNullable<ViewFilters['mode']>) => {
+  const handleModeChange = (mode: HistoryMode) => {
     const isModeTab = mode === 'frames' || mode === 'references'
     const tab = isModeTab ? mode : 'all'
 
     setFilters({ mode, tab })
   }
 
-  const handleModelChange = (model: NonNullable<ViewFilters['model']>) => setFilters({ model })
+  const handleModelChange = (model: string) => setFilters({ model })
 
-  const handleResolutionChange = (resolution: NonNullable<ViewFilters['resolution']>) =>
-    setFilters({ resolution })
+  const handleResolutionChange = (resolution: ResolutionFilter) => setFilters({ resolution })
 
-  const handleAspectChange = (aspect: NonNullable<ViewFilters['aspect']>) => setFilters({ aspect })
+  const handleAspectChange = (aspect: AspectFilter) => setFilters({ aspect })
 
-  const handleAudioChange = (audio: NonNullable<ViewFilters['audio']>) => setFilters({ audio })
+  const handleAudioChange = (audio: AudioFilter) => setFilters({ audio })
 
   return (
     <>

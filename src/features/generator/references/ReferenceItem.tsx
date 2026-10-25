@@ -2,9 +2,10 @@
 
 import { isNil } from 'lodash-es'
 
+import type { KindExtensions } from '@/core/media-kinds'
 import { type RefSlot, slotLabel } from '@/core/prompt-tokens'
 import type { UploadItem } from '@/core/schemas/upload-item'
-import { openMediaPicker, type PickerExtensions } from '@/features/media-picker/picker/store'
+import { openMediaPicker } from '@/features/media-picker/picker/store'
 import { openPreview } from '@/features/preview/preview-store'
 
 import { ReferenceThumb } from './ReferenceThumb'
@@ -18,7 +19,7 @@ interface ReferenceItemProps {
   isLifted?: boolean
   previewUploads: UploadItem[]
   slots: Map<string, RefSlot>
-  extensions?: PickerExtensions
+  extensions?: KindExtensions
   onSelectSlot: (slot: RefSlot) => void
   onReplace: (id: string, upload: UploadItem) => void
   onRemove: (id: string) => void

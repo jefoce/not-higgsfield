@@ -4,13 +4,12 @@ import { useState } from 'react'
 import { isEmpty } from 'lodash-es'
 import useSWR from 'swr'
 
-import { extensionAllowed, extWithDot, mimeFromExt } from '@/core/media-kinds'
+import { extensionAllowed, extWithDot, type KindExtensions, mimeFromExt } from '@/core/media-kinds'
 import type { FolderFile, MediaKind } from '@/core/media-types'
 import { openPreview, type PreviewItem } from '@/features/preview/preview-store'
 import { fetchFolderFiles } from '@/lib/api/folders'
 import { thumbUrl } from '@/lib/api/media-urls'
 
-import type { PickerExtensions } from '../picker/store'
 import { FolderBreadcrumbs } from './FolderBreadcrumbs'
 import { FolderDirTile } from './FolderDirTile'
 import { FolderFileTile } from './FolderFileTile'
@@ -20,7 +19,7 @@ export interface FolderTabProps {
   folderName: string
   kinds: MediaKind[]
   max: number
-  extensions?: PickerExtensions
+  extensions?: KindExtensions
   sub: string
   selectedRels: string[]
   onPickFile: (rel: string) => void

@@ -38,4 +38,6 @@ export const UploadItemSchema = z.object({
   remote: UploadRemoteSchema.optional(),
 })
 
+export type UploadRemote = z.infer<typeof UploadRemoteSchema>
+
 export type UploadItem = z.infer<typeof UploadItemSchema>

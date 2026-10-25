@@ -2,7 +2,7 @@
 
 import { Image as ImageIcon, Music, Video } from 'lucide-react'
 
-import type { RefSlot } from '@/core/prompt-tokens'
+import type { MediaKind } from '@/core/media-types'
 
 const ICONS = {
   image: ImageIcon,
@@ -11,7 +11,7 @@ const ICONS = {
 }
 
 interface ReferenceIconProps {
-  kind: RefSlot['kind']
+  kind: MediaKind
   size: number
 }
 

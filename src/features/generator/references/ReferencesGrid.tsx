@@ -4,9 +4,9 @@ import { closestCenter, DndContext } from '@dnd-kit/core'
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import { keyBy } from 'lodash-es'
 
+import type { KindExtensions } from '@/core/media-kinds'
 import type { ModelPreset } from '@/core/presets/types'
 import { referenceSlots } from '@/core/prompt-tokens'
-import type { PickerExtensions } from '@/features/media-picker/picker/store'
 import { UploadProgressTile } from '@/features/media-picker/uploads/UploadProgressTile'
 import type { DropProps } from '@/features/media-picker/uploads/use-drop-upload'
 import type { UploadQueue } from '@/features/media-picker/uploads/use-upload-queue'
@@ -23,7 +23,7 @@ import { useReferencesDnd } from './use-references-dnd'
 
 interface ReferencesGridProps {
   preset: ModelPreset
-  extensions?: PickerExtensions
+  extensions?: KindExtensions
   max: number
   queue: UploadQueue
   dropProps: DropProps

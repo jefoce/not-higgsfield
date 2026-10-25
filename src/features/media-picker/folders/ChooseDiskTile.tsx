@@ -5,18 +5,17 @@ import { isEmpty } from 'lodash-es'
 import { FolderOpen } from 'lucide-react'
 import { toast } from 'sonner'
 
+import type { KindExtensions } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { errorMessage } from '@/lib/errors'
 import { getPlatform } from '@/lib/platform'
 import { Spinner } from '@/ui/Spinner'
 
-import type { PickerExtensions } from '../picker/store'
-
 interface ChooseDiskTileProps {
   kinds: MediaKind[]
   max: number
-  extensions?: PickerExtensions
+  extensions?: KindExtensions
   onUploaded: (items: UploadItem[]) => void
 }
 

@@ -1,10 +1,10 @@
-import type { TestMessage } from './use-secrets'
+import type { TestMessage, TestTone } from './use-secrets'
 
 const MESSAGE_TONES = {
   ok: 'text-lime',
   error: 'text-danger',
   info: 'text-fg-2',
-} satisfies Record<TestMessage['tone'], string>
+} satisfies Record<TestTone, string>
 
 interface TestMessageLineProps {
   result: TestMessage | null

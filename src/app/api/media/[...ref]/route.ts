@@ -6,7 +6,7 @@ import type { MediaKind } from '@/core/media-types'
 import { resolveMediaRef } from '@/server/fs/media-ref'
 import { streamFile } from '@/server/fs/range-response'
 import { errorResponse, jsonError, type PathRouteContext } from '@/server/http'
-import { CompatError, getCompatMedia } from '@/server/media/compat'
+import { CompatError, type CompatMedia, getCompatMedia } from '@/server/media/compat'
 import { assertLocalRequest } from '@/server/request-guard'
 
 export const dynamic = 'force-dynamic'
@@ -37,7 +37,7 @@ export async function GET(request: Request, { params }: PathRouteContext) {
       compatKind = media.kind
     }
 
-    let target: Awaited<ReturnType<typeof getCompatMedia>> | null = null
+    let target: CompatMedia | null = null
 
     if (!isNil(compatKind)) {
       target = await getCompatMedia({

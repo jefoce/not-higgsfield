@@ -4,16 +4,15 @@ import { isNil } from 'lodash-es'
 import { Minimize2 } from 'lucide-react'
 
 import { MEDIA_KINDS } from '@/core/media-kinds'
-import type { ReferencePlan } from '@/core/media-types'
+import type { MediaKindCounts, ReferencePlan } from '@/core/media-types'
 import type { ModelPreset } from '@/core/presets/types'
-import type { SlotCounts } from '@/core/prompt-tokens'
 import { cn } from '@/lib/cn'
 import { Tooltip } from '@/ui/Tooltip'
 
 import { REFERENCE_ICONS } from './reference-icons'
 
 interface ReferenceCountersProps {
-  counts: SlotCounts
+  counts: MediaKindCounts
   preset: ModelPreset
   plan: ReferencePlan | null
 }

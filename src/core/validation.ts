@@ -61,14 +61,18 @@ function createInputSchema(preset: ModelPreset) {
   })
 }
 
-export type PriceInput = z.infer<ReturnType<typeof priceInputSchema>>
+type PriceInputSchema = ReturnType<typeof priceInputSchema>
+
+type InputSchema = ReturnType<typeof createInputSchema>
+
+export type PriceInput = z.infer<PriceInputSchema>
 
 /** Schema for the price-only estimate request. Prompt and seed are ignored. */
-export function buildPriceInputSchema(preset: ModelPreset): ReturnType<typeof priceInputSchema> {
+export function buildPriceInputSchema(preset: ModelPreset): PriceInputSchema {
   return priceInputSchema(preset)
 }
 
-export function buildInputSchema(preset: ModelPreset): ReturnType<typeof createInputSchema> {
+export function buildInputSchema(preset: ModelPreset): InputSchema {
   return createInputSchema(preset)
 }
 

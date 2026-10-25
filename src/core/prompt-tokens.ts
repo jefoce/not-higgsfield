@@ -37,10 +37,8 @@ const CANONICAL = /@(Image|Video|Audio) (\d{1,2})(?!\d)/g
 const LOOSE =
   /@(image|img|video|audio)\s?(\d{1,2})(?!\d)|\[(image|img|video|audio)\s?(\d{1,2})\]|\b(Image|Video|Audio)\s(\d{1,2})(?!\d)/gi
 
-export type SlotCounts = MediaKindCounts
-
 export interface ReferenceSlotsResult {
-  counts: SlotCounts
+  counts: MediaKindCounts
   slots: Map<string, RefSlot>
 }
 
@@ -49,7 +47,7 @@ export function referenceSlots(
   ids: readonly string[],
   kindOf: (id: string) => MediaKind | undefined,
 ): ReferenceSlotsResult {
-  const counts: SlotCounts = { image: 0, video: 0, audio: 0 }
+  const counts: MediaKindCounts = { image: 0, video: 0, audio: 0 }
   const slots = new Map<string, RefSlot>()
 
   for (const id of ids) {
@@ -78,7 +76,7 @@ export function idForSlot(slots: Map<string, RefSlot>, slot: RefSlot): string | 
 }
 
 /** Text -> parts. @ and [] forms always become slots. Bare "Image 1" only when that slot exists. */
-export function parsePromptParts(text: string, counts: SlotCounts): PromptPart[] {
+export function parsePromptParts(text: string, counts: MediaKindCounts): PromptPart[] {
   const parts: PromptPart[] = []
   let last = 0
 
@@ -130,7 +128,7 @@ function readLooseMatch(match: RegExpExecArray): LooseMatch | null {
 }
 
 /** Resolves a loose match to a slot, or null to leave it as text. */
-function looseSlot(match: RegExpExecArray, counts: SlotCounts): RefSlot | null {
+function looseSlot(match: RegExpExecArray, counts: MediaKindCounts): RefSlot | null {
   const parsed = readLooseMatch(match)
 
   if (!parsed) {
@@ -192,7 +190,7 @@ export function promptSlots(prompt: string): RefSlot[] {
 }
 
 /** Slots mentioned but not attached. */
-export function missingSlots(prompt: string, counts: SlotCounts): RefSlot[] {
+export function missingSlots(prompt: string, counts: MediaKindCounts): RefSlot[] {
   return promptSlots(prompt).filter((slot) => slot.n > counts[slot.kind])
 }
 
@@ -205,6 +203,6 @@ export function renderPromptForApi(prompt: string, preset: ModelPreset): string 
 }
 
 /** Canonicalize loose forms (used by the server and history migration). */
-export function canonicalizePrompt(prompt: string, counts: SlotCounts): string {
+export function canonicalizePrompt(prompt: string, counts: MediaKindCounts): string {
   return serializeParts(parsePromptParts(prompt, counts))
 }

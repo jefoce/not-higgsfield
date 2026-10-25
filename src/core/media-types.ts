@@ -49,7 +49,7 @@ export interface ReferencePlan {
   images: ReferencePlanImage[]
 }
 
-interface ReferencePlanImage extends PixelSize {
+export interface ReferencePlanImage extends PixelSize {
   id: string
   bytes: number
   format: 'jpeg' | 'png'

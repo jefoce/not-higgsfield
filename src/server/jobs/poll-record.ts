@@ -4,7 +4,7 @@ import { isNil } from 'lodash-es'
 
 import { MAX_JOB_AGE_MIN } from '@/core/constants'
 import { recordProvider } from '@/core/providers/registry'
-import type { GenerationRecord, JobStatus } from '@/core/schemas/generation-record'
+import type { GenerationRecord, JobStatus, RecordJob } from '@/core/schemas/generation-record'
 
 import { ProviderError, type ProviderErrorKind } from '../providers/provider-error'
 import { getVideoProvider } from '../providers/registry'
@@ -52,7 +52,7 @@ export async function processRecord(record: GenerationRecord): Promise<void> {
 
 interface PollJobParams {
   record: GenerationRecord
-  current: NonNullable<GenerationRecord['job']>
+  current: RecordJob
 }
 
 /** Returns null when the tick handled the provider error. */
@@ -75,7 +75,7 @@ async function pollJob(params: PollJobParams): Promise<JobSnapshot | null> {
 
 interface PrepareNextParams {
   record: GenerationRecord
-  current: NonNullable<GenerationRecord['job']>
+  current: RecordJob
   job: JobSnapshot
   status: JobStatus
   now: string
@@ -83,7 +83,7 @@ interface PrepareNextParams {
 
 interface PreparedRecord {
   next: GenerationRecord
-  jobFields: NonNullable<GenerationRecord['job']>
+  jobFields: RecordJob
 }
 
 function prepareNext(params: PrepareNextParams): PreparedRecord {
@@ -143,7 +143,7 @@ function applyUsageCost(params: ApplyUsageCostParams): GenerationRecord {
 interface FinishFinalParams {
   record: GenerationRecord
   status: JobStatus
-  jobFields: NonNullable<GenerationRecord['job']>
+  jobFields: RecordJob
   job: JobSnapshot
   now: string
 }
