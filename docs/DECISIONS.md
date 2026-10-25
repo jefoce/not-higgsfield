@@ -1,5 +1,37 @@
 # Decisions
 
+## 2026-10-25 - Ternaries carry one simple choice
+
+Decision: a ternary is allowed only as `const name = test ? a : b`. The test is one simple check, branches are plain values. Components are never rendered through a ternary, use `&&`, an early return or a component variable (`const Icon = isOn ? A : B`). `TERNARY_SELECTORS` enforces the rule in `src`, tests stay exempt.
+
+Why: a JSX or call branch hides a second code path inside an expression, and the selector keeps each choice named.
+
+Rejected: nested ternaries, ternary JSX and ternary branches that compute.
+
+## 2026-10-25 - Callback props keep their name
+
+Decision: a callback prop passed down stays `props.onAction` at the use site. A function created in the component and passed to an `on*` prop is named `handle<Action>`. An existing function (setter, store action, `props.onX`, an import) is passed directly. A callback is destructured only when every use sits inside a hook callback, where `props.onX()` would make `props` the dependency. A store selection is named after the action (`clearSelection`) and passed directly.
+
+Why: renamed aliases add a second name for one function, and the destructuring exception stays limited to the dependency-array case.
+
+Rejected: `const handleClose = props.onClose`, destructuring renames and handler names on store actions.
+
+## 2026-10-25 - `jsx-no-bind` off
+
+Decision: `react/jsx-no-bind` is off. `INLINE_FUNCTION_SELECTORS` bans arrow and function values in JSX attributes, and a plain `const handleX = () => ...` is the default.
+
+Why: `jsx-no-bind` also reported a named handler declared in the component, which forced `useCallback` on every handler. The selector covers the inline case without forcing memoization.
+
+Rejected: `jsx-no-bind` with `allowArrowFunctions`, and `useCallback` as the only way to pass a handler.
+
+## 2026-10-25 - `Branded` ids deferred
+
+Decision: id types stay plain strings for now. Adopt a `Branded` type with the next data-model change.
+
+Why: upload, generation and folder ids are uuid strings, so branding would catch mix-ups, but it touches every id in schemas, repos, `lib/api`, stores and tests. That is a big diff with no bug on record.
+
+Rejected: branding now, and a partial brand on one id family.
+
 ## 2026-10-25 - Composition root in `server/boot.ts`
 
 Decision: `bootServer()` acquires the instance lock, starts secrets without blocking, wires the submit queue and job events, starts the poller and parent watch, then checks ffmpeg. `instrumentation.ts` only guards the runtime and calls it.
@@ -48,13 +80,13 @@ Why: named parts are readable, reusable and testable. `no-restricted-syntax` enf
 
 Rejected: inline object literals for parameter bags, return types and nested schema fields.
 
-## 2026-10-25 - Stored data schemas with `schemaVersion`
+## 2026-10-25 - Stored data schemas without version fields
 
-Decision: files on disk parse through `src/core/schemas` with `safeParse`. `GenerationRecord` carries `schemaVersion: 1`, defaulted for older files. An invalid file is skipped and logged, never thrown.
+Decision: files on disk parse through `src/core/schemas` with `safeParse`. Stored JSON changes are additive, new fields are optional or have a zod default. No version fields today. A file without a version is version 1, the first breaking change adds `schemaVersion: 2` and a migration next to the schema. An invalid file is skipped and logged, never thrown.
 
-Why: JSON on disk is outside data, and a version field allows a later migration.
+Why: every change on the horizon is additive, and a version added later costs nothing. Older files keep parsing and users move forward.
 
-Rejected: `JSON.parse(text) as T` and silent casts.
+Rejected: `JSON.parse(text) as T` and silent casts. A version field before the first breaking change.
 
 ## 2026-10-23 - Server-owned price estimate
 

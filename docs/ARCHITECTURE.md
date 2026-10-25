@@ -28,14 +28,17 @@ Two run modes, one server:
 | `src/core/schemas` | Zod schemas for stored JSON: records, uploads, folders. |
 | `src/core/provider-errors` | Error types, family tables, app rules and HTTP codes behind one `friendlyError`. |
 | `src/core/types.ts` | Shared API shapes: records, uploads, folders, pricing, secrets, capabilities. |
-| `src/server` | IO: boot, route helpers, jobs, services, repos, providers, storage, secrets, media. |
+| `src/core/catalog.ts` | Catalog entry, model status and catalog shapes shared by the client and the server. |
+| `src/core/utility-types.ts` | Shared utility types `Dict` and `HasId`. |
+| `src/server` | IO: boot, route helpers, jobs, services, repos, providers, storage, secrets, media, config. |
 | `src/server/boot.ts` | Composition root. Lock, secrets, queue wiring, poller, parent watch, ffmpeg. |
+| `src/server/config` | `isMockMode`, the app-wide dev switch shared by the provider and storage registries. |
 | `src/server/jobs` | `submit-queue`, `run-submit`, `submit-media`, `submit-record`, `poller`, `download-queue`, `reconcile`. |
-| `src/server/services` | Orchestration for routes and jobs: `credits`, `model-catalog`, `remote-inputs`, `upload-probe`, `uploads`, `connection-test`. |
+| `src/server/services` | Orchestration for routes and jobs: `credits`, `model-catalog`, `remote-inputs`, `upload-probe`, `uploads`, `connection-test`, `create-generation`, `estimate-generation`. |
 | `src/server/providers` | `VideoProvider` interface, registry, OpenRouter adapter, mock adapter, `ProviderError` kinds. |
 | `src/server/storage` | `ObjectStore` interface, registry, generic S3 store, R2 config, mock store, hashing. |
 | `src/server/repos` | `generations`, `uploads`, `folders`, `json-dir-store`. |
-| `src/server/sync` | `withLock`, the per-key serialization primitive. |
+| `src/server/sync` | `withLock`, the per-key serialization primitive, and `ttl-cache`, the `globalState` TTL cache. |
 | `src/server/media` | `image-data-url`, `to-data-url`, `thumbs`, `compat`, `ffmpeg`. |
 | `src/features` | UI grouped by feature: generator, history, media picker, preview, settings, player, studio. |
 | `src/features/generator` | `panel`, `store`, `references`, `frames`, `prompt`, `options`, `model`, `credits`, `generate`. |
@@ -44,6 +47,8 @@ Two run modes, one server:
 | `src/ui` | Primitives (button, modal, popover, tabs, slider, tooltip). |
 | `src/ui/form` | `Field`, `Input`, `NumberInput`, `PasswordInput`, `SearchInput`, `Switch`. |
 | `src/lib` | Client helpers, `platform/` (browser and desktop), drop router, media support. |
+| `src/lib/notify.ts` | `toastError` and `copyText`, the only toast helpers outside `src/features`. |
+| `src/lib/use-*.ts` | Shared hooks: `useBoolean`, `useAsyncAction`, `useDebouncedValue`. |
 | `src/lib/api` | Client functions for every route. The only place an API URL is written. |
 | `src/app` | Next routes and the page shell. |
 | `src-tauri` | Desktop shell, sidecar supervisor, window and settings. |
