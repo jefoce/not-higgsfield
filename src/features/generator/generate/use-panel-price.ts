@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { omit } from 'lodash-es'
 import useSWR from 'swr'
 import { useShallow } from 'zustand/react/shallow'
@@ -10,25 +9,13 @@ import type { GenerationInput } from '@/core/schemas/generation-record'
 import type { GenerationEstimate } from '@/core/types'
 import { fetchEstimate } from '@/lib/api/generations'
 import { generationEstimateKey } from '@/lib/swr-keys'
+import { useDebouncedValue } from '@/lib/use-debounced-value'
 
 import { useGeneratorStore } from '../store/store'
 
 const DEBOUNCE_MS = 500
 
 type PriceDraft = Omit<GenerationInput, 'prompt' | 'seed'>
-
-/** Serialized key stays until the draft stops changing. */
-function useDebouncedJson(json: string): string {
-  const [debouncedJson, setDebouncedJson] = useState(json)
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedJson(json), DEBOUNCE_MS)
-
-    return () => clearTimeout(timer)
-  }, [json])
-
-  return debouncedJson
-}
 
 /** Price-only body. Prompt and seed never reach the estimate key. */
 function priceJson(draft: PriceDraft): string {
@@ -53,7 +40,7 @@ export function usePanelPrice() {
   )
 
   const json = priceJson(draft)
-  const debouncedJson = useDebouncedJson(json)
+  const debouncedJson = useDebouncedValue(json, DEBOUNCE_MS)
 
   const { data, isLoading } = useSWR<GenerationEstimate>(
     generationEstimateKey(debouncedJson),
