@@ -4,10 +4,15 @@ import { type MouseEvent, useCallback } from 'react'
 
 import { cn } from '@/lib/cn'
 
+export interface FilterOption<T extends string> {
+  value: T
+  label: string
+}
+
 interface FilterChoiceProps<T extends string> {
   label: string
   value: T
-  options: readonly { value: T; label: string }[]
+  options: readonly FilterOption<T>[]
   onChange: (value: T) => void
 }
 

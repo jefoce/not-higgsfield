@@ -8,7 +8,7 @@ import type { AspectChoice, Resolution } from '@/core/presets/types'
 import { RESOLUTIONS } from '@/core/presets/types'
 
 import { type HistoryMode, useHistoryViewStore, type ViewFilters } from '../list/view-store'
-import { FilterChoice } from './FilterChoice'
+import { FilterChoice, type FilterOption } from './FilterChoice'
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -17,19 +17,19 @@ const STATUS_OPTIONS = [
   { value: 'failed', label: 'Failed' },
 ] as const
 
-const MODE_OPTIONS: readonly { value: HistoryMode; label: string }[] = [
+const MODE_OPTIONS: readonly FilterOption<HistoryMode>[] = [
   { value: 'all', label: 'All' },
   { value: 'text', label: 'Text' },
   { value: 'frames', label: 'Frames' },
   { value: 'references', label: 'References' },
 ]
 
-const RESOLUTION_OPTIONS: readonly { value: Resolution | 'all'; label: string }[] = [
+const RESOLUTION_OPTIONS: readonly FilterOption<Resolution | 'all'>[] = [
   { value: 'all', label: 'All' },
   ...RESOLUTIONS.map((value) => ({ value, label: value })),
 ]
 
-const ASPECT_OPTIONS: readonly { value: AspectChoice | 'all'; label: string }[] = [
+const ASPECT_OPTIONS: readonly FilterOption<AspectChoice | 'all'>[] = [
   { value: 'all', label: 'All' },
   { value: 'auto', label: 'Auto' },
   ...uniq(MODEL_PRESETS.flatMap((preset) => preset.aspectRatios)).map((value) => ({

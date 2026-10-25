@@ -5,9 +5,14 @@ import { useEffect, useRef, useState } from 'react'
 import type { ReferencePlan } from '@/core/media-types'
 import { requestReferencePlan } from '@/lib/api/generations'
 
+interface ImagePlanAnswer {
+  key: string
+  plan: ReferencePlan
+}
+
 /** Debounced share of the submit encoder. Stale answers for older lists are dropped. */
 export function useImagePlan(presetId: string, ids: string[]): ReferencePlan | null {
-  const [answer, setAnswer] = useState<{ key: string; plan: ReferencePlan } | null>(null)
+  const [answer, setAnswer] = useState<ImagePlanAnswer | null>(null)
   const key = ids.join(',')
   const answerKey = `${presetId}:${key}`
   const latest = useRef(0)

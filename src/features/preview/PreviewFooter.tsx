@@ -7,7 +7,12 @@ import type { UploadItem } from '@/core/media-types'
 import { type ActionKey, type PreviewActions } from './preview-store'
 import { PreviewActionButton } from './PreviewActionButton'
 
-const ACTIONS: { key: ActionKey; label: string }[] = [
+interface PreviewAction {
+  key: ActionKey
+  label: string
+}
+
+const ACTIONS: PreviewAction[] = [
   { key: 'insert', label: 'Insert in prompt' },
   { key: 'replace', label: 'Replace' },
   { key: 'remove', label: 'Remove' },

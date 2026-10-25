@@ -2,13 +2,15 @@
 
 import { useSelectionStore } from './selection-store'
 
-/** Selection state and click handling for one card. */
-export function useSelectionItem(id: string): {
+interface UseSelectionItem {
   selected: boolean
   selecting: boolean
   selectable: boolean
   select: (shift: boolean) => void
-} {
+}
+
+/** Selection state and click handling for one card. */
+export function useSelectionItem(id: string): UseSelectionItem {
   const isSelected = useSelectionStore((state) => state.ids.has(id))
   const isSelecting = useSelectionStore((state) => state.ids.size > 0)
   const isSelectable = useSelectionStore((state) => state.order.includes(id))

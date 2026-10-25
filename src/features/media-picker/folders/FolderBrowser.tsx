@@ -16,7 +16,12 @@ interface FolderBrowserProps {
   onNavigateParent: () => void
 }
 
-function crumbPaths(path: string): { label: string; path: string }[] {
+interface FolderCrumb {
+  label: string
+  path: string
+}
+
+function crumbPaths(path: string): FolderCrumb[] {
   const parts = path.split('/').filter(Boolean)
 
   return parts.map((label, index) => ({

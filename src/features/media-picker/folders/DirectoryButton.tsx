@@ -3,8 +3,10 @@
 import { useCallback } from 'react'
 import { Folder } from 'lucide-react'
 
+import type { BrowseDir } from '@/core/media-types'
+
 export interface DirectoryButtonProps {
-  dir: { name: string; path: string }
+  dir: BrowseDir
   onNavigate: (path: string) => void
 }
 

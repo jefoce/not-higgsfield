@@ -64,7 +64,15 @@ export async function POST(request: Request): Promise<Response> {
   }
 }
 
-type ExportEntry = { saved: string } | { skip: BatchSkip }
+interface ExportSaved {
+  saved: string
+}
+
+interface ExportSkipped {
+  skip: BatchSkip
+}
+
+type ExportEntry = ExportSaved | ExportSkipped
 
 interface ExportEntryParams {
   id: string

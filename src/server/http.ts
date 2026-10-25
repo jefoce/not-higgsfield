@@ -9,6 +9,30 @@ import type { MediaKind } from '@/core/media-types'
 import { HttpError, ValidationError } from './errors'
 import { ProviderError } from './providers/provider-error'
 
+export interface IdParams {
+  id: string
+}
+
+export interface IdRouteContext {
+  params: Promise<IdParams>
+}
+
+export interface PathParams {
+  ref: string[]
+}
+
+export interface PathRouteContext {
+  params: Promise<PathParams>
+}
+
+export interface KeyParams {
+  key: string[]
+}
+
+export interface KeyRouteContext {
+  params: Promise<KeyParams>
+}
+
 interface JsonErrorParams {
   status: number
   error: string

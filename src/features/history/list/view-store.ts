@@ -10,7 +10,9 @@ import type { HistoryFilters } from '@/core/types'
 export type HistoryMode = 'all' | 'text' | 'frames' | 'references'
 
 /** HistoryFilters plus the mode query the list route understands. */
-export type ViewFilters = HistoryFilters & { mode?: HistoryMode }
+export interface ViewFilters extends HistoryFilters {
+  mode?: HistoryMode
+}
 
 export type HistoryView = 'list' | 'grid'
 

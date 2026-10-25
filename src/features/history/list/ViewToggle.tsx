@@ -7,7 +7,12 @@ import { cn } from '@/lib/cn'
 
 import { type HistoryView, useHistoryViewStore } from './view-store'
 
-const OPTIONS: { value: HistoryView; label: string }[] = [
+interface ViewOption {
+  value: HistoryView
+  label: string
+}
+
+const OPTIONS: ViewOption[] = [
   { value: 'list', label: 'List' },
   { value: 'grid', label: 'Grid' },
 ]

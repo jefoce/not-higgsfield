@@ -1,16 +1,12 @@
 import { canCancelInGrace } from '@/core/submit-state'
-import { errorResponse, jsonError } from '@/server/http'
+import { errorResponse, type IdRouteContext, jsonError } from '@/server/http'
 import { cancelScheduledSubmit } from '@/server/jobs/submit-queue'
 import { deleteGenerationFiles, getGeneration } from '@/server/repos/generations'
 import { assertLocalRequest } from '@/server/request-guard'
 import { withLock } from '@/server/sync/lock'
 
-interface Params {
-  params: Promise<{ id: string }>
-}
-
 /** Cancels a generation only while it is still inside the grace window. */
-export async function POST(request: Request, { params }: Params) {
+export async function POST(request: Request, { params }: IdRouteContext) {
   try {
     assertLocalRequest(request)
     const { id } = await params

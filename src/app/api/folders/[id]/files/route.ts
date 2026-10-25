@@ -1,12 +1,8 @@
-import { errorResponse, parseKinds } from '@/server/http'
+import { errorResponse, type IdRouteContext, parseKinds } from '@/server/http'
 import { listFolderFiles } from '@/server/repos/folders'
 import { assertLocalRequest } from '@/server/request-guard'
 
-interface Params {
-  params: Promise<{ id: string }>
-}
-
-export async function GET(request: Request, { params }: Params) {
+export async function GET(request: Request, { params }: IdRouteContext) {
   try {
     assertLocalRequest(request)
     const { id } = await params

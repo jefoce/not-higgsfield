@@ -34,7 +34,12 @@ interface SlotTooltipParams {
 const TARGETS = { start: 'frame-start', end: 'frame-end' } as const
 const LABELS = { start: 'Start frame', end: 'End frame' } as const
 
-function frameState(params: FrameStateParams): { isBroken: boolean; isPreviewable: boolean } {
+interface FrameState {
+  isBroken: boolean
+  isPreviewable: boolean
+}
+
+function frameState(params: FrameStateParams): FrameState {
   const { hasFrame, upload } = params
 
   if (!hasFrame) {

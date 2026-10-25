@@ -12,7 +12,12 @@ import { Tooltip } from '@/ui/Tooltip'
 
 import { CreditsPopover } from './CreditsPopover'
 
-function summarize(credits: CreditsInfo | undefined): { text: string; amount: number | null } {
+interface CreditsSummary {
+  text: string
+  amount: number | null
+}
+
+function summarize(credits: CreditsInfo | undefined): CreditsSummary {
   if (!credits || (!isNil(credits.error) && credits.error !== '')) {
     return { text: '--', amount: null }
   }

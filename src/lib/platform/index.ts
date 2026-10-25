@@ -1,6 +1,6 @@
 import type { FolderItem, UploadItem } from '@/core/media-types'
 
-import type { Platform } from './types'
+import type { Platform, SavedVideos } from './types'
 
 let instance: Promise<Platform> | null = null
 
@@ -33,7 +33,6 @@ export const platform = {
     (await impl()).confirm(...args),
   saveVideo: async (...args: Parameters<Platform['saveVideo']>): Promise<boolean> =>
     (await impl()).saveVideo(...args),
-  saveVideos: async (
-    ...args: Parameters<Platform['saveVideos']>
-  ): Promise<{ saved: number; folder?: string }> => (await impl()).saveVideos(...args),
+  saveVideos: async (...args: Parameters<Platform['saveVideos']>): Promise<SavedVideos> =>
+    (await impl()).saveVideos(...args),
 }

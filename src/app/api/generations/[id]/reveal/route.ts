@@ -1,16 +1,12 @@
 import fs from 'node:fs/promises'
 
-import { errorResponse, jsonError } from '@/server/http'
+import { errorResponse, type IdRouteContext, jsonError } from '@/server/http'
 import { downloadPaths } from '@/server/paths'
 import { getGeneration } from '@/server/repos/generations'
 import { assertLocalRequest } from '@/server/request-guard'
 import { getSystem } from '@/server/system'
 
-interface Params {
-  params: Promise<{ id: string }>
-}
-
-export async function POST(request: Request, { params }: Params) {
+export async function POST(request: Request, { params }: IdRouteContext) {
   try {
     assertLocalRequest(request)
     const { id } = await params

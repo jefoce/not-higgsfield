@@ -3,7 +3,9 @@ import type { GenerationInput, GeneratorTab } from '@/core/types'
 
 type PromptMap = Record<GeneratorTab, string>
 
-export type GeneratorDraft = Omit<GenerationInput, 'prompt'> & { prompts: PromptMap }
+export interface GeneratorDraft extends Omit<GenerationInput, 'prompt'> {
+  prompts: PromptMap
+}
 
 /** Active mode prompt. */
 export const promptFor = (state: Pick<GeneratorDraft, 'prompts' | 'tab'>): string =>

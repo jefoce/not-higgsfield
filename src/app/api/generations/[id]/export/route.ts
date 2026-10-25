@@ -4,7 +4,7 @@ import path from 'node:path'
 import { isNil } from 'lodash-es'
 import { z } from 'zod'
 
-import { errorResponse, jsonError, zodError } from '@/server/http'
+import { errorResponse, type IdRouteContext, jsonError, zodError } from '@/server/http'
 import { getGeneration } from '@/server/repos/generations'
 import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 import { sessionRequired } from '@/server/session'
@@ -16,12 +16,8 @@ const BodySchema = z.object({
   overwrite: z.boolean().optional(),
 })
 
-interface Params {
-  params: Promise<{ id: string }>
-}
-
 /** Copies a finished video to a user-chosen absolute path. */
-export async function POST(request: Request, { params }: Params): Promise<Response> {
+export async function POST(request: Request, { params }: IdRouteContext): Promise<Response> {
   try {
     if (!sessionRequired()) {
       return jsonError({ status: 404, error: 'Not found' })

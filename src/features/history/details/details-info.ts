@@ -4,8 +4,13 @@ import { formatEstimate, formatUsd } from '@/core/pricing'
 import { ACTIVE_STATUSES, type GenerationRecord } from '@/core/types'
 import { formatClock } from '@/lib/format'
 
+interface CostInfo {
+  text: string
+  note: string
+}
+
 /** Cost text and its estimate or rate note for one record. */
-export function costInfo(record: GenerationRecord): { text: string; note: string } {
+export function costInfo(record: GenerationRecord): CostInfo {
   if (ACTIVE_STATUSES.includes(record.status)) {
     return { text: formatEstimate(record.cost.estimatedUsd), note: '' }
   }

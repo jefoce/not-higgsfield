@@ -5,13 +5,13 @@ import { errorResponse, zodError } from '@/server/http'
 import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 import { secretsReady, secretStatus, setSecrets } from '@/server/secrets'
 
-const BodySchema = z.object({
-  values: z.object(
-    Object.fromEntries(
-      SECRET_NAMES.map((name) => [name, SECRET_SCHEMAS[name].nullable().optional()]),
-    ),
+const SecretValuesSchema = z.object(
+  Object.fromEntries(
+    SECRET_NAMES.map((name) => [name, SECRET_SCHEMAS[name].nullable().optional()]),
   ),
-})
+)
+
+const BodySchema = z.object({ values: SecretValuesSchema })
 
 export async function GET(request: Request) {
   try {

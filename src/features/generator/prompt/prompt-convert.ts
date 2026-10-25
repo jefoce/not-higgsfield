@@ -94,10 +94,15 @@ export interface MentionItem {
   [key: string]: string | number | null
 }
 
-/** One typeahead row per current slot, with its live thumb. */
-export function mentionItems(state: Pick<GeneratorState, 'references' | 'uploadsById'>): {
+interface MentionItemGroups {
   '@': MentionItem[]
-} {
+  [key: string]: MentionItem[]
+}
+
+/** One typeahead row per current slot, with its live thumb. */
+export function mentionItems(
+  state: Pick<GeneratorState, 'references' | 'uploadsById'>,
+): MentionItemGroups {
   const counts = slotCounts(state)
   const items: MentionItem[] = []
 

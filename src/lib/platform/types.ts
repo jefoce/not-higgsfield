@@ -8,6 +8,11 @@ interface ChooseFilesParams {
   extensions?: KindExtensions
 }
 
+export interface SavedVideos {
+  saved: number
+  folder?: string
+}
+
 export interface Platform {
   kind: 'browser' | 'desktop'
 
@@ -28,15 +33,29 @@ export interface Platform {
   saveVideo(record: GenerationRecord): Promise<boolean>
 
   /** Saves many videos into one folder. Browser starts a staggered download per file. */
-  saveVideos(records: GenerationRecord[]): Promise<{ saved: number; folder?: string }>
+  saveVideos(records: GenerationRecord[]): Promise<SavedVideos>
 
   /** Desktop only: real paths of files dropped on the window. Browser returns a no-op unsubscribe. */
   onFileDrop(handler: FileDropHandler): Promise<() => void>
 }
 
-type FileDropEvent =
-  | { type: 'over'; x: number; y: number }
-  | { type: 'drop'; x: number; y: number; paths: string[] }
-  | { type: 'leave' }
+interface FileDropOverEvent {
+  type: 'over'
+  x: number
+  y: number
+}
+
+interface FileDropDropEvent {
+  type: 'drop'
+  x: number
+  y: number
+  paths: string[]
+}
+
+interface FileDropLeaveEvent {
+  type: 'leave'
+}
+
+type FileDropEvent = FileDropOverEvent | FileDropDropEvent | FileDropLeaveEvent
 
 type FileDropHandler = (event: FileDropEvent) => void

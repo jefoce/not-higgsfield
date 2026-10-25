@@ -1,17 +1,13 @@
 import { z } from 'zod'
 
-import { errorResponse, jsonError, zodError } from '@/server/http'
+import { errorResponse, type IdRouteContext, jsonError, zodError } from '@/server/http'
 import { deleteGeneration, setFavorite } from '@/server/jobs/generation-actions'
 import { getGeneration } from '@/server/repos/generations'
 import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 
 const PatchSchema = z.object({ favorite: z.boolean() })
 
-interface Params {
-  params: Promise<{ id: string }>
-}
-
-export async function GET(request: Request, { params }: Params) {
+export async function GET(request: Request, { params }: IdRouteContext) {
   try {
     assertLocalRequest(request)
     const { id } = await params
@@ -27,7 +23,7 @@ export async function GET(request: Request, { params }: Params) {
   }
 }
 
-export async function PATCH(request: Request, { params }: Params) {
+export async function PATCH(request: Request, { params }: IdRouteContext) {
   try {
     assertLocalRequest(request)
     const { id } = await params
@@ -49,7 +45,7 @@ export async function PATCH(request: Request, { params }: Params) {
   }
 }
 
-export async function DELETE(request: Request, { params }: Params) {
+export async function DELETE(request: Request, { params }: IdRouteContext) {
   try {
     assertLocalRequest(request)
     const { id } = await params

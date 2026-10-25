@@ -73,11 +73,13 @@ function uploadDropped(params: UploadDroppedParams): void {
     .catch((error) => toast.error(errorMessage(error)))
 }
 
-/** Tracks drag state and uploads files dropped on the returned handlers. */
-export function useDropUpload(params: DropUploadParams): {
+interface UseDropUpload {
   dragging: boolean
   dropProps: DropProps
-} {
+}
+
+/** Tracks drag state and uploads files dropped on the returned handlers. */
+export function useDropUpload(params: DropUploadParams): UseDropUpload {
   const { id, enabled: isEnabled, kinds, extensions, onUploaded, onFiles } = params
   const [isDragging, setIsDragging] = useState(false)
   const depth = useRef(0)

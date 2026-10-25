@@ -110,10 +110,12 @@ function handlePaste(event: PasteLike, params: PasteMediaOptions): void {
   handlePastedPath(event, params)
 }
 
-/** One paste behavior for the picker (window) and the generator panel (element). */
-export function usePasteMedia(params: PasteMediaOptions): {
+interface UsePasteMedia {
   onPaste?: (event: ClipboardEvent<HTMLElement>) => void
-} {
+}
+
+/** One paste behavior for the picker (window) and the generator panel (element). */
+export function usePasteMedia(params: PasteMediaOptions): UsePasteMedia {
   const { enabled: isEnabled, scope } = params
   const current = useRef(params)
 

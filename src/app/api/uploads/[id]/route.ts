@@ -1,15 +1,11 @@
 import { inputIds } from '@/core/submit-state'
 import { UploadError } from '@/server/errors'
-import { errorResponse } from '@/server/http'
+import { errorResponse, type IdRouteContext } from '@/server/http'
 import { listActiveGenerations } from '@/server/repos/generations'
 import { assertLocalRequest } from '@/server/request-guard'
 import { removeUpload } from '@/server/services/uploads'
 
-interface Params {
-  params: Promise<{ id: string }>
-}
-
-export async function DELETE(request: Request, { params }: Params) {
+export async function DELETE(request: Request, { params }: IdRouteContext) {
   try {
     assertLocalRequest(request)
     const { id } = await params

@@ -100,11 +100,13 @@ export function posterForWidth(record: GenerationRecord, mediaWidth: number): st
 
 export const uploadThumb = (id: string, width = 160): string => uploadThumbUrl(id, width)
 
-/** Reference counts and slot positions from the record snapshot order. */
-export function recordSlots(record: GenerationRecord): {
+interface RecordSlots {
   counts: SlotCounts
   slots: Map<string, RefSlot>
-} {
+}
+
+/** Reference counts and slot positions from the record snapshot order. */
+export function recordSlots(record: GenerationRecord): RecordSlots {
   return referenceSlots(record.input.references, (id) => record.inputsSnapshot[id]?.kind)
 }
 

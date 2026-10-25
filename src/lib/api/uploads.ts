@@ -79,8 +79,12 @@ export function uploadFilesWithProgress(
   })
 }
 
+interface UploadErrorBody {
+  error?: string
+}
+
 function serverErrorText(xhr: XMLHttpRequest): string {
-  const body = xhr.response as { error?: string } | null
+  const body = xhr.response as UploadErrorBody | null
   const text = isEmpty(xhr.statusText) ? `Upload failed (${xhr.status})` : xhr.statusText
 
   return body?.error ?? text

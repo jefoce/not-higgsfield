@@ -4,15 +4,11 @@ import { isNil } from 'lodash-es'
 
 import { resolveMediaRef } from '@/server/fs/media-ref'
 import { streamFile } from '@/server/fs/range-response'
-import { errorResponse, jsonError } from '@/server/http'
+import { errorResponse, jsonError, type PathRouteContext } from '@/server/http'
 import { CompatError, getCompatMedia } from '@/server/media/compat'
 import { assertLocalRequest } from '@/server/request-guard'
 
 export const dynamic = 'force-dynamic'
-
-interface Params {
-  params: Promise<{ ref: string[] }>
-}
 
 /** Download names are immutable uuids, uploads and folders can change. */
 function cacheControlFor(ref: string, isCompat: boolean): string {
@@ -27,7 +23,7 @@ function cacheControlFor(ref: string, isCompat: boolean): string {
   return 'private, max-age=0, must-revalidate'
 }
 
-export async function GET(request: Request, { params }: Params) {
+export async function GET(request: Request, { params }: PathRouteContext) {
   try {
     assertLocalRequest(request)
     const { ref } = await params

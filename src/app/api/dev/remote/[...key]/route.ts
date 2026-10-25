@@ -1,17 +1,13 @@
 import { isNil } from 'lodash-es'
 
 import { streamFile } from '@/server/fs/range-response'
-import { errorResponse, jsonError } from '@/server/http'
+import { errorResponse, jsonError, type KeyRouteContext } from '@/server/http'
 import { assertLocalRequest } from '@/server/request-guard'
 import { mockObjectPath, verifyMockSignature } from '@/server/storage/mock-store'
 
 export const dynamic = 'force-dynamic'
 
-interface Params {
-  params: Promise<{ key: string[] }>
-}
-
-async function serve(request: Request, { params }: Params): Promise<Response> {
+async function serve(request: Request, { params }: KeyRouteContext): Promise<Response> {
   const { key } = await params
 
   return handle(request, key)

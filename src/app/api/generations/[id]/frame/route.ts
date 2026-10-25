@@ -4,7 +4,7 @@ import path from 'node:path'
 
 import { z } from 'zod'
 
-import { errorResponse, jsonError, zodError } from '@/server/http'
+import { errorResponse, type IdRouteContext, jsonError, zodError } from '@/server/http'
 import { extractBoundaryFrame } from '@/server/media/ffmpeg'
 import { downloadPaths, DOWNLOADS_DIR } from '@/server/paths'
 import { getGeneration } from '@/server/repos/generations'
@@ -13,11 +13,7 @@ import { createFileUpload } from '@/server/services/uploads'
 
 const BodySchema = z.object({ at: z.enum(['first', 'last']) })
 
-interface Params {
-  params: Promise<{ id: string }>
-}
-
-export async function POST(request: Request, { params }: Params) {
+export async function POST(request: Request, { params }: IdRouteContext) {
   try {
     assertLocalRequest(request)
     const { id } = await params
