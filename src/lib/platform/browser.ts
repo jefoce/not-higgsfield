@@ -9,7 +9,9 @@ import {
   fetchSystemCapabilities,
 } from '@/lib/api/system'
 
-import type { Platform } from './types'
+import type { AppInfo, InstallResult, Platform, UpdateListener } from './types'
+
+const RELEASE_URL = 'https://github.com/jefoce/not-higgsfield/releases/latest'
 
 /** Download URL built from the record alone, no history feature import. */
 function downloadUrl(record: GenerationRecord): string {
@@ -105,4 +107,27 @@ export const browserPlatform: Platform = {
   },
 
   onFileDrop: noFileDrop,
+
+  appInfo: async (): Promise<AppInfo> => {
+    return {
+      version: process.env.NEXT_PUBLIC_APP_VERSION ?? '',
+      installKind: 'browser',
+      autoCheck: false,
+      lastCheck: null,
+    }
+  },
+
+  checkUpdate: async () => {
+    return null
+  },
+
+  installUpdate: async (_onProgress: UpdateListener): Promise<InstallResult> => {
+    return { cancelled: true }
+  },
+
+  setAutoCheck: async () => {},
+
+  openReleasePage: async () => {
+    window.open(RELEASE_URL, '_blank', 'noopener')
+  },
 }

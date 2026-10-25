@@ -15,6 +15,33 @@ export interface SavedVideos {
   folder?: string
 }
 
+export interface AppInfo {
+  version: string
+  installKind: InstallKind
+  autoCheck: boolean
+  lastCheck: string | null
+}
+
+export interface AppUpdate {
+  version: string
+  notes: string
+  date: string | null
+}
+
+export interface UpdateProgress {
+  downloaded: number
+  total: number | null
+  phase: 'downloading' | 'installing'
+}
+
+export interface InstallResult {
+  cancelled: boolean
+}
+
+export type InstallKind = 'macos' | 'windows' | 'appimage' | 'linux-package' | 'browser'
+
+export type UpdateListener = (progress: UpdateProgress) => void
+
 export interface Platform {
   kind: 'browser' | 'desktop'
 
@@ -39,6 +66,12 @@ export interface Platform {
 
   /** Desktop only: real paths of files dropped on the window. Browser returns a no-op unsubscribe. */
   onFileDrop(handler: FileDropHandler): Promise<() => void>
+
+  appInfo(): Promise<AppInfo>
+  checkUpdate(): Promise<AppUpdate | null>
+  installUpdate(onProgress: UpdateListener): Promise<InstallResult>
+  setAutoCheck(isOn: boolean): Promise<void>
+  openReleasePage(): Promise<void>
 }
 
 interface FileDropOverEvent {

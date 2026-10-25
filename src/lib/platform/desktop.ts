@@ -1,3 +1,4 @@
+import { Channel, invoke } from '@tauri-apps/api/core'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { ask, open, save } from '@tauri-apps/plugin-dialog'
 import {
@@ -18,7 +19,13 @@ import { createFolder } from '@/lib/api/folders'
 import { exportBatch, exportRecord } from '@/lib/api/generations'
 
 import { linkPaths } from './link-paths'
-import type { Platform } from './types'
+import type { InstallResult, Platform, UpdateListener } from './types'
+import {
+  AppInfoSchema,
+  InstallResultSchema,
+  UpdateCheckSchema,
+  UpdateProgressSchema,
+} from './update-schemas'
 
 export const desktopPlatform: Platform = {
   kind: 'desktop',
@@ -145,5 +152,31 @@ export const desktopPlatform: Platform = {
         handler({ type: 'over', x, y })
       }
     })
+  },
+
+  appInfo: async () => {
+    return AppInfoSchema.parse(await invoke('update_info'))
+  },
+
+  checkUpdate: async () => {
+    return UpdateCheckSchema.parse(await invoke('update_check'))
+  },
+
+  installUpdate: async (onProgress: UpdateListener): Promise<InstallResult> => {
+    const channel = new Channel<unknown>()
+
+    channel.onmessage = (message) => {
+      onProgress(UpdateProgressSchema.parse(message))
+    }
+
+    return InstallResultSchema.parse(await invoke('update_install', { channel }))
+  },
+
+  setAutoCheck: async (isOn: boolean) => {
+    await invoke('update_set_auto', { isOn })
+  },
+
+  openReleasePage: async () => {
+    await invoke('update_open_release')
   },
 }

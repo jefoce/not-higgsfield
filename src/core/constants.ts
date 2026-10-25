@@ -20,6 +20,8 @@ export const HISTORY_SCROLL_DELAY_MS = 300
 export const HISTORY_BATCH_MAX = 200
 export const DOWNLOAD_STAGGER_MS = 300
 export const CREDITS_POLL_MS = 60000
+export const UPDATE_CHECK_DELAY_MS = 15000
+export const UPDATE_CHECK_INTERVAL_MS = 43200000
 
 export const LOW_RES_MIN_PX = 300
 

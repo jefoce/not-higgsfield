@@ -1,6 +1,6 @@
 'use client'
 
-import { type RefObject } from 'react'
+import { type ReactNode, type RefObject } from 'react'
 import { isEmpty } from 'lodash-es'
 
 import { REMOTE_MAX_GB } from '@/core/constants'
@@ -20,6 +20,7 @@ interface SettingsBodyProps {
   status: SecretStatus | undefined
   draft: SettingsDraft
   sectionRefs: Record<SettingsSection, RefObject<HTMLElement | null>>
+  appSection: ReactNode
 }
 
 function storedNote(remote: RemoteStatus | undefined): string | undefined {
@@ -32,7 +33,7 @@ function storedNote(remote: RemoteStatus | undefined): string | undefined {
 
 /** Loading, error and key sections inside the settings modal. */
 export function SettingsBody(props: SettingsBodyProps) {
-  const { status, draft, sectionRefs } = props
+  const { status, draft, sectionRefs, appSection } = props
   const remote = useRemoteStatusData()
 
   const {
@@ -51,12 +52,10 @@ export function SettingsBody(props: SettingsBodyProps) {
     return void onRetry()
   }
 
-  const loadError = status?.loadError
-
-  if (!isEmpty(loadError)) {
+  if (!isEmpty(status?.loadError)) {
     return (
       <div className="flex items-start justify-between gap-3 rounded-lg border border-danger/40 bg-danger/10 p-3">
-        <p className="text-xs text-danger">{loadError}</p>
+        <p className="text-xs text-danger">{status?.loadError}</p>
         <Button size="sm" variant="outline" loading={isRetrying} onClick={handleRetry}>
           Retry
         </Button>
@@ -116,6 +115,8 @@ export function SettingsBody(props: SettingsBodyProps) {
           />
         )
       })}
+
+      {appSection}
     </>
   )
 }

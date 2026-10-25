@@ -1,8 +1,9 @@
 'use client'
 
-import { createRef, type RefObject, useEffect, useMemo } from 'react'
+import { createRef, type ReactNode, type RefObject, useEffect, useMemo } from 'react'
 import { X } from 'lucide-react'
 import useSWR from 'swr'
+import { useShallow } from 'zustand/react/shallow'
 
 import type { CreditsInfo } from '@/core/types'
 import { fetchCredits } from '@/lib/api/credits'
@@ -23,19 +24,19 @@ function createSectionRefs(): Record<SettingsSection, RefObject<HTMLElement | nu
   ) as Record<SettingsSection, RefObject<HTMLElement | null>>
 }
 
+interface SettingsModalProps {
+  appSection: ReactNode
+}
+
 /** Stored key editor: status, save, remove and test. */
-export function SettingsModal() {
-  const isOpen = useSettingsStore((state) => {
-    return state.open
-  })
+export function SettingsModal(props: SettingsModalProps) {
+  const { appSection } = props
 
-  const section = useSettingsStore((state) => {
-    return state.section
-  })
-
-  const closeSettings = useSettingsStore((state) => {
-    return state.closeSettings
-  })
+  const { isOpen, section, closeSettings } = useSettingsStore(
+    useShallow((state) => {
+      return { isOpen: state.open, section: state.section, closeSettings: state.closeSettings }
+    }),
+  )
 
   const { status } = useSecrets()
 
@@ -94,7 +95,12 @@ export function SettingsModal() {
       </header>
 
       <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-5 py-3">
-        <SettingsBody status={status} draft={draft} sectionRefs={sectionRefs} />
+        <SettingsBody
+          status={status}
+          draft={draft}
+          sectionRefs={sectionRefs}
+          appSection={appSection}
+        />
       </div>
 
       <footer className="flex items-center justify-between gap-3 border-t border-line px-5 py-3">
