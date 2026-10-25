@@ -4,6 +4,7 @@ import { isNil } from 'lodash-es'
 import { ExternalLink, RefreshCw } from 'lucide-react'
 
 import { formatUsd } from '@/core/pricing'
+import { OPENROUTER_CREDITS_URL } from '@/core/providers/openrouter'
 import { openSettings } from '@/features/settings/settings-store'
 import { useCredits } from '@/lib/api/credits'
 import { getPlatform } from '@/lib/platform'
@@ -17,7 +18,7 @@ function handleOpenSettings(): void {
 function handleTopUp(): void {
   void getPlatform()
     .then((platform) => {
-      return platform.openExternal('https://openrouter.ai/settings/credits')
+      return platform.openExternal(OPENROUTER_CREDITS_URL)
     })
     .catch(() => {})
 }

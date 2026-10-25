@@ -1,5 +1,7 @@
 import type { VideoProviderDescriptor } from './types'
 
+export const OPENROUTER_CREDITS_URL = 'https://openrouter.ai/settings/credits'
+
 export const OPENROUTER_DESCRIPTOR = {
   id: 'openrouter',
   label: 'OpenRouter',
@@ -20,11 +22,12 @@ export const OPENROUTER_DESCRIPTOR = {
     },
   ],
   requiredSecrets: ['OPENROUTER_API_KEY'],
-  links: {
-    keys: 'https://openrouter.ai/settings/keys',
-    credits: 'https://openrouter.ai/settings/credits',
-    docs: 'https://openrouter.ai/docs/guides/overview/multimodal/video-generation',
-  },
+  links: [
+    { label: 'API keys', url: 'https://openrouter.ai/workspaces/default/keys' },
+    { label: 'Management keys', url: 'https://openrouter.ai/settings/management-keys' },
+    { label: 'Credits', url: OPENROUTER_CREDITS_URL },
+    { label: 'Setup guide', url: 'https://github.com/jefoce/not-higgsfield#first-setup' },
+  ],
   httpRules: {
     400: {
       title: 'OpenRouter rejected the request.',

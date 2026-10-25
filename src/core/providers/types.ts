@@ -21,10 +21,9 @@ export interface ProviderSecretField {
 }
 
 /** @public */
-export interface ProviderLinks {
-  keys: string
-  credits: string | null
-  docs: string
+export interface ProviderLink {
+  label: string
+  url: string
 }
 
 export interface VideoProviderDescriptor {
@@ -32,7 +31,7 @@ export interface VideoProviderDescriptor {
   label: string
   fields: readonly ProviderSecretField[]
   requiredSecrets: readonly SecretName[]
-  links: ProviderLinks
+  links: readonly ProviderLink[]
   httpRules: HttpRuleTable
 }
 
@@ -41,5 +40,5 @@ export interface StorageProviderDescriptor {
   label: string
   fields: readonly ProviderSecretField[]
   requiredSecrets: readonly SecretName[]
-  links: ProviderLinks
+  links: readonly ProviderLink[]
 }

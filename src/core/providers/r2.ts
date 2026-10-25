@@ -35,9 +35,9 @@ export const R2_DESCRIPTOR = {
     },
   ],
   requiredSecrets: R2_NAMES,
-  links: {
-    keys: 'https://dash.cloudflare.com/?to=/:account/r2/api-tokens',
-    credits: null,
-    docs: 'https://developers.cloudflare.com/r2/',
-  },
+  links: [
+    { label: 'Buckets', url: 'https://dash.cloudflare.com/?to=/:account/r2/overview' },
+    { label: 'API tokens', url: 'https://dash.cloudflare.com/?to=/:account/r2/api-tokens' },
+    { label: 'Setup guide', url: 'https://github.com/jefoce/not-higgsfield#first-setup' },
+  ],
 } satisfies StorageProviderDescriptor

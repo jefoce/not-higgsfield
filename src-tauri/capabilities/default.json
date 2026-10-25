@@ -14,7 +14,11 @@
     "notification:default",
     {
       "identifier": "opener:allow-open-url",
-      "allow": [{ "url": "https://openrouter.ai/*" }]
+      "allow": [
+        { "url": "https://openrouter.ai/*" },
+        { "url": "https://dash.cloudflare.com/*" },
+        { "url": "https://github.com/jefoce/not-higgsfield*" }
+      ]
     }
   ]
 }
