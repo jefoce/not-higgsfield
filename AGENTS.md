@@ -55,7 +55,7 @@ pnpm typecheck && pnpm lint && pnpm deps && pnpm format:check && pnpm knip && pn
 - One type per API shape, in `src/core`, imported by both the route and the client. No copies of a response type in a component.
 - Flat object types. One level per object type. Every nested shape gets a name. Owner-prefixed when the part belongs to one owner (`RecordJob`, `RecordOutput`), shared when the shape repeats (`PixelSize`, `FrameSlots`, `MediaKindCounts`). Width and height pairs use `PixelSize`. No inline `z.object` inside another schema. Tests are exempt.
 - `satisfies` for literal config objects (presets, tables). `as const` for fixed lists.
-- No nested ternaries. Branch on simple values only (identifier, literal, member access, template string, JSX, `null`, single-argument call). A function, object, array, `await`, assignment or nested ternary in a branch becomes a named handler, variable or early return.
+- Ternary only as `const name = test ? a : b`. The test is one simple check, branches are plain values. Never render JSX through a ternary: use `&&`, an early return, or a component variable (`const Icon = isOn ? A : B`).
 - Boolean variables and params start with `is`, `has`, `can`, `should` or `did`. Types are PascalCase. Module constants are UPPER_CASE or camelCase.
 - Zod schema constants keep PascalCase names (`QuerySchema`), even though other module constants are camelCase or UPPER_CASE.
 - Required props and fields stay required. Do not make a value optional and then guard against undefined downstream.
@@ -180,8 +180,6 @@ async function copyUnique(params: CopyUniqueParams): Promise<string> {
   Boolean(poster) && <img src={poster} alt="" />
 }
 ```
-
-- A ternary only when both branches render something: `{completed ? <LazyVideo /> : <StatusOverlay />}`.
 
 ## UI building blocks
 
