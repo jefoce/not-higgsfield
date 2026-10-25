@@ -1,8 +1,10 @@
-import { isEmpty, isNil } from 'lodash-es'
+import { isEmpty } from 'lodash-es'
 
 import { THUMB_WIDTH } from '@/core/constants'
 import { isNonEmptyString } from '@/core/guards'
 import { canPlay } from '@/lib/media-support'
+
+import { withQuery } from './query'
 
 const encodeRef = (ref: string): string => ref.split('/').map(encodeURIComponent).join('/')
 
@@ -34,13 +36,8 @@ export function mediaUrl(ref: string, mime?: string): string {
 /** Thumbnail URL for a ref, encoding each path segment. */
 export function thumbUrl(params: ThumbUrlParams): string {
   const { ref, w = THUMB_WIDTH, version } = params
-  const query = new URLSearchParams({ w: String(w) })
 
-  if (!isNil(version)) {
-    query.set('v', String(version))
-  }
-
-  return `/api/thumbs/${encodeRef(ref)}?${query.toString()}`
+  return withQuery(`/api/thumbs/${encodeRef(ref)}`, { w, v: version })
 }
 
 /** Download URL for a stored video file, optionally forcing a download. */

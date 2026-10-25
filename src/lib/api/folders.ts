@@ -4,7 +4,7 @@ import type { BrowseResult, FolderListing, MediaKind } from '@/core/media-types'
 import type { FolderItem } from '@/core/schemas/folder-item'
 import { apiDelete, apiPost, fetcher } from '@/lib/fetcher'
 
-import { withQuery } from './uploads'
+import { withQuery } from './query'
 
 export function fetchFolders(): Promise<FolderItem[]> {
   return fetcher<FolderItem[]>('/api/folders')

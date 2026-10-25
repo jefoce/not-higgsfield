@@ -5,6 +5,25 @@ import { isNonEmptyString } from './guards'
 import type { GenerationInput, GenerationRecord, JobStatus } from './schemas/generation-record'
 import { ACTIVE_STATUSES, type HistoryFilters, type HistoryMode, type StatusFilter } from './types'
 
+/** View defaults, and the value each filter needs to count as inactive. */
+export const DEFAULT_FILTERS = {
+  status: 'all',
+  tab: 'all',
+  resolution: 'all',
+  aspect: 'all',
+  audio: 'any',
+  mode: 'all',
+  model: 'all',
+} as const satisfies Pick<
+  HistoryFilters,
+  'status' | 'tab' | 'resolution' | 'aspect' | 'audio' | 'mode' | 'model'
+>
+
+type FilterKey = keyof typeof DEFAULT_FILTERS
+
+/** Filter name and its inactive value, in query order. */
+export const FILTER_PARAMS = Object.entries(DEFAULT_FILTERS) as [FilterKey, string][]
+
 const hasMedia = (input: GenerationInput): boolean =>
   !isEmpty(input.frames.start) || !isEmpty(input.frames.end) || !isEmpty(input.references)
 

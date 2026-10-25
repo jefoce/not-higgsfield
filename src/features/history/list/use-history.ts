@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo } from 'react'
 import useSWRInfinite from 'swr/infinite'
 
-import { HISTORY_PAGE_SIZE } from '@/core/constants'
 import { isNonEmptyString } from '@/core/guards'
 import { countActive } from '@/core/history-filters'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
@@ -13,30 +12,7 @@ import { registerHistoryRefresh } from '@/lib/swr-keys'
 
 import { loadedRecords, revalidateHistory } from './history-pages'
 import { useHistoryPoll } from './use-history-poll'
-import { FILTER_PARAMS, useHistoryViewStore, type ViewFilters } from './view-store'
-
-function historyKey(filters: ViewFilters): string {
-  const params = new URLSearchParams({ limit: String(HISTORY_PAGE_SIZE) })
-  const query = filters.q?.trim()
-
-  if (isNonEmptyString(query)) {
-    params.set('q', query)
-  }
-
-  if (filters.favorite === true) {
-    params.set('favorite', '1')
-  }
-
-  for (const [key, fallback] of FILTER_PARAMS) {
-    const value = filters[key]
-
-    if (isNonEmptyString(value) && value !== fallback) {
-      params.set(key, value)
-    }
-  }
-
-  return params.toString()
-}
+import { useHistoryViewStore } from './view-store'
 
 interface HistoryResult {
   records: GenerationRecord[]
@@ -51,12 +27,11 @@ interface HistoryResult {
 
 export function useHistory(): HistoryResult {
   const filters = useHistoryViewStore((state) => state.filters)
-  const query = historyKey(filters)
 
   const { data, isLoading, isValidating, size, setSize, mutate } =
     useSWRInfinite<GenerationListResult>(
       (index: number, previous: GenerationListResult | null) =>
-        generationPageKey({ query, index, previous }),
+        generationPageKey({ filters, index, previous }),
       fetchGenerationPage,
       {
         keepPreviousData: true,

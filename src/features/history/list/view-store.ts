@@ -5,32 +5,14 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 import { ZOOM_DEFAULT, ZOOM_STEPS } from '@/core/constants'
+import { DEFAULT_FILTERS, FILTER_PARAMS } from '@/core/history-filters'
 import type { HistoryFilters, HistoryMode } from '@/core/types'
-
-/** HistoryFilters plus the mode query the list route understands. */
-export interface ViewFilters extends HistoryFilters {
-  mode?: HistoryMode
-}
 
 export type HistoryView = 'list' | 'grid'
 
-const DEFAULT_FILTERS = {
-  status: 'all',
-  tab: 'all',
-  resolution: 'all',
-  aspect: 'all',
-  audio: 'any',
-  mode: 'all',
-  model: 'all',
-} as const satisfies Pick<
-  ViewFilters,
-  'status' | 'tab' | 'resolution' | 'aspect' | 'audio' | 'mode' | 'model'
->
-
-type FilterKey = keyof typeof DEFAULT_FILTERS
-
-/** Query param name and its "no filter" value, shared with the list key. */
-export const FILTER_PARAMS = Object.entries(DEFAULT_FILTERS) as [FilterKey, string][]
+interface ViewFilters extends HistoryFilters {
+  mode?: HistoryMode
+}
 
 const MAX_ZOOM = ZOOM_STEPS - 1
 

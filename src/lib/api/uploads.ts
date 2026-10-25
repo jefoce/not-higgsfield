@@ -1,32 +1,14 @@
 import { isEmpty, isNil } from 'lodash-es'
 
-import { isNonEmptyString } from '@/core/guards'
 import type { MediaKind } from '@/core/media-types'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { apiDelete, apiPost, fetcher } from '@/lib/fetcher'
 
+import { withQuery } from './query'
+
 export interface FetchUploadsParams {
   kinds?: MediaKind[]
   ids?: string[]
-}
-
-/** Adds only defined, non-empty query values to a URL. */
-export function withQuery(base: string, params: Record<string, string | undefined>): string {
-  const query = new URLSearchParams()
-
-  for (const [key, value] of Object.entries(params)) {
-    if (isNonEmptyString(value)) {
-      query.set(key, value)
-    }
-  }
-
-  const qs = query.toString()
-
-  if (isEmpty(qs)) {
-    return base
-  }
-
-  return `${base}?${qs}`
 }
 
 export function fetchUploads(params: FetchUploadsParams = {}): Promise<UploadItem[]> {
