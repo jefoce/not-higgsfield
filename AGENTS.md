@@ -159,7 +159,7 @@ async function copyUnique(params: CopyUniqueParams): Promise<string> {
   2. The function is in a dependency array (`useEffect`, `useMemo`, another `useCallback`).
   3. A custom hook returns the function. Consumers may put it in their deps.
   4. The function goes to a third-party hook or component that documents a stable identity requirement.
-- Everywhere else, a plain `const handleX = () => ...`. `react-hooks/exhaustive-deps` catches missing deps in cases 2 and 3.
+- Plain `const handleX = () => ...` is the default. `jsx-no-bind` is off, the inline-function selector bans only inline JSX functions. `react-hooks/exhaustive-deps` catches missing deps in cases 2 and 3.
 - Same rule for `useMemo`: objects or arrays passed to a `memo()` child or a dependency array, and calculations measured as slow. Not for cheap values.
 
 ### Conditional rendering
