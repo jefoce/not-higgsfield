@@ -10,7 +10,6 @@ import type { VideoProviderId } from '@/core/providers/types'
 import type { PricingInfo } from '@/core/types'
 
 import { globalState } from '../global-state'
-import { isMockMode } from '../providers/openrouter/mock-mode'
 import { getVideoProvider } from '../providers/registry'
 import type { ProviderModel } from '../providers/types'
 import { secretsReady } from '../secrets'
@@ -66,10 +65,6 @@ async function buildEntry(preset: ModelPreset): Promise<CatalogEntry> {
       status: 'no_provider',
       reason: `Add your ${label} key in Settings.`,
     }
-  }
-
-  if (isMockMode()) {
-    return { ...base, provider: binding.provider, status: 'available', reason: null }
   }
 
   const models = await provider.listModels()

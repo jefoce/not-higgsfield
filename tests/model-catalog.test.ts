@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { MODEL_PRESETS } from '@/core/presets'
 import { primaryBinding } from '@/core/pricing'
+import { listModels as mockListModels } from '@/server/providers/mock/models'
 import type { ProviderModel } from '@/server/providers/types'
 import { getModelCatalog } from '@/server/services/model-catalog'
 
@@ -17,7 +18,6 @@ const mocks = vi.hoisted(() => {
   return {
     getPricing: vi.fn(async () => pricing),
     isConfigured: vi.fn(() => true),
-    isMockMode: vi.fn(() => false),
     listModels: vi.fn(async (): Promise<readonly ProviderModel[]> => []),
   }
 })
@@ -28,10 +28,6 @@ vi.mock('@/server/providers/registry', () => ({
     isConfigured: mocks.isConfigured,
     listModels: mocks.listModels,
   }),
-}))
-
-vi.mock('@/server/providers/openrouter/mock-mode', () => ({
-  isMockMode: () => mocks.isMockMode(),
 }))
 
 vi.mock('@/server/secrets', () => ({
@@ -56,7 +52,6 @@ const allPresetModels = (): ProviderModel[] =>
 beforeEach(() => {
   mocks.getPricing.mockClear()
   mocks.isConfigured.mockReturnValue(true)
-  mocks.isMockMode.mockReturnValue(false)
   mocks.listModels.mockReset()
   mocks.listModels.mockResolvedValue([])
 })
@@ -97,12 +92,12 @@ describe('getModelCatalog status', () => {
     expect(mocks.listModels).not.toHaveBeenCalled()
   })
 
-  it('marks every model available in mock mode without a fetch', async () => {
-    mocks.isMockMode.mockReturnValue(true)
+  it('marks every model available from the mock adapter list', async () => {
+    mocks.listModels.mockResolvedValue(await mockListModels())
 
     const { entries } = await getModelCatalog()
 
     expect(entries.every((entry) => entry.status === 'available')).toBe(true)
-    expect(mocks.listModels).not.toHaveBeenCalled()
+    expect(entries.every((entry) => entry.reason === null)).toBe(true)
   })
 })
