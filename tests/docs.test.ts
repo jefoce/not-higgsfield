@@ -2,10 +2,15 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { isString } from 'lodash-es'
 import { describe, expect, it } from 'vitest'
 
 import * as bounds from '@/core/constants'
 import { MODEL_PRESETS } from '@/core/presets'
+import { APP_RULES } from '@/core/provider-errors/app'
+import { OPENROUTER_DESCRIPTOR } from '@/core/providers/openrouter'
+import { STORAGE_PROVIDERS, VIDEO_PROVIDERS } from '@/core/providers/registry'
+import { GUIDE_BASE } from '@/core/providers/types'
 import { STATUS_HELP } from '@/core/status-help'
 import type { Dict } from '@/core/utility-types'
 
@@ -60,6 +65,26 @@ function tableRows(markdown: string, heading: string): string[][] {
 
 const file = (rel: string) => {
   return path.join(ROOT, rel)
+}
+
+/** Image targets in markdown image syntax and HTML src attributes. */
+function imageTargets(markdown: string): string[] {
+  const targets: string[] = []
+
+  for (const match of markdown.matchAll(/(?:!\[[^\]]*\]\(|\bsrc=")([^")\s]+)/g)) {
+    const target = required(match[1], 'image target').split('#')[0] ?? ''
+
+    if (target.includes('images/')) {
+      targets.push(target)
+    }
+  }
+
+  return targets
+}
+
+/** Rule title as text, throwing when the rule builds it from raw text. */
+function ruleTitle(title: unknown, label: string): string {
+  return required(isString(title) ? title : null, `Rule title for ${label}`)
 }
 
 /** Status labels packed in the first cell of a row, split on `/`. */
@@ -164,15 +189,84 @@ describe('documentation tables', () => {
       )
     }
   })
+})
 
-  it('keeps the README R2 limits equal to the constants', () => {
-    const readme = fs.readFileSync(file('README.md'), 'utf8')
+describe('user guides', () => {
+  it('keeps every guide image on disk', () => {
+    const files = [
+      'README.md',
+      ...fs.readdirSync(path.join(DOCS, 'user')).map((name) => {
+        return path.join('docs', 'user', name)
+      }),
+    ]
 
-    expect(bounds.REMOTE_MAX_GB).toBe(8)
-    expect(readme).toContain(`${String(bounds.REMOTE_MAX_GB)} GB`)
-    expect(readme).toContain(`${String(bounds.REMOTE_UNUSED_DAYS)} days`)
+    for (const rel of files) {
+      for (const target of imageTargets(fs.readFileSync(file(rel), 'utf8'))) {
+        const resolved = path.resolve(path.dirname(file(rel)), target)
+
+        expect(fs.existsSync(resolved), `${rel} -> ${target}`).toBe(true)
+      }
+    }
   })
 
+  it('links the README and the app to both guides', () => {
+    const readme = fs.readFileSync(file('README.md'), 'utf8')
+
+    for (const rel of ['docs/user/OPENROUTER.md', 'docs/user/CLOUDFLARE-R2.md']) {
+      expect(readme).toContain(`](${rel})`)
+      expect(fs.existsSync(file(rel)), rel).toBe(true)
+    }
+
+    for (const descriptor of [...VIDEO_PROVIDERS, ...STORAGE_PROVIDERS]) {
+      const link = required(
+        descriptor.links.find((candidate) => {
+          return candidate.label === 'Setup guide'
+        }),
+        `Setup guide link for ${descriptor.id}`,
+      )
+
+      const rel = link.url.slice(`${GUIDE_BASE}/`.length)
+
+      expect(link.url.startsWith(GUIDE_BASE), descriptor.id).toBe(true)
+      expect(fs.existsSync(path.join(DOCS, 'user', rel)), link.url).toBe(true)
+    }
+  })
+
+  it('keeps the R2 guide numbers equal to the constants', () => {
+    const guide = fs.readFileSync(file('docs/user/CLOUDFLARE-R2.md'), 'utf8')
+
+    expect(bounds.REMOTE_MAX_GB).toBe(8)
+    expect(guide).toContain(`${String(bounds.REMOTE_MAX_GB)} GB`)
+    expect(guide).toContain(`${String(bounds.REMOTE_FREE_GB)} GB`)
+    expect(guide).toContain(`${String(bounds.REMOTE_UNUSED_DAYS)} days`)
+    expect(guide).toContain(`${String(bounds.REMOTE_LINK_TTL_SEC / 3600)} hours`)
+  })
+
+  it('quotes the app strings in the guides', () => {
+    const openrouter = fs.readFileSync(file('docs/user/OPENROUTER.md'), 'utf8')
+    const r2 = fs.readFileSync(file('docs/user/CLOUDFLARE-R2.md'), 'utf8')
+    const readme = fs.readFileSync(file('README.md'), 'utf8')
+    const unauthorized = required(OPENROUTER_DESCRIPTOR.httpRules[401], '401 rule')
+    const insufficient = required(OPENROUTER_DESCRIPTOR.httpRules[402], '402 rule')
+
+    const capRule = required(
+      APP_RULES.find((rule) => {
+        return rule.match === "R2 is at the app's"
+      }),
+      'R2 cap rule',
+    )
+
+    const capTitle = ruleTitle(capRule.title, 'R2 cap')
+
+    expect(openrouter).toContain(ruleTitle(unauthorized.title, '401'))
+    expect(openrouter).toContain(ruleTitle(insufficient.title, '402'))
+    expect(r2).toContain(capTitle)
+    expect(readme).toContain(capTitle)
+    expect(readme).not.toContain("R2 is at the app's")
+  })
+})
+
+describe('documentation text', () => {
   it('keeps the Higgsfield trademark disclaimer', () => {
     const readme = fs.readFileSync(file('README.md'), 'utf8').replaceAll(/\s+/g, ' ')
 
