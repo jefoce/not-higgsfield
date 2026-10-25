@@ -13,7 +13,11 @@ R2 is Cloudflare's file storage. Not Higgsfield needs it only for models that ta
 
 ## 1. Turn on R2
 
-Sign in at [dash.cloudflare.com](https://dash.cloudflare.com), open **Storage & databases → [R2 Object Storage](https://dash.cloudflare.com/?to=/:account/r2/overview)** and finish the checkout.
+Sign in at [dash.cloudflare.com](https://dash.cloudflare.com) and open **Storage & databases → [R2 Object Storage](https://dash.cloudflare.com/?to=/:account/r2/overview)**.
+
+**New account?** Cloudflare first shows the R2 plan. Press **Add R2 subscription to my account** and add a card. Total due now is $0.00, and Cloudflare charges only above the free monthly limits.
+
+After that, R2 opens on its overview page.
 
 <img src="../images/cloudflare-r2-step-1.png" width="720" alt="R2 Object Storage overview with usage and Add Budget Alert">
 
@@ -32,18 +36,20 @@ Press **Create bucket**:
 
 ## 3. Create a token for that bucket
 
-Open **Manage account → Account API tokens → Create a token**:
+Open **Manage account → Account API tokens** and press **Create Token**.
+
+<img src="../images/cloudflare-r2-api-step-1.png" width="720" alt="Account API tokens page with the Create Token button">
 
 - **Token name:** `not-higgsfield`
 - **Permission policies:** **R2 Buckets**, pick your bucket, then tick **Read** and **Edit** on **Workers R2 Storage Bucket Item**.
 - **Token expiration:** your choice. When it ends, video and sound references fail until you create a new token (steps 3 to 5).
 - **Client IP address filtering:** leave empty. Your home IP can change.
 
-<img src="../images/cloudflare-r2-api-step-1.png" width="720" alt="Create a token with R2 Buckets scoped to one bucket, Read and Edit">
+<img src="../images/cloudflare-r2-api-step-2.png" width="720" alt="Create a token with R2 Buckets scoped to one bucket, Read and Edit">
 
 Press **Review token**. You should see **R2 › your bucket** with Read and Write. Then press **Create token**.
 
-<img src="../images/cloudflare-r2-api-step-2.png" width="720" alt="Review token showing the bucket with Read and Write">
+<img src="../images/cloudflare-r2-api-step-3.png" width="720" alt="Review token showing the bucket with Read and Write">
 
 ## 4. Copy the keys
 
@@ -54,8 +60,6 @@ The dialog shows the values only once. The app needs three of them, plus the buc
 - **Secret Access Key**
 
 You do not need "Your API Token" or the S3 endpoint. The app builds the endpoint from the Account ID.
-
-<img src="../images/cloudflare-r2-api-step-3.png" width="720" alt="Token created dialog with Account ID, Access Key ID and Secret Access Key">
 
 > [!WARNING]
 > Paste the keys straight into the app, not into notes or a chat. If you lose the secret, delete the token and create a new one.

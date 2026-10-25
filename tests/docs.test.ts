@@ -14,6 +14,7 @@ import { GUIDE_BASE } from '@/core/providers/types'
 import { STATUS_HELP } from '@/core/status-help'
 import type { Dict } from '@/core/utility-types'
 
+import { imageTargets } from './helpers/image-targets'
 import { required } from './helpers/required'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
@@ -65,21 +66,6 @@ function tableRows(markdown: string, heading: string): string[][] {
 
 const file = (rel: string) => {
   return path.join(ROOT, rel)
-}
-
-/** Image targets in markdown image syntax and HTML src attributes. */
-function imageTargets(markdown: string): string[] {
-  const targets: string[] = []
-
-  for (const match of markdown.matchAll(/(?:!\[[^\]]*\]\(|\bsrc=")([^")\s]+)/g)) {
-    const target = required(match[1], 'image target').split('#')[0] ?? ''
-
-    if (target.includes('images/')) {
-      targets.push(target)
-    }
-  }
-
-  return targets
 }
 
 /** Rule title as text, throwing when the rule builds it from raw text. */
