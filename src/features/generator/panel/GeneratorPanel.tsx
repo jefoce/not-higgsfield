@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useSyncExternalStore } from 'react'
+import { noop } from 'lodash-es'
 import { Settings } from 'lucide-react'
 
 import { openSettings } from '@/features/settings/settings-store'
@@ -18,8 +19,6 @@ import { ModeTabs } from './ModeTabs'
 import { SettingsRow } from './SettingsRow'
 import { usePanelDraft } from './use-panel-draft'
 import { usePanelPaste, useUploadsRefresh } from './use-panel-uploads'
-
-const noop = (): void => {}
 
 const emptySubscribe = () => {
   return noop

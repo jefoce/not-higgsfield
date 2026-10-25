@@ -1,5 +1,7 @@
 'use client'
 
+import { isNil } from 'lodash-es'
+
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import type { StatusHelp } from '@/core/status-help'
 import { cn } from '@/lib/cn'
@@ -7,8 +9,6 @@ import { cn } from '@/lib/cn'
 import { GraceCancel } from './GraceCancel'
 import { type Tone } from './status-tone'
 import { StatusPill } from './StatusPill'
-
-const noop = (): void => {}
 
 interface ActiveStatusProps {
   record: GenerationRecord
@@ -25,8 +25,6 @@ interface ActiveStatusProps {
 export function ActiveStatus(props: ActiveStatusProps) {
   const { record, isCompact, canCancel, graceSeconds, tone, label, help } = props
 
-  const handleCancelClick = props.onCancel ?? noop
-
   return (
     <div
       className={cn(
@@ -37,13 +35,13 @@ export function ActiveStatus(props: ActiveStatusProps) {
       <div className={cn('flex flex-wrap items-start gap-2', isCompact && 'gap-1.5')}>
         <StatusPill label={label} help={help} tone={tone} isCompact={isCompact} />
 
-        {canCancel && (
+        {canCancel && !isNil(props.onCancel) && (
           <GraceCancel
             key={record.submit?.notBefore}
             notBefore={record.submit?.notBefore}
             seconds={graceSeconds}
             compact={isCompact}
-            onCancel={handleCancelClick}
+            onCancel={props.onCancel}
           />
         )}
       </div>
