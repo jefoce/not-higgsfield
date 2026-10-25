@@ -75,6 +75,42 @@ describe('createTtlCache', () => {
     expect(load).toHaveBeenCalledTimes(2)
   })
 
+  it('shares one load between concurrent gets for the same id', async () => {
+    useClock(1_000)
+
+    const cache = createTtlCache<number>({ key: 'test-pending', okTtlMs: 100, failTtlMs: 10 })
+    const gate = Promise.withResolvers<void>()
+
+    const load = vi.fn(async () => {
+      await gate.promise
+
+      return value(1)
+    })
+
+    const first = cache.get('a', load)
+    const second = cache.get('a', load)
+
+    gate.resolve()
+
+    expect(await Promise.all([first, second])).toEqual([1, 1])
+    expect(load).toHaveBeenCalledTimes(1)
+  })
+
+  it('retries after a rejected load clears the pending entry', async () => {
+    useClock(1_000)
+
+    const cache = createTtlCache<number>({ key: 'test-rejected', okTtlMs: 100, failTtlMs: 10 })
+
+    const load = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('load failed'))
+      .mockResolvedValueOnce(value(2))
+
+    await expect(cache.get('a', load)).rejects.toThrow('load failed')
+    expect(await cache.get('a', load)).toBe(2)
+    expect(load).toHaveBeenCalledTimes(2)
+  })
+
   it('loads again after clear', async () => {
     useClock(1_000)
 

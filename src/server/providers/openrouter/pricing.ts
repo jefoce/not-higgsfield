@@ -11,19 +11,10 @@ import type { Dict } from '@/core/utility-types'
 
 import { onSecretsChange } from '../../secrets'
 import { createTtlCache, type TtlLoadResult } from '../../sync/ttl-cache'
+import { fetchVideoModels } from './video-models'
 
 const API_URL = 'https://openrouter.ai/api/v1'
-const MODELS_URL = `${API_URL}/videos/models`
 const LIVE_TTL_MS = 3_600_000
-
-const ModelSchema = z
-  .object({
-    id: z.string(),
-    pricing_skus: z.record(z.string(), z.unknown()).optional(),
-  })
-  .loose()
-
-const ModelsSchema = z.object({ data: z.array(ModelSchema) }).loose()
 
 const EndpointPricingSchema = z.object({ discount: z.number() }).loose()
 
@@ -41,11 +32,14 @@ const cache = createTtlCache<PricingInfo>({
 
 /** List and discounted rates. Live results cache for an hour, fallback for five minutes. */
 export async function getPricing(preset: ModelPreset, isForce = false): Promise<PricingInfo> {
-  return cache.get(preset.id, () => loadPricing(preset), isForce)
+  return cache.get(preset.id, () => loadPricing(preset, isForce), isForce)
 }
 
-async function loadPricing(preset: ModelPreset): Promise<TtlLoadResult<PricingInfo>> {
-  const info = await fetchPricing(preset)
+async function loadPricing(
+  preset: ModelPreset,
+  isForce: boolean,
+): Promise<TtlLoadResult<PricingInfo>> {
+  const info = await fetchPricing(preset, isForce)
 
   return { value: info, isOk: info.source === 'live' }
 }
@@ -63,8 +57,11 @@ function fallback(preset: ModelPreset): PricingInfo {
 }
 
 /** A broken endpoints call keeps the live list rates at discount 0. */
-async function fetchPricing(preset: ModelPreset): Promise<PricingInfo> {
-  const [listSkus, discount] = await Promise.all([fetchListSkus(preset), fetchDiscount(preset)])
+async function fetchPricing(preset: ModelPreset, isForce: boolean): Promise<PricingInfo> {
+  const [listSkus, discount] = await Promise.all([
+    fetchListSkus(preset, isForce),
+    fetchDiscount(preset),
+  ])
 
   if (!listSkus) {
     return fallback(preset)
@@ -85,30 +82,16 @@ async function fetchPricing(preset: ModelPreset): Promise<PricingInfo> {
   }
 }
 
-async function fetchListSkus(preset: ModelPreset): Promise<Dict<number> | null> {
+async function fetchListSkus(preset: ModelPreset, isForce: boolean): Promise<Dict<number> | null> {
   try {
-    const res = await fetch(MODELS_URL, {
-      cache: 'no-store',
-      signal: AbortSignal.timeout(FETCH_TIMEOUTS.meta),
-    })
+    const models = await fetchVideoModels(isForce)
+    const model = models.find((item) => item.id === primaryBinding(preset).modelId)
 
-    if (!res.ok) {
+    if (isNil(model)) {
       return null
     }
 
-    const parsed = ModelsSchema.safeParse(await res.json())
-
-    if (!parsed.success) {
-      return null
-    }
-
-    const model = parsed.data.data.find((item) => item.id === primaryBinding(preset).modelId)
-
-    if (model) {
-      return readSkus(model.pricing_skus)
-    }
-
-    return null
+    return readSkus(model.pricing_skus)
   } catch {
     return null
   }

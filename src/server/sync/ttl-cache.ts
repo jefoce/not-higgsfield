@@ -29,6 +29,7 @@ interface TtlCacheEntry<T> {
 export function createTtlCache<T>(options: TtlCacheOptions): TtlCache<T> {
   const { key, okTtlMs, failTtlMs } = options
   const entries = globalState<Map<string, TtlCacheEntry<T>>>(key, () => new Map())
+  const pending = globalState<Map<string, Promise<T>>>(`${key}:pending`, () => new Map())
 
   // eslint-disable-next-line @typescript-eslint/max-params -- fixed TtlCache signature
   async function get(
@@ -42,6 +43,26 @@ export function createTtlCache<T>(options: TtlCacheOptions): TtlCache<T> {
       return cached.value
     }
 
+    const running = pending.get(id)
+
+    if (!isNil(running)) {
+      return running
+    }
+
+    return track(id, runLoad(id, load))
+  }
+
+  function track(id: string, next: Promise<T>): Promise<T> {
+    pending.set(id, next)
+
+    return next.finally(() => {
+      if (pending.get(id) === next) {
+        pending.delete(id)
+      }
+    })
+  }
+
+  async function runLoad(id: string, load: () => Promise<TtlLoadResult<T>>): Promise<T> {
     const result = await load()
     const ttlMs = result.isOk ? okTtlMs : failTtlMs
 
@@ -52,6 +73,7 @@ export function createTtlCache<T>(options: TtlCacheOptions): TtlCache<T> {
 
   function clear(): void {
     entries.clear()
+    pending.clear()
   }
 
   return { get, clear }
