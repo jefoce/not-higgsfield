@@ -4,9 +4,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Dispatch, RefObject, SetStateAction } from 'react'
 
 import type { UploadItem } from '@/core/types'
+import { uploadFilesWithProgress } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
 
-import { uploadFilesWithProgress } from './api'
 import type { UploadProgressItem } from './UploadProgressTile'
 
 export interface UploadQueue {

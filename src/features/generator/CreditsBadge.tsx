@@ -6,11 +6,11 @@ import { Wallet } from 'lucide-react'
 import { CREDIT_DANGER_USD, CREDIT_WARN_USD } from '@/core/constants'
 import { formatUsd } from '@/core/pricing'
 import type { CreditsInfo } from '@/core/types'
+import { useCredits } from '@/lib/api/credits'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
 import { Tooltip } from '@/ui/Tooltip'
 
 import { CreditsPopover } from './CreditsPopover'
-import { useCredits } from './use-credits'
 
 function summarize(credits: CreditsInfo | undefined): { text: string; amount: number | null } {
   if (!credits || (!isNil(credits.error) && credits.error !== '')) {

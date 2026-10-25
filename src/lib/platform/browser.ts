@@ -1,18 +1,19 @@
 import { DOWNLOAD_STAGGER_MS } from '@/core/constants'
 import type { FolderItem, GenerationRecord, UploadItem } from '@/core/types'
-
+import { downloadMediaUrl } from '@/lib/api/media-urls'
 import {
   chooseFiles as chooseFilesFromServer,
   chooseFolder as chooseFolderFromServer,
   fetchSystemCapabilities,
-} from './system-api'
+} from '@/lib/api/system'
+
 import type { Platform } from './types'
 
 /** Download URL built from the record alone, no history feature import. */
 function downloadUrl(record: GenerationRecord): string {
   const file = record.output?.video ?? `${record.id}.mp4`
 
-  return `/api/media/downloads/${file}?download=1`
+  return downloadMediaUrl(file, true)
 }
 
 /** One anchor click, used by single and batch downloads. */

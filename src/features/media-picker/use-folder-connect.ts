@@ -4,10 +4,9 @@ import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { BrowseResult, FolderItem } from '@/core/types'
+import { createFolder } from '@/lib/api/folders'
 import { errorMessage } from '@/lib/errors'
 import { getPlatform } from '@/lib/platform'
-
-import { createFolder } from './api'
 
 interface UseFolderConnectParams {
   data: BrowseResult | null

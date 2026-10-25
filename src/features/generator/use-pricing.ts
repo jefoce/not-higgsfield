@@ -3,7 +3,7 @@
 import useSWR from 'swr'
 
 import type { PricingInfo } from '@/core/types'
-import { fetcher } from '@/lib/fetcher'
+import { fetchPricing, pricingKey } from '@/lib/api/generations'
 
 import { useGeneratorStore } from './store'
 
@@ -12,11 +12,9 @@ export function usePricing(presetIdOverride?: string) {
   const storePresetId = useGeneratorStore((state) => state.presetId)
   const presetId = presetIdOverride ?? storePresetId
 
-  const { data: pricing } = useSWR<PricingInfo>(
-    `/api/pricing?preset=${encodeURIComponent(presetId)}`,
-    fetcher,
-    { refreshInterval: 3_600_000 },
-  )
+  const { data: pricing } = useSWR<PricingInfo>(pricingKey(presetId), fetchPricing, {
+    refreshInterval: 3_600_000,
+  })
 
   return { pricing }
 }

@@ -6,10 +6,10 @@ import { ExternalLink, RefreshCw } from 'lucide-react'
 
 import { formatUsd } from '@/core/pricing'
 import { openSettings } from '@/features/settings/settings-store'
+import { useCredits } from '@/lib/api/credits'
 import { getPlatform } from '@/lib/platform'
 
 import { CreditsRow } from './CreditsRow'
-import { useCredits } from './use-credits'
 
 function handleOpenSettings(): void {
   openSettings('openrouter')

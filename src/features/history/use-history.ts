@@ -7,7 +7,7 @@ import useSWRInfinite from 'swr/infinite'
 import { HISTORY_PAGE_SIZE } from '@/core/constants'
 import { countActive } from '@/core/history-filters'
 import type { GenerationListResult, GenerationRecord } from '@/core/types'
-import { fetcher } from '@/lib/fetcher'
+import { fetchGenerationPage, generationPageKey } from '@/lib/api/generations'
 import { registerHistoryRefresh } from '@/lib/swr-keys'
 
 import { loadedRecords, revalidateHistory } from './history-pages'
@@ -56,20 +56,9 @@ export function useHistory(): HistoryResult {
 
   const { data, isLoading, isValidating, size, setSize, mutate } =
     useSWRInfinite<GenerationListResult>(
-      (index: number, previous: GenerationListResult | null) => {
-        if (index > 0 && isNil(previous?.nextCursor)) {
-          return null
-        }
-
-        const params = new URLSearchParams(query)
-
-        if (index > 0 && !isNil(previous?.nextCursor)) {
-          params.set('cursor', previous.nextCursor)
-        }
-
-        return `/api/generations?${params.toString()}`
-      },
-      fetcher,
+      (index: number, previous: GenerationListResult | null) =>
+        generationPageKey({ query, index, previous }),
+      fetchGenerationPage,
       {
         keepPreviousData: true,
         revalidateOnFocus: true,

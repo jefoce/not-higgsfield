@@ -11,11 +11,12 @@ const mocks = vi.hoisted(() => ({
   linkFolderFile: vi.fn(),
 }))
 
-vi.mock('@/features/media-picker/api', () => ({
+vi.mock('@/lib/api/folders', () => ({
   fetchFolderFiles: mocks.fetchFolderFiles,
   linkFolderFile: mocks.linkFolderFile,
-  thumbUrl: () => '/thumb',
 }))
+
+vi.mock('@/lib/api/media-urls', () => ({ thumbUrl: () => '/thumb' }))
 
 vi.mock('swr', () => ({
   default: () => ({

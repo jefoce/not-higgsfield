@@ -2,8 +2,8 @@
 
 import { AlertTriangle } from 'lucide-react'
 
-import { mediaUrl, thumbUrl } from '@/features/media-picker/api'
 import { LazyVideo } from '@/features/player/LazyVideo'
+import { mediaUrl, thumbUrl } from '@/lib/api/media-urls'
 
 import type { PreviewItem } from './preview-store'
 import { PreviewAudio } from './PreviewAudio'

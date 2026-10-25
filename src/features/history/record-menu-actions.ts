@@ -2,10 +2,11 @@ import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
 import { canCancelInGrace } from '@/core/submit-state'
-import type { GenerationRecord, UploadItem } from '@/core/types'
+import type { GenerationRecord } from '@/core/types'
 import { useGeneratorStore } from '@/features/generator/store'
+import { captureGenerationFrame, revealGeneration } from '@/lib/api/generations'
+import { linkGenerationFile } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
-import { apiPost } from '@/lib/fetcher'
 
 import { cancelGeneration } from './record-actions'
 import { plainPrompt } from './record-view'
@@ -13,7 +14,7 @@ import { plainPrompt } from './record-view'
 /** Grabs the first or last frame of a finished video and arms it as the start frame. */
 export async function captureFrame(record: GenerationRecord, at: 'first' | 'last'): Promise<void> {
   try {
-    const upload = await apiPost<UploadItem>(`/api/generations/${record.id}/frame`, { at })
+    const upload = await captureGenerationFrame(record.id, at)
     const store = useGeneratorStore.getState()
 
     store.setTab('frames')
@@ -27,7 +28,7 @@ export async function captureFrame(record: GenerationRecord, at: 'first' | 'last
 /** Links the finished video as a reference when the preset allows it. */
 export async function addReference(record: GenerationRecord): Promise<void> {
   try {
-    const upload = await apiPost<UploadItem>('/api/uploads/link', { generationId: record.id })
+    const upload = await linkGenerationFile({ generationId: record.id })
     const store = useGeneratorStore.getState()
 
     store.setTab('references')
@@ -71,7 +72,7 @@ export async function copySeed(record: GenerationRecord): Promise<void> {
 
 export async function revealRecord(record: GenerationRecord): Promise<void> {
   try {
-    await apiPost(`/api/generations/${record.id}/reveal`)
+    await revealGeneration(record.id)
   } catch (error) {
     toast.error(errorMessage(error))
   }

@@ -4,9 +4,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { BrowseResult } from '@/core/types'
+import { browseDirs } from '@/lib/api/folders'
 import { errorMessage } from '@/lib/errors'
-
-import { browseDirs } from './api'
 
 export interface AddFolderBrowse {
   path: string | null

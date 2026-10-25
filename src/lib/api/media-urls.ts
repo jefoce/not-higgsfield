@@ -1,0 +1,52 @@
+import { isEmpty, isNil } from 'lodash-es'
+
+import { THUMB_WIDTH } from '@/core/constants'
+import { canPlay } from '@/lib/media-support'
+
+const encodeRef = (ref: string): string => ref.split('/').map(encodeURIComponent).join('/')
+
+interface ThumbUrlParams {
+  ref: string
+  w?: number
+  version?: string | number
+}
+
+/** Media stream URL, routed through the compat copy when the MIME cannot play. */
+export function mediaUrl(ref: string, mime?: string): string {
+  const [pathRef, query = ''] = ref.split('?')
+  const base = `/api/media/${encodeRef(pathRef)}`
+  const plainUrl = isEmpty(query) ? base : `${base}?${query}`
+
+  if (isNil(mime) || mime === '' || canPlay(mime)) {
+    return plainUrl
+  }
+
+  const params = new URLSearchParams(query)
+
+  params.set('compat', '1')
+
+  return `${base}?${params.toString()}`
+}
+
+/** Thumbnail URL for a ref, encoding each path segment. */
+export function thumbUrl(params: ThumbUrlParams): string {
+  const { ref, w = THUMB_WIDTH, version } = params
+  const query = new URLSearchParams({ w: String(w) })
+
+  if (!isNil(version)) {
+    query.set('v', String(version))
+  }
+
+  return `/api/thumbs/${encodeRef(ref)}?${query.toString()}`
+}
+
+/** Download URL for a stored video file, optionally forcing a download. */
+export function downloadMediaUrl(file: string, isDownload = false): string {
+  const base = `/api/media/downloads/${file}`
+
+  return isDownload ? `${base}?download=1` : base
+}
+
+export function uploadThumbUrl(id: string, width = 160): string {
+  return `/api/thumbs/uploads/${id}?w=${width}`
+}

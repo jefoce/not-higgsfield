@@ -4,8 +4,9 @@ import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { GenerationRecord } from '@/core/types'
+import { deleteGeneration } from '@/lib/api/generations'
 import { errorMessage } from '@/lib/errors'
-import { apiDelete, ApiError } from '@/lib/fetcher'
+import { ApiError } from '@/lib/fetcher'
 import { Button } from '@/ui/Button'
 import { Modal } from '@/ui/Modal'
 
@@ -27,7 +28,7 @@ export function DeleteConfirm(props: DeleteConfirmProps) {
     setIsDeleting(true)
 
     try {
-      await apiDelete(`/api/generations/${record.id}`)
+      await deleteGeneration(record.id)
       toast.success('Deleted')
       await revalidateHistory()
       handleOpenChange(false)

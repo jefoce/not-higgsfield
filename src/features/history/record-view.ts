@@ -10,7 +10,7 @@ import {
 } from '@/core/prompt-tokens'
 import { type FriendlyError, friendlyError } from '@/core/provider-errors'
 import type { GenerationRecord } from '@/core/types'
-import { thumbUrl } from '@/features/media-picker/api'
+import { downloadMediaUrl, thumbUrl, uploadThumbUrl } from '@/lib/api/media-urls'
 
 const SELECTABLE_STATUSES: readonly GenerationRecord['status'][] = [
   'completed',
@@ -69,7 +69,7 @@ export function recordAspect(record: GenerationRecord): string {
 }
 
 export const videoSrc = (record: GenerationRecord): string =>
-  `/api/media/downloads/${record.output?.video ?? `${record.id}.mp4`}`
+  downloadMediaUrl(record.output?.video ?? `${record.id}.mp4`)
 
 /** Rounds up to the next poster bucket. */
 function posterWidth(widthPx: number): number {
@@ -95,8 +95,7 @@ export function posterForWidth(record: GenerationRecord, mediaWidth: number): st
   return posterSrc(record, width)
 }
 
-export const uploadThumb = (id: string, width = 160): string =>
-  `/api/thumbs/uploads/${id}?w=${width}`
+export const uploadThumb = (id: string, width = 160): string => uploadThumbUrl(id, width)
 
 /** Reference counts and slot positions from the record snapshot order. */
 export function recordSlots(record: GenerationRecord): {

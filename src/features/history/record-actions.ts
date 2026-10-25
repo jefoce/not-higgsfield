@@ -5,8 +5,9 @@ import { toast } from 'sonner'
 
 import type { GenerationRecord, UploadItem } from '@/core/types'
 import { useGeneratorStore } from '@/features/generator/store'
+import { cancelGenerationRequest, fetchUploadsByIds, setFavorite } from '@/lib/api/generations'
 import { errorMessage } from '@/lib/errors'
-import { ApiError, apiPatch, apiPost, fetcher } from '@/lib/fetcher'
+import { ApiError } from '@/lib/fetcher'
 import { platform } from '@/lib/platform'
 import { refreshHistory } from '@/lib/swr-keys'
 
@@ -23,7 +24,7 @@ export async function saveRecordVideo(record: GenerationRecord): Promise<void> {
 
 export async function toggleFavorite(record: GenerationRecord): Promise<void> {
   try {
-    await apiPatch(`/api/generations/${record.id}`, { favorite: !record.favorite })
+    await setFavorite(record.id, !record.favorite)
     await refreshHistory()
   } catch (error) {
     toast.error(errorMessage(error))
@@ -33,7 +34,7 @@ export async function toggleFavorite(record: GenerationRecord): Promise<void> {
 /** Cancels a generation still inside the submit grace window. */
 export async function cancelGeneration(id: string): Promise<void> {
   try {
-    await apiPost(`/api/generations/${id}/cancel`)
+    await cancelGenerationRequest(id)
     toast.success('Generation cancelled')
     await refreshHistory()
   } catch (error) {
@@ -94,9 +95,7 @@ export async function rerunRecord(record: GenerationRecord, presetId?: string): 
     let uploads: UploadItem[] = []
 
     if (ids.length > 0) {
-      uploads = await fetcher<UploadItem[]>(
-        `/api/uploads?ids=${ids.map(encodeURIComponent).join(',')}`,
-      )
+      uploads = await fetchUploadsByIds(ids)
     }
 
     const ghosts = ghostUploads({ record, ids, uploads })

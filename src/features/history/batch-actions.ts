@@ -1,13 +1,7 @@
 import { chunk } from 'lodash-es'
 
 import { HISTORY_BATCH_MAX } from '@/core/constants'
-import type { BatchSkip } from '@/core/types'
-import { apiPost } from '@/lib/fetcher'
-
-interface BatchResult {
-  done: string[]
-  skipped: BatchSkip[]
-}
+import { batchGenerations, type BatchResult } from '@/lib/api/generations'
 
 /** Runs the same batch action in chunks the server accepts. */
 export async function batchAction(
@@ -15,9 +9,7 @@ export async function batchAction(
   body: Record<string, unknown>,
 ): Promise<BatchResult> {
   const results = await Promise.all(
-    chunk(ids, HISTORY_BATCH_MAX).map((part) =>
-      apiPost<BatchResult>('/api/generations/batch', { ...body, ids: part }),
-    ),
+    chunk(ids, HISTORY_BATCH_MAX).map((part) => batchGenerations(part, body)),
   )
 
   return {

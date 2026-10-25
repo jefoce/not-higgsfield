@@ -7,14 +7,12 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { inputForSubmit } from '@/core/normalize-input'
 import type { GenerationEstimate, GenerationInput } from '@/core/types'
-import { apiPost } from '@/lib/fetcher'
+import { fetchEstimate } from '@/lib/api/generations'
 import { generationEstimateKey } from '@/lib/swr-keys'
 
 import { useGeneratorStore } from './store'
 
 const DEBOUNCE_MS = 500
-
-type EstimateKey = readonly [string, string]
 
 type PriceDraft = Omit<GenerationInput, 'prompt' | 'seed'>
 
@@ -29,10 +27,6 @@ function useDebouncedJson(json: string): string {
   }, [json])
 
   return debouncedJson
-}
-
-async function fetchEstimate([url, json]: EstimateKey): Promise<GenerationEstimate> {
-  return apiPost<GenerationEstimate>(url, JSON.parse(json) as unknown)
 }
 
 /** Price-only body. Prompt and seed never reach the estimate key. */

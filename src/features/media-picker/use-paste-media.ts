@@ -7,9 +7,8 @@ import { toast } from 'sonner'
 
 import { acceptFiles, type KindExtensions, pastedPath } from '@/core/media-kinds'
 import type { MediaKind, UploadItem } from '@/core/types'
+import { linkAbsPath } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
-
-import { linkAbsPath } from './api'
 
 export interface PasteMediaOptions {
   enabled: boolean

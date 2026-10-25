@@ -2,14 +2,14 @@
 
 import { useEffect } from 'react'
 import { isNil } from 'lodash-es'
-import useSWR, { mutate } from 'swr'
+import useSWR from 'swr'
 import { z } from 'zod'
 
 import { R2_NAMES, type SecretName } from '@/core/secret-names'
 import type { SecretStatus, TestResult } from '@/core/types'
-import { apiPost, apiRequest, fetcher } from '@/lib/fetcher'
+import { fetchSecrets } from '@/lib/api/settings'
 import { readLocal, writeLocal } from '@/lib/local-store'
-import { refreshRemoteStatus } from '@/lib/remote-status'
+import { SECRETS_KEY } from '@/lib/swr-keys'
 
 import { openSettings, type SettingsSection } from './settings-store'
 
@@ -22,7 +22,6 @@ export interface TestMessage {
   text: string
 }
 
-const SECRETS_KEY = '/api/settings/secrets'
 const PROMPTED_KEY = 'not-higgsfield:settings-prompted'
 const PROMPTED_VALUE = z.union([z.boolean(), z.string(), z.number()])
 
@@ -32,42 +31,13 @@ export function useSecrets() {
     data,
     isLoading,
     mutate: refresh,
-  } = useSWR<SecretStatus>(SECRETS_KEY, fetcher, {
+  } = useSWR<SecretStatus>(SECRETS_KEY, fetchSecrets, {
     revalidateOnFocus: false,
     // Poll while the parent app waits on a keychain prompt.
     refreshInterval: (latest) => (latest?.loading === true ? 2000 : 0),
   })
 
   return { status: data, isLoading, refresh: () => refresh() }
-}
-
-/** Retries a failed keychain load. */
-export async function retrySecrets(): Promise<SecretStatus> {
-  const next = await apiPost<SecretStatus>(`${SECRETS_KEY}/reload`)
-
-  await mutate(SECRETS_KEY, next, { revalidate: false })
-  await refreshRemoteStatus()
-
-  return next
-}
-
-/** Saves only the given keys. `null` removes a key. */
-export async function saveSecrets(
-  values: Partial<Record<SecretName, string | null>>,
-): Promise<SecretStatus> {
-  const next = await apiRequest<SecretStatus>(SECRETS_KEY, {
-    method: 'PUT',
-    body: JSON.stringify({ values }),
-  })
-
-  await mutate(SECRETS_KEY, next, { revalidate: false })
-
-  return next
-}
-
-/** Tests credentials already saved on the server. */
-export function testTarget(target: SettingsSection): Promise<TestResult> {
-  return apiPost<TestResult>('/api/settings/test', { target })
 }
 
 /** OS label for the keychain backend. */

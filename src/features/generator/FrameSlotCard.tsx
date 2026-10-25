@@ -5,7 +5,7 @@ import { AlertTriangle, Image as ImageIcon, Maximize2, X } from 'lucide-react'
 import type { MouseEvent } from 'react'
 
 import type { UploadItem } from '@/core/types'
-import { thumbUrl } from '@/features/media-picker/api'
+import { thumbUrl } from '@/lib/api/media-urls'
 import { cn } from '@/lib/cn'
 
 interface FrameSlotCardProps {

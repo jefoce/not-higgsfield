@@ -26,7 +26,7 @@ import {
   slotToken,
 } from '@/core/prompt-tokens'
 import type { MediaKind } from '@/core/types'
-import { thumbUrl } from '@/features/media-picker/api'
+import { thumbUrl } from '@/lib/api/media-urls'
 
 import { type GeneratorState, slotCounts, uploadForSlot, useGeneratorStore } from './store'
 

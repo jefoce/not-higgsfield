@@ -6,15 +6,14 @@ import { toast } from 'sonner'
 import { inputForSubmit } from '@/core/normalize-input'
 import { getPreset } from '@/core/presets'
 import { friendlyError } from '@/core/provider-errors'
-import type { GenerationRecord } from '@/core/types'
 import { cancelGeneration } from '@/features/history/record-actions'
 import { revalidateHistory } from '@/features/history/use-history'
 import { openSettings } from '@/features/settings/settings-store'
-import { apiPost } from '@/lib/fetcher'
+import { refreshCredits } from '@/lib/api/credits'
+import { createGeneration } from '@/lib/api/generations'
 import { getPlatform } from '@/lib/platform'
 
 import { inputFromState, useGeneratorStore } from './store'
-import { refreshCredits } from './use-credits'
 
 function requestNotifications(): void {
   void getPlatform()
@@ -63,7 +62,7 @@ export function useGenerate() {
 
     try {
       const input = inputForSubmit(inputFromState(useGeneratorStore.getState()))
-      const record = await apiPost<GenerationRecord>('/api/generations', input)
+      const record = await createGeneration(input)
 
       setIsGenerating(false)
 

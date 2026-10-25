@@ -3,14 +3,14 @@ import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { UploadItem } from '@/core/types'
-import { linkAbsPath } from '@/features/media-picker/api'
 import type { PasteMediaOptions } from '@/features/media-picker/use-paste-media'
 import { usePasteMedia } from '@/features/media-picker/use-paste-media'
+import { linkAbsPath } from '@/lib/api/uploads'
 
 const toast = vi.hoisted(() => ({ error: vi.fn(), skipped: vi.fn() }))
 
 vi.mock('sonner', () => ({ toast: Object.assign(toast.skipped, { error: toast.error }) }))
-vi.mock('@/features/media-picker/api', () => ({ linkAbsPath: vi.fn() }))
+vi.mock('@/lib/api/uploads', () => ({ linkAbsPath: vi.fn() }))
 
 const png = new File(['png'], 'a.png', { type: 'image/png' })
 const gif = new File(['gif'], 'b.gif', { type: 'image/gif' })

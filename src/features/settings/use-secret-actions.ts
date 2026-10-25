@@ -3,10 +3,11 @@
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
+import { retrySecrets, testSecretTarget } from '@/lib/api/settings'
 import { errorMessage } from '@/lib/errors'
 
 import type { SettingsSection } from './settings-store'
-import { retrySecrets, testLine, type TestMessage, testTarget } from './use-secrets'
+import { testLine, type TestMessage } from './use-secrets'
 
 const EMPTY_RESULTS: Record<SettingsSection, TestMessage | null> = { openrouter: null, r2: null }
 
@@ -36,7 +37,7 @@ export function useSecretActions(params: UseSecretActionsParams) {
     setTesting(target)
 
     try {
-      const result = await testTarget(target)
+      const result = await testSecretTarget(target)
 
       setResults((current) => ({ ...current, [target]: testLine(target, result) }))
     } catch (error) {

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { refreshRemoteStatus } from '@/lib/remote-status'
+import { refreshRemoteStatus } from '@/lib/api/remote'
 import { REMOTE_STATUS_KEY } from '@/lib/swr-keys'
 
 const { mutate } = vi.hoisted(() => ({ mutate: vi.fn() }))

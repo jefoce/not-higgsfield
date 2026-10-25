@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { GenerationRecord } from '@/core/types'
 
-vi.mock('@/lib/platform/system-api', () => ({
+vi.mock('@/lib/api/system', () => ({
   chooseFiles: vi.fn(),
   chooseFolder: vi.fn(),
   fetchSystemCapabilities: vi.fn(),

@@ -5,10 +5,10 @@ import { isNil } from 'lodash-es'
 import useSWR from 'swr'
 
 import type { UploadItem } from '@/core/types'
+import { fetchFolders } from '@/lib/api/folders'
 import { pauseAudio } from '@/lib/audio-player'
 
 import { AddFolderDialog } from './AddFolderDialog'
-import { fetchFolders } from './api'
 import { PickerContent } from './PickerContent'
 import { PickerDropOverlay } from './PickerDropOverlay'
 import { PickerFooter } from './PickerFooter'

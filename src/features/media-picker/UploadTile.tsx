@@ -8,10 +8,9 @@ import { toast } from 'sonner'
 
 import { acceptForKinds, type KindExtensions } from '@/core/media-kinds'
 import type { MediaKind, UploadItem } from '@/core/types'
+import { uploadFilesWithProgress } from '@/lib/api/uploads'
 import { cn } from '@/lib/cn'
 import { errorMessage } from '@/lib/errors'
-
-import { uploadFilesWithProgress } from './api'
 
 export interface UploadTileProps {
   kinds: MediaKind[]

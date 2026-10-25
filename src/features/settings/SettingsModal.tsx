@@ -5,7 +5,8 @@ import { X } from 'lucide-react'
 import useSWR from 'swr'
 
 import type { CreditsInfo } from '@/core/types'
-import { fetcher } from '@/lib/fetcher'
+import { fetchCredits } from '@/lib/api/credits'
+import { CREDITS_KEY } from '@/lib/swr-keys'
 import { Button } from '@/ui/Button'
 import { Modal } from '@/ui/Modal'
 
@@ -21,7 +22,7 @@ export function SettingsModal() {
   const closeSettings = useSettingsStore((state) => state.closeSettings)
   const { status } = useSecrets()
 
-  const { data: credits } = useSWR<CreditsInfo>('/api/credits', fetcher, {
+  const { data: credits } = useSWR<CreditsInfo>(CREDITS_KEY, fetchCredits, {
     revalidateOnFocus: false,
   })
 

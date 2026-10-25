@@ -5,9 +5,9 @@ import { isEmpty, isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
 import type { FolderItem } from '@/core/types'
+import { linkFolderFile } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
 
-import { linkFolderFile } from './api'
 import { closeMediaPicker, type PickerRequest } from './store'
 
 interface UsePickerConfirmParams {

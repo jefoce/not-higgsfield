@@ -2,9 +2,8 @@ import { chunk } from 'lodash-es'
 import { toast } from 'sonner'
 
 import type { UploadItem } from '@/core/types'
+import { linkAbsPath } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
-
-import { linkAbsPath } from './system-api'
 
 /** Links paths 3 at a time. One toast per failure, the rest still reach the UI. */
 export async function linkPaths(paths: string[]): Promise<UploadItem[]> {

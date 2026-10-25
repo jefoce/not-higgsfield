@@ -5,7 +5,7 @@ import { uniq } from 'lodash-es'
 
 import { HISTORY_POLL_MS } from '@/core/constants'
 import { ACTIVE_STATUSES, type GenerationListResult, type GenerationRecord } from '@/core/types'
-import { fetcher } from '@/lib/fetcher'
+import { fetchGenerationsByIds } from '@/lib/api/generations'
 
 import { patchPage, revalidateHistory } from './history-pages'
 
@@ -67,9 +67,7 @@ export function useHistoryPoll(params: HistoryPollParams): void {
       isRunning = true
 
       try {
-        const result = await fetcher<GenerationListResult>(
-          `/api/generations?ids=${ids.map(encodeURIComponent).join(',')}`,
-        )
+        const result = await fetchGenerationsByIds(ids)
 
         if (isStopped) {
           return

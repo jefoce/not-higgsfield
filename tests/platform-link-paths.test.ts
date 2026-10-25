@@ -4,7 +4,7 @@ import type { UploadItem } from '@/core/types'
 
 const mocks = vi.hoisted(() => ({ linkAbsPath: vi.fn(), toastError: vi.fn() }))
 
-vi.mock('@/lib/platform/system-api', () => ({
+vi.mock('@/lib/api/uploads', () => ({
   linkAbsPath: mocks.linkAbsPath,
   errorMessage: (error: unknown) => (error instanceof Error ? error.message : 'Request failed'),
 }))

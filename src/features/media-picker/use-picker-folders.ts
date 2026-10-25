@@ -5,10 +5,10 @@ import { toast } from 'sonner'
 import { useSWRConfig } from 'swr'
 
 import type { FolderItem, UploadItem } from '@/core/types'
+import { deleteFolder } from '@/lib/api/folders'
+import { linkFolderFile } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
 import { platform } from '@/lib/platform'
-
-import { deleteFolder, linkFolderFile } from './api'
 
 interface UsePickerFoldersParams {
   activeTab: string

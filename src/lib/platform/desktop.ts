@@ -12,7 +12,8 @@ import { HISTORY_BATCH_MAX } from '@/core/constants'
 import { promptSlug } from '@/core/file-names'
 import { extensionsForKinds } from '@/core/media-kinds'
 import type { FolderItem, GenerationRecord, UploadItem } from '@/core/types'
-import { apiPost } from '@/lib/fetcher'
+import { createFolder } from '@/lib/api/folders'
+import { exportBatch, exportRecord } from '@/lib/api/generations'
 
 import { linkPaths } from './link-paths'
 import type { Platform } from './types'
@@ -48,7 +49,7 @@ export const desktopPlatform: Platform = {
       return null
     }
 
-    return apiPost<FolderItem>('/api/folders', { path: selected })
+    return createFolder(selected)
   },
 
   requestNotifications: async () => {
@@ -83,7 +84,7 @@ export const desktopPlatform: Platform = {
       return false
     }
 
-    await apiPost(`/api/generations/${record.id}/export`, { path: target, overwrite: true })
+    await exportRecord({ id: record.id, path: target })
 
     return true
   },
@@ -104,10 +105,7 @@ export const desktopPlatform: Platform = {
     let saved = 0
 
     for (const part of chunk(records, HISTORY_BATCH_MAX)) {
-      const result = await apiPost<{ saved: string[] }>('/api/generations/export-batch', {
-        ids: part.map((record) => record.id),
-        dir,
-      })
+      const result = await exportBatch({ ids: part.map((record) => record.id), dir })
 
       saved += result.saved.length
     }

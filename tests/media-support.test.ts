@@ -5,7 +5,7 @@ import path from 'node:path'
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { mediaUrl } from '@/features/media-picker/api'
+import { mediaUrl } from '@/lib/api/media-urls'
 import { __resetCanPlayCache, canPlay } from '@/lib/media-support'
 
 function stubDocument(supported: Record<string, string>): void {

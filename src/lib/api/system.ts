@@ -13,7 +13,3 @@ export function chooseFiles(kinds: MediaKind[], isMultiple: boolean): Promise<Up
 export function chooseFolder(): Promise<FolderItem | null> {
   return apiPost<FolderItem | null>('/api/system/choose-folder', {})
 }
-
-export function linkAbsPath(absPath: string): Promise<UploadItem> {
-  return apiPost<UploadItem>('/api/uploads/link', { absPath })
-}

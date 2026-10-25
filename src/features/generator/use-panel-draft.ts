@@ -8,9 +8,9 @@ import { getPreset } from '@/core/presets'
 import type { GenerationInput } from '@/core/types'
 import { validateInput } from '@/core/validation'
 import { useSecrets } from '@/features/settings/use-secrets'
+import { useRemoteStatus } from '@/lib/api/remote'
 
 import { useGeneratorStore } from './store'
-import { useRemoteStatus } from './use-remote-status'
 
 /** Draft input and validation for the active preset. */
 export function usePanelDraft() {

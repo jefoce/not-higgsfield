@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import type { ReferencePlan } from '@/core/types'
-import { apiPost } from '@/lib/fetcher'
+import { requestReferencePlan } from '@/lib/api/generations'
 
 /** Debounced share of the submit encoder. Stale answers for older lists are dropped. */
 export function useImagePlan(presetId: string, ids: string[]): ReferencePlan | null {
@@ -20,10 +20,7 @@ export function useImagePlan(presetId: string, ids: string[]): ReferencePlan | n
     }
 
     const timer = window.setTimeout(() => {
-      void apiPost<ReferencePlan>('/api/references/plan', {
-        presetId,
-        ids: key.split(','),
-      })
+      void requestReferencePlan(presetId, key.split(','))
         .then((plan) => {
           if (sequence === latest.current) {
             setAnswer({ key: answerKey, plan })

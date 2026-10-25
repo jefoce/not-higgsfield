@@ -7,7 +7,7 @@ import type {
 } from 'lexical-beautiful-mentions'
 
 import { slotLabel } from '@/core/prompt-tokens'
-import { thumbUrl } from '@/features/media-picker/api'
+import { thumbUrl } from '@/lib/api/media-urls'
 import { cn } from '@/lib/cn'
 
 import { mentionSlot } from './prompt-convert'

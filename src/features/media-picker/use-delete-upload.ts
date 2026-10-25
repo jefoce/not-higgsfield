@@ -4,9 +4,8 @@ import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { UploadItem } from '@/core/types'
+import { deleteUpload } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
-
-import { deleteUpload } from './api'
 
 interface UseDeleteUploadParams {
   mutate: () => Promise<unknown>

@@ -3,7 +3,7 @@
 import { isNil } from 'lodash-es'
 
 import type { UploadItem } from '@/core/types'
-import { mediaUrl, thumbUrl } from '@/features/media-picker/api'
+import { mediaUrl, thumbUrl } from '@/lib/api/media-urls'
 import { cn } from '@/lib/cn'
 import { Tooltip } from '@/ui/Tooltip'
 
