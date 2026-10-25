@@ -4,6 +4,7 @@ import { LOW_RES_MIN_PX, MAX_ACTIVE_JOBS, MAX_INLINE_MEDIA_MB } from './constant
 import type { UploadItem } from './media-types'
 import { aspectAllowed } from './output-size'
 import type { ModelPreset } from './presets/types'
+import { primaryBinding } from './pricing'
 import { resolveTransport } from './transport'
 import type { GenerationInput } from './types'
 import { checkReferenceLimits } from './validation-media'
@@ -144,7 +145,7 @@ export function validateLimits(params: ValidateWithContextParams): RuleResult {
     }
 
     const transport = resolveTransport({
-      preset,
+      binding: primaryBinding(preset),
       kind: upload.kind,
       remoteConfigured: ctx.remoteConfigured ?? false,
     })

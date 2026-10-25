@@ -4,6 +4,7 @@ import { maxDurationFor } from './duration-limits'
 import { KIND_TITLE, MEDIA_KINDS } from './media-kinds'
 import type { MediaKind, UploadItem } from './media-types'
 import type { ModelPreset } from './presets/types'
+import { primaryBinding } from './pricing'
 import { missingSlots, referenceSlots, type SlotCounts } from './prompt-tokens'
 import { resolveTransport } from './transport'
 import type { GenerationInput } from './types'
@@ -86,7 +87,9 @@ const checkRemoteTransport = (params: CheckRemoteTransportParams): void => {
       continue
     }
 
-    if (resolveTransport({ preset, kind, remoteConfigured: false }) !== 'url') {
+    if (
+      resolveTransport({ binding: primaryBinding(preset), kind, remoteConfigured: false }) !== 'url'
+    ) {
       continue
     }
 

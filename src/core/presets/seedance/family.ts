@@ -8,7 +8,6 @@ export const SEEDANCE_FAMILY = {
   promptOptional: false,
   audio: { supported: true, default: true },
   frames: { start: true, end: true },
-  inputTransport: { image: 'base64', video: 'url', audio: 'auto' },
   maxInputPlusOutputSec: null,
   promptMaxChars: 5000,
   seed: true,

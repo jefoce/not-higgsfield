@@ -1,3 +1,4 @@
+import { primaryBinding } from '../pricing'
 import { SEEDANCE_20 } from './seedance/seedance-2.0'
 import { SEEDANCE_25 } from './seedance/seedance-2.5'
 import type { ModelPreset } from './types'
@@ -21,4 +22,4 @@ export const getPreset = (id: string): ModelPreset => findPreset(id) ?? MODEL_PR
 
 /** Shortest duration to submit: the provider minimum raised to the billing floor. */
 export const minDuration = (preset: ModelPreset): number =>
-  Math.max(preset.duration.min, preset.pricing.minBillableSec)
+  Math.max(preset.duration.min, primaryBinding(preset).pricing.minBillableSec)

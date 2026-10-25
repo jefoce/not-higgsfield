@@ -1,4 +1,5 @@
 import type { MediaKind } from '../media-types'
+import type { VideoProviderId } from '../providers/types'
 
 export const RESOLUTIONS = ['480p', '720p', '768p', '1080p', '2K', '4K'] as const
 export type Resolution = (typeof RESOLUTIONS)[number]
@@ -18,7 +19,15 @@ export const ASPECT_RATIOS = [
 export type AspectRatio = (typeof ASPECT_RATIOS)[number]
 export type AspectChoice = AspectRatio | 'auto'
 
-type Transport = 'base64' | 'url' | 'auto'
+/** @public */
+export type Transport = 'base64' | 'url' | 'auto'
+
+/** @public */
+export interface TransportByKind {
+  image: Transport
+  video: Transport
+  audio: Transport
+}
 
 type PresetFamily = 'wan' | 'seedance'
 
@@ -84,12 +93,18 @@ export interface VideoTokenPricing {
   referenceVideoFactor: number
 }
 
-export type PresetPricing = PerSecondPricing | VideoTokenPricing
+export type PricingRule = PerSecondPricing | VideoTokenPricing
+
+export interface ProviderBinding {
+  provider: VideoProviderId
+  modelId: string
+  pricing: PricingRule
+  transport: TransportByKind
+}
 
 export interface ModelPreset {
   id: string
   title: string
-  slug: string
   family: PresetFamily
 
   /** Key the picker maps to a lucide icon. */
@@ -118,12 +133,11 @@ export interface ModelPreset {
     audioMaxSec?: number
     audioNeedsVisual?: boolean
   }
-  inputTransport: { image: Transport; video: Transport; audio: Transport }
   referenceLimits?: Partial<Record<MediaKind, ReferenceLimits>>
   maxInputPlusOutputSec: number | null
   promptMaxChars: number
   seed: boolean
   refLabel: string
   outputSizes?: Partial<Record<Resolution, Partial<Record<AspectRatio, `${number}x${number}`>>>>
-  pricing: PresetPricing
+  bindings: readonly [ProviderBinding, ...ProviderBinding[]]
 }

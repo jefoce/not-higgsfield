@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { getPreset } from '@/core/presets'
+import { primaryBinding } from '@/core/pricing'
 import { getPricing } from '@/server/providers/openrouter/pricing'
 
 const WAN_SKUS = {
@@ -137,7 +138,7 @@ describe('getPricing discounts', () => {
     const info = await getPricing(getPreset('wan-3.0'), true)
 
     expect(info).toMatchObject({ source: 'fallback', discount: 0 })
-    expect(info.skus).toEqual(getPreset('wan-3.0').pricing.fallback)
+    expect(info.skus).toEqual(primaryBinding(getPreset('wan-3.0')).pricing.fallback)
     expect(info.listSkus).toEqual(info.skus)
   })
 })

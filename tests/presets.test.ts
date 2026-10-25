@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_PRESET_ID, findPreset, getPreset, MODEL_PRESETS } from '@/core/presets'
 import { ASPECT_RATIOS, RESOLUTIONS } from '@/core/presets/types'
-import { skuKey } from '@/core/pricing'
+import { primaryBinding, skuKey } from '@/core/pricing'
 
 describe('MODEL_PRESETS', () => {
   it('ships Wan and Seedance presets in order', () => {
@@ -36,7 +36,7 @@ describe('MODEL_PRESETS', () => {
 
     expect(prime.referenceLimits).toEqual(wan.referenceLimits)
 
-    expect(prime.inputTransport).toEqual({
+    expect(primaryBinding(prime).transport).toEqual({
       image: 'base64',
       video: 'url',
       audio: 'url',
@@ -56,7 +56,7 @@ describe('MODEL_PRESETS', () => {
   })
 
   it('builds Wan per-second keys from the resolution', () => {
-    const pricing = getPreset('wan-3.0').pricing
+    const pricing = primaryBinding(getPreset('wan-3.0')).pricing
 
     if (pricing.kind !== 'perSecond') {
       throw new Error('Wan must be per-second')
@@ -81,7 +81,7 @@ describe('Seedance presets', () => {
   it('defines Seedance 2.0 limits and sizes', () => {
     const preset = getPreset('seedance-2.0')
 
-    expect(preset.slug).toBe('bytedance/seedance-2.0')
+    expect(primaryBinding(preset).modelId).toBe('bytedance/seedance-2.0')
     expect(preset.duration).toEqual({ min: 4, max: 15, default: 5, options: [4, 5, 8, 10, 15] })
     expect(preset.defaultResolution).toBe('720p')
     expect(preset.resolutions).toEqual(['480p', '720p', '1080p', '4K'])
@@ -108,7 +108,7 @@ describe('Seedance presets', () => {
   it('defines Seedance 2.5 limits and at-prefixed labels', () => {
     const preset = getPreset('seedance-2.5')
 
-    expect(preset.slug).toBe('bytedance/seedance-2.5')
+    expect(primaryBinding(preset).modelId).toBe('bytedance/seedance-2.5')
     expect(preset.duration.max).toBe(30)
     expect(preset.resolutions).toEqual(['480p', '720p'])
     expect(preset.references.image).toBe(30)
@@ -133,7 +133,7 @@ describe('Seedance presets', () => {
 
 describe('preset pricing', () => {
   it('uses video-token pricing for Seedance', () => {
-    const pricing = getPreset('seedance-2.0').pricing
+    const pricing = primaryBinding(getPreset('seedance-2.0')).pricing
 
     if (pricing.kind !== 'videoTokens') {
       throw new Error('Seedance must use tokens')

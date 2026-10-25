@@ -4,14 +4,14 @@ import { MEDIA_KINDS } from '@/core/media-kinds'
 import { aspectAllowed } from '@/core/output-size'
 import { minDuration, MODEL_PRESETS } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
-import { skuKey } from '@/core/pricing'
+import { primaryBinding, skuKey } from '@/core/pricing'
 
 /** Every key the preset can produce for its allowed inputs. */
 function pricingKeys(preset: ModelPreset): string[] {
   return preset.resolutions.flatMap((resolution) =>
     [true, false].flatMap((isAudio) =>
       [true, false].map((hasVideoInput) =>
-        skuKey(preset.pricing, { resolution, audio: isAudio, hasVideoInput }),
+        skuKey(primaryBinding(preset).pricing, { resolution, audio: isAudio, hasVideoInput }),
       ),
     ),
   )
@@ -70,14 +70,16 @@ describe('preset contract', () => {
   it('has a fallback for every SKU key pricing can return', () => {
     for (const preset of MODEL_PRESETS) {
       for (const key of pricingKeys(preset)) {
-        expect(preset.pricing.fallback[key], `${preset.id} ${key}`).toBeDefined()
+        expect(primaryBinding(preset).pricing.fallback[key], `${preset.id} ${key}`).toBeDefined()
       }
     }
   })
 
   it('declares a reference video billing factor', () => {
     for (const preset of MODEL_PRESETS) {
-      expect(preset.pricing.referenceVideoFactor, preset.id).toBeGreaterThanOrEqual(0)
+      expect(primaryBinding(preset).pricing.referenceVideoFactor, preset.id).toBeGreaterThanOrEqual(
+        0,
+      )
     }
   })
 
@@ -104,7 +106,7 @@ describe('preset contract', () => {
 
   it('has unique ids and slugs', () => {
     const ids = MODEL_PRESETS.map((preset) => preset.id)
-    const slugs = MODEL_PRESETS.map((preset) => preset.slug)
+    const slugs = MODEL_PRESETS.map((preset) => primaryBinding(preset).modelId)
 
     expect(new Set(ids).size).toBe(ids.length)
     expect(new Set(slugs).size).toBe(slugs.length)

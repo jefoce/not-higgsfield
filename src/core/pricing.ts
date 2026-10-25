@@ -4,7 +4,8 @@ import { outputSize } from './output-size'
 import type {
   AspectChoice,
   ModelPreset,
-  PresetPricing,
+  PricingRule,
+  ProviderBinding,
   Resolution,
   SkuCondition,
   SkuContext,
@@ -17,8 +18,13 @@ export interface PriceContext {
   hasVideoInput: boolean
 }
 
+/** The binding used for price and default request decisions. */
+export function primaryBinding(preset: ModelPreset): ProviderBinding {
+  return preset.bindings[0]
+}
+
 /** First matching rule wins. An unmatched context returns an empty key. */
-export function skuKey(pricing: PresetPricing, ctx: SkuContext): string {
+export function skuKey(pricing: PricingRule, ctx: SkuContext): string {
   const tier = pricing.tiers[ctx.resolution] ?? ''
 
   const isMatch = (condition: SkuCondition): boolean => {
@@ -54,9 +60,10 @@ interface PricePerSecParams {
 
 const rawRate = (params: PricePerSecParams): number | null => {
   const { preset, ctx, skus } = params
-  const table = skus ?? preset.pricing.fallback
+  const { pricing } = primaryBinding(preset)
+  const table = skus ?? pricing.fallback
 
-  const key = skuKey(preset.pricing, {
+  const key = skuKey(pricing, {
     resolution: ctx.resolution,
     audio: ctx.audio && preset.audio.supported,
     hasVideoInput: ctx.hasVideoInput,
@@ -74,14 +81,15 @@ const rawRate = (params: PricePerSecParams): number | null => {
 /** Per-second rate in USD, or null when the SKU is missing. */
 export function pricePerSec(params: PricePerSecParams): number | null {
   const { preset, ctx } = params
+  const { pricing } = primaryBinding(preset)
   const raw = rawRate(params)
 
   if (isNil(raw)) {
     return null
   }
 
-  if (preset.pricing.kind === 'perSecond') {
-    return preset.pricing.unit === 'cents' ? raw / 100 : raw
+  if (pricing.kind === 'perSecond') {
+    return pricing.unit === 'cents' ? raw / 100 : raw
   }
 
   const aspect = ctx.aspect === 'auto' ? preset.defaultAspectRatio : ctx.aspect
@@ -91,12 +99,12 @@ export function pricePerSec(params: PricePerSecParams): number | null {
     return null
   }
 
-  return ((size.width * size.height * preset.pricing.fps) / 1024) * raw
+  return ((size.width * size.height * pricing.fps) / 1024) * raw
 }
 
 /** Seconds the provider bills, honoring the preset floor. */
 export function billableSeconds(preset: ModelPreset, duration: number): number {
-  return Math.max(preset.pricing.minBillableSec, duration)
+  return Math.max(primaryBinding(preset).pricing.minBillableSec, duration)
 }
 
 function estimateUsd(rate: number, duration: number): number {
@@ -127,7 +135,8 @@ export function estimatePrice(params: EstimatePriceParams): PriceEstimate | null
   }
 
   const seconds =
-    billableSeconds(preset, duration) + referenceSeconds * preset.pricing.referenceVideoFactor
+    billableSeconds(preset, duration) +
+    referenceSeconds * primaryBinding(preset).pricing.referenceVideoFactor
 
   return { pricePerSec: rate, estimatedUsd: estimateUsd(rate, seconds), seconds }
 }

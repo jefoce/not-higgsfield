@@ -3,6 +3,7 @@ import { isNil } from 'lodash-es'
 import { GRACE_STALE_MS } from './constants'
 import type { UploadItem } from './media-types'
 import type { ModelPreset } from './presets/types'
+import { primaryBinding } from './pricing'
 import { type ResolvedTransport, resolveTransport } from './transport'
 import type { GenerationInput, GenerationRecord, JobStatus } from './types'
 
@@ -62,7 +63,11 @@ export function transportsFor(params: TransportsForParams): Record<string, Resol
   return Object.fromEntries(
     Object.values(uploads).map((upload) => [
       upload.id,
-      resolveTransport({ preset, kind: upload.kind, remoteConfigured: isRemoteConfigured }),
+      resolveTransport({
+        binding: primaryBinding(preset),
+        kind: upload.kind,
+        remoteConfigured: isRemoteConfigured,
+      }),
     ]),
   )
 }

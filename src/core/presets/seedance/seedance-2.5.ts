@@ -1,3 +1,4 @@
+import { VIDEO_PROVIDER_IDS } from '../../providers/types'
 import { videoTokenPricing } from '../helpers'
 import type { ModelPreset } from '../types'
 import { SEEDANCE_FAMILY, SEEDANCE_UNKNOWN_LIMITS, seedanceImageLimits } from './family'
@@ -42,7 +43,6 @@ export const SEEDANCE_25: ModelPreset = {
   ...SEEDANCE_FAMILY,
   id: 'seedance-2.5',
   title: 'Seedance 2.5',
-  slug: 'bytedance/seedance-2.5',
   // Any integer 4-30. Source: https://docs.byteplus.com/en/docs/byteplus_las/video_gen_enhanced
   // OpenRouter supported_durations lists every integer in the range. Options are quick picks.
   duration: { min: 4, max: 30, default: 5, options: [4, 5, 8, 10, 15, 20, 30] },
@@ -78,5 +78,12 @@ export const SEEDANCE_25: ModelPreset = {
   maxInputPlusOutputSec: null,
   refLabel: '@{Kind} {n}',
   outputSizes: SIZES,
-  pricing: PRICING,
+  bindings: [
+    {
+      provider: VIDEO_PROVIDER_IDS[0],
+      modelId: 'bytedance/seedance-2.5',
+      pricing: PRICING,
+      transport: { image: 'base64', video: 'url', audio: 'auto' },
+    },
+  ],
 }

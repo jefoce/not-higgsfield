@@ -2,6 +2,7 @@ import 'server-only'
 
 import { MODEL_PRESETS } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
+import { primaryBinding } from '@/core/pricing'
 
 import type { ProviderModel } from '../types'
 
@@ -12,7 +13,7 @@ export async function listModels(): Promise<readonly ProviderModel[]> {
 
 function staticModel(preset: ModelPreset): ProviderModel {
   return {
-    modelId: preset.slug,
+    modelId: primaryBinding(preset).modelId,
     durations: preset.duration.options ?? allDurations(preset),
     resolutions: preset.resolutions,
     aspectRatios: preset.aspectRatios,

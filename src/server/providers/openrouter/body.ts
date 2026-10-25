@@ -4,6 +4,7 @@ import { isNil } from 'lodash-es'
 
 import type { MediaKind } from '@/core/media-types'
 import type { ModelPreset } from '@/core/presets/types'
+import { primaryBinding } from '@/core/pricing'
 import { renderPromptForApi } from '@/core/prompt-tokens'
 import type { GenerationInput } from '@/core/types'
 
@@ -149,7 +150,7 @@ export function buildRequestBody(params: BuildRequestBodyParams): OpenRouterVide
   const { input, preset } = params
 
   return {
-    model: preset.slug,
+    model: primaryBinding(preset).modelId,
     duration: input.duration,
     resolution: input.resolution,
     ...audioFields(params),

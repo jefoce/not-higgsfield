@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import { getPreset } from '@/core/presets'
-import type { ModelPreset, PresetPricing, Resolution } from '@/core/presets/types'
+import type { ModelPreset, PricingRule, Resolution } from '@/core/presets/types'
 import type { PriceContext } from '@/core/pricing'
-import { estimatePrice, formatRate, pricePerSec } from '@/core/pricing'
+import { estimatePrice, formatRate, pricePerSec, primaryBinding } from '@/core/pricing'
 
 const wan = getPreset('wan-3.0')
 const prime = getPreset('wan-3.0-prime')
@@ -18,13 +18,10 @@ const ctx = (resolution: Resolution, overrides: Partial<PriceContext> = {}): Pri
   ...overrides,
 })
 
-const withPricing = (
-  pricing: PresetPricing,
-  overrides: Partial<ModelPreset> = {},
-): ModelPreset => ({
+const withPricing = (pricing: PricingRule, overrides: Partial<ModelPreset> = {}): ModelPreset => ({
   ...wan,
   ...overrides,
-  pricing,
+  bindings: [{ ...primaryBinding(wan), pricing }],
 })
 
 describe('pricePerSec Wan', () => {
@@ -41,7 +38,7 @@ describe('pricePerSec Wan', () => {
   })
 
   it('divides cents by 100', () => {
-    const pricing: PresetPricing = {
+    const pricing: PricingRule = {
       kind: 'perSecond',
       unit: 'cents',
       skuRules: [{ when: {}, key: 'per_sec' }],
@@ -57,7 +54,7 @@ describe('pricePerSec Wan', () => {
   })
 
   it('passes audio only when the preset supports it', () => {
-    const pricing: PresetPricing = {
+    const pricing: PricingRule = {
       kind: 'perSecond',
       unit: 'usd',
       skuRules: [
@@ -88,7 +85,7 @@ describe('pricePerSec Wan', () => {
   it('returns null for missing or non-finite keys', () => {
     expect(pricePerSec({ preset: wan, ctx: ctx('768p') })).toBeNull()
 
-    const pricing: PresetPricing = {
+    const pricing: PricingRule = {
       kind: 'perSecond',
       unit: 'usd',
       skuRules: [{ when: {}, key: 'x' }],
@@ -146,7 +143,7 @@ describe('pricePerSec Seedance', () => {
 
 describe('estimatePrice', () => {
   it('bills output only when the reference video factor is zero', () => {
-    const pricing: PresetPricing = {
+    const pricing: PricingRule = {
       kind: 'perSecond',
       unit: 'usd',
       skuRules: [{ when: {}, key: 'per_sec' }],

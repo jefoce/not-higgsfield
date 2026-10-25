@@ -12,6 +12,7 @@ import { isRecord } from '@/core/guards'
 import { outputSize } from '@/core/output-size'
 import { MODEL_PRESETS } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
+import { primaryBinding } from '@/core/pricing'
 import { asJobStatus } from '@/core/submit-state'
 import type { PricingInfo, TestResult } from '@/core/types'
 
@@ -118,7 +119,7 @@ async function getAccount(): Promise<ProviderAccount> {
 }
 
 async function getPricing(preset: ModelPreset): Promise<PricingInfo> {
-  const listSkus = { ...preset.pricing.fallback }
+  const listSkus = { ...primaryBinding(preset).pricing.fallback }
 
   return {
     skus: { ...listSkus },
@@ -270,7 +271,7 @@ function mockDimensions(params: MockDimensionsParams): { width: number; height: 
   const { model, presetId, resolution, aspect } = params
 
   const preset =
-    MODEL_PRESETS.find((item) => item.slug === model) ??
+    MODEL_PRESETS.find((item) => primaryBinding(item).modelId === model) ??
     MODEL_PRESETS.find((item) => item.id === presetId)
 
   const res = preset?.resolutions.find((item) => item === resolution)

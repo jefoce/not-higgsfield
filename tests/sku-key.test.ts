@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { MODEL_PRESETS } from '@/core/presets'
-import { skuKey } from '@/core/pricing'
+import { primaryBinding, skuKey } from '@/core/pricing'
 
 /** Keys recorded from the per-preset key functions before the SKU rules replaced them. */
 const EXPECTED: Record<string, Record<string, string>> = {
@@ -81,9 +81,10 @@ describe('skuKey', () => {
         for (const [isAudio, hasVideoInput] of COMBINATIONS) {
           const label = `${preset.id} ${resolution} audio=${isAudio} video=${hasVideoInput}`
 
-          expect(skuKey(preset.pricing, { resolution, audio: isAudio, hasVideoInput }), label).toBe(
-            expected[`${resolution}|${isAudio}|${hasVideoInput}`],
-          )
+          expect(
+            skuKey(primaryBinding(preset).pricing, { resolution, audio: isAudio, hasVideoInput }),
+            label,
+          ).toBe(expected[`${resolution}|${isAudio}|${hasVideoInput}`])
         }
       }
     }

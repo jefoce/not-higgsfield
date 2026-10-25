@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { getPreset } from '@/core/presets'
+import { primaryBinding } from '@/core/pricing'
 import { validateInput } from '@/core/validation'
 
 import { input, MB, preset, upload, uploadsOf } from './helpers/validation-fixtures'
@@ -79,7 +80,12 @@ describe('validateInput submit and inline limits', () => {
   it('rejects an oversized video reference sent inline', () => {
     const inline = {
       ...preset,
-      inputTransport: { image: 'base64', video: 'base64', audio: 'base64' },
+      bindings: [
+        {
+          ...primaryBinding(preset),
+          transport: { image: 'base64', video: 'base64', audio: 'base64' },
+        },
+      ],
     } as const
 
     const result = validateInput({

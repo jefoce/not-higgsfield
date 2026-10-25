@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import { FETCH_TIMEOUTS, PRICING_FALLBACK_TTL_MS } from '@/core/constants'
 import type { ModelPreset } from '@/core/presets/types'
+import { primaryBinding } from '@/core/pricing'
 import type { PricingInfo } from '@/core/types'
 
 import { globalState } from '../../global-state'
@@ -54,7 +55,7 @@ export async function getPricing(preset: ModelPreset, isForce = false): Promise<
 }
 
 function fallback(preset: ModelPreset): PricingInfo {
-  const listSkus = { ...preset.pricing.fallback }
+  const listSkus = { ...primaryBinding(preset).pricing.fallback }
 
   return {
     skus: { ...listSkus },
@@ -105,7 +106,7 @@ async function fetchListSkus(preset: ModelPreset): Promise<Record<string, number
       return null
     }
 
-    const model = parsed.data.data.find((item) => item.id === preset.slug)
+    const model = parsed.data.data.find((item) => item.id === primaryBinding(preset).modelId)
 
     return model ? readSkus(model.pricing_skus) : null
   } catch {
@@ -115,7 +116,7 @@ async function fetchListSkus(preset: ModelPreset): Promise<Record<string, number
 
 async function fetchDiscount(preset: ModelPreset): Promise<number> {
   try {
-    const res = await fetch(`${API_URL}/models/${preset.slug}/endpoints`, {
+    const res = await fetch(`${API_URL}/models/${primaryBinding(preset).modelId}/endpoints`, {
       cache: 'no-store',
       signal: AbortSignal.timeout(FETCH_TIMEOUTS.meta),
     })

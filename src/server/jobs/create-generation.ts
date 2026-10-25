@@ -4,6 +4,7 @@ import { randomInt, randomUUID } from 'node:crypto'
 
 import { MAX_REQUEST_MB, REQUEST_RESERVE_MB, SEED_MAX, SUBMIT_GRACE_MS } from '@/core/constants'
 import type { ReferencePlan, UploadItem } from '@/core/media-types'
+import { primaryBinding } from '@/core/pricing'
 import { VIDEO_PROVIDER_IDS } from '@/core/providers/types'
 import type { GenerationInput, GenerationRecord } from '@/core/types'
 
@@ -32,7 +33,7 @@ export async function createGeneration(raw: GenerationInput): Promise<Generation
     status: 'submitting',
     provider: VIDEO_PROVIDER_IDS[0],
     input: { ...input, frames: { ...input.frames }, references: [...input.references] },
-    preset: { id: preset.id, title: preset.title, slug: preset.slug },
+    preset: { id: preset.id, title: preset.title, slug: primaryBinding(preset).modelId },
     inputsSnapshot: snapshot(uploads, encoded.plan),
     submit: {
       stage: 'grace',
