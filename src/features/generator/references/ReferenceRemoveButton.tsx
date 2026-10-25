@@ -34,7 +34,7 @@ export function ReferenceRemoveButton(props: ReferenceRemoveButtonProps) {
       onClick={handleRemoveClick}
       aria-label={`Remove ${label}`}
       className={cn(
-        'absolute -top-2 -right-2 z-20 size-4 items-center justify-center rounded-md border border-line bg-white/5 text-fg backdrop-blur-sm',
+        'absolute -top-2 -right-2 z-20 size-4 items-center justify-center rounded-md border border-line bg-white/5 text-fg backdrop-blur-sm linux:bg-surface-2',
         overlayClass,
       )}
     >

@@ -36,7 +36,7 @@ export function ReferencesEmpty(props: ReferencesEmptyProps) {
             /* eslint-disable-next-line react/no-array-index-key -- static list */
             key={index}
             className={cn(
-              'flex size-9 items-center justify-center rounded-full border border-white/50 bg-white/4 text-fg-2 backdrop-blur-xs',
+              'flex size-9 items-center justify-center rounded-full border border-white/50 bg-white/4 text-fg-2 backdrop-blur-xs linux:bg-surface-2',
               index > 0 && '-mx-1',
             )}
           >

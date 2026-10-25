@@ -67,12 +67,12 @@ export function FrameSlotCard(props: FrameSlotCardProps) {
         {!hasFrame && (
           <>
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2">
-              <span className="flex size-10 items-center justify-center rounded-full bg-white/4 text-fg-2 mix-blend-luminosity shadow-[0_128.852px_36.007px_rgba(0,0,0,0),0_82.429px_33.031px_rgba(0,0,0,0.01),0_46.422px_27.972px_rgba(0,0,0,0.05),0_20.533px_20.533px_rgba(0,0,0,0.09),0_5.059px_11.308px_rgba(0,0,0,0.1),inset_0_-0.298px_5.356px_rgba(185,185,185,0.35)] backdrop-blur-xs">
+              <span className="flex size-10 items-center justify-center rounded-full bg-white/4 text-fg-2 mix-blend-luminosity shadow-[0_128.852px_36.007px_rgba(0,0,0,0),0_82.429px_33.031px_rgba(0,0,0,0.01),0_46.422px_27.972px_rgba(0,0,0,0.05),0_20.533px_20.533px_rgba(0,0,0,0.09),0_5.059px_11.308px_rgba(0,0,0,0.1),inset_0_-0.298px_5.356px_rgba(185,185,185,0.35)] backdrop-blur-xs linux:bg-surface-2">
                 <ImageIcon size={16} />
               </span>
               <span className="cursor-default text-sm font-medium text-fg-2">{label}</span>
             </div>
-            <span className="pointer-events-none absolute top-0 right-0 rounded-3xl bg-white/5 px-1.5 py-1 text-3xs font-normal text-fg-2 backdrop-blur-sm">
+            <span className="pointer-events-none absolute top-0 right-0 rounded-3xl bg-white/5 px-1.5 py-1 text-3xs font-normal text-fg-2 backdrop-blur-sm linux:bg-surface-2">
               Optional
             </span>
           </>
