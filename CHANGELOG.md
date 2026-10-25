@@ -9,6 +9,9 @@
 - The cost estimate includes the seconds of reference videos.
 - Reference durations show their exact values.
 - Files chosen in the folder picker are marked before you press Add.
+- Step-by-step setup guides for OpenRouter and Cloudflare R2, linked from Settings.
+- Settings shows how much R2 storage the app uses.
+- List view darkens the video edges on hover, like the grid.
 
 ### Fixed
 
@@ -16,10 +19,13 @@
 - Glass surfaces no longer render a broken blur on Linux.
 - R2 status refreshes after you save the settings.
 - Credits no longer show the previous key's numbers after a key change.
+- The Cloudflare links in Settings open from the desktop app.
 
 ### Changed
 
 - The Linux AppImage steps name the correct FUSE package for Ubuntu 22.04 and 24.04.
+- The app keeps R2 storage under 8 GB, inside Cloudflare's free tier, and removes the oldest unused references first.
+- The Generate button no longer spins while it is disabled.
 
 Internal: provider and storage layers, stricter lint, stored data validation.
 
