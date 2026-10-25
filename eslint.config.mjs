@@ -77,10 +77,7 @@ export default defineConfig([
       'import/first': 'error',
       'import/newline-after-import': 'error',
       'import/no-duplicates': ['error', { 'prefer-inline': true }],
-      '@typescript-eslint/consistent-type-imports': [
-        'error',
-        { fixStyle: 'separate-type-imports' },
-      ],
+      '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
       'no-restricted-imports': [
         'error',
         {
