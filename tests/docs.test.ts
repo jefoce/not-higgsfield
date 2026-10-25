@@ -165,6 +165,14 @@ describe('documentation tables', () => {
     }
   })
 
+  it('keeps the README R2 limits equal to the constants', () => {
+    const readme = fs.readFileSync(file('README.md'), 'utf8')
+
+    expect(bounds.REMOTE_MAX_GB).toBe(8)
+    expect(readme).toContain(`${String(bounds.REMOTE_MAX_GB)} GB`)
+    expect(readme).toContain(`${String(bounds.REMOTE_UNUSED_DAYS)} days`)
+  })
+
   it('keeps the Higgsfield trademark disclaimer', () => {
     const readme = fs.readFileSync(file('README.md'), 'utf8').replaceAll(/\s+/g, ' ')
 
