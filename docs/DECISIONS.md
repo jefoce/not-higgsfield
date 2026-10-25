@@ -122,6 +122,46 @@ Why: every change on the horizon is additive, and a version added later costs no
 
 Rejected: `JSON.parse(text) as T` and silent casts. A version field before the first breaking change.
 
+## 2026-10-25 - Updates run in Rust
+
+Decision: the Tauri shell checks for, downloads and installs updates with `tauri-plugin-updater`. The webview calls five commands: `update_info`, `update_check`, `update_install`, `update_set_auto` and `update_open_release`.
+
+Why: the webview never gets the updater permission or the signing key. The shell stops the Node server before it replaces the app, so no job writes into a bundle that is being swapped. Every download is checked against the public key embedded in `tauri.conf.json`, and the `latest` endpoint skips drafts and prereleases until they are published.
+
+Rejected: an in-page updater (needs the webview permission and a server stop from the wrong side), and manual downloads for every release.
+
+## 2026-10-25 - R2 storage cap of 8 GB with eviction
+
+Decision: `REMOTE_MAX_GB` is 8. A put that would pass the cap first removes the oldest keys whose `lastUsedAt` is past the 2 hour link TTL, then fails with `RemoteCapError` when nothing evictable frees enough room.
+
+Why: Cloudflare has no hard spend cap and needs a card. Tracking the app's own objects keeps usage under the free 10 GB.
+
+Rejected: listing the bucket to measure usage, and a lock per put. Two parallel uploads may both pass, and the 2 GB headroom covers that.
+
+## 2026-10-25 - User guides in `docs/user`, linked from Settings
+
+Decision: setup guides for OpenRouter and Cloudflare R2 live in `docs/user`, one file per service. Settings links the exact guide page and the README links the same files.
+
+Why: the README stays short, the guides carry screenshots, and the app sends the reader to the page they need.
+
+Rejected: one long setup section in the README, and help text in the app that duplicates the guides.
+
+## 2026-10-25 - Shared unions from const arrays, no `enum`
+
+Decision: a string union that is validated, iterated, stored or sent over HTTP or IPC comes from one `as const` array. The type is `(typeof LIST)[number]` and schemas use `z.enum(LIST)`.
+
+Why: one list feeds the type, zod and loops, and nothing is emitted at runtime.
+
+Rejected: a TS `enum`, which adds runtime code and uses nominal strings, and a second list for zod.
+
+## 2026-10-25 - Runtime copy stamped by build id
+
+Decision: the shell stages the bundled server into a per-version runtime dir once. A `.nh-build` stamp holds the bundled build id, and a runtime copy whose stamp differs is replaced.
+
+Why: a same-version rebuild served a stale frontend before the stamp.
+
+Rejected: copying the server on every launch, and trusting the version folder alone.
+
 ## 2026-10-23 - Server-owned price estimate
 
 Decision: estimate is a price-only server route. `buildPriceInputSchema` has presetId, tab, audio, duration, aspectRatio, resolution, frames, references. Client sends no prompt or seed. SWR key uses those fields, disables focus and stale revalidation, keeps previous data. Spinner covers only the debounce and first key fetch. Create keeps full validation. Actual `usage.cost` wins.
@@ -223,90 +263,6 @@ Decision: after the window is built, turn off WebKit's `PreferPageRenderingUpdat
 Why: WKWebView caps page rendering near 60 fps on ProMotion displays. The private API lifts the cap, so scrolling and video playback use the full display refresh rate.
 
 Rejected: leaving the cap at 60 fps. Not App Store safe because it uses private API. Direct distribution only. Each selector is checked with `respondsToSelector:` and the call is wrapped in `catch_unwind`, so a future macOS without the API stays at 60 fps.
-
-## 2026-10-20 - Scaffold merged in place
-
-The project root already held PLAN.md and docs/, so create-next-app ran in a temp directory and its files were merged into the root. No second git repository was created.
-
-## 2026-10-20 - Reference path
-
-Visual references live in docs/references/. PLAN.md says docs/reference/, but the supplied folder name wins.
-
-## 2026-10-20 - TMPDIR workaround
-
-The default TMPDIR points to a missing directory. pnpm commands run with TMPDIR=/private/tmp.
-
-## 2026-10-20 - Mock mode default
-
-.env.local sets OPENROUTER_MOCK=1 so development jobs do not call the API or incur cost.
-
-## 2026-10-20 - OpenRouter request shapes
-
-Docs confirmed frame_images with image_url and frame_type, input_references as a type union, optional prompt with frames, GET jobs without progress or timestamps, relative polling_url, and pricing SKU keys of the form duration_seconds_<resolution>.
-
-## 2026-10-20 - Mock timeline
-
-Mock jobs stay pending for 3 seconds, then in_progress for 6 seconds, and the mock video is generated locally.
-
-## 2026-10-20 - wan-3.0 reference kinds
-
-Docs describe input_references for wan-3.0 as images only, but the app still allows video and audio references per user decision and surfaces provider errors.
-
-## 2026-10-20 - History text mode filter
-
-The text-only mode tab is a client-side post-filter over loaded records. Prompt search is applied server-side with the other filters.
-
-## 2026-10-20 - Add as reference
-
-Add-as-reference downloads the mp4 in the browser and uploads a copy through the existing uploads route, so no new API route was added.
-
-## 2026-10-20 - Seed Randomize
-
-The Randomize button picks a fixed random number while the Random switch stays off. Toggle the switch for server-random seeds.
-
-## 2026-10-20 - Request size guard
-
-The total request size check runs before the generation record is written.
-
-## 2026-10-20 - Mock content fallback
-
-After a restart, mock content uses record.input as the fallback source for dimensions and duration.
-
-## 2026-10-20 - Browse errors
-
-Directory browse failures throw typed BrowseError values with status 400 for invalid input and 404 for missing paths.
-
-- Credits hint says "management key" instead of the env var name so no OPENROUTER string ships in the client bundle.
-
-## 2026-10-20 - Review follow-ups
-
-- Tab normalization runs `inputForSubmit` on submit and server side, and history thumbs render only the record's tab.
-- Boot reconcile no longer expires by age. A job expires only on OpenRouter expired, 404, or a passed `expires_at`.
-- Local API guard requires matching Host, Origin, Sec-Fetch-Site and a JSON content type, or answers 403/415.
-- Model picker options come from `MODEL_PRESETS`, and prices use live SKU rates with a saved fallback.
-- Price shows in the Resolution popover, the model picker and the Generate button. Discounted prices show the struck list price and the percent off.
-- Adding a video reference clamps duration to the preset combined input plus output limit, with a toast.
-- Known literal labels in stored or pasted prompts become mention chips.
-- Picker thumb URLs carry a file stamp version so replaced uploads refetch their thumb.
-- Upload delete removes the file and every generation link that references it.
-- Global CSS removes focus outlines. Keyboard state relies on hover/focus styling instead.
-
-## 2026-10-20 - History zoom proportions
-
-History zoom uses the supplied sizes as proportions of the row width, measured at a 1518px reference row. List media is 16:9, details fills the remaining width, and rows keep the same height as the media. Grid keeps a fixed column count per step and scales tile width without rewrapping.
-
-| Slider | List video | List details | Grid tile |
-| --- | --- | --- | --- |
-| 1 | 604px (604x340) | 902px | 172px x 8 |
-| 2 | 710px (710x399) | 796px | 200px x 7 |
-| 3 | 830px (830x467) | 840px | 252px x 6 |
-| 4 | 980px (980x551) | 524px | 286px x 5 |
-| 5 | 1132px (1132x637) | 374px | 362px x 4 |
-| 6 | 1270x714px | 240w x 714h | 486px x 3 |
-
-Slider 3 totals 830 + 840 = 1670px, more than the 1518px reference. Media keeps the 830px share and details takes the remainder so the row never overflows.
-
-The details panel stops shrinking at 240px wide and 280px tall. Below that the media box caps at the remaining row width and stays 16:9, so narrow windows keep the same layout without horizontal overflow. Media aligns to the top when it is shorter than the details panel.
 
 ## 2026-10-21 - Tauri shell with a Node sidecar
 
@@ -428,13 +384,76 @@ Why: the raw text stays available for Details and Copy, and table fixes apply to
 
 Rejected: rewriting stored errors at write time.
 
-## 2026-10-25 - Updates run in Rust
+## 2026-10-20 - Mock mode default
 
-Decision: the Tauri shell checks for, downloads and installs updates with `tauri-plugin-updater`. The webview calls five commands: `update_info`, `update_check`, `update_install`, `update_set_auto` and `update_open_release`.
+.env.local sets OPENROUTER_MOCK=1 so development jobs do not call the API or incur cost.
 
-Why: the webview never gets the updater permission or the signing key. The shell stops the Node server before it replaces the app, so no job writes into a bundle that is being swapped. Every download is checked against the public key embedded in `tauri.conf.json`, and the `latest` endpoint skips drafts and prereleases until they are published.
+## 2026-10-20 - OpenRouter request shapes
 
-Rejected: an in-page updater (needs the webview permission and a server stop from the wrong side), and manual downloads for every release.
+Docs confirmed frame_images with image_url and frame_type, input_references as a type union, optional prompt with frames, GET jobs without progress or timestamps, relative polling_url, and pricing SKU keys of the form duration_seconds_<resolution>.
+
+## 2026-10-20 - Mock timeline
+
+Mock jobs stay pending for 3 seconds, then in_progress for 6 seconds, and the mock video is generated locally.
+
+## 2026-10-20 - wan-3.0 reference kinds
+
+Docs describe input_references for wan-3.0 as images only, but the app still allows video and audio references per user decision and surfaces provider errors.
+
+## 2026-10-20 - History text mode filter
+
+The text-only mode tab is a client-side post-filter over loaded records. Prompt search is applied server-side with the other filters.
+
+## 2026-10-20 - Add as reference
+
+Add-as-reference downloads the mp4 in the browser and uploads a copy through the existing uploads route, so no new API route was added.
+
+## 2026-10-20 - Seed Randomize
+
+The Randomize button picks a fixed random number while the Random switch stays off. Toggle the switch for server-random seeds.
+
+## 2026-10-20 - Request size guard
+
+The total request size check runs before the generation record is written.
+
+## 2026-10-20 - Mock content fallback
+
+After a restart, mock content uses record.input as the fallback source for dimensions and duration.
+
+## 2026-10-20 - Browse errors
+
+Directory browse failures throw typed BrowseError values with status 400 for invalid input and 404 for missing paths.
+
+## 2026-10-20 - Review follow-ups
+
+- Tab normalization runs `inputForSubmit` on submit and server side, and history thumbs render only the record's tab.
+- Boot reconcile no longer expires by age. A job expires only on OpenRouter expired, 404, or a passed `expires_at`.
+- Local API guard requires matching Host, Origin, Sec-Fetch-Site and a JSON content type, or answers 403/415.
+- Model picker options come from `MODEL_PRESETS`, and prices use live SKU rates with a saved fallback.
+- Price shows in the Resolution popover, the model picker and the Generate button. Discounted prices show the struck list price and the percent off.
+- Adding a video reference clamps duration to the preset combined input plus output limit, with a toast.
+- Known literal labels in stored or pasted prompts become mention chips.
+- Picker thumb URLs carry a file stamp version so replaced uploads refetch their thumb.
+- Upload delete removes the file and every generation link that references it.
+- Global CSS removes focus outlines. Keyboard state relies on hover/focus styling instead.
+- Credits hint says "management key" instead of the env var name so no OPENROUTER string ships in the client bundle.
+
+## 2026-10-20 - History zoom proportions
+
+History zoom uses the supplied sizes as proportions of the row width, measured at a 1518px reference row. List media is 16:9, details fills the remaining width, and rows keep the same height as the media. Grid keeps a fixed column count per step and scales tile width without rewrapping.
+
+| Slider | List video | List details | Grid tile |
+| --- | --- | --- | --- |
+| 1 | 604px (604x340) | 902px | 172px x 8 |
+| 2 | 710px (710x399) | 796px | 200px x 7 |
+| 3 | 830px (830x467) | 840px | 252px x 6 |
+| 4 | 980px (980x551) | 524px | 286px x 5 |
+| 5 | 1132px (1132x637) | 374px | 362px x 4 |
+| 6 | 1270x714px | 240w x 714h | 486px x 3 |
+
+Slider 3 totals 830 + 840 = 1670px, more than the 1518px reference. Media keeps the 830px share and details takes the remainder so the row never overflows.
+
+The details panel stops shrinking at 240px wide and 280px tall. Below that the media box caps at the remaining row width and stays 16:9, so narrow windows keep the same layout without horizontal overflow. Media aligns to the top when it is shorter than the details panel.
 
 ## Deferred on purpose
 
