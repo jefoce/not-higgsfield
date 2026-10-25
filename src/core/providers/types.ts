@@ -1,6 +1,9 @@
 import type { HttpRuleTable } from '../provider-errors/types'
 import type { SecretName } from '../secret-names'
 
+/** Base URL of the user guides on GitHub, resolved on the default branch. */
+export const GUIDE_BASE = 'https://github.com/jefoce/not-higgsfield/blob/HEAD/docs/user'
+
 /** @public */
 export const VIDEO_PROVIDER_IDS = ['openrouter'] as const
 

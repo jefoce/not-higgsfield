@@ -1,5 +1,5 @@
 import { R2_NAMES } from '../secret-names'
-import type { StorageProviderDescriptor } from './types'
+import { GUIDE_BASE, type StorageProviderDescriptor } from './types'
 
 export const R2_DESCRIPTOR = {
   id: 'r2',
@@ -38,6 +38,6 @@ export const R2_DESCRIPTOR = {
   links: [
     { label: 'Buckets', url: 'https://dash.cloudflare.com/?to=/:account/r2/overview' },
     { label: 'API tokens', url: 'https://dash.cloudflare.com/?to=/:account/r2/api-tokens' },
-    { label: 'Setup guide', url: 'https://github.com/jefoce/not-higgsfield#first-setup' },
+    { label: 'Setup guide', url: `${GUIDE_BASE}/CLOUDFLARE-R2.md` },
   ],
 } satisfies StorageProviderDescriptor

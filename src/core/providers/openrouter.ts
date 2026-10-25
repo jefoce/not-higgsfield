@@ -1,4 +1,4 @@
-import type { VideoProviderDescriptor } from './types'
+import { GUIDE_BASE, type VideoProviderDescriptor } from './types'
 
 export const OPENROUTER_CREDITS_URL = 'https://openrouter.ai/settings/credits'
 
@@ -26,7 +26,7 @@ export const OPENROUTER_DESCRIPTOR = {
     { label: 'API keys', url: 'https://openrouter.ai/workspaces/default/keys' },
     { label: 'Management keys', url: 'https://openrouter.ai/settings/management-keys' },
     { label: 'Credits', url: OPENROUTER_CREDITS_URL },
-    { label: 'Setup guide', url: 'https://github.com/jefoce/not-higgsfield#first-setup' },
+    { label: 'Setup guide', url: `${GUIDE_BASE}/OPENROUTER.md` },
   ],
   httpRules: {
     400: {
