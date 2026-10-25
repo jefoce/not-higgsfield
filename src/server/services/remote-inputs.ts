@@ -110,7 +110,7 @@ export async function presignFor(upload: UploadItem): Promise<string> {
 
   return requireStore().presign({
     key: upload.remote.key,
-    ttlSec: linkTtlSec(),
+    ttlSec: REMOTE_LINK_TTL_SEC,
     contentType: upload.mime,
   })
 }
@@ -247,14 +247,4 @@ function requireStore(): ObjectStore {
   }
 
   return store
-}
-
-function linkTtlSec(): number {
-  const value = Number(process.env.REMOTE_LINK_TTL_SEC)
-
-  if (Number.isFinite(value) && value > 0) {
-    return value
-  }
-
-  return REMOTE_LINK_TTL_SEC
 }
