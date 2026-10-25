@@ -18,5 +18,5 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: corepack pnpm install --frozen-lockfile
-      - run: LIVE_CATALOG=1 TMPDIR=/private/tmp corepack pnpm vitest run tests/catalog-live.test.ts
+      - run: pnpm install --frozen-lockfile
+      - run: LIVE_CATALOG=1 pnpm vitest run tests/catalog-live.test.ts
