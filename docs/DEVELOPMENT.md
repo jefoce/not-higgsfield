@@ -32,12 +32,18 @@ The dev server binds to 127.0.0.1:3000. Data goes to `~/.not-higgsfield` unless 
 | `pnpm build` | Production build, standalone output |
 | `pnpm start` | Run the production build |
 | `pnpm lint` | ESLint |
+| `pnpm format` | Prettier, writes |
+| `pnpm format:check` | Prettier, check only |
 | `pnpm test` | Vitest, all suites, once |
 | `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm deps` | dependency-cruiser over `src` |
+| `pnpm deps:graph` | Write the dependency graph to `docs/deps.mmd` |
+| `pnpm knip` | Unused files, exports and dependencies |
 | `pnpm desktop:prepare` | Build and stage the server, Node and ffmpeg sidecars |
 | `pnpm desktop:dev` | Tauri window against the dev server, no sidecar |
-| `pnpm desktop:build` | macOS app and dmg |
+| `pnpm desktop:build` | Installers for the current platform: dmg on macOS, NSIS on Windows, AppImage, deb and rpm on Linux |
 | `pnpm ffmpeg:build` | Build the pinned GPL ffmpeg into the local cache |
+| `pnpm node:build` | Build the small-ICU Node sidecar into the local cache |
 | `pnpm notices` | Regenerate npm notices, copy notices and LICENSE into resources |
 | `pnpm smoke` | Run the staged server smoke test |
 | `pnpm tauri` | Pass a command to the Tauri CLI |
@@ -118,14 +124,15 @@ Mock mode keeps the Test button enabled without stored keys.
 | `R2_ACCESS_KEY_ID` | R2 token access key |
 | `R2_SECRET_ACCESS_KEY` | R2 token secret |
 | `R2_BUCKET` | Bucket name |
-| `REMOTE_LINK_TTL_SEC` | Presigned link lifetime in seconds, default 7200 |
-| `REMOTE_UNUSED_DAYS` | R2 retention in days, default 30 |
 | `REMOTE_MOCK` | Local R2 mock, `1` or `fail` |
 | `REMOTE_MOCK_MBPS` | Mock upload speed |
 | `APP_TOKEN` | Desktop session token, set by Tauri |
 | `PARENT_PID` | Tauri process id, set by Tauri. The server exits when it disappears. |
 | `PORT`, `HOSTNAME` | Server bind address |
 | `NH_SECRETS_BACKEND` | `file` forces the file backend, for debugging keychain issues |
+| `NH_UPDATE_ENDPOINT` | Updater manifest URL, for packaged rc tests |
+| `LIVE_CATALOG` | `1` runs the live OpenRouter catalog test |
+| `FFMPEG_PATH` | ffmpeg binary for the dev server and smoke runs |
 | `APP_ORIGIN` | Origin used by mock remote links |
 
 Env values override stored keys and are read-only in Settings.
@@ -146,11 +153,11 @@ Watch mode:
 pnpm vitest
 ```
 
-`tests/docs.test.ts` checks the README status table, the architecture models and bounds tables, and that relative doc links exist.
+`tests/docs.test.ts` checks the README status table, the architecture models and bounds tables, every guide image on disk, both guides linked from the README and from the app, the R2 guide numbers, the app strings quoted in the guides, the trademark disclaimer, and that relative doc links exist. `tests/docs-images.test.ts` keeps the R2 guide images in reading order. `tests/provider-links.test.ts` checks every provider link against the opener allowlist in `src-tauri/capabilities/default.json`.
 
 ## 10. Lint and dead code
 
-`pnpm lint` runs ESLint. `pnpm knip` reports unused files, exports and dependencies. Clear findings before adding it to the lint script.
+`pnpm lint` runs ESLint. `pnpm knip` reports unused files, exports and dependencies, and is part of the gate and CI.
 
 `.github/workflows/ci.yml` runs typecheck, lint, deps, format, knip, tests and build on pushes to any branch and on pull requests, tag pushes are left to the release workflow, which runs the same checks for `v*-rc.*`. Dependabot opens one grouped monthly pull request for npm, cargo and GitHub Actions against `releases`, semver-major updates are ignored. CodeQL default setup runs weekly on actions, JavaScript/TypeScript and Rust.
 
@@ -191,7 +198,7 @@ On Linux the AppImage needs FUSE 2. Ubuntu 22.04 or Debian 12: `sudo apt install
 
 Sidecars: `not-higgsfield-server-<target-triple>` is the Node runtime, `ffmpeg-<target-triple>` is ffmpeg. Tauri lists both as external binaries and injects `PORT`, `HOSTNAME=127.0.0.1`, `APP_TOKEN` and `PARENT_PID`.
 
-Desktop does not run the server from `Contents/Resources/server`. On first launch it copies that folder to `~/.not-higgsfield/runtime/<app version>`, stages the copy in a hidden `.staging-<pid>` folder, then renames it into place. Later launches reuse the copy. The sidecar runs with that folder as its cwd, so Next writes `.next/cache` there and the bundle resources stay untouched. The ad-hoc signature seal stays valid after running and quitting. A version bump stages a fresh copy and removes older runtime folders after readiness.
+Desktop does not run the server from `Contents/Resources/server`. On first launch it copies that folder to `~/.not-higgsfield/runtime/<app version>`, stages the copy in a hidden `.staging-<pid>` folder, then renames it into place. A `.nh-build` stamp names the bundled build the copy came from, matching `.next/BUILD_ID` when present. Later launches reuse the copy only when the stamp matches the bundled build, so a same-version rebuild restages it. The stamp is written last, so an interrupted copy never counts as done. The sidecar runs with that folder as its cwd, so Next writes `.next/cache` there and the bundle resources stay untouched. The ad-hoc signature seal stays valid after running and quitting. A version bump uses its own folder and removes older runtime folders after readiness.
 
 The bundle sets `LSUIElement` so the sidecar gets no Dock tile. Next sets `process.title`, which makes LaunchServices re-register the Node child under the app bundle id, agent bundles default to `UIElement`. `main.rs` restores `Regular` for the shell, so only one Dock entry remains.
 
@@ -308,13 +315,13 @@ Seed the packages from an older run with the `SIDECARS_RUN_ID` repository variab
 
 A push to `releases` runs the same workflow and creates `vX.Y.Z` after all jobs pass.
 
-1. Branch `X.Y.Z` from `releases`, bump `package.json`, `src-tauri/Cargo.toml`, `Cargo.lock`, and open `## X.Y.Z - YYYY-MM-DD` in `CHANGELOG.md`.
+1. Branch `X.Y.Z` from `releases`, bump `package.json`, `src-tauri/Cargo.toml` and `Cargo.lock`, and open `## X.Y.Z - unreleased` in `CHANGELOG.md`. Replace `unreleased` with the date in the last commit before the PR.
 2. Run `pnpm typecheck && pnpm lint && pnpm deps && pnpm format:check && pnpm knip && pnpm test && pnpm build`, then `pnpm desktop:build` and `pnpm smoke`.
 3. Manual rc runs: `workflow_dispatch` with `tag: vX.Y.Z-rc.N`, use `reuse_sidecars_run_id` or `force_rebuild_sidecars` only when needed.
-4. Install the draft assets on real machines: mock run, real cheap-model run, history, Settings Test, no secrets in logs. On macOS also check the required `xattr -dr com.apple.quarantine` install step on the downloaded dmg.
+4. Install the draft assets on real machines: mock run, real cheap-model run, history, Settings Test, no secrets in logs. On macOS also check the required `xattr -dr com.apple.quarantine` install step on the downloaded dmg. Then the update test: install the previous rc, start it with `NH_UPDATE_ENDPOINT` pointing at the new rc's `latest.json`, press **Install and restart**. Check the macOS keychain prompt once, run `xattr -l` on the installed app and find no quarantine line, check the Windows relaunch and the AppImage replace.
 5. Open the pull request titled `X.Y.Z`, `pr-version` checks version, title, Cargo, lock and CHANGELOG.
 6. Squash merge into `releases`. The workflow runs and creates `vX.Y.Z` only after every job passes.
-7. Publish the draft. Keep the ffmpeg source archives attached (GPL).
+7. Before publishing the draft, check the release has three `.sig` files (macOS `.app.tar.gz`, Windows `-setup.exe`, Linux `.AppImage`), the `.app.tar.gz` and `latest.json`. Publishing ships `latest.json` to every installed 0.2.0+ app. Keep the ffmpeg source archives attached (GPL).
 
 Prebuilt ffmpeg and Node sidecars and the ffmpeg source archives are public on GHCR:
 [not-higgsfield-sidecars](https://github.com/users/jefoce/packages/container/package/not-higgsfield-sidecars),
@@ -328,7 +335,7 @@ Test the update path against an rc manifest by setting `NH_UPDATE_ENDPOINT` befo
 
 A local test against `http://127.0.0.1` needs `dangerousInsecureTransportProtocol` passed inline with `--config`, for example `pnpm desktop:build -- --config '{"plugins":{"updater":{"dangerousInsecureTransportProtocol":true}}}'`. Never commit the flag to `tauri.conf.json` or `tauri.updater.conf.json`.
 
-To roll back a bad release, delete the `latest.json` asset from that release so `latest` falls back to the previous release, or publish a fixed patch release.
+To roll back a bad release, edit it and mark it as a pre-release, or delete it. GitHub then marks the previous release as Latest, whose `latest.json` offers nothing newer. Apps already on the bad version need a fixed patch release.
 
 ## 17. Later: Developer ID and notarization
 
