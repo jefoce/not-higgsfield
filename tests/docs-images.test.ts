@@ -8,13 +8,15 @@ import { imageTargets } from './helpers/image-targets'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
 
-/** R2 guide images in reading order. `step-0` and `api-step-4` are not on disk yet. */
+/** R2 guide images in reading order. */
 const R2_GUIDE_IMAGES = [
   'cloudflare-r2-step-1.png',
   'cloudflare-r2-step-2.png',
+  'cloudflare-r2-step-3.png',
   'cloudflare-r2-api-step-1.png',
   'cloudflare-r2-api-step-2.png',
   'cloudflare-r2-api-step-3.png',
+  'cloudflare-r2-api-step-4.png',
 ]
 
 const file = (rel: string) => {

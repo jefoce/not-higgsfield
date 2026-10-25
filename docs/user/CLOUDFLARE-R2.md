@@ -17,9 +17,11 @@ Sign in at [dash.cloudflare.com](https://dash.cloudflare.com) and open **Storage
 
 **New account?** Cloudflare first shows the R2 plan. Press **Add R2 subscription to my account** and add a card. Total due now is $0.00, and Cloudflare charges only above the free monthly limits.
 
+<img src="../images/cloudflare-r2-step-1.png" width="720" alt="R2 subscription page with free monthly usage and Total Due Now $0.00">
+
 After that, R2 opens on its overview page.
 
-<img src="../images/cloudflare-r2-step-1.png" width="720" alt="R2 Object Storage overview with usage and Add Budget Alert">
+<img src="../images/cloudflare-r2-step-2.png" width="720" alt="R2 Object Storage overview with usage and Add Budget Alert">
 
 > [!TIP]
 > Press **Add Budget Alert** under Billing Dashboard and set it to $1. Cloudflare emails you if anything is ever billed.
@@ -32,7 +34,7 @@ Press **Create bucket**:
 - **Location:** Automatic. Do not choose **Specify jurisdiction**, the app cannot reach jurisdiction buckets.
 - **Default storage class:** Standard. Infrequent Access has no free tier.
 
-<img src="../images/cloudflare-r2-step-2.png" width="720" alt="Create a bucket form with name, Automatic location and Standard class">
+<img src="../images/cloudflare-r2-step-3.png" width="720" alt="Create a bucket form with name, Automatic location and Standard class">
 
 ## 3. Create a token for that bucket
 
@@ -60,6 +62,8 @@ The dialog shows the values only once. The app needs three of them, plus the buc
 - **Secret Access Key**
 
 You do not need "Your API Token" or the S3 endpoint. The app builds the endpoint from the Account ID.
+
+<img src="../images/cloudflare-r2-api-step-4.png" width="720" alt="Token created dialog with Account ID, Access Key ID and Secret Access Key">
 
 > [!WARNING]
 > Paste the keys straight into the app, not into notes or a chat. If you lose the secret, delete the token and create a new one.
