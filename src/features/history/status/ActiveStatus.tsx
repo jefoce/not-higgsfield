@@ -1,7 +1,7 @@
 'use client'
 
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import type { StatusHelp } from '@/core/status-help'
-import type { GenerationRecord } from '@/core/types'
 import { cn } from '@/lib/cn'
 
 import { GraceCancel } from './GraceCancel'

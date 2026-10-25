@@ -1,4 +1,4 @@
-import type { GenerationRecord } from './types'
+import type { GenerationRecord } from './schemas/generation-record'
 
 /** File-safe name from the prompt, falling back to the preset. */
 export function promptSlug(record: Pick<GenerationRecord, 'input' | 'preset'>): string {

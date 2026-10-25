@@ -3,7 +3,7 @@
 import { type MouseEvent, useCallback } from 'react'
 import { Heart } from 'lucide-react'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { cn } from '@/lib/cn'
 
 import { toggleFavorite } from './record-actions'

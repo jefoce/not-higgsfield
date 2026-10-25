@@ -2,9 +2,10 @@
 
 import { useCallback } from 'react'
 
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { STATUS_HELP, statusHelpKey } from '@/core/status-help'
 import { graceDelayMs } from '@/core/submit-state'
-import { ACTIVE_STATUSES, type GenerationRecord } from '@/core/types'
+import { ACTIVE_STATUSES } from '@/core/types'
 import { cn } from '@/lib/cn'
 import { useNow } from '@/lib/use-now'
 

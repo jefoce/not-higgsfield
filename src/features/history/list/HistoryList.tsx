@@ -1,4 +1,4 @@
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 
 import { HistoryRow } from './HistoryRow'
 

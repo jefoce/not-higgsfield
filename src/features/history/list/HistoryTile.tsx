@@ -3,7 +3,7 @@
 import { useCallback } from 'react'
 
 import { GRID_TILE_ASPECT } from '@/core/constants'
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { LazyVideo } from '@/features/player/LazyVideo'
 
 import { CardActions } from '../actions/CardActions'

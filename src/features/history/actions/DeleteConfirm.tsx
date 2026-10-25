@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { deleteGeneration } from '@/lib/api/generations'
 import { errorMessage } from '@/lib/errors'
 import { ApiError } from '@/lib/fetcher'

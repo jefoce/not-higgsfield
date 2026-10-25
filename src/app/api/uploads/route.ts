@@ -1,4 +1,4 @@
-import type { UploadItem } from '@/core/media-types'
+import type { UploadItem } from '@/core/schemas/upload-item'
 import { errorResponse, jsonError, parseKinds } from '@/server/http'
 import { listUploads } from '@/server/repos/uploads'
 import { assertLocalRequest } from '@/server/request-guard'

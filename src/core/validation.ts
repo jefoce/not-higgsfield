@@ -3,12 +3,11 @@ import { z } from 'zod'
 
 import { SEED_MAX } from './constants'
 import { KIND_PLURAL } from './media-kinds'
-import type { UploadItem } from './media-types'
 import { minDuration } from './presets'
 import type { ModelPreset } from './presets/types'
 import { slotLabel } from './prompt-tokens'
-import { FrameSlotsSchema } from './schemas/generation-record'
-import type { GenerationInput } from './types'
+import { FrameSlotsSchema, type GenerationInput } from './schemas/generation-record'
+import type { UploadItem } from './schemas/upload-item'
 import { validateReferences } from './validation-references'
 import {
   validateFrames,

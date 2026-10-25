@@ -1,6 +1,6 @@
 import { act } from '@testing-library/react'
 
-import type { GenerationRecord, JobStatus } from '@/core/types'
+import type { GenerationRecord, JobStatus } from '@/core/schemas/generation-record'
 import { useSelectionStore } from '@/features/history/selection/selection-store'
 
 import { required } from './required'

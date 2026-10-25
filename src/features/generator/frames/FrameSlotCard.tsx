@@ -4,7 +4,7 @@ import { isNil } from 'lodash-es'
 import { AlertTriangle, Image as ImageIcon, Maximize2, X } from 'lucide-react'
 import type { MouseEvent } from 'react'
 
-import type { UploadItem } from '@/core/media-types'
+import type { UploadItem } from '@/core/schemas/upload-item'
 import { thumbUrl } from '@/lib/api/media-urls'
 import { cn } from '@/lib/cn'
 

@@ -2,12 +2,13 @@ import { isNil, sumBy } from 'lodash-es'
 
 import { maxDurationFor } from './duration-limits'
 import { KIND_TITLE, MEDIA_KINDS } from './media-kinds'
-import type { MediaKind, UploadItem } from './media-types'
+import type { MediaKind } from './media-types'
 import type { ModelPreset } from './presets/types'
 import { primaryBinding } from './pricing'
 import { missingSlots, referenceSlots, type SlotCounts } from './prompt-tokens'
+import type { GenerationInput } from './schemas/generation-record'
+import type { UploadItem } from './schemas/upload-item'
 import { resolveTransport } from './transport'
-import type { GenerationInput } from './types'
 import { checkReferenceLimits, seconds } from './validation-media'
 import type {
   RuleResult,

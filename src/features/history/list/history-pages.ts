@@ -1,6 +1,7 @@
 import { uniqBy } from 'lodash-es'
 
-import type { GenerationListResult, GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
+import type { GenerationListResult } from '@/core/types'
 import { refreshHistory } from '@/lib/swr-keys'
 
 /** Deduped records from every loaded history page. */

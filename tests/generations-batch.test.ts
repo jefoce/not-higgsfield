@@ -5,7 +5,7 @@ import path from 'node:path'
 
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 
 const root = await mkdtemp(path.join(os.tmpdir(), 'nh-batch-'))
 

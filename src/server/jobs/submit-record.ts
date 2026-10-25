@@ -1,6 +1,6 @@
 import 'server-only'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 
 import { getGeneration, saveGeneration } from '../repos/generations'
 import { withLock } from '../sync/lock'

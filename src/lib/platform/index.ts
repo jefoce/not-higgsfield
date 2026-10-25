@@ -1,4 +1,5 @@
-import type { FolderItem, UploadItem } from '@/core/media-types'
+import type { FolderItem } from '@/core/schemas/folder-item'
+import type { UploadItem } from '@/core/schemas/upload-item'
 
 import type { Platform, SavedVideos } from './types'
 

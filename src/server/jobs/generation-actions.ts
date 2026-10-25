@@ -1,7 +1,8 @@
 import 'server-only'
 
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { canCancelInGrace } from '@/core/submit-state'
-import { ACTIVE_STATUSES, type GenerationRecord } from '@/core/types'
+import { ACTIVE_STATUSES } from '@/core/types'
 
 import { deleteGenerationFiles, getGeneration, saveGeneration } from '../repos/generations'
 import { withLock } from '../sync/lock'

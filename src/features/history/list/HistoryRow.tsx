@@ -3,7 +3,7 @@
 import { type MouseEvent, useCallback, useRef } from 'react'
 
 import { DETAILS_MIN_WIDTH, ROW_MIN_HEIGHT } from '@/core/constants'
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { LazyVideo } from '@/features/player/LazyVideo'
 import { isOwnEvent } from '@/lib/events'
 

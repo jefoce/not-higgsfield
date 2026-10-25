@@ -1,6 +1,6 @@
 import { Clock, Diamond, Volume2, VolumeX } from 'lucide-react'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { formatSecondsShort } from '@/lib/format'
 import { RatioIcon } from '@/ui/RatioIcon'
 

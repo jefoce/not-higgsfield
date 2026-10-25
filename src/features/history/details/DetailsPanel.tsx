@@ -1,6 +1,7 @@
 'use client'
 
-import { ACTIVE_STATUSES, type GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
+import { ACTIVE_STATUSES } from '@/core/types'
 import { useNow } from '@/lib/use-now'
 import { Tooltip } from '@/ui/Tooltip'
 

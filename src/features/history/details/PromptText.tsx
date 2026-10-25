@@ -1,5 +1,5 @@
 import { parsePromptParts } from '@/core/prompt-tokens'
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 
 import { recordCounts } from '../actions/record-view'
 import { PromptSlot } from './PromptSlot'

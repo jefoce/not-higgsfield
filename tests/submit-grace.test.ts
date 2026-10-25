@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { canCancelInGrace, graceDelayMs } from '@/core/submit-state'
-import type { GenerationRecord } from '@/core/types'
 
 type CancelState = Pick<GenerationRecord, 'status' | 'submit' | 'job'>
 

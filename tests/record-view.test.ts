@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { posterSrc } from '@/features/history/actions/record-view'
 
 const record = {

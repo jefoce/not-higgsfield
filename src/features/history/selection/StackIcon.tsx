@@ -1,6 +1,7 @@
 import { AlertCircle, Video } from 'lucide-react'
 
-import { ACTIVE_STATUSES, type GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
+import { ACTIVE_STATUSES } from '@/core/types'
 import { Spinner } from '@/ui/Spinner'
 
 interface StackIconProps {

@@ -4,7 +4,8 @@ import { useEffect, useRef } from 'react'
 import { uniq } from 'lodash-es'
 
 import { HISTORY_POLL_MS } from '@/core/constants'
-import { ACTIVE_STATUSES, type GenerationListResult, type GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
+import { ACTIVE_STATUSES, type GenerationListResult } from '@/core/types'
 import { fetchGenerationsByIds } from '@/lib/api/generations'
 
 import { patchPage, revalidateHistory } from './history-pages'

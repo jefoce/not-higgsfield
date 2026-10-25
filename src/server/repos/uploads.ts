@@ -6,7 +6,8 @@ import fs from 'node:fs/promises'
 import { filter, isNil, orderBy } from 'lodash-es'
 
 import { extWithDot, kindFromExt, mimeFromExt } from '@/core/media-kinds'
-import type { MediaKind, UploadItem } from '@/core/media-types'
+import type { MediaKind } from '@/core/media-types'
+import type { UploadItem } from '@/core/schemas/upload-item'
 
 import { UploadError } from '../errors'
 import { removeFile, writeJsonAtomic } from '../fs/json-file'

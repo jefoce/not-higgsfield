@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react'
 
-import type { UploadItem } from '@/core/media-types'
+import type { UploadItem } from '@/core/schemas/upload-item'
 import { mediaUrl, thumbUrl } from '@/lib/api/media-urls'
 import { cn } from '@/lib/cn'
 

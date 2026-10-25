@@ -3,7 +3,7 @@
 import { useCallback, useEffect } from 'react'
 
 import { getPreset } from '@/core/presets'
-import type { GeneratorTab } from '@/core/types'
+import type { GeneratorTab } from '@/core/schemas/generation-record'
 import { SegmentedTabs } from '@/ui/SegmentedTabs'
 import { Tooltip } from '@/ui/Tooltip'
 

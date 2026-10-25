@@ -1,24 +1,12 @@
 import type { AspectChoice, Resolution } from './presets/types'
-import type {
-  GenerationInput as StoredGenerationInput,
-  GenerationRecord as StoredGenerationRecord,
-  GeneratorTab as StoredGeneratorTab,
-  JobStatus as StoredJobStatus,
-} from './schemas/generation-record'
+import type { GenerationRecord, GeneratorTab, JobStatus } from './schemas/generation-record'
 import type { SecretName } from './secret-names'
-
-export type GeneratorTab = StoredGeneratorTab
 
 /** Start and end frame data URLs. */
 export interface FrameSlots {
   start: string | null
   end: string | null
 }
-
-/** Exact generate panel state. Saved in record, copied back by Rerun. */
-export type GenerationInput = StoredGenerationInput
-
-export type JobStatus = StoredJobStatus
 
 export const ACTIVE_STATUSES: JobStatus[] = ['submitting', 'pending', 'in_progress']
 
@@ -27,8 +15,6 @@ export interface BatchSkip {
   id: string
   reason: 'not_found' | 'active' | 'not_ready'
 }
-
-export type GenerationRecord = StoredGenerationRecord
 
 export interface HistoryFilters {
   q?: string

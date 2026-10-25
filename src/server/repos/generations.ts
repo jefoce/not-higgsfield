@@ -1,7 +1,7 @@
 import 'server-only'
 
-import { GenerationRecordSchema } from '@/core/schemas/generation-record'
-import { ACTIVE_STATUSES, type GenerationRecord } from '@/core/types'
+import { type GenerationRecord, GenerationRecordSchema } from '@/core/schemas/generation-record'
+import { ACTIVE_STATUSES } from '@/core/types'
 
 import { removeFile, writeJsonAtomic } from '../fs/json-file'
 import { isUuid } from '../fs/media-ref'

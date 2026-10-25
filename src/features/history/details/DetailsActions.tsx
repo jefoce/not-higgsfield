@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 import { isNil } from 'lodash-es'
 import { Trash2 } from 'lucide-react'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { formatDate } from '@/lib/format'
 import { Button } from '@/ui/Button'
 

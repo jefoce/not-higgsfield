@@ -3,11 +3,11 @@ import 'server-only'
 import { isNil } from 'lodash-es'
 
 import { MAX_REQUEST_MB } from '@/core/constants'
-import type { UploadItem } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
+import type { UploadItem } from '@/core/schemas/upload-item'
 import { graceDelayMs, inputIds, transportsFor, withTransports } from '@/core/submit-state'
 import type { ResolvedTransport } from '@/core/transport'
-import type { GenerationRecord } from '@/core/types'
 
 import { ProviderError } from '../providers/provider-error'
 import type { SubmittedJob } from '../providers/types'

@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { HISTORY_SCROLL_DELAY_MS } from '@/core/constants'
-import type { GenerationRecord, JobStatus } from '@/core/types'
+import type { GenerationRecord, JobStatus } from '@/core/schemas/generation-record'
 import { truncate } from '@/lib/format'
 import { readLocal, writeLocal } from '@/lib/local-store'
 import { getPlatform } from '@/lib/platform'

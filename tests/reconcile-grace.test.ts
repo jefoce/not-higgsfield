@@ -5,8 +5,8 @@ import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { GRACE_STALE_MS } from '@/core/constants'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { isStaleGrace } from '@/core/submit-state'
-import type { GenerationRecord } from '@/core/types'
 
 import { storedRecord } from './helpers/stored-record'
 

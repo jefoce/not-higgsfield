@@ -11,7 +11,7 @@ import {
 import { friendlyError } from '@/core/provider-errors'
 import type { FriendlyError } from '@/core/provider-errors/types'
 import { recordProvider, videoProviderDescriptor } from '@/core/providers/registry'
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { downloadMediaUrl, thumbUrl, uploadThumbUrl } from '@/lib/api/media-urls'
 
 const SELECTABLE_STATUSES: readonly GenerationRecord['status'][] = [

@@ -3,11 +3,12 @@ import { toast } from 'sonner'
 
 import { SEED_MAX } from '@/core/constants'
 import { maxDurationFor } from '@/core/duration-limits'
-import type { MediaKind, UploadItem } from '@/core/media-types'
+import type { MediaKind } from '@/core/media-types'
 import { minDuration } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
 import { idForSlot, referenceSlots, type RefSlot, type SlotCounts } from '@/core/prompt-tokens'
-import type { GenerationInput } from '@/core/types'
+import type { GenerationInput } from '@/core/schemas/generation-record'
+import type { UploadItem } from '@/core/schemas/upload-item'
 import { formatSecondsExact } from '@/lib/format'
 
 interface ReferenceState {

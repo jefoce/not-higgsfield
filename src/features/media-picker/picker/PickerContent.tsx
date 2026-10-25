@@ -2,7 +2,8 @@
 
 import { isNil } from 'lodash-es'
 
-import type { FolderItem, UploadItem } from '@/core/media-types'
+import type { FolderItem } from '@/core/schemas/folder-item'
+import type { UploadItem } from '@/core/schemas/upload-item'
 
 import { FolderTab } from '../folders/FolderTab'
 import { UploadsTab } from '../uploads/UploadsTab'

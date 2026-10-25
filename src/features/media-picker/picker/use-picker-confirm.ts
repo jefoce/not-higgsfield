@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 import { isEmpty, isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
-import type { FolderItem } from '@/core/media-types'
+import type { FolderItem } from '@/core/schemas/folder-item'
 import { linkFolderFile } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
 

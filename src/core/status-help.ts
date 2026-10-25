@@ -1,4 +1,4 @@
-import type { GenerationRecord } from './types'
+import type { GenerationRecord } from './schemas/generation-record'
 
 export type StatusHelpKey =
   | 'processing'

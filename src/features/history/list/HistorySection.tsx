@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { isEmpty, isNil } from 'lodash-es'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { useGeneratorStore } from '@/features/generator/store/store'
 import { cn } from '@/lib/cn'
 

@@ -5,7 +5,7 @@ import { isNil } from 'lodash-es'
 import { Pause, Play } from 'lucide-react'
 import type { MouseEvent } from 'react'
 
-import type { UploadItem } from '@/core/media-types'
+import type { UploadItem } from '@/core/schemas/upload-item'
 import {
   currentDuration,
   currentSrc,

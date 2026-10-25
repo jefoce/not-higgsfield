@@ -3,7 +3,7 @@ import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { AspectRatio } from '@/core/presets/types'
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { AspectRatioPopover } from '@/features/generator/options/AspectRatioPopover'
 import { useGeneratorStore } from '@/features/generator/store/store'
 import { DetailsPanel } from '@/features/history/details/DetailsPanel'

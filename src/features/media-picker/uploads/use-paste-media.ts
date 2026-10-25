@@ -6,7 +6,8 @@ import type { ClipboardEvent } from 'react'
 import { toast } from 'sonner'
 
 import { acceptFiles, type KindExtensions, pastedPath } from '@/core/media-kinds'
-import type { MediaKind, UploadItem } from '@/core/media-types'
+import type { MediaKind } from '@/core/media-types'
+import type { UploadItem } from '@/core/schemas/upload-item'
 import { linkAbsPath } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
 

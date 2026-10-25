@@ -1,6 +1,7 @@
 import { DOWNLOAD_STAGGER_MS } from '@/core/constants'
-import type { FolderItem, UploadItem } from '@/core/media-types'
-import type { GenerationRecord } from '@/core/types'
+import type { FolderItem } from '@/core/schemas/folder-item'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
+import type { UploadItem } from '@/core/schemas/upload-item'
 import { downloadMediaUrl } from '@/lib/api/media-urls'
 import {
   chooseFiles as chooseFilesFromServer,

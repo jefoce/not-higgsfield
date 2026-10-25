@@ -1,8 +1,8 @@
 import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { canCancelInGrace } from '@/core/submit-state'
-import type { GenerationRecord } from '@/core/types'
 import { useGeneratorStore } from '@/features/generator/store/store'
 import { captureGenerationFrame, revealGeneration } from '@/lib/api/generations'
 import { linkGenerationFile } from '@/lib/api/uploads'

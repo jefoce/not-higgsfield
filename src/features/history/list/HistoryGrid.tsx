@@ -1,6 +1,6 @@
 'use client'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 
 import { HistoryTile } from './HistoryTile'
 import { useHistoryViewStore, zoomToGridColumns } from './view-store'

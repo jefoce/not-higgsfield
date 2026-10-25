@@ -1,11 +1,11 @@
 import { isNil } from 'lodash-es'
 
 import { GRACE_STALE_MS } from './constants'
-import type { UploadItem } from './media-types'
 import type { ModelPreset } from './presets/types'
 import { primaryBinding } from './pricing'
+import type { GenerationInput, GenerationRecord, JobStatus } from './schemas/generation-record'
+import type { UploadItem } from './schemas/upload-item'
 import { type ResolvedTransport, resolveTransport } from './transport'
-import type { GenerationInput, GenerationRecord, JobStatus } from './types'
 
 /** Remaining grace delay in ms. A missing, invalid or past notBefore is 0. */
 export function graceDelayMs(notBefore: string | undefined, now = Date.now()): number {

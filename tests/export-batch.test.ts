@@ -5,7 +5,7 @@ import path from 'node:path'
 
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 
 import { required } from './helpers/required'
 

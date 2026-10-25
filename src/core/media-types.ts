@@ -1,9 +1,4 @@
 import type { PixelSize } from './geometry'
-import type { FolderItem as StoredFolderItem } from './schemas/folder-item'
-import type {
-  LinkMode as StoredLinkMode,
-  UploadItem as StoredUploadItem,
-} from './schemas/upload-item'
 
 export type MediaKind = 'image' | 'video' | 'audio'
 
@@ -13,10 +8,6 @@ export interface MediaKindCounts {
   video: number
   audio: number
 }
-
-export type UploadItem = StoredUploadItem
-export type LinkMode = StoredLinkMode
-export type FolderItem = StoredFolderItem
 
 export interface FolderDir {
   name: string

@@ -2,7 +2,7 @@
 
 import { type KeyboardEvent, type MouseEvent, useCallback } from 'react'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { isOwnEvent } from '@/lib/events'
 
 interface TileActivationParams {

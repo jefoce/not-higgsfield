@@ -1,6 +1,6 @@
 import { isNil } from 'lodash-es'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 
 import { posterSrc } from '../actions/record-view'
 import { StackIcon } from './StackIcon'

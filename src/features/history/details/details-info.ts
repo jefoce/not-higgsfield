@@ -1,7 +1,8 @@
 import { isNil } from 'lodash-es'
 
 import { formatEstimate, formatUsd } from '@/core/pricing'
-import { ACTIVE_STATUSES, type GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
+import { ACTIVE_STATUSES } from '@/core/types'
 import { formatClock } from '@/lib/format'
 
 interface CostInfo {

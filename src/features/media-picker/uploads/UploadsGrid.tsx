@@ -2,7 +2,8 @@
 
 import { isEmpty } from 'lodash-es'
 
-import type { MediaKind, UploadItem } from '@/core/media-types'
+import type { MediaKind } from '@/core/media-types'
+import type { UploadItem } from '@/core/schemas/upload-item'
 import type { PreviewActions } from '@/features/preview/preview-store'
 
 import { ChooseDiskTile } from '../folders/ChooseDiskTile'

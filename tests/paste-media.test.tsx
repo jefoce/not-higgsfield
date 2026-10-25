@@ -2,7 +2,7 @@
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { UploadItem } from '@/core/media-types'
+import type { UploadItem } from '@/core/schemas/upload-item'
 import type { PasteMediaOptions } from '@/features/media-picker/uploads/use-paste-media'
 import { usePasteMedia } from '@/features/media-picker/uploads/use-paste-media'
 import { linkAbsPath } from '@/lib/api/uploads'

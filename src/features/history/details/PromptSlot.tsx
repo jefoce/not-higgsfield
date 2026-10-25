@@ -2,7 +2,7 @@ import { isNil } from 'lodash-es'
 import { Music } from 'lucide-react'
 
 import { idForSlot, type RefSlot, slotLabel } from '@/core/prompt-tokens'
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 
 import { recordSlots, uploadThumb } from '../actions/record-view'
 

@@ -6,7 +6,8 @@ import useSWR from 'swr'
 import { useShallow } from 'zustand/react/shallow'
 
 import { inputForSubmit } from '@/core/normalize-input'
-import type { GenerationEstimate, GenerationInput } from '@/core/types'
+import type { GenerationInput } from '@/core/schemas/generation-record'
+import type { GenerationEstimate } from '@/core/types'
 import { fetchEstimate } from '@/lib/api/generations'
 import { generationEstimateKey } from '@/lib/swr-keys'
 

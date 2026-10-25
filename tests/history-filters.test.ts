@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { applyFilters, countActive, paginate, sortRecords } from '@/core/history-filters'
 import type { AspectChoice, Resolution } from '@/core/presets/types'
-import type { GenerationRecord, GeneratorTab, JobStatus } from '@/core/types'
+import type { GenerationRecord, GeneratorTab, JobStatus } from '@/core/schemas/generation-record'
 
 import { required } from './helpers/required'
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { STATUS_HELP, statusHelpKey, statusHelpText } from '@/core/status-help'
-import type { GenerationRecord } from '@/core/types'
 
 type StatusInput = Pick<GenerationRecord, 'status' | 'submit' | 'download'>
 

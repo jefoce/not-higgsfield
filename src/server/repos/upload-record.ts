@@ -2,8 +2,7 @@ import 'server-only'
 
 import path from 'node:path'
 
-import type { UploadItem } from '@/core/media-types'
-import { UploadItemSchema } from '@/core/schemas/upload-item'
+import { type UploadItem, UploadItemSchema } from '@/core/schemas/upload-item'
 
 import { readJson, writeJsonAtomic } from '../fs/json-file'
 import { isUuid } from '../fs/media-ref'

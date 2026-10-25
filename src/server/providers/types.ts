@@ -3,7 +3,8 @@ import 'server-only'
 import type { MediaKind } from '@/core/media-types'
 import type { ModelPreset } from '@/core/presets/types'
 import type { VideoProviderId } from '@/core/providers/types'
-import type { GenerationInput, JobStatus, PricingInfo, TestResult } from '@/core/types'
+import type { GenerationInput, JobStatus } from '@/core/schemas/generation-record'
+import type { PricingInfo, TestResult } from '@/core/types'
 
 export interface ProviderModel {
   modelId: string

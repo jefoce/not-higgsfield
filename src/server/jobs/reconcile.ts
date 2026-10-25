@@ -3,8 +3,8 @@ import 'server-only'
 import { isNil } from 'lodash-es'
 
 import { INTERRUPT_SENDING_TEXT } from '@/core/provider-errors/app'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { isStaleGrace } from '@/core/submit-state'
-import type { GenerationRecord } from '@/core/types'
 
 import { getGeneration, listGenerations, saveGeneration } from '../repos/generations'
 import { withLock } from '../sync/lock'

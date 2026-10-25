@@ -1,6 +1,6 @@
 import { isNil } from 'lodash-es'
 
-import type { GenerationRecord } from '../types'
+import type { GenerationRecord } from '../schemas/generation-record'
 import { OPENROUTER_DESCRIPTOR } from './openrouter'
 import { R2_DESCRIPTOR } from './r2'
 import {

@@ -3,8 +3,9 @@ import 'server-only'
 import { isNil, sumBy } from 'lodash-es'
 
 import { IMAGE_MAX_ENCODED_MB, IMAGE_MAX_SIDE_PX, IMAGE_STEPS } from '@/core/constants'
-import type { ReferencePlan, UploadItem } from '@/core/media-types'
+import type { ReferencePlan } from '@/core/media-types'
 import type { ModelPreset, ReferenceLimits } from '@/core/presets/types'
+import type { UploadItem } from '@/core/schemas/upload-item'
 
 import { HttpError } from '../errors'
 import { uploadPaths } from '../paths'

@@ -5,7 +5,7 @@ import { MoreHorizontal } from 'lucide-react'
 import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui'
 
 import { getPreset } from '@/core/presets'
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { cn } from '@/lib/cn'
 
 import { DeleteConfirm } from './DeleteConfirm'

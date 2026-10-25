@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { getPreset } from '@/core/presets'
-import type { GenerationInput } from '@/core/types'
+import type { GenerationInput } from '@/core/schemas/generation-record'
 import { buildRequestBody } from '@/server/providers/openrouter/body'
 import type { ResolvedMedia } from '@/server/providers/types'
 

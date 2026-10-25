@@ -12,7 +12,7 @@ import { isNil } from 'lodash-es'
 import { FETCH_TIMEOUTS, MAX_DOWNLOAD_RETRIES } from '@/core/constants'
 import { COPY_EXPIRED_TEXT } from '@/core/provider-errors/app'
 import { recordProvider } from '@/core/providers/registry'
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 
 import { exists, isDiskFull } from '../fs/stat'
 import { globalState } from '../global-state'

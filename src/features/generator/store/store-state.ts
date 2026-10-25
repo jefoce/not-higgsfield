@@ -1,6 +1,6 @@
-import type { UploadItem } from '@/core/media-types'
 import type { RefSlot } from '@/core/prompt-tokens'
-import type { GenerationInput, GeneratorTab } from '@/core/types'
+import type { GenerationInput, GeneratorTab } from '@/core/schemas/generation-record'
+import type { UploadItem } from '@/core/schemas/upload-item'
 
 import type { GeneratorDraft } from './store-draft'
 

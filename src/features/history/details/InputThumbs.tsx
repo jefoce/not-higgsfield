@@ -1,4 +1,4 @@
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 
 import { InputThumb } from './InputThumb'
 import { thumbItems } from './thumb-item'

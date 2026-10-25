@@ -10,7 +10,7 @@ import { clampDuration, normalizeForPreset } from '@/core/normalize-input'
 import { findPreset, getPreset } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
 import type { RefSlot } from '@/core/prompt-tokens'
-import type { GenerationInput } from '@/core/types'
+import type { GenerationInput } from '@/core/schemas/generation-record'
 
 import { defaults, inputFromState } from './store-draft'
 import { createFrameActions } from './store-frame-actions'

@@ -3,7 +3,7 @@
 import { useCallback } from 'react'
 import { Plus, X } from 'lucide-react'
 
-import type { FolderItem } from '@/core/media-types'
+import type { FolderItem } from '@/core/schemas/folder-item'
 
 import { FolderTabButton } from '../folders/FolderTabButton'
 import { tabClass } from './tab-class'

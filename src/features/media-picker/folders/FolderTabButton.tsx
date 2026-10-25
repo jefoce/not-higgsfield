@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 import { X } from 'lucide-react'
 import type { MouseEvent } from 'react'
 
-import type { FolderItem } from '@/core/media-types'
+import type { FolderItem } from '@/core/schemas/folder-item'
 import { cn } from '@/lib/cn'
 
 import { tabClass } from '../picker/tab-class'

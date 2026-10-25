@@ -1,8 +1,8 @@
 import type { ModelStatus } from './catalog'
-import type { UploadItem } from './media-types'
 import type { ModelPreset } from './presets/types'
 import type { RefSlot } from './prompt-tokens'
-import type { GenerationInput } from './types'
+import type { GenerationInput } from './schemas/generation-record'
+import type { UploadItem } from './schemas/upload-item'
 
 export interface MissingSlotIssue {
   type: 'missing-slot'

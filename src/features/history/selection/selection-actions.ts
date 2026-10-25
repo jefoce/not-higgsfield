@@ -1,7 +1,7 @@
 import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { errorMessage } from '@/lib/errors'
 import { platform } from '@/lib/platform'
 

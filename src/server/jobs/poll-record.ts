@@ -4,7 +4,7 @@ import { isNil } from 'lodash-es'
 
 import { MAX_JOB_AGE_MIN } from '@/core/constants'
 import { recordProvider } from '@/core/providers/registry'
-import type { GenerationRecord, JobStatus } from '@/core/types'
+import type { GenerationRecord, JobStatus } from '@/core/schemas/generation-record'
 
 import { ProviderError, type ProviderErrorKind } from '../providers/provider-error'
 import { getVideoProvider } from '../providers/registry'

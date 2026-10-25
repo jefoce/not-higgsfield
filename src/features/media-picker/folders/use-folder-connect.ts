@@ -3,7 +3,8 @@
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
-import type { BrowseResult, FolderItem } from '@/core/media-types'
+import type { BrowseResult } from '@/core/media-types'
+import type { FolderItem } from '@/core/schemas/folder-item'
 import { createFolder } from '@/lib/api/folders'
 import { errorMessage } from '@/lib/errors'
 import { getPlatform } from '@/lib/platform'

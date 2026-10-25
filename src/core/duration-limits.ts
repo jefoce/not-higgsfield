@@ -1,9 +1,9 @@
 import { isNil } from 'lodash-es'
 
-import type { UploadItem } from './media-types'
 import { minDuration } from './presets'
 import type { ModelPreset } from './presets/types'
-import type { GenerationInput } from './types'
+import type { GenerationInput } from './schemas/generation-record'
+import type { UploadItem } from './schemas/upload-item'
 
 interface ReferenceDurationLimitParams {
   references: readonly string[]

@@ -2,7 +2,7 @@
 
 import { create } from 'zustand'
 
-import type { UploadItem } from '@/core/media-types'
+import type { UploadItem } from '@/core/schemas/upload-item'
 
 /** Upload item plus a read-only ref for files not linked yet. */
 export interface PreviewItem extends UploadItem {

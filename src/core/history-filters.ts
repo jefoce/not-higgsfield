@@ -1,12 +1,8 @@
 import { clamp, filter, isEmpty, isNil, orderBy } from 'lodash-es'
 
 import { HISTORY_MAX_PAGE_SIZE, HISTORY_PAGE_SIZE } from './constants'
-import {
-  ACTIVE_STATUSES,
-  type GenerationRecord,
-  type HistoryFilters,
-  type JobStatus,
-} from './types'
+import type { GenerationRecord, JobStatus } from './schemas/generation-record'
+import { ACTIVE_STATUSES, type HistoryFilters } from './types'
 
 type StatusFilter = NonNullable<HistoryFilters['status']>
 

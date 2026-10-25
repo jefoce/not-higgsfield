@@ -6,7 +6,8 @@ import useSWRInfinite from 'swr/infinite'
 
 import { HISTORY_PAGE_SIZE } from '@/core/constants'
 import { countActive } from '@/core/history-filters'
-import type { GenerationListResult, GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
+import type { GenerationListResult } from '@/core/types'
 import { fetchGenerationPage, generationPageKey } from '@/lib/api/generations'
 import { registerHistoryRefresh } from '@/lib/swr-keys'
 

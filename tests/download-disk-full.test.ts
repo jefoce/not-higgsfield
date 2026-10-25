@@ -4,7 +4,7 @@ import path from 'node:path'
 
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import type { queueDownload as QueueDownload } from '@/server/jobs/download-queue'
 import type { getGeneration as GetGeneration } from '@/server/repos/generations'
 

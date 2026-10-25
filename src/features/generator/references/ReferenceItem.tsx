@@ -3,8 +3,8 @@
 import { useCallback } from 'react'
 import { isNil } from 'lodash-es'
 
-import type { UploadItem } from '@/core/media-types'
 import { type RefSlot, slotLabel } from '@/core/prompt-tokens'
+import type { UploadItem } from '@/core/schemas/upload-item'
 import { openMediaPicker, type PickerExtensions } from '@/features/media-picker/picker/store'
 import { openPreview } from '@/features/preview/preview-store'
 

@@ -5,7 +5,7 @@ import fs from 'node:fs/promises'
 import { groupBy, isNil } from 'lodash-es'
 
 import { REMOTE_LINK_TTL_SEC, REMOTE_UNUSED_DAYS } from '@/core/constants'
-import type { UploadItem } from '@/core/media-types'
+import type { UploadItem } from '@/core/schemas/upload-item'
 
 import { globalState } from '../global-state'
 import { uploadPaths } from '../paths'

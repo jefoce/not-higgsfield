@@ -5,7 +5,7 @@ import { isEmpty, isNil } from 'lodash-es'
 import { useShallow } from 'zustand/react/shallow'
 
 import { getPreset } from '@/core/presets'
-import type { GenerationInput } from '@/core/types'
+import type { GenerationInput } from '@/core/schemas/generation-record'
 import { validateInput } from '@/core/validation'
 import { useSecrets } from '@/features/settings/use-secrets'
 import { useModelEntry } from '@/lib/api/models'

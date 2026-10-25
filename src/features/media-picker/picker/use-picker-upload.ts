@@ -3,7 +3,7 @@
 import { useCallback } from 'react'
 import { useSWRConfig } from 'swr'
 
-import type { UploadItem } from '@/core/media-types'
+import type { UploadItem } from '@/core/schemas/upload-item'
 
 import { type DropProps, useDropUpload } from '../uploads/use-drop-upload'
 import { usePasteMedia } from '../uploads/use-paste-media'

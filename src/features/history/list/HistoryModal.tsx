@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 import { isNil } from 'lodash-es'
 
 import { DETAILS_MIN_WIDTH } from '@/core/constants'
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { LazyVideo } from '@/features/player/LazyVideo'
 import { Modal } from '@/ui/Modal'
 

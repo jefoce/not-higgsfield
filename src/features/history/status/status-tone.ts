@@ -1,8 +1,8 @@
 import { isNil } from 'lodash-es'
 
 import type { FriendlyError } from '@/core/provider-errors/types'
+import type { GenerationRecord, JobStatus } from '@/core/schemas/generation-record'
 import { STATUS_HELP, statusHelpKey } from '@/core/status-help'
-import type { GenerationRecord, JobStatus } from '@/core/types'
 
 export type Tone = 'lime' | 'gray' | 'red'
 

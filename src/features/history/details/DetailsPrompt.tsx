@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 import { Copy } from 'lucide-react'
 import { toast } from 'sonner'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 
 import { PromptText } from './PromptText'
 

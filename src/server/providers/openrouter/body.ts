@@ -6,7 +6,7 @@ import type { MediaKind } from '@/core/media-types'
 import type { ModelPreset } from '@/core/presets/types'
 import { primaryBinding } from '@/core/pricing'
 import { renderPromptForApi } from '@/core/prompt-tokens'
-import type { GenerationInput } from '@/core/types'
+import type { GenerationInput } from '@/core/schemas/generation-record'
 
 interface MediaPayload {
   id: string

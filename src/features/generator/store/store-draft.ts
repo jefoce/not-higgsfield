@@ -1,5 +1,5 @@
 import { DEFAULT_PRESET_ID, getPreset } from '@/core/presets'
-import type { GenerationInput, GeneratorTab } from '@/core/types'
+import type { GenerationInput, GeneratorTab } from '@/core/schemas/generation-record'
 
 type PromptMap = Record<GeneratorTab, string>
 

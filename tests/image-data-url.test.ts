@@ -6,9 +6,9 @@ import { isNil } from 'lodash-es'
 import sharp from 'sharp'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import type { UploadItem } from '@/core/media-types'
 import type { ModelPreset } from '@/core/presets/types'
 import { WAN_30 } from '@/core/presets/wan/wan-3.0'
+import type { UploadItem } from '@/core/schemas/upload-item'
 import type { encodeImages as EncodeImages } from '@/server/media/image-data-url'
 import type { removeUpload as RemoveUpload } from '@/server/services/uploads'
 

@@ -2,7 +2,7 @@
 
 import { Download, Heart } from 'lucide-react'
 
-import type { GenerationRecord } from '@/core/types'
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { cn } from '@/lib/cn'
 import { Tooltip } from '@/ui/Tooltip'
 

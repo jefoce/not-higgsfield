@@ -3,10 +3,11 @@ import 'server-only'
 import { randomInt, randomUUID } from 'node:crypto'
 
 import { MAX_REQUEST_MB, REQUEST_RESERVE_MB, SEED_MAX, SUBMIT_GRACE_MS } from '@/core/constants'
-import type { ReferencePlan, UploadItem } from '@/core/media-types'
+import type { ReferencePlan } from '@/core/media-types'
 import { primaryBinding } from '@/core/pricing'
 import { VIDEO_PROVIDER_IDS } from '@/core/providers/types'
-import type { GenerationInput, GenerationRecord } from '@/core/types'
+import type { GenerationInput, GenerationRecord } from '@/core/schemas/generation-record'
+import type { UploadItem } from '@/core/schemas/upload-item'
 
 import { encodeImages } from '../media/image-data-url'
 import { saveGeneration } from '../repos/generations'

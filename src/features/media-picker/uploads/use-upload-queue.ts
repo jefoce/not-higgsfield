@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Dispatch, RefObject, SetStateAction } from 'react'
 
-import type { UploadItem } from '@/core/media-types'
+import type { UploadItem } from '@/core/schemas/upload-item'
 import { uploadFilesWithProgress } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
 
