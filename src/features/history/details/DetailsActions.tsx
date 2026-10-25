@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
 import { isNil } from 'lodash-es'
 import { Trash2 } from 'lucide-react'
 
 import type { FriendlyError } from '@/core/provider-errors/types'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { formatDate } from '@/lib/format'
+import { useBoolean } from '@/lib/use-boolean'
 import { Button } from '@/ui/Button'
 
 import { DeleteConfirm } from '../actions/DeleteConfirm'
@@ -27,7 +27,7 @@ interface DetailsActionsProps {
 /** Timestamps on the left, hover actions on the right, delete dialog for failed records. */
 export function DetailsActions(props: DetailsActionsProps) {
   const { record, isActive, now } = props
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const confirmDialog = useBoolean()
   const isFailed = record.status === 'failed'
   let friendly: FriendlyError | null = null
 
@@ -43,7 +43,11 @@ export function DetailsActions(props: DetailsActionsProps) {
 
   const handleFavorite = () => void toggleFavorite(record)
 
-  const handleOpenDelete = () => setIsConfirmOpen(true)
+  const handleOpenDelete = () => confirmDialog.on()
+
+  const handleConfirmOpenChange = (isOpen: boolean): void => {
+    confirmDialog.set(isOpen)
+  }
 
   return (
     <>
@@ -94,8 +98,8 @@ export function DetailsActions(props: DetailsActionsProps) {
       </div>
       <DeleteConfirm
         record={record}
-        open={isConfirmOpen}
-        onOpenChange={setIsConfirmOpen}
+        open={confirmDialog.value}
+        onOpenChange={handleConfirmOpenChange}
         onDeleted={props.onDeleted}
       />
     </>

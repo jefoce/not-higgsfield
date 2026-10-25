@@ -1,10 +1,11 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { TriangleAlert } from 'lucide-react'
 
 import type { RefSlot } from '@/core/prompt-tokens'
 import type { ValidationIssue } from '@/core/validation-types'
+import { useBoolean } from '@/lib/use-boolean'
 import { Chip } from '@/ui/Chip'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
 
@@ -18,8 +19,12 @@ interface PromptWarningsProps {
 /** Warning counter chip with a clickable list. Hidden when there are none. */
 export function PromptWarnings(props: PromptWarningsProps) {
   const { warnings } = props
-  const [isOpen, setIsOpen] = useState(false)
+  const warningsPopover = useBoolean()
   const occurrences = useRef<Record<string, number>>({})
+
+  const handleOpenChange = (isOpen: boolean): void => {
+    warningsPopover.set(isOpen)
+  }
 
   const handleGo = (slot: RefSlot): void => {
     const key = `${slot.kind}-${slot.n}`
@@ -27,7 +32,7 @@ export function PromptWarnings(props: PromptWarningsProps) {
 
     occurrences.current[key] = occurrence + 1
     props.onFocus?.(slot, occurrence)
-    setIsOpen(false)
+    warningsPopover.off()
   }
 
   if (warnings.length === 0) {
@@ -35,7 +40,7 @@ export function PromptWarnings(props: PromptWarningsProps) {
   }
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <Popover open={warningsPopover.value} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Chip
           variant="warning"

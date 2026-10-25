@@ -6,6 +6,7 @@ import { ChevronRight } from 'lucide-react'
 
 import { getPreset, MODEL_PRESETS } from '@/core/presets'
 import { useModelEntry } from '@/lib/api/models'
+import { useBoolean } from '@/lib/use-boolean'
 import { useMediaQuery } from '@/lib/use-media-query'
 import { SearchInput } from '@/ui/form/SearchInput'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
@@ -16,7 +17,7 @@ import { ModelRow } from './ModelRow'
 
 /** Panel-width preset picker with search and capability badges. */
 export function ModelPicker() {
-  const [isOpen, setIsOpen] = useState(false)
+  const modelMenu = useBoolean()
   const [query, setQuery] = useState('')
   const presetId = useGeneratorStore((state) => state.presetId)
   const setPreset = useGeneratorStore((state) => state.setPreset)
@@ -30,7 +31,7 @@ export function ModelPicker() {
   )
 
   const handleOpenChange = (isOpen: boolean): void => {
-    setIsOpen(isOpen)
+    modelMenu.set(isOpen)
 
     if (!isOpen) {
       setQuery('')
@@ -43,14 +44,14 @@ export function ModelPicker() {
 
   const handleSelectPreset = (id: string): void => {
     setPreset(id)
-    setIsOpen(false)
+    modelMenu.off()
   }
 
   const side = isWide ? 'right' : 'bottom'
 
   return (
     <div className="mt-4">
-      <Popover open={isOpen} onOpenChange={handleOpenChange}>
+      <Popover open={modelMenu.value} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <button
             type="button"

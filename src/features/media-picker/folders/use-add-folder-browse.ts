@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import type { BrowseResult } from '@/core/media-types'
 import { browseDirs } from '@/lib/api/folders'
 import { errorMessage } from '@/lib/errors'
+import { useBoolean } from '@/lib/use-boolean'
 
 export interface AddFolderBrowse {
   path: string | null
@@ -22,7 +23,7 @@ export interface AddFolderBrowse {
 export function useAddFolderBrowse(isOpen: boolean): AddFolderBrowse {
   const [path, setPath] = useState<string | null>(null)
   const [data, setData] = useState<BrowseResult | null>(null)
-  const [isHidden, setIsHidden] = useState(false)
+  const { value: isHidden, set: setIsHidden } = useBoolean()
   const [reload, setReload] = useState(0)
 
   useEffect(() => {
@@ -56,10 +57,13 @@ export function useAddFolderBrowse(isOpen: boolean): AddFolderBrowse {
     setData(null)
   }, [])
 
-  const toggleHidden = useCallback((isChecked: boolean) => {
-    setData(null)
-    setIsHidden(isChecked)
-  }, [])
+  const toggleHidden = useCallback(
+    (isChecked: boolean) => {
+      setData(null)
+      setIsHidden(isChecked)
+    },
+    [setIsHidden],
+  )
 
   return { path, data, isHidden, navigate, navigateRoot, navigateParent, reset, toggleHidden }
 }

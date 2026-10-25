@@ -7,6 +7,7 @@ import useSWR from 'swr'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { fetchFolders } from '@/lib/api/folders'
 import { pauseAudio } from '@/lib/audio-player'
+import { useBoolean } from '@/lib/use-boolean'
 
 import { AddFolderDialog } from '../folders/AddFolderDialog'
 import { useFolderBrowse } from '../folders/use-folder-browse'
@@ -50,9 +51,13 @@ export function PickerBody(props: PickerBodyProps) {
   })
 
   const upload = usePickerUpload({ request, onCommit: commit })
-  const [isAddOpen, setIsAddOpen] = useState(false)
+  const addFolderDialog = useBoolean()
 
-  const handleAddFolderOpen = () => setIsAddOpen(true)
+  const handleAddFolderOpen = () => addFolderDialog.on()
+
+  const handleAddOpenChange = (isOpen: boolean): void => {
+    addFolderDialog.set(isOpen)
+  }
 
   const handleSelectUpload = (item: UploadItem) => commit([item])
 
@@ -110,8 +115,8 @@ export function PickerBody(props: PickerBodyProps) {
       </div>
 
       <AddFolderDialog
-        open={isAddOpen}
-        onOpenChange={setIsAddOpen}
+        open={addFolderDialog.value}
+        onOpenChange={handleAddOpenChange}
         onAdded={foldersState.handleAdded}
       />
     </>

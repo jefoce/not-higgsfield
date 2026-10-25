@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
 import { MoreHorizontal } from 'lucide-react'
 import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui'
 
 import { getPreset } from '@/core/presets'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { cn } from '@/lib/cn'
+import { useBoolean } from '@/lib/use-boolean'
 
 import { DeleteConfirm } from './DeleteConfirm'
 import { MoreMenuContent } from './MoreMenuContent'
@@ -32,7 +32,7 @@ interface MoreMenuProps {
 /** Record actions: frame capture, reference copy, clipboard, reveal, delete. */
 export function MoreMenu(props: MoreMenuProps) {
   const { record, className, variant = 'overlay' } = props
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const confirmDialog = useBoolean()
   const isCompleted = record.status === 'completed'
   const hasFullVideoRefs = getPreset(record.preset.id).references.video === 0
 
@@ -48,9 +48,13 @@ export function MoreMenu(props: MoreMenuProps) {
 
   const handleReveal = () => void revealRecord(record)
 
+  const handleConfirmOpenChange = (isOpen: boolean): void => {
+    confirmDialog.set(isOpen)
+  }
+
   const handleRemove = () => {
     if (!cancelInGrace(record)) {
-      setIsConfirmOpen(true)
+      confirmDialog.on()
     }
   }
 
@@ -86,8 +90,8 @@ export function MoreMenu(props: MoreMenuProps) {
       </DropdownMenuPrimitive.Root>
       <DeleteConfirm
         record={record}
-        open={isConfirmOpen}
-        onOpenChange={setIsConfirmOpen}
+        open={confirmDialog.value}
+        onOpenChange={handleConfirmOpenChange}
         onDeleted={props.onDeleted}
       />
     </>
