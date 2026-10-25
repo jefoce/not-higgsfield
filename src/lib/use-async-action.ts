@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 export interface AsyncAction<TArgs extends unknown[]> {
   isRunning: boolean
@@ -15,7 +15,8 @@ export function useAsyncAction<TArgs extends unknown[]>(
   const isRunningRef = useRef(false)
   const actionRef = useRef(action)
 
-  useEffect(() => {
+  // Latest-callback pattern. Layout effect so a run fired in the same commit sees the current action. Client-only file, no SSR warning.
+  useLayoutEffect(() => {
     actionRef.current = action
   })
 
