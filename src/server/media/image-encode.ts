@@ -6,6 +6,7 @@ import { IMAGE_MAX_SIDE_PX } from '@/core/constants'
 import type { UploadItem } from '@/core/schemas/upload-item'
 
 import { uploadPaths } from '../paths'
+import { createLimiter } from '../sync/limiter'
 import { flattenColor } from './flatten-color'
 import {
   type CacheRecord,
@@ -32,10 +33,9 @@ export const sideFor = (stepSide: number, modelSide?: number): number => {
 }
 
 const MAX_CONCURRENT = 2
+const limiter = createLimiter('imageEncodeQueue', MAX_CONCURRENT)
 const inFlight = new Map<string, Promise<EncodedImage>>()
 const opacityInFlight = new Map<string, Promise<boolean>>()
-const waiters: Array<() => void> = []
-let active = 0
 
 /** Cached per upload and step. Source EXIF is never copied to the output. */
 export async function encodeAtStep(params: EncodeStepParams): Promise<EncodedImage> {
@@ -53,32 +53,17 @@ export async function encodeAtStep(params: EncodeStepParams): Promise<EncodedIma
     return shared
   }
 
-  const task = withSlot(() => {
-    return encodeUncached(params)
-  }).finally(() => {
-    return inFlight.delete(key)
-  })
+  const task = limiter
+    .run(() => {
+      return encodeUncached(params)
+    })
+    .finally(() => {
+      return inFlight.delete(key)
+    })
 
   inFlight.set(key, task)
 
   return task
-}
-
-async function withSlot<T>(fn: () => Promise<T>): Promise<T> {
-  if (active >= MAX_CONCURRENT) {
-    await new Promise<void>((resolve) => {
-      return waiters.push(resolve)
-    })
-  }
-
-  active += 1
-
-  try {
-    return await fn()
-  } finally {
-    active -= 1
-    waiters.shift()?.()
-  }
 }
 
 async function encodeUncached(params: EncodeStepParams): Promise<EncodedImage> {

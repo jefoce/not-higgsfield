@@ -18,6 +18,7 @@ import type { MediaKind } from '@/core/media-types'
 
 import { HttpError } from '../errors'
 import { THUMBS_DIR } from '../paths'
+import { createLimiter } from '../sync/limiter'
 import { extractFrame } from './ffmpeg'
 import sharp from './sharp'
 
@@ -41,9 +42,8 @@ export interface ThumbResult {
 }
 
 const MAX_CONCURRENT = 4
+const limiter = createLimiter('thumbQueue', MAX_CONCURRENT)
 const inFlight = new Map<string, Promise<ThumbResult>>()
-const waiters: Array<() => void> = []
-let active = 0
 
 export async function getThumbnail(input: ThumbInput): Promise<ThumbResult> {
   if (input.kind === 'audio') {
@@ -100,7 +100,7 @@ async function createThumb(params: CreateThumbParams): Promise<ThumbResult> {
   const { input, hash, width, filePath } = params
 
   try {
-    const buffer = await withSlot(() => {
+    const buffer = await limiter.run(() => {
       if (input.kind === 'image') {
         return renderImage(input.absolutePath, width)
       }
@@ -113,23 +113,6 @@ async function createThumb(params: CreateThumbParams): Promise<ThumbResult> {
     return { filePath, contentType: 'image/webp' }
   } catch {
     throw new ThumbUnavailableError()
-  }
-}
-
-async function withSlot<T>(fn: () => Promise<T>): Promise<T> {
-  if (active >= MAX_CONCURRENT) {
-    await new Promise<void>((resolve) => {
-      return waiters.push(resolve)
-    })
-  }
-
-  active += 1
-
-  try {
-    return await fn()
-  } finally {
-    active -= 1
-    waiters.shift()?.()
   }
 }
 

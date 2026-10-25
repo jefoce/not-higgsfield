@@ -9,8 +9,8 @@ import { isNil } from 'lodash-es'
 import { FFMPEG_TIMEOUTS } from '@/core/constants'
 import type { MediaKind } from '@/core/media-types'
 
-import { globalState } from '../global-state'
 import { COMPAT_DIR } from '../paths'
+import { createLimiter } from '../sync/limiter'
 import { withLock } from '../sync/lock'
 import { probeMedia, runFfmpeg } from './ffmpeg'
 
@@ -37,14 +37,7 @@ export class CompatError extends Error {
   }
 }
 
-interface Gate {
-  active: number
-  waiting: Array<() => void>
-}
-
-const gate = globalState<Gate>('compatQueue', () => {
-  return { active: 0, waiting: [] }
-})
+const limiter = createLimiter('compatQueue', MAX_CONVERSIONS)
 
 /** Webview-safe H.264/AAC copy of a source, built once and reused until it goes stale. */
 interface GetCompatMediaParams {
@@ -87,17 +80,14 @@ export async function getCompatMedia(params: GetCompatMediaParams): Promise<Comp
     }
 
     await assertNotFailed(failedPath, source.mtimeMs)
-    const release = await acquire()
 
-    try {
+    await limiter.run(async () => {
       if (await isFresh(filePath, source.mtimeMs)) {
         return
       }
 
       await convertOrMarkFailed({ source: absPath, kind, filePath, failedPath, ext })
-    } finally {
-      release()
-    }
+    })
   })
 
   return { path: filePath, contentType }
@@ -189,34 +179,6 @@ async function isFresh(filePath: string, sourceMtimeMs: number): Promise<boolean
 /** Records the last serve so the 30 day sweep keeps hot files. */
 function touch(filePath: string): Promise<void> {
   return fs.utimes(filePath, new Date(), new Date()).catch(() => {})
-}
-
-/** Runs at most MAX_CONVERSIONS at once. Waiting slots are handed over. */
-async function acquire(): Promise<() => void> {
-  if (gate.active >= MAX_CONVERSIONS) {
-    await new Promise<void>((resolve) => {
-      return gate.waiting.push(resolve)
-    })
-  } else {
-    gate.active += 1
-  }
-
-  let hasReleased = false
-
-  return () => {
-    if (hasReleased) {
-      return
-    }
-
-    hasReleased = true
-    const next = gate.waiting.shift()
-
-    if (next) {
-      next()
-    } else {
-      gate.active -= 1
-    }
-  }
 }
 
 interface ConvertParams {
