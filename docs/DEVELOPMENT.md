@@ -171,6 +171,8 @@ pnpm vitest
 
 `pnpm desktop:build` builds the installers for the current platform only: dmg on macOS, NSIS on Windows, AppImage/deb/rpm on Linux.
 
+On Linux the AppImage needs FUSE 2. Ubuntu 22.04 or Debian 12: `sudo apt install libfuse2`. Ubuntu 24.04 or newer: `sudo apt install libfuse2t64`. Install exactly that package, not `fuse`, which replaces `fuse3`. Without FUSE, run `./not-higgsfield-*-linux-x64.AppImage --appimage-extract-and-run`.
+
 `pnpm desktop:prepare` runs a Next build, then `scripts/prepare-desktop.mjs`:
 
 1. Copies `.next/standalone` and `.next/static` into `src-tauri/resources/server`, skipping env files, docs, sources, tests and build caches.
@@ -279,6 +281,7 @@ If `bundle_dmg.sh` was interrupted, delete the leftover `rw.*.dmg` next to the b
 | Kill a stuck sidecar | Quit the app, then `pkill -f not-higgsfield-server` |
 | Reset the instance lock | Quit every instance, then delete `~/.not-higgsfield/server.lock` |
 | Force the file keychain backend | Start the server with `NH_SECRETS_BACKEND=file` |
+| Linux UI looks transparent or ghosted | WebKitGTK blur, see the `data-os` rule in `globals.css` |
 | Port | `desktop.json`, default 47821. A busy port falls back to a free one. |
 
 Run the packaged server without Tauri:
