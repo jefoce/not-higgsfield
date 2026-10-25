@@ -42,27 +42,38 @@ export function UploadsTab(props: UploadsTabProps) {
     onRetry: handleRetryUpload,
     onDismiss: handleDismissUpload,
   } = props
+
   const { data, isLoading, mutate } = useSWR(['uploads', kinds], () => fetchUploads({ kinds }))
+
   const { data: canChooseFiles } = useSWR('platform-choose', async () =>
     (await getPlatform()).canChooseFiles(),
   )
+
   const items = (data ?? []).filter((item) =>
     extensionAllowed({ kind: item.kind, ext: item.ext, extensions }),
   )
+
   const selectedIds = selected.map((item) => item.id)
   const isMaxReached = selected.length >= max
-  const handleAvailable = (item: UploadItem) => {
-    if (selectedIds.includes(item.id)) return ['deselect' as const]
 
-    if (isMaxReached) return []
+  const handleAvailable = (item: UploadItem) => {
+    if (selectedIds.includes(item.id)) {
+      return ['deselect' as const]
+    }
+
+    if (isMaxReached) {
+      return []
+    }
 
     return ['select' as const]
   }
+
   const actions: PreviewActions = {
     select: handleSelect,
     deselect: handleSelect,
     available: handleAvailable,
   }
+
   const deletion = useDeleteUpload({ mutate, onDeleted })
 
   return (

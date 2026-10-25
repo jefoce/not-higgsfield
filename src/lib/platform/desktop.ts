@@ -24,14 +24,19 @@ export const desktopPlatform: Platform = {
 
   chooseFiles: async (params): Promise<UploadItem[]> => {
     const { kinds, multiple: isMultiple, extensions } = params
+
     const selected = await open({
       multiple: isMultiple,
       filters: [{ name: 'Media', extensions: extensionsForKinds(kinds, extensions) }],
     })
 
-    if (isNil(selected)) return []
+    if (isNil(selected)) {
+      return []
+    }
 
-    if (Array.isArray(selected)) return linkPaths(selected)
+    if (Array.isArray(selected)) {
+      return linkPaths(selected)
+    }
 
     return linkPaths([selected])
   },
@@ -39,19 +44,25 @@ export const desktopPlatform: Platform = {
   chooseFolder: async (): Promise<FolderItem | null> => {
     const selected = await open({ directory: true, multiple: false })
 
-    if (isNil(selected) || Array.isArray(selected)) return null
+    if (isNil(selected) || Array.isArray(selected)) {
+      return null
+    }
 
     return apiPost<FolderItem>('/api/folders', { path: selected })
   },
 
   requestNotifications: async () => {
-    if (await isPermissionGranted()) return
+    if (await isPermissionGranted()) {
+      return
+    }
 
     await requestPermission()
   },
 
   notify: async (title: string, body: string) => {
-    if (!(await isPermissionGranted())) return
+    if (!(await isPermissionGranted())) {
+      return
+    }
 
     sendNotification({ title, body })
   },
@@ -68,7 +79,9 @@ export const desktopPlatform: Platform = {
       filters: [{ name: 'Video', extensions: ['mp4'] }],
     })
 
-    if (isNil(target)) return false
+    if (isNil(target)) {
+      return false
+    }
 
     await apiPost(`/api/generations/${record.id}/export`, { path: target, overwrite: true })
 
@@ -77,13 +90,16 @@ export const desktopPlatform: Platform = {
 
   saveVideos: async (records: GenerationRecord[]) => {
     const count = records.length
+
     const dir = await open({
       directory: true,
       multiple: false,
       title: `Choose a folder for ${count} video${count === 1 ? '' : 's'}`,
     })
 
-    if (isNil(dir) || Array.isArray(dir)) return { saved: 0 }
+    if (isNil(dir) || Array.isArray(dir)) {
+      return { saved: 0 }
+    }
 
     let saved = 0
 
@@ -113,8 +129,11 @@ export const desktopPlatform: Platform = {
       const x = payload.position.x / ratio
       const y = payload.position.y / ratio
 
-      if (payload.type === 'drop') handler({ type: 'drop', x, y, paths: payload.paths })
-      else handler({ type: 'over', x, y })
+      if (payload.type === 'drop') {
+        handler({ type: 'drop', x, y, paths: payload.paths })
+      } else {
+        handler({ type: 'over', x, y })
+      }
     })
   },
 }

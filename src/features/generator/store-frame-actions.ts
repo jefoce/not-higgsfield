@@ -19,11 +19,15 @@ export function createFrameActions(set: SetState): FrameActions {
         const frames = { ...state.frames, [slot]: upload?.id ?? null }
         const shouldClearStart = slot === 'start' && !upload
 
-        if (shouldClearStart) frames.end = null
+        if (shouldClearStart) {
+          frames.end = null
+        }
 
         let uploadsById = state.uploadsById
 
-        if (upload) uploadsById = { ...state.uploadsById, [upload.id]: upload }
+        if (upload) {
+          uploadsById = { ...state.uploadsById, [upload.id]: upload }
+        }
 
         const aspectRatio =
           shouldClearStart && state.aspectRatio === 'auto'

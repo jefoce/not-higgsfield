@@ -72,6 +72,7 @@ describe('buildOpenRouterBody frames', () => {
         frame_type: 'first_frame',
       },
     ])
+
     expect(body.input_references).toBeUndefined()
     expect(body.aspect_ratio).toBeUndefined()
   })
@@ -87,6 +88,7 @@ describe('buildOpenRouterBody frames', () => {
       'first_frame',
       'last_frame',
     ])
+
     expect(body.frame_images?.[1].image_url.url).toBe('data:image/png;base64,END')
   })
 })
@@ -104,6 +106,7 @@ describe('buildOpenRouterBody references and slots', () => {
       { type: 'image_url', image_url: { url: 'data:image/png;base64,IMG' } },
       { type: 'audio_url', audio_url: { url: 'data:audio/mpeg;base64,AUD' } },
     ])
+
     expect(body.frame_images).toBeUndefined()
   })
 
@@ -119,6 +122,7 @@ describe('buildOpenRouterBody references and slots', () => {
 
   it('renders Seedance 2.5 slots with the at prefix', () => {
     const seedance = getPreset('seedance-2.5')
+
     const body = buildOpenRouterBody({
       input: input({
         presetId: seedance.id,
@@ -153,6 +157,7 @@ describe('buildOpenRouterBody limits', () => {
 
   it('omits generate_audio when the preset does not support it', () => {
     const silent = { ...preset, audio: { supported: false, default: false } }
+
     const body = buildOpenRouterBody({
       input: input({ audio: true }),
       preset: silent,
@@ -171,6 +176,7 @@ describe('buildOpenRouterBody limits', () => {
 
   it('omits the last frame when the preset lacks it', () => {
     const noEnd = { ...preset, frames: { start: true, end: false } }
+
     const body = buildOpenRouterBody({
       input: input({ tab: 'frames', prompt: '', frames: { start: 'start', end: 'end' } }),
       preset: noEnd,
@@ -182,6 +188,7 @@ describe('buildOpenRouterBody limits', () => {
 
   it('omits the first frame when the preset lacks it', () => {
     const noStart = { ...preset, frames: { start: false, end: false } }
+
     const body = buildOpenRouterBody({
       input: input({ tab: 'frames', prompt: '', frames: { start: 'start', end: null } }),
       preset: noStart,

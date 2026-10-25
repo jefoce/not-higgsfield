@@ -20,7 +20,9 @@ export async function POST(request: Request) {
     assertLocalRequest(request)
     const body = BodySchema.safeParse(await readJsonBody(request))
 
-    if (!body.success) return zodError(body.error)
+    if (!body.success) {
+      return zodError(body.error)
+    }
 
     return Response.json(await addFolder(body.data), { status: 201 })
   } catch (error) {

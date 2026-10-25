@@ -28,14 +28,18 @@ export async function PUT(request: Request) {
     assertLocalRequest(request)
     const body = BodySchema.safeParse(await readJsonBody(request))
 
-    if (!body.success) return zodError(body.error)
+    if (!body.success) {
+      return zodError(body.error)
+    }
 
     await secretsReady()
     await setSecrets(body.data.values)
 
     const names = Object.keys(body.data.values)
 
-    if (names.length > 0) console.log(`[not-higgsfield] secrets updated: ${names.join(', ')}`)
+    if (names.length > 0) {
+      console.log(`[not-higgsfield] secrets updated: ${names.join(', ')}`)
+    }
 
     return Response.json(secretStatus())
   } catch (error) {

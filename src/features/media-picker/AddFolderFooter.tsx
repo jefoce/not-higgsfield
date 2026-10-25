@@ -10,6 +10,7 @@ import { Switch } from '@/ui/form/Switch'
 import { fetchSystemCapabilities } from './api'
 
 const NATIVE_LABELS: Record<string, string> = { darwin: 'Finder', win32: 'Explorer' }
+
 const nativeLabel = (platform: string): string => NATIVE_LABELS[platform] ?? 'Files'
 
 interface AddFolderFooterProps {
@@ -27,6 +28,7 @@ interface AddFolderFooterProps {
 export function AddFolderFooter(props: AddFolderFooterProps) {
   const { data, isHidden, isAdding, isChoosing, onAdd, onChooseNative, onClose, onShowHidden } =
     props
+
   const handleAdd = onAdd
   const handleChooseNative = onChooseNative
   const handleClose = onClose

@@ -22,7 +22,9 @@ describe('linkPaths', () => {
       await new Promise((resolve) => setTimeout(resolve, 5))
       active -= 1
 
-      if (file === 'bad') throw new Error('cannot link')
+      if (file === 'bad') {
+        throw new Error('cannot link')
+      }
 
       return { id: file } as UploadItem
     })

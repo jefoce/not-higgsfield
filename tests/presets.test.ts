@@ -17,6 +17,7 @@ describe('MODEL_PRESETS', () => {
       'seedance-2.0',
       'seedance-2.5',
     ])
+
     expect(DEFAULT_PRESET_ID).toBe('wan-3.0')
   })
 
@@ -25,6 +26,7 @@ describe('MODEL_PRESETS', () => {
     const prime = getPreset('wan-3.0-prime')
 
     expect(prime.references).toEqual(wan.references)
+
     expect(prime.references).toEqual({
       image: 10,
       video: 5,
@@ -36,12 +38,15 @@ describe('MODEL_PRESETS', () => {
       audioMinSec: 1,
       audioMaxSec: 15,
     })
+
     expect(prime.referenceLimits).toEqual(wan.referenceLimits)
+
     expect(prime.inputTransport).toEqual({
       image: 'base64',
       video: 'url',
       audio: 'url',
     })
+
     expect(prime.frames).toEqual(wan.frames)
     expect(prime.duration).toEqual(wan.duration)
     expect(prime.resolutions).toEqual(wan.resolutions)
@@ -58,12 +63,16 @@ describe('MODEL_PRESETS', () => {
   it('builds Wan per-second keys from the resolution', () => {
     const pricing = getPreset('wan-3.0').pricing
 
-    if (pricing.kind !== 'perSecond') throw new Error('Wan must be per-second')
+    if (pricing.kind !== 'perSecond') {
+      throw new Error('Wan must be per-second')
+    }
 
     expect(pricing.unit).toBe('usd')
+
     expect(pricing.key({ resolution: '1080p', audio: true, hasVideoInput: false })).toBe(
       'duration_seconds_1080p',
     )
+
     expect(pricing.fallback.duration_seconds_1080p).toBe(0.2)
   })
 
@@ -81,6 +90,7 @@ describe('Seedance presets', () => {
     expect(preset.duration).toEqual({ min: 4, max: 15, default: 5, options: [4, 5, 8, 10, 15] })
     expect(preset.defaultResolution).toBe('720p')
     expect(preset.resolutions).toEqual(['480p', '720p', '1080p', '4K'])
+
     expect(preset.references).toEqual({
       image: 9,
       video: 3,
@@ -93,6 +103,7 @@ describe('Seedance presets', () => {
       audioMaxSec: 15,
       audioNeedsVisual: true,
     })
+
     expect(preset.maxInputPlusOutputSec).toBeNull()
     expect(preset.promptMaxChars).toBe(5000)
     expect(preset.refLabel).toBe('{Kind} {n}')
@@ -129,24 +140,32 @@ describe('preset pricing', () => {
   it('uses video-token pricing for Seedance', () => {
     const pricing = getPreset('seedance-2.0').pricing
 
-    if (pricing.kind !== 'videoTokens') throw new Error('Seedance must use tokens')
+    if (pricing.kind !== 'videoTokens') {
+      throw new Error('Seedance must use tokens')
+    }
 
     expect(pricing.fps).toBe(24)
+
     expect(pricing.key({ resolution: '720p', audio: true, hasVideoInput: false })).toBe(
       'video_tokens',
     )
+
     expect(pricing.key({ resolution: '1080p', audio: true, hasVideoInput: false })).toBe(
       'video_tokens_1080p',
     )
+
     expect(pricing.key({ resolution: '4K', audio: true, hasVideoInput: false })).toBe(
       'video_tokens_4k',
     )
+
     expect(pricing.key({ resolution: '720p', audio: true, hasVideoInput: true })).toBe(
       'video_tokens_with_video_input',
     )
+
     expect(pricing.key({ resolution: '1080p', audio: true, hasVideoInput: true })).toBe(
       'video_tokens_1080p_with_video_input',
     )
+
     expect(pricing.fallback.video_tokens).toBe(0.000007)
   })
 })

@@ -10,6 +10,7 @@ export async function GET(request: Request, { params }: Params) {
     assertLocalRequest(request)
     const { id } = await params
     const query = new URL(request.url).searchParams
+
     const result = await listFolderFiles({
       folderId: id,
       sub: query.get('sub') ?? undefined,

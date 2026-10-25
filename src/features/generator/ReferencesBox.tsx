@@ -27,11 +27,15 @@ export function ReferencesBox() {
   const { counts } = referenceSlots(references, (id) => uploadsById[id]?.kind)
   const kinds = MEDIA_KINDS.filter((kind) => counts[kind] < preset.references[kind])
   const max = sumBy(kinds, (kind) => preset.references[kind] - counts[kind])
+
   const handlePick = useCallback((): void => {
-    if (isEmpty(kinds)) return
+    if (isEmpty(kinds)) {
+      return
+    }
 
     openMediaPicker({ target: 'references', kinds, max, extensions, onPick: addReferences })
   }, [kinds, max, extensions, addReferences])
+
   const { dragging: isDragging, dropProps } = useDropUpload({
     id: 'references',
     enabled: true,

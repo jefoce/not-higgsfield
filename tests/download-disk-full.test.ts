@@ -24,7 +24,9 @@ let getGeneration: typeof GetGeneration
 
 beforeAll(async () => {
   await fs.mkdir(root, { recursive: true })
+
   ;({ queueDownload } = await import('@/server/jobs/download-queue'))
+
   ;({ getGeneration } = await import('@/server/repos/generations'))
 })
 
@@ -37,6 +39,7 @@ describe('download on a full disk', () => {
     fetchVideoContent.mockResolvedValue(diskFullResponse())
 
     await queueDownload(makeRecord(), JOB)
+
     const saved = await waitFor(async () => {
       const record = await getGeneration(ID)
 
@@ -77,7 +80,9 @@ async function waitFor<T>(read: () => Promise<T | null>, timeoutMs = 2000): Prom
   while (Date.now() < deadline) {
     const value = await read()
 
-    if (value) return value
+    if (value) {
+      return value
+    }
 
     await new Promise((resolve) => setTimeout(resolve, 20))
   }

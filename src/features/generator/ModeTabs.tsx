@@ -16,13 +16,16 @@ export function ModeTabs() {
   const preset = getPreset(useGeneratorStore((state) => state.presetId))
   const refs = preset.references
   const isRefsDisabled = refs.image + refs.video + refs.audio === 0
+
   const handleValueChange = useCallback(
     (value: string): void => setTab(value as GeneratorTab),
     [setTab],
   )
 
   useEffect(() => {
-    if (isRefsDisabled && tab === 'references') setTab('frames')
+    if (isRefsDisabled && tab === 'references') {
+      setTab('frames')
+    }
   }, [isRefsDisabled, tab, setTab])
 
   return (

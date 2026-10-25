@@ -11,6 +11,7 @@ export interface FolderCrumbButtonProps {
 /** One clickable segment in the folder path bar. */
 export function FolderCrumbButton(props: FolderCrumbButtonProps) {
   const { label, path, onNavigate } = props
+
   const handleSelect = useCallback(() => onNavigate(path), [onNavigate, path])
 
   return (

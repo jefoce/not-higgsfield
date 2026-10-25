@@ -39,6 +39,7 @@ export function GenerateButton(props: GenerateButtonProps) {
     listPrice,
     discount,
   } = props
+
   const isBusy = isGenerating || isPriceLoading
   const spinnerTone = isDisabled ? 'muted' : 'onAccent'
 

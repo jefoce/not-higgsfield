@@ -8,6 +8,7 @@ export interface RefSlot {
   kind: MediaKind
   n: number
 }
+
 export type PromptPart = { type: 'text'; text: string } | { type: 'slot'; slot: RefSlot }
 
 const KIND_WORD: Record<string, MediaKind> = {
@@ -18,9 +19,11 @@ const KIND_WORD: Record<string, MediaKind> = {
 }
 
 export const slotLabel = (slot: RefSlot): string => `${KIND_TITLE[slot.kind]} ${slot.n}`
+
 export const slotToken = (slot: RefSlot): string => `@${slotLabel(slot)}`
 
 const CANONICAL = /@(Image|Video|Audio) (\d{1,2})(?!\d)/g
+
 const LOOSE =
   /@(image|img|video|audio)\s?(\d{1,2})(?!\d)|\[(image|img|video|audio)\s?(\d{1,2})\]|\b(Image|Video|Audio)\s(\d{1,2})(?!\d)/gi
 
@@ -37,7 +40,9 @@ export function referenceSlots(
   for (const id of ids) {
     const kind = kindOf(id)
 
-    if (isNil(kind)) continue
+    if (isNil(kind)) {
+      continue
+    }
 
     counts[kind] += 1
     slots.set(id, { kind, n: counts[kind] })
@@ -49,7 +54,9 @@ export function referenceSlots(
 /** Id attached at a slot, or null. */
 export function idForSlot(slots: Map<string, RefSlot>, slot: RefSlot): string | null {
   for (const [id, candidate] of slots) {
-    if (candidate.kind === slot.kind && candidate.n === slot.n) return id
+    if (candidate.kind === slot.kind && candidate.n === slot.n) {
+      return id
+    }
   }
 
   return null
@@ -64,15 +71,21 @@ export function parsePromptParts(text: string, counts: SlotCounts): PromptPart[]
     const index = match.index ?? 0
     const slot = looseSlot(match, counts)
 
-    if (!slot) continue // keep non-slot text untouched
+    if (!slot) {
+      continue
+    } // keep non-slot text untouched
 
-    if (index > last) parts.push({ type: 'text', text: text.slice(last, index) })
+    if (index > last) {
+      parts.push({ type: 'text', text: text.slice(last, index) })
+    }
 
     parts.push({ type: 'slot', slot })
     last = index + match[0].length
   }
 
-  if (last < text.length) parts.push({ type: 'text', text: text.slice(last) })
+  if (last < text.length) {
+    parts.push({ type: 'text', text: text.slice(last) })
+  }
 
   return parts
 }
@@ -88,7 +101,9 @@ function readLooseMatch(match: RegExpExecArray): LooseMatch | null {
   const [, atKind, atNum, bracketKind, bracketNum, bareKind, bareNum] = match
   const word = atKind ?? bracketKind ?? bareKind
 
-  if (isNil(word) || word === '') return null
+  if (isNil(word) || word === '') {
+    return null
+  }
 
   return {
     word,
@@ -102,14 +117,20 @@ function readLooseMatch(match: RegExpExecArray): LooseMatch | null {
 function looseSlot(match: RegExpExecArray, counts: SlotCounts): RefSlot | null {
   const parsed = readLooseMatch(match)
 
-  if (!parsed) return null
+  if (!parsed) {
+    return null
+  }
 
   const kind = KIND_WORD[parsed.word.toLowerCase()]
   const n = Number(parsed.rawNumber)
 
-  if (isNil(kind) || n < 1 || n > 99) return null
+  if (isNil(kind) || n < 1 || n > 99) {
+    return null
+  }
 
-  if (parsed.isBare && (!parsed.isCapitalized || n > counts[kind])) return null
+  if (parsed.isBare && (!parsed.isCapitalized || n > counts[kind])) {
+    return null
+  }
 
   return { kind, n }
 }
@@ -126,7 +147,9 @@ export function promptSlots(prompt: string): RefSlot[] {
   for (const match of prompt.matchAll(CANONICAL)) {
     const slot = { kind: KIND_WORD[match[1].toLowerCase()], n: Number(match[2]) }
 
-    if (!slots.some((seen) => seen.kind === slot.kind && seen.n === slot.n)) slots.push(slot)
+    if (!slots.some((seen) => seen.kind === slot.kind && seen.n === slot.n)) {
+      slots.push(slot)
+    }
   }
 
   return slots

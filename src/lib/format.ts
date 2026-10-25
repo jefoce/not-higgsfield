@@ -28,7 +28,9 @@ export function formatSecondsExact(value: number): string {
 
 /** m:ss for >= 60s, otherwise `6.8s` unless `shouldAlwaysClock` is set. */
 export function formatMediaDuration(seconds: number, shouldAlwaysClock = false): string {
-  if (!shouldAlwaysClock && seconds < 60) return formatSecondsShort(seconds)
+  if (!shouldAlwaysClock && seconds < 60) {
+    return formatSecondsShort(seconds)
+  }
 
   const minutes = Math.floor(seconds / 60)
   const rest = Math.round(seconds % 60)
@@ -62,7 +64,9 @@ export function formatBytes(bytes: number): string {
 
 /** Cuts text to `max` characters including a trailing "...". */
 export function truncate(text: string, max: number): string {
-  if (text.length <= max) return text
+  if (text.length <= max) {
+    return text
+  }
 
   return `${text.slice(0, Math.max(0, max - 3))}...`
 }

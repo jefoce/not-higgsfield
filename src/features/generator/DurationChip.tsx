@@ -15,9 +15,13 @@ function chipClass(params: ChipClassParams): string {
   const { value, duration, limit } = params
   const base = 'h-8 rounded-md px-2 text-xs font-medium'
 
-  if (value > limit) return `${base} bg-white/5 text-fg-2 opacity-40`
+  if (value > limit) {
+    return `${base} bg-white/5 text-fg-2 opacity-40`
+  }
 
-  if (value === duration) return `${base} bg-lime/15 text-lime`
+  if (value === duration) {
+    return `${base} bg-lime/15 text-lime`
+  }
 
   return `${base} bg-white/5 text-fg-2 hover:text-fg`
 }
@@ -34,6 +38,7 @@ interface DurationChipProps {
 export function DurationChip(props: DurationChipProps) {
   const { value, duration, limit, limitText, onSelect } = props
   const isOverLimit = value > limit
+
   const handleSelect = useCallback((): void => onSelect(value), [onSelect, value])
 
   return (

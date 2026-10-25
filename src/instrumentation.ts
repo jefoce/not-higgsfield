@@ -3,7 +3,9 @@
  * Server modules are imported dynamically so the Edge build stays clean.
  */
 export async function register() {
-  if (process.env.NEXT_RUNTIME !== 'nodejs') return
+  if (process.env.NEXT_RUNTIME !== 'nodejs') {
+    return
+  }
 
   const { acquireInstanceLock } = await import('@/server/instance-lock')
 
@@ -28,6 +30,7 @@ export async function register() {
     import('@/server/media/ffmpeg'),
     import('@/server/paths'),
   ])
+
   const ffmpeg = assertFfmpeg()
 
   console.log('[not-higgsfield] storage', STORAGE_ROOT, 'ffmpeg', ffmpeg.path, ffmpeg.exists)

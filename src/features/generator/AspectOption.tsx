@@ -21,7 +21,9 @@ interface AspectOptionProps {
 
 /** Resolutions that hold the option, empty when it fits everywhere. */
 function unavailableFor(option: AspectChoice, preset: ModelPreset): Resolution[] {
-  if (option === 'auto') return []
+  if (option === 'auto') {
+    return []
+  }
 
   return preset.resolutions.filter((candidate) => !isNil(preset.outputSizes?.[candidate]?.[option]))
 }
@@ -32,6 +34,7 @@ export function AspectOption(props: AspectOptionProps) {
   const isAllowed = option === 'auto' || aspectAllowed({ preset, resolution, aspect: option })
   const onlyAt = unavailableFor(option, preset)
   const reason = isAllowed || onlyAt.length === 0 ? null : `Only at ${onlyAt.join(', ')}`
+
   const handleSelect = useCallback((): void => onSelect(option), [onSelect, option])
 
   return (

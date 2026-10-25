@@ -21,11 +21,15 @@ const FINAL: JobStatus[] = ['completed', 'failed', 'cancelled', 'expired']
 export async function processRecord(record: GenerationRecord): Promise<void> {
   const current = record.job
 
-  if (isNil(current) || current.id === '') return
+  if (isNil(current) || current.id === '') {
+    return
+  }
 
   const job = await pollJob({ record, current })
 
-  if (!job) return
+  if (!job) {
+    return
+  }
 
   const status = asJobStatus(job.status) ?? record.status
 
@@ -59,7 +63,9 @@ async function pollJob(params: PollJobParams): Promise<VideoJobResponse | null> 
   try {
     return await getVideoJob(current.id, { submittedAt: current.submittedAt })
   } catch (error) {
-    if (await handleJobError(record, error)) return null
+    if (await handleJobError(record, error)) {
+      return null
+    }
 
     throw error
   }
@@ -80,6 +86,7 @@ interface PreparedRecord {
 
 function prepareNext(params: PrepareNextParams): PreparedRecord {
   const { record, current, job, status, now } = params
+
   const jobFields = {
     ...current,
     generationId: job.generation_id ?? current.generationId,
@@ -112,7 +119,9 @@ function applyUsageCost(params: ApplyUsageCostParams): GenerationRecord {
   const { record, job } = params
   const usageCost = job.usage?.cost
 
-  if (isNil(usageCost)) return record
+  if (isNil(usageCost)) {
+    return record
+  }
 
   const actual = isMockMode() ? record.cost.estimatedUsd : usageCost
 
@@ -137,6 +146,7 @@ interface FinishFinalParams {
 
 async function finishFinal(params: FinishFinalParams): Promise<void> {
   const { record, status, jobFields, job, now } = params
+
   const next = {
     ...record,
     job: { ...jobFields, completedAt: jobFields.completedAt ?? now },
@@ -154,14 +164,18 @@ async function finishFinal(params: FinishFinalParams): Promise<void> {
 }
 
 function finalizeCost(record: GenerationRecord, job: VideoJobResponse): GenerationRecord {
-  if (!isNil(job.usage?.cost)) return record
+  if (!isNil(job.usage?.cost)) {
+    return record
+  }
 
   return { ...record, cost: { ...record.cost, actualUsd: 0, billed: false } }
 }
 
 /** Returns true when the error was handled and this tick should stop. */
 async function handleJobError(record: GenerationRecord, error: unknown): Promise<boolean> {
-  if (!(error instanceof OpenRouterError)) return false
+  if (!(error instanceof OpenRouterError)) {
+    return false
+  }
 
   if (error.status === 404) {
     await saveGeneration({ ...record, status: 'failed', error: 'Job not found on OpenRouter' })
@@ -172,7 +186,9 @@ async function handleJobError(record: GenerationRecord, error: unknown): Promise
   if (error.status === 401 || error.status === 403) {
     const text = `OpenRouter auth failed: ${error.message}`
 
-    if (record.error !== text) await saveGeneration({ ...record, error: text })
+    if (record.error !== text) {
+      await saveGeneration({ ...record, error: text })
+    }
 
     return true
   }
@@ -181,7 +197,9 @@ async function handleJobError(record: GenerationRecord, error: unknown): Promise
 }
 
 function isAgedOut(record: GenerationRecord, status: JobStatus): boolean {
-  if (status !== 'pending' && status !== 'in_progress') return false
+  if (status !== 'pending' && status !== 'in_progress') {
+    return false
+  }
 
   return Date.now() - Date.parse(record.createdAt) > MAX_JOB_AGE_MIN * 60_000
 }

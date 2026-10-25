@@ -35,6 +35,7 @@ describe('shouldRetryAsBase64', () => {
         fitsBase64: true,
       }),
     ).toBe(false)
+
     expect(
       shouldRetryAsBase64({
         error: new TypeError('fetch failed'),

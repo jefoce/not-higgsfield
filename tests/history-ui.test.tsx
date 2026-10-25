@@ -93,6 +93,7 @@ describe('selectable cards', () => {
         ),
       ),
     )
+
     fireEvent.click(
       required(container.querySelector<HTMLElement>('#history-item-c [role="checkbox"]'), 'c box'),
       { shiftKey: true },
@@ -108,6 +109,7 @@ const REAL_PERSON_VIDEO = 'InputVideoSensitiveContentDetected.PrivacyInformation
 describe('failed pill corner', () => {
   it('uses the same checkbox corner as completed cards and keeps the pill apart', () => {
     setOrder(['f'])
+
     const { container } = render(
       <HistoryGrid
         records={[record('f', { status: 'failed', error: RAW_ERROR })]}

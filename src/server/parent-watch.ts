@@ -9,10 +9,14 @@ const CHECK_MS = 1000
 export function startParentWatch(): () => void {
   const pid = Number(process.env.PARENT_PID)
 
-  if (!Number.isInteger(pid) || pid <= 0) return () => {}
+  if (!Number.isInteger(pid) || pid <= 0) {
+    return () => {}
+  }
 
   const timer = setInterval(() => {
-    if (isAlive(pid)) return
+    if (isAlive(pid)) {
+      return
+    }
 
     clearInterval(timer)
     console.log('[not-higgsfield] parent exited, shutting down')

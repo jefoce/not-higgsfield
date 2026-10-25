@@ -25,7 +25,9 @@ export async function listUploadRecords(): Promise<UploadItem[]> {
 }
 
 export async function getUploadRecord(id: string): Promise<UploadItem | null> {
-  if (!isUuid(id)) return null
+  if (!isUuid(id)) {
+    return null
+  }
 
   return store.get(id)
 }
@@ -56,7 +58,9 @@ export async function updateUpload(
   id: string,
   patch: (item: UploadItem) => UploadItem,
 ): Promise<UploadItem | null> {
-  if (!isUuid(id)) return null
+  if (!isUuid(id)) {
+    return null
+  }
 
   return withLock(`upload:${id}`, async () => {
     const current = await loadUploadRecord(id)

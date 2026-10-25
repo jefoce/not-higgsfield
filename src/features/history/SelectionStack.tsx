@@ -19,7 +19,9 @@ export function SelectionStack(props: SelectionStackProps) {
       {stack.map((id, index) => {
         const record = byId.get(id)
 
-        if (!record) return null
+        if (!record) {
+          return null
+        }
 
         const poster = posterSrc(record, 80)
 

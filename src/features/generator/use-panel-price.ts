@@ -56,8 +56,10 @@ export function usePanelPrice() {
       references: state.references,
     })),
   )
+
   const json = priceJson(draft)
   const debouncedJson = useDebouncedJson(json)
+
   const { data, isLoading } = useSWR<GenerationEstimate>(
     generationEstimateKey(debouncedJson),
     fetchEstimate,
@@ -68,6 +70,7 @@ export function usePanelPrice() {
       shouldRetryOnError: false,
     },
   )
+
   const isDebouncePending = json !== debouncedJson
 
   return {

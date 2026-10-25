@@ -68,6 +68,7 @@ function record(aspectRatio: GenerationRecord['input']['aspectRatio']): Generati
 beforeEach(() => {
   vi.stubGlobal('ResizeObserver', Observer)
   vi.stubGlobal('IntersectionObserver', Observer)
+
   useGeneratorStore.setState({
     presetId: 'wan-3.0',
     tab: 'frames',
@@ -102,9 +103,11 @@ describe('RatioIcon', () => {
     const [width, height] = ratio.split(':').map(Number)
 
     expect(box.className).toContain('border')
+
     expect(Number.parseFloat(box.style.width) / Number.parseFloat(box.style.height)).toBeCloseTo(
       width / height,
     )
+
     expect(square.style.width).toBe('14px')
     expect(square.style.height).toBe('14px')
     expect(square.className).toContain('items-center')
@@ -138,6 +141,7 @@ function expectRatioBox(root: HTMLElement, ratio: AspectRatio) {
 
   expect(square.getAttribute('aria-hidden')).toBe('true')
   expect(box.className).toContain('border')
+
   expect(Number.parseFloat(box.style.width) / Number.parseFloat(box.style.height)).toBeCloseTo(
     width / height,
   )
@@ -157,6 +161,7 @@ describe('field and history callers', () => {
       tab: 'frames',
       frames: { start: 'start-frame', end: null },
     })
+
     render(<AspectRatioPopover />)
 
     const svg = screen.getByRole('button', { name: 'Auto' }).querySelector('svg')

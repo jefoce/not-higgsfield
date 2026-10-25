@@ -14,7 +14,9 @@ export async function updateSubmit(
   return withLock(id, async () => {
     const record = await getGeneration(id)
 
-    if (!record) return null
+    if (!record) {
+      return null
+    }
 
     const next = patch(record)
 

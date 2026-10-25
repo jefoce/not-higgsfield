@@ -44,8 +44,13 @@ export function statusLabel(record: GenerationRecord): string {
 
 /** Gray while a submit stage or download is running, otherwise the status tone. */
 export function statusTone(record: GenerationRecord): Tone {
-  if (!isNil(record.submit?.stage)) return 'gray'
-  if (record.download) return 'gray'
+  if (!isNil(record.submit?.stage)) {
+    return 'gray'
+  }
+
+  if (record.download) {
+    return 'gray'
+  }
 
   return TONES[record.status]
 }
@@ -55,7 +60,9 @@ export function statusLine(
   record: GenerationRecord,
   friendly: FriendlyError | null,
 ): string | null {
-  if (!isNil(friendly) && !isNil(friendly.hint)) return friendly.hint
+  if (!isNil(friendly) && !isNil(friendly.hint)) {
+    return friendly.hint
+  }
 
   return record.status === 'cancelled' ? CANCELLED_TEXT : null
 }
@@ -75,7 +82,9 @@ interface GraceCancelVisibleParams {
 export function isGraceCancelVisible(params: GraceCancelVisibleParams): boolean {
   const { record, remainingMs, onCancel } = params
 
-  if (!isGraceRecord(record)) return false
+  if (!isGraceRecord(record)) {
+    return false
+  }
 
   return remainingMs > 0 && !isNil(onCancel)
 }

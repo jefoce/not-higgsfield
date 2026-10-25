@@ -24,19 +24,28 @@ export function useTileActivation(params: TileActivationParams): TileActivation 
 
   const activate = useCallback(
     (isShift: boolean) => {
-      if ((isShift || isSelecting) && !canSelect) return
+      if ((isShift || isSelecting) && !canSelect) {
+        return
+      }
 
-      if (isShift || isSelecting) select(isShift)
-      else handleOpen(record)
+      if (isShift || isSelecting) {
+        select(isShift)
+      } else {
+        handleOpen(record)
+      }
     },
     [canSelect, isSelecting, select, handleOpen, record],
   )
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLDivElement>) => {
-      if (!isOwnEvent(event)) return
+      if (!isOwnEvent(event)) {
+        return
+      }
 
-      if ((event.target as HTMLElement).closest('button, a, input')) return
+      if ((event.target as HTMLElement).closest('button, a, input')) {
+        return
+      }
 
       activate(event.shiftKey)
     },
@@ -45,11 +54,17 @@ export function useTileActivation(params: TileActivationParams): TileActivation 
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
-      if (!isOwnEvent(event)) return
+      if (!isOwnEvent(event)) {
+        return
+      }
 
-      if (event.target !== event.currentTarget) return
+      if (event.target !== event.currentTarget) {
+        return
+      }
 
-      if (event.key !== 'Enter' && event.key !== ' ') return
+      if (event.key !== 'Enter' && event.key !== ' ') {
+        return
+      }
 
       event.preventDefault()
       activate(event.shiftKey)

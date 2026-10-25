@@ -36,7 +36,9 @@ export function usePickerUpload(params: UsePickerUploadParams): PickerUpload {
 
   const handleUploaded = useCallback(
     (items: UploadItem[]) => {
-      if (request !== useMediaPickerStore.getState().request) return
+      if (request !== useMediaPickerStore.getState().request) {
+        return
+      }
 
       refreshUploads()
       onCommit(items)
@@ -45,6 +47,7 @@ export function usePickerUpload(params: UsePickerUploadParams): PickerUpload {
   )
 
   const queue = useUploadQueue(handleUploaded)
+
   const { dragging: isDragging, dropProps } = useDropUpload({
     id: 'picker',
     enabled: true,
@@ -53,7 +56,9 @@ export function usePickerUpload(params: UsePickerUploadParams): PickerUpload {
     onUploaded: handleUploaded,
     onFiles: queue.enqueue,
   })
+
   const readKinds = () => request.kinds
+
   const readExtensions = () => request.extensions
 
   usePasteMedia({

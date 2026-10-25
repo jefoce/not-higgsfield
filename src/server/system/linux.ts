@@ -24,13 +24,17 @@ export const linux: SystemAdapter = {
   async chooseFiles({ kinds, multiple: isMultiple, prompt }) {
     const tool = await picker()
 
-    if (isNil(tool)) throw new HttpError(501, 'No file dialog available')
+    if (isNil(tool)) {
+      throw new HttpError(501, 'No file dialog available')
+    }
 
     const files = extensions(kinds)
+
     const args =
       tool === 'zenity'
         ? zenityFiles({ files, multiple: isMultiple, prompt })
         : kdialogFiles({ files, multiple: isMultiple, prompt })
+
     const { stdout } = await dialog(tool, args)
 
     return lines(stdout)
@@ -39,11 +43,15 @@ export const linux: SystemAdapter = {
   async chooseFolder({ prompt }) {
     const tool = await picker()
 
-    if (isNil(tool)) throw new HttpError(501, 'No folder dialog available')
+    if (isNil(tool)) {
+      throw new HttpError(501, 'No folder dialog available')
+    }
 
     let args = ['--getexistingdirectory', os.homedir(), '--title', prompt]
 
-    if (tool === 'zenity') args = ['--file-selection', '--directory', `--title=${prompt}`]
+    if (tool === 'zenity') {
+      args = ['--file-selection', '--directory', `--title=${prompt}`]
+    }
 
     const { stdout } = await dialog(tool, args)
 
@@ -76,7 +84,9 @@ function zenityFiles(params: FilesArgsParams): string[] {
 
   const args = ['--file-selection', `--title=${prompt}`, `--file-filter=Media | ${patterns}`]
 
-  if (isMultiple) args.push('--multiple', '--separator=\n')
+  if (isMultiple) {
+    args.push('--multiple', '--separator=\n')
+  }
 
   return args
 }
@@ -87,7 +97,9 @@ function kdialogFiles(params: FilesArgsParams): string[] {
 
   const args = ['--getopenfilename', os.homedir(), `${patterns}|Media`, '--title', prompt]
 
-  if (isMultiple) args.push('--multiple', '--separate-output')
+  if (isMultiple) {
+    args.push('--multiple', '--separate-output')
+  }
 
   return args
 }
@@ -100,9 +112,13 @@ function lines(stdout: string): string[] {
 }
 
 async function picker(): Promise<Picker | null> {
-  if (await hasCommand('zenity')) return 'zenity'
+  if (await hasCommand('zenity')) {
+    return 'zenity'
+  }
 
-  if (await hasCommand('kdialog')) return 'kdialog'
+  if (await hasCommand('kdialog')) {
+    return 'kdialog'
+  }
 
   return null
 }
@@ -118,7 +134,9 @@ async function dialog(file: string, args: string[]) {
   try {
     return await run(file, args, { timeout: DIALOG_TIMEOUT, killSignal: 'SIGKILL' })
   } catch (error) {
-    if (isCancel(error)) return { stdout: '', stderr: '' }
+    if (isCancel(error)) {
+      return { stdout: '', stderr: '' }
+    }
 
     throw error
   }

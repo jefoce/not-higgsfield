@@ -8,6 +8,7 @@ export async function GET(request: Request) {
   try {
     assertLocalRequest(request)
     const query = new URL(request.url).searchParams
+
     const ids = (query.get('ids') ?? '')
       .split(',')
       .map((part) => part.trim())
@@ -26,11 +27,15 @@ export async function POST(request: Request) {
     assertLocalRequest(request)
     const form = await request.formData().catch(() => null)
 
-    if (!form) return jsonError({ status: 400, error: 'Invalid form data' })
+    if (!form) {
+      return jsonError({ status: 400, error: 'Invalid form data' })
+    }
 
     const files = form.getAll('file').filter((value): value is File => value instanceof File)
 
-    if (files.length === 0) return jsonError({ status: 400, error: 'No files provided' })
+    if (files.length === 0) {
+      return jsonError({ status: 400, error: 'No files provided' })
+    }
 
     const items: UploadItem[] = []
 

@@ -19,8 +19,10 @@ export const darwin: SystemAdapter = {
     const types = extensions(kinds)
       .map((ext) => `"${ext}"`)
       .join(', ')
+
     const typeClause = types === '' ? '' : ` of type {${types}}`
     const multipleClause = isMultiple ? ' with multiple selections allowed' : ''
+
     const script = [
       'tell application "System Events"',
       'activate',
@@ -56,6 +58,7 @@ export const darwin: SystemAdapter = {
       'end tell',
       'return POSIX path of picked',
     ]
+
     const { stdout } = await dialog(
       'osascript',
       script.flatMap((line) => ['-e', line]),
@@ -105,7 +108,9 @@ async function dialog(file: string, args: string[]) {
   try {
     return await run(file, args, { timeout: DIALOG_TIMEOUT, killSignal: 'SIGKILL' })
   } catch (error) {
-    if (isCancel(error)) return { stdout: '', stderr: '' }
+    if (isCancel(error)) {
+      return { stdout: '', stderr: '' }
+    }
 
     throw error
   }

@@ -46,7 +46,9 @@ vi.mock('sharp', async (importOriginal) => {
       get(target, prop, receiver) {
         const value = Reflect.get(target, prop, receiver)
 
-        if (typeof value !== 'function') return value
+        if (typeof value !== 'function') {
+          return value
+        }
 
         if (prop === 'toBuffer') {
           return (...args: unknown[]) =>
@@ -109,15 +111,20 @@ let uploadsDir: string
 
 beforeAll(async () => {
   await fs.rm(ROOT, { recursive: true, force: true })
+
   ;({ encodeImages } = await import('@/server/media/image-data-url'))
+
   ;({ UPLOADS_DIR: uploadsDir } = await import('@/server/paths'))
 })
 
 afterAll(async () => {
   await fs.rm(ROOT, { recursive: true, force: true })
 
-  if (isNil(PREVIOUS_ROOT)) delete process.env.STORAGE_ROOT
-  else process.env.STORAGE_ROOT = PREVIOUS_ROOT
+  if (isNil(PREVIOUS_ROOT)) {
+    delete process.env.STORAGE_ROOT
+  } else {
+    process.env.STORAGE_ROOT = PREVIOUS_ROOT
+  }
 })
 
 async function fixture(data: Buffer): Promise<UploadItem> {

@@ -26,7 +26,10 @@ export function isSelectable(record: GenerationRecord): boolean {
 
 /** Friendly error for a record, or null when there is no raw text. */
 export function recordError(record: GenerationRecord): FriendlyError | null {
-  if (isNil(record.error) || record.error === '') return null
+  if (isNil(record.error) || record.error === '') {
+    return null
+  }
+
   return friendlyError({
     raw: record.error,
     family: findPreset(record.input.presetId)?.family ?? null,
@@ -37,7 +40,9 @@ const hasPx = (value: number | undefined): boolean =>
   !isNil(value) && value !== 0 && !Number.isNaN(value)
 
 const sizedAspect = (width: number | undefined, height: number | undefined): string | undefined => {
-  if (!hasPx(width) || !hasPx(height)) return undefined
+  if (!hasPx(width) || !hasPx(height)) {
+    return undefined
+  }
 
   return `${width}/${height}`
 }
@@ -48,11 +53,18 @@ export function recordAspect(record: GenerationRecord): string {
   const start = record.input.frames.start
   const frame = isNil(start) ? undefined : record.inputsSnapshot[start]
   const aspect = record.input.aspectRatio
+
   const sized =
     sizedAspect(output?.width, output?.height) ?? sizedAspect(frame?.width, frame?.height)
 
-  if (!isNil(sized)) return sized
-  if (aspect === 'auto') return '16/9'
+  if (!isNil(sized)) {
+    return sized
+  }
+
+  if (aspect === 'auto') {
+    return '16/9'
+  }
+
   return aspect.replace(':', '/')
 }
 
@@ -68,9 +80,19 @@ function posterWidth(widthPx: number): number {
 export function posterSrc(record: GenerationRecord, widthPx = PREVIEW_WIDTH): string | undefined {
   const preview = record.output?.preview
 
-  if (isNil(preview) || preview === '') return undefined
+  if (isNil(preview) || preview === '') {
+    return undefined
+  }
 
   return thumbUrl({ ref: `downloads/${preview}`, w: posterWidth(widthPx) })
+}
+
+/** Poster sized for the rendered media width in device pixels. */
+export function posterForWidth(record: GenerationRecord, mediaWidth: number): string | undefined {
+  const dpr = Math.max(typeof window === 'undefined' ? 1 : window.devicePixelRatio, 1)
+  const width = mediaWidth > 0 ? Math.ceil((mediaWidth * dpr) / 80) * 80 : undefined
+
+  return posterSrc(record, width)
 }
 
 export const uploadThumb = (id: string, width = 160): string =>

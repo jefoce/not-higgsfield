@@ -39,6 +39,7 @@ export function PlayerControls(props: PlayerControlsProps) {
   const handleTogglePlay = video.togglePlay
   const handleToggleMute = video.toggleMute
   const handleToggleFullscreen = video.toggleFullscreen
+
   const handleSeek = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       video.seek(Number(event.currentTarget.value))

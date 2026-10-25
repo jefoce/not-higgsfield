@@ -29,8 +29,10 @@ export function PickerBody(props: PickerBodyProps) {
   const { request } = props
   const [activeTab, setActiveTab] = useState('uploads')
   const folderBrowse = useFolderBrowse(request.max)
+
   const { folderSub, selectedFolderRels, handleReset, handleNavigate, handleToggleFile } =
     folderBrowse
+
   const handleTabChange = useCallback(
     (tab: string) => {
       setActiveTab(tab)
@@ -38,25 +40,32 @@ export function PickerBody(props: PickerBodyProps) {
     },
     [handleReset],
   )
+
   const handleClose = closeMediaPicker
   const selection = usePickerSelection(request)
   const { commit, confirm } = selection
   const { data: folders = [] } = useSWR(['folders'], fetchFolders)
+
   const foldersState = usePickerFolders({
     activeTab,
     folders,
     onTabChange: handleTabChange,
     onCommit: commit,
   })
+
   const upload = usePickerUpload({ request, onCommit: commit })
   const [isAddOpen, setIsAddOpen] = useState(false)
   const handleAddOpenChange = setIsAddOpen
+
   const handleAddFolderOpen = useCallback(() => setIsAddOpen(true), [])
+
   const handleSelectUpload = useCallback((item: UploadItem) => commit([item]), [commit])
+
   const handleAdded = foldersState.handleAdded
   const handleDisconnect = foldersState.handleDisconnect
   const activeFolder = foldersState.activeFolder
   const isFolderTab = !isNil(activeFolder) && activeTab !== 'uploads'
+
   const { isAddingFolderFiles, handleConfirm } = usePickerConfirm({
     request,
     activeFolder,

@@ -22,7 +22,9 @@ interface MediaTileControlsProps {
 export function MediaTileControls(props: MediaTileControlsProps) {
   const { label, isPreviewable, isBlocked, isSelected, isMissing, onSelect, onPreview, onDelete } =
     props
+
   const handleSelect = onSelect
+
   const handlePreviewClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()
@@ -30,6 +32,7 @@ export function MediaTileControls(props: MediaTileControlsProps) {
     },
     [onPreview],
   )
+
   const handleDeleteClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()
@@ -37,6 +40,7 @@ export function MediaTileControls(props: MediaTileControlsProps) {
     },
     [onDelete],
   )
+
   const handleDeleteMouseDown = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => event.stopPropagation(),
     [],

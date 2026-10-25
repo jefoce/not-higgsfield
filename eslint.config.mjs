@@ -64,22 +64,6 @@ const OBJECT_FUNCTION_SELECTOR = {
   message: 'Name the function (handle<Action>) and pass it by reference.',
 }
 
-// Reserved for B6: no re-exports.
-const MODULE_SELECTORS = [
-  {
-    selector: 'ExportAllDeclaration, ExportNamedDeclaration[source]',
-    message: 'No re-exports. Import from the module that defines it.',
-  },
-]
-
-// Reserved for B2: dependencies are wired in src/server/boot.ts.
-const SERVER_SELECTORS = [
-  {
-    selector: 'ImportExpression',
-    message: 'No dynamic imports in server code. Wire dependencies in src/server/boot.ts.',
-  },
-]
-
 const localPlugin = { rules: { 'padding-around-functions': paddingAroundFunctions } }
 
 export default defineConfig([

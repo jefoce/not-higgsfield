@@ -34,12 +34,14 @@ describe('maxDurationFor', () => {
         preset,
       }),
     ).toBe(23)
+
     const uploads = uploadsOf(
       upload('v1', 'video', { durationSec: 6.8 }),
       upload('v2', 'video', { durationSec: 3 }),
     )
 
     expect(maxDurationFor({ input: input({ references: ['v1', 'v2'] }), uploads, preset })).toBe(20)
+
     expect(
       maxDurationFor({
         input: input({ references: ['v1'] }),
@@ -75,11 +77,13 @@ describe('maxDurationFor', () => {
       ...preset,
       duration: { min: 4, max: 8, default: 6, options: [4, 6, 8] as const },
     }
+
     const uploads = uploadsOf(upload('v', 'video', { durationSec: 25 }))
 
     expect(
       maxDurationFor({ input: input({ references: ['v'] }), uploads, preset: optionPreset }),
     ).toBe(5)
+
     expect(
       maxDurationFor({ input: input({ tab: 'frames' }), uploads: {}, preset: optionPreset }),
     ).toBe(8)
@@ -91,9 +95,11 @@ describe('issueText', () => {
     expect(issueText({ type: 'missing-slot', slot: { kind: 'image', n: 3 }, attached: 2 })).toBe(
       '@Image 3 is not attached (2 images)',
     )
+
     expect(issueText({ type: 'missing-slot', slot: { kind: 'video', n: 1 }, attached: 0 })).toBe(
       '@Video 1 is not attached (0 videos)',
     )
+
     expect(issueText({ type: 'missing-slot', slot: { kind: 'audio', n: 2 }, attached: 1 })).toBe(
       '@Audio 2 is not attached (1 audio)',
     )

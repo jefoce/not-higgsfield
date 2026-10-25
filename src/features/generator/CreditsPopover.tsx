@@ -24,10 +24,13 @@ function handleTopUp(): void {
 /** Account balance, key limits, usage, and refresh/top-up actions. */
 export function CreditsPopover() {
   const { credits, refresh, isLoading } = useCredits()
+
   const money = (value: number | null | undefined) => (isNil(value) ? '--' : formatUsd(value))
+
   const keyLimit = isNil(credits?.keyLimitRemaining)
     ? 'No key limit'
     : `${money(credits.keyLimitRemaining)} / ${money(credits.keyLimit)}`
+
   const handleRefresh = useCallback((): void => refresh(true), [refresh])
 
   return (

@@ -2,19 +2,13 @@ import 'server-only'
 
 import { isNil, sumBy } from 'lodash-es'
 
-import {
-  FLATTEN_BACKGROUND,
-  FLATTEN_LIGHT,
-  FLATTEN_LUMINANCE,
-  IMAGE_MAX_ENCODED_MB,
-  IMAGE_MAX_SIDE_PX,
-  IMAGE_STEPS,
-} from '@/core/constants'
+import { IMAGE_MAX_ENCODED_MB, IMAGE_MAX_SIDE_PX, IMAGE_STEPS } from '@/core/constants'
 import type { ModelPreset, ReferenceLimits } from '@/core/presets'
 import type { ReferencePlan, UploadItem } from '@/core/types'
 
 import { uploadPaths } from '../paths'
 import { HttpError } from '../request-guard'
+import { flattenColor } from './flatten-color'
 import {
   type CacheRecord,
   type EncodedImage,
@@ -47,7 +41,6 @@ export class ImageTooLargeError extends HttpError {
 }
 
 const MB = 1024 * 1024
-const FALLBACK_BACKGROUND: FlattenColor = FLATTEN_BACKGROUND
 
 interface EncodeStepParams {
   upload: UploadItem
@@ -64,7 +57,9 @@ export async function encodeImages(params: EncodeImagesParams): Promise<EncodedI
   const limit = preset.referenceLimits?.image
   const perImageBytes = Math.min(limit?.maxBytes ?? Infinity, IMAGE_MAX_ENCODED_MB * MB)
 
-  if (images.length === 0) return emptyResult(limit)
+  if (images.length === 0) {
+    return emptyResult(limit)
+  }
 
   for (const [index, step] of IMAGE_STEPS.entries()) {
     const result = await tryStep({
@@ -77,7 +72,9 @@ export async function encodeImages(params: EncodeImagesParams): Promise<EncodedI
       baseBytes,
     })
 
-    if (result) return result
+    if (result) {
+      return result
+    }
   }
 
   throw new ImageTooLargeError()
@@ -108,6 +105,7 @@ interface TryStepParams {
 async function tryStep(params: TryStepParams): Promise<EncodedImages | null> {
   const { images, step, stepNumber, limit, perImageBytes, budgetBytes, baseBytes } = params
   const maxSide = sideFor(step.maxSidePx, limit?.maxSidePx)
+
   const encoded = await Promise.all(
     images.map(async (upload) => ({
       upload,
@@ -120,11 +118,14 @@ async function tryStep(params: TryStepParams): Promise<EncodedImages | null> {
       }),
     })),
   )
+
   const totalBytes = sumBy(encoded, ({ image }) => image.bytes)
   const isWithinBudget = totalBytes + baseBytes <= budgetBytes
   const isUnderCap = encoded.every(({ image }) => image.bytes <= perImageBytes)
 
-  if (!isWithinBudget || !isUnderCap) return null
+  if (!isWithinBudget || !isUnderCap) {
+    return null
+  }
 
   const media = Object.fromEntries(encoded.map(({ upload, image }) => [upload.id, image]))
 
@@ -160,12 +161,16 @@ async function encodeAtStep(params: EncodeStepParams): Promise<EncodedImage> {
   const { upload, step } = params
   const cached = await readCache(upload.id, step)
 
-  if (cached) return cached
+  if (cached) {
+    return cached
+  }
 
   const key = `${upload.id}:${step}`
   const shared = inFlight.get(key)
 
-  if (shared) return shared
+  if (shared) {
+    return shared
+  }
 
   const task = withSlot(() => encodeUncached(params)).finally(() => inFlight.delete(key))
 
@@ -175,7 +180,9 @@ async function encodeAtStep(params: EncodeStepParams): Promise<EncodedImage> {
 }
 
 async function withSlot<T>(fn: () => Promise<T>): Promise<T> {
-  if (active >= MAX_CONCURRENT) await new Promise<void>((resolve) => waiters.push(resolve))
+  if (active >= MAX_CONCURRENT) {
+    await new Promise<void>((resolve) => waiters.push(resolve))
+  }
 
   active += 1
 
@@ -192,7 +199,9 @@ async function encodeUncached(params: EncodeStepParams): Promise<EncodedImage> {
   // A parallel caller may have finished between the in-flight check and this task.
   const fresh = await readCache(upload.id, step)
 
-  if (fresh) return fresh
+  if (fresh) {
+    return fresh
+  }
 
   const source = uploadPaths(upload.id, upload.ext).media
   const isOpaque = await opacityFor(upload, source)
@@ -200,7 +209,9 @@ async function encodeUncached(params: EncodeStepParams): Promise<EncodedImage> {
   const shouldKeepAlpha = isTransparent && hasAlpha
   let flattened: FlattenColor | undefined
 
-  if (isTransparent && !hasAlpha) flattened = await flattenColor(source)
+  if (isTransparent && !hasAlpha) {
+    flattened = await flattenColor(source)
+  }
 
   let pipeline = sharp(source, { pages: 1 })
     .rotate()
@@ -211,13 +222,16 @@ async function encodeUncached(params: EncodeStepParams): Promise<EncodedImage> {
   if (shouldKeepAlpha) {
     pipeline = pipeline.png({ compressionLevel: 9, palette: false })
   } else {
-    if (!isNil(flattened)) pipeline = pipeline.flatten({ background: flattened })
+    if (!isNil(flattened)) {
+      pipeline = pipeline.flatten({ background: flattened })
+    }
 
     pipeline = pipeline.jpeg({ quality: jpegQuality, mozjpeg: true, chromaSubsampling: '4:4:4' })
   }
 
   const { data, info } = await pipeline.toBuffer({ resolveWithObject: true })
   const format = shouldKeepAlpha ? 'png' : 'jpeg'
+
   const record: CacheRecord = {
     width: info.width,
     height: info.height,
@@ -235,11 +249,15 @@ async function encodeUncached(params: EncodeStepParams): Promise<EncodedImage> {
 async function opacityFor(upload: UploadItem, source: string): Promise<boolean> {
   const isOpaque = await readOpaque(upload.id)
 
-  if (!isNil(isOpaque)) return isOpaque
+  if (!isNil(isOpaque)) {
+    return isOpaque
+  }
 
   const shared = opacityInFlight.get(upload.id)
 
-  if (shared) return shared
+  if (shared) {
+    return shared
+  }
 
   const task = statsOpaque(source)
     .then(async (isOpaque) => {
@@ -258,58 +276,11 @@ async function opacityFor(upload: UploadItem, source: string): Promise<boolean> 
 async function statsOpaque(source: string): Promise<boolean> {
   const meta = await sharp(source).metadata()
 
-  if (!meta.hasAlpha) return true
+  if (!meta.hasAlpha) {
+    return true
+  }
 
   return (await sharp(source, { pages: 1 }).stats()).isOpaque
 }
 
 const base64Bytes = (bytes: number): number => Math.ceil(bytes / 3) * 4
-
-/** Average of opaque pixels that touch transparency, at 256 px preview. */
-async function flattenColor(source: string): Promise<FlattenColor> {
-  const { data, info } = await sharp(source, { pages: 1 })
-    .rotate()
-    .resize({ width: 256, height: 256, fit: 'inside', withoutEnlargement: true })
-    .ensureAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true })
-  const { width, height } = info
-  const channels = info.channels
-  let red = 0
-  let green = 0
-  let blue = 0
-  let count = 0
-
-  const alphaAt = (x: number, y: number): number => {
-    if (x < 0 || y < 0 || x >= width || y >= height) return 0
-
-    return data[(y * width + x) * channels + 3]
-  }
-  const touchesTransparency = (x: number, y: number): boolean =>
-    alphaAt(x - 1, y) < 255 ||
-    alphaAt(x + 1, y) < 255 ||
-    alphaAt(x, y - 1) < 255 ||
-    alphaAt(x, y + 1) < 255
-
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
-      const index = (y * width + x) * channels
-
-      if (data[index + 3] !== 255) continue
-
-      if (!touchesTransparency(x, y)) continue
-
-      red += data[index]
-      green += data[index + 1]
-      blue += data[index + 2]
-      count += 1
-    }
-  }
-
-  if (count === 0) return FALLBACK_BACKGROUND
-
-  const luminance =
-    (0.2126 * (red / count) + 0.7152 * (green / count) + 0.0722 * (blue / count)) / 255
-
-  return luminance > FLATTEN_LUMINANCE ? FLATTEN_LIGHT : FALLBACK_BACKGROUND
-}

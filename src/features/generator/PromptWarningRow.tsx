@@ -13,8 +13,11 @@ interface PromptWarningRowProps {
 /** One warning row: plain text or a button that focuses its slot. */
 export function PromptWarningRow(props: PromptWarningRowProps) {
   const { issue, onSelect } = props
+
   const handleSelect = useCallback((): void => {
-    if (issue.type !== 'text') onSelect(issue.slot)
+    if (issue.type !== 'text') {
+      onSelect(issue.slot)
+    }
   }, [issue, onSelect])
 
   if (issue.type === 'text') {

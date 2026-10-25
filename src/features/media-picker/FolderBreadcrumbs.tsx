@@ -15,6 +15,7 @@ export interface FolderBreadcrumbsProps {
 export function FolderBreadcrumbs(props: FolderBreadcrumbsProps) {
   const { folderName, sub, onNavigate: handleNavigate } = props
   const segments = sub.split('/').filter(Boolean)
+
   const handleRoot = useCallback(() => handleNavigate(''), [handleNavigate])
 
   return (

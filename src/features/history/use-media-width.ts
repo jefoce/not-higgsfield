@@ -9,7 +9,9 @@ export function useMediaWidth(ref: RefObject<HTMLDivElement | null>): number {
   useEffect(() => {
     const node = ref.current
 
-    if (!node) return
+    if (!node) {
+      return
+    }
 
     const observer = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width))
 

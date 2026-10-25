@@ -24,9 +24,11 @@ export function useVideoFullscreen(
 
   const toggleFullscreen = () => {
     const node = rootRef.current
+
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- webkitEnterFullscreen missing from lib.dom
     const video = videoRef.current as
       (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null
+
     const run = async () => {
       try {
         if (document.fullscreenElement) {

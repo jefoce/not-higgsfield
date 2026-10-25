@@ -27,6 +27,7 @@ export function PickerTabs(props: PickerTabsProps) {
     onDisconnectFolder: handleDisconnectFolder,
     onClose: handleClose,
   } = props
+
   const handleUploadsTab = useCallback(() => handleTabChange('uploads'), [handleTabChange])
 
   return (

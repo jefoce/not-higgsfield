@@ -61,21 +61,28 @@ export async function uploadUrls(params: UploadUrlsParams): Promise<void> {
   const { id, uploads, transports, signal } = params
   const targets = Object.values(uploads).filter((upload) => transports[upload.id] === 'url')
 
-  if (targets.length === 0) return
+  if (targets.length === 0) {
+    return
+  }
 
   const total = sumBy(targets, 'sizeBytes')
   const sentBy = new Map<string, number>()
   let lastWrite = 0
+
   const report = (shouldForce = false): void => {
     const now = Date.now()
 
-    if (!shouldForce && now - lastWrite < 1000) return
+    if (!shouldForce && now - lastWrite < 1000) {
+      return
+    }
 
     lastWrite = now
     const sent = sumBy(targets, (upload) => Math.min(sentBy.get(upload.id) ?? 0, upload.sizeBytes))
     let progress = 99
 
-    if (total !== 0) progress = Math.min(99, Math.round((sent / total) * 100))
+    if (total !== 0) {
+      progress = Math.min(99, Math.round((sent / total) * 100))
+    }
 
     void saveProgress(id, progress).catch((error) =>
       console.error(`[not-higgsfield] submit progress failed for ${id}`, error),
@@ -84,6 +91,7 @@ export async function uploadUrls(params: UploadUrlsParams): Promise<void> {
 
   for (const group of chunk(targets, 2)) {
     throwIfStopped(signal)
+
     await Promise.all(
       group.map(async (upload) => {
         const saved = await ensureRemote({
@@ -107,6 +115,7 @@ export async function uploadUrls(params: UploadUrlsParams): Promise<void> {
 export async function buildMedia(params: BuildMediaParams): Promise<BuiltMedia> {
   const { uploads, transports, preset } = params
   const items = Object.values(uploads)
+
   const remote = await Promise.all(
     items
       .filter((upload) => transports[upload.id] === 'url')
@@ -117,7 +126,9 @@ export async function buildMedia(params: BuildMediaParams): Promise<BuiltMedia> 
         bytes: 0,
       })),
   )
+
   const inline = items.filter((upload) => transports[upload.id] !== 'url')
+
   const others = await Promise.all(
     inline
       .filter((upload) => upload.kind !== 'image')
@@ -127,18 +138,21 @@ export async function buildMedia(params: BuildMediaParams): Promise<BuiltMedia> 
         return { id: upload.id, kind: upload.kind, url, bytes }
       }),
   )
+
   const { plan, media: images } = await encodeImages({
     uploads: inline.filter((upload) => upload.kind === 'image'),
     preset,
     budgetBytes: IMAGE_BUDGET,
     baseBytes: sumBy(others, 'bytes'),
   })
+
   const encoded = Object.entries(images).map(([id, image]) => ({
     id,
     kind: 'image' as const,
     url: image.url,
     bytes: image.bytes,
   }))
+
   const entries = [...remote, ...others, ...encoded]
   const media = Object.fromEntries(entries.map(({ id, kind, url }) => [id, { id, kind, url }]))
 
@@ -147,7 +161,9 @@ export async function buildMedia(params: BuildMediaParams): Promise<BuiltMedia> 
 
 /** Stores the encoding actually sent for each image. */
 export async function recordSent(id: string, plan: ReferencePlan): Promise<void> {
-  if (plan.images.length === 0) return
+  if (plan.images.length === 0) {
+    return
+  }
 
   const sent = new Map(plan.images.map((image) => [image.id, image]))
 
@@ -157,7 +173,9 @@ export async function recordSent(id: string, plan: ReferencePlan): Promise<void>
       Object.entries(record.inputsSnapshot).map(([key, item]) => {
         const image = sent.get(key)
 
-        if (!image) return [key, item]
+        if (!image) {
+          return [key, item]
+        }
 
         return [
           key,
@@ -183,15 +201,19 @@ export async function send(params: SendParams): Promise<SubmitResponse> {
   } catch (error) {
     const hasUrlInputs = Object.values(transports).includes('url')
 
-    if (!shouldRetryAsBase64({ error, hasUrlInputs, fitsBase64: true })) throw error
+    if (!shouldRetryAsBase64({ error, hasUrlInputs, fitsBase64: true })) {
+      throw error
+    }
 
     const retry = await buildMedia({ uploads, transports: base64Only(transports), preset }).catch(
       () => null,
     )
+
     const canFitBase64 = !isNil(retry) && retry.encodedBytes <= LIMIT_BYTES
 
-    if (!retry || !shouldRetryAsBase64({ error, hasUrlInputs, fitsBase64: canFitBase64 }))
+    if (!retry || !shouldRetryAsBase64({ error, hasUrlInputs, fitsBase64: canFitBase64 })) {
       throw error
+    }
 
     await markBase64(record.id)
     console.warn(`[not-higgsfield] retrying submit as base64 for ${record.id}`)
@@ -202,7 +224,9 @@ export async function send(params: SendParams): Promise<SubmitResponse> {
 
 async function saveProgress(id: string, progress: number): Promise<void> {
   await updateSubmit(id, (record) => {
-    if (record.submit?.stage !== 'uploading') return null
+    if (record.submit?.stage !== 'uploading') {
+      return null
+    }
 
     return { ...record, submit: { ...record.submit, progress } }
   })
@@ -211,6 +235,7 @@ async function saveProgress(id: string, progress: number): Promise<void> {
 async function markBase64(id: string): Promise<void> {
   await updateSubmit(id, (record) => {
     const transport = { transport: 'base64' as const }
+
     const inputsSnapshot = Object.fromEntries(
       Object.entries(record.inputsSnapshot).map(([key, item]) => [key, { ...item, ...transport }]),
     )

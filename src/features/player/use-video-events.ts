@@ -19,7 +19,9 @@ export function useVideoEvents(params: UseVideoEventsParams): void {
   useEffect(() => {
     const video = videoRef.current
 
-    if (!isActive || !video) return
+    if (!isActive || !video) {
+      return
+    }
 
     onTime(0)
     onDuration(0)
@@ -27,8 +29,11 @@ export function useVideoEvents(params: UseVideoEventsParams): void {
     onMuted(video.muted)
 
     const syncTime = () => onTime(video.currentTime)
+
     const syncDuration = () => onDuration(Number.isFinite(video.duration) ? video.duration : 0)
+
     const syncPaused = () => onPaused(video.paused)
+
     const syncMuted = () => onMuted(video.muted)
 
     video.addEventListener('timeupdate', syncTime)

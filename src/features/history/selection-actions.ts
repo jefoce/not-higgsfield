@@ -16,7 +16,9 @@ export async function downloadSelected(selected: GenerationRecord[]): Promise<vo
     if (selected.length === 1) {
       const isSaved = await platform.saveVideo(selected[0])
 
-      if (!isSaved) return
+      if (!isSaved) {
+        return
+      }
 
       toast.success('Video saved')
 
@@ -25,7 +27,9 @@ export async function downloadSelected(selected: GenerationRecord[]): Promise<vo
 
     const result = await platform.saveVideos(selected)
 
-    if (result.saved === 0) return
+    if (result.saved === 0) {
+      return
+    }
 
     if (!isNil(result.folder) && result.folder !== '') {
       toast.success(`${pluralVideos(result.saved)} saved to ${result.folder}`)
@@ -69,6 +73,7 @@ export async function deleteSelected(selected: GenerationRecord[]): Promise<void
     selected.map((record) => record.id),
     { action: 'delete' },
   )
+
   const skippedActive = result.skipped.filter((item) => item.reason === 'active').length
   const skippedText = `${skippedActive} still generating ${skippedActive === 1 ? 'was' : 'were'} skipped`
 

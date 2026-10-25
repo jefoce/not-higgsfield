@@ -23,7 +23,9 @@ const SIZES = {
 
 const PRICING = videoTokenPricing({
   key: ({ audio: hasAudio, hasVideoInput: hasVideo }) => {
-    if (hasVideo) return 'video_tokens_with_video_input'
+    if (hasVideo) {
+      return 'video_tokens_with_video_input'
+    }
 
     return hasAudio ? 'video_tokens' : 'video_tokens_without_audio'
   },

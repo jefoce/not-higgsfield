@@ -29,11 +29,15 @@ export function referenceVideoSeconds(params: ReferenceVideoSecondsParams): numb
 export function durationLimitFor(params: ReferenceDurationLimitParams): number {
   const { references, uploads, preset } = params
 
-  if (isNil(preset.maxInputPlusOutputSec)) return preset.duration.max
+  if (isNil(preset.maxInputPlusOutputSec)) {
+    return preset.duration.max
+  }
 
   const total = referenceVideoSeconds({ references, uploads })
 
-  if (total === 0 || Number.isNaN(total)) return preset.duration.max
+  if (total === 0 || Number.isNaN(total)) {
+    return preset.duration.max
+  }
 
   const room = Math.floor(preset.maxInputPlusOutputSec - total)
 
@@ -50,11 +54,15 @@ interface MaxDurationForParams {
 export function maxDurationFor(params: MaxDurationForParams): number {
   const { input, uploads, preset } = params
 
-  if (isNil(preset.maxInputPlusOutputSec)) return preset.duration.max
+  if (isNil(preset.maxInputPlusOutputSec)) {
+    return preset.duration.max
+  }
 
   let references: string[] = []
 
-  if (input.tab === 'references') references = input.references
+  if (input.tab === 'references') {
+    references = input.references
+  }
 
   return durationLimitFor({ references, uploads, preset })
 }

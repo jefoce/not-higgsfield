@@ -35,12 +35,16 @@ export function MediaTileAudio(props: MediaTileAudioProps) {
   const playedRatio = !isNil(elapsed) && total > 0 ? elapsed / total : 0
   const played = Math.min(1, playedRatio)
   const badgeOffset = item.source === 'link' || isMissing ? 'pt-6' : ''
+
   const handleAudioClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()
 
-      if (isAudioPlaying) pauseAudio()
-      else playAudio(audioSrc)
+      if (isAudioPlaying) {
+        pauseAudio()
+      } else {
+        playAudio(audioSrc)
+      }
     },
     [isAudioPlaying, audioSrc],
   )

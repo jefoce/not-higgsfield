@@ -32,6 +32,7 @@ export function jsonDirStore<T extends { id: string }>(
   params: JsonDirStoreParams,
 ): JsonDirStore<T> {
   const { key, dir, fileOf } = params
+
   const state = globalState<IndexState<T>>(key, () => ({
     map: new Map(),
     dirMtimeMs: -1,
@@ -47,9 +48,12 @@ export function jsonDirStore<T extends { id: string }>(
   async function load(): Promise<Map<string, T>> {
     const mtimeMs = await dirMtime()
 
-    if (state.loaded && state.dirMtimeMs === mtimeMs) return state.map
+    if (state.loaded && state.dirMtimeMs === mtimeMs) {
+      return state.map
+    }
 
     const names = await listJsonFileNames(dir)
+
     const records: (T | null)[] = await Promise.all(
       names.map((name) => readJson<T>(path.join(dir, name))),
     )
@@ -57,6 +61,7 @@ export function jsonDirStore<T extends { id: string }>(
     state.map = new Map(
       records.filter((record): record is T => !isNil(record)).map((record) => [record.id, record]),
     )
+
     state.dirMtimeMs = mtimeMs
     state.loaded = true
 
@@ -64,7 +69,9 @@ export function jsonDirStore<T extends { id: string }>(
   }
 
   async function refreshMtime(): Promise<void> {
-    if (!state.loaded) return
+    if (!state.loaded) {
+      return
+    }
 
     state.dirMtimeMs = await dirMtime()
   }
@@ -76,11 +83,15 @@ export function jsonDirStore<T extends { id: string }>(
     async get(id) {
       const cached = state.loaded ? state.map.get(id) : undefined
 
-      if (cached) return cached
+      if (cached) {
+        return cached
+      }
 
       const record = await readJson<T>(fileOf(id))
 
-      if (record) state.map.set(id, record)
+      if (record) {
+        state.map.set(id, record)
+      }
 
       return record
     },

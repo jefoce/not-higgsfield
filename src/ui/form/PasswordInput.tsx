@@ -14,6 +14,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
     const { className, disabled: isDisabled, value, ...rest } = props
     const [isRevealed, setIsRevealed] = useState(false)
     const isValueEmpty = isNil(value) || value === ''
+
     const handleToggleRevealed = useCallback(() => setIsRevealed((isCurrent) => !isCurrent), [])
 
     return (

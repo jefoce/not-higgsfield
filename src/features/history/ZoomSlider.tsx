@@ -12,6 +12,7 @@ import { useHistoryViewStore } from './view-store'
 export function ZoomSlider() {
   const zoom = useHistoryViewStore((state) => state.zoom)
   const handleZoomChange = useHistoryViewStore((state) => state.setZoom)
+
   const handleReset = useCallback(() => handleZoomChange(ZOOM_DEFAULT), [handleZoomChange])
 
   return (

@@ -19,6 +19,7 @@ interface SliderProps {
 /** Single-value ranged slider with neutral track. */
 export function Slider(props: SliderProps) {
   const { value, onValueChange, min, max, step = 1, className, ariaLabel, name } = props
+
   const handleValueChange = useCallback(
     ([nextValue]: number[]) => onValueChange(nextValue),
     [onValueChange],

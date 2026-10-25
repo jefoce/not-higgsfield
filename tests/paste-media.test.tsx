@@ -57,6 +57,7 @@ afterEach(cleanup)
 describe('usePasteMedia', () => {
   it('uploads accepted files and reports skipped ones', () => {
     const onFiles = vi.fn()
+
     const view = render(
       <Harness options={{ kinds: () => ['image'], onFiles, onUploaded: vi.fn() }} />,
     )
@@ -73,6 +74,7 @@ describe('usePasteMedia', () => {
   it('links an absolute media path pasted as text', async () => {
     vi.mocked(linkAbsPath).mockResolvedValue(video)
     const onUploaded = vi.fn()
+
     const view = render(
       <Harness options={{ kinds: () => ['video'], onFiles: vi.fn(), onUploaded }} />,
     )
@@ -87,6 +89,7 @@ describe('usePasteMedia', () => {
 
   it('ignores a paste inside a text input', () => {
     const onFiles = vi.fn()
+
     const view = render(
       <Harness options={{ kinds: () => ['image'], onFiles, onUploaded: vi.fn() }} />,
     )
@@ -101,6 +104,7 @@ describe('usePasteMedia', () => {
 
   it('ignores text pasted into the prompt editor', () => {
     const onFiles = vi.fn()
+
     const view = render(
       <Harness options={{ kinds: () => ['image'], onFiles, onUploaded: vi.fn() }} />,
     )
@@ -115,6 +119,7 @@ describe('usePasteMedia', () => {
 
   it('handles files pasted into the prompt editor', () => {
     const onFiles = vi.fn()
+
     const view = render(
       <Harness options={{ kinds: () => ['image'], onFiles, onUploaded: vi.fn() }} />,
     )

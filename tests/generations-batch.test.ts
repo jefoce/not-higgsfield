@@ -87,6 +87,7 @@ describe('POST /api/generations/batch', () => {
     const response = await POST(
       batchRequest({ action: 'favorite', ids: [first.id, second.id], favorite: true }),
     )
+
     const body = (await response.json()) as { done: string[]; skipped: unknown[] }
 
     expect(response.status).toBe(200)
@@ -105,6 +106,7 @@ describe('POST /api/generations/batch', () => {
     await write(active)
 
     const response = await POST(batchRequest({ action: 'delete', ids: [done.id, active.id] }))
+
     const body = (await response.json()) as {
       done: string[]
       skipped: { id: string; reason: string }[]

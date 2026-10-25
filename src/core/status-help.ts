@@ -108,9 +108,13 @@ const STATUS_KEYS: Record<GenerationRecord['status'], StatusHelpKey> = {
 export function statusHelpKey(
   record: Pick<GenerationRecord, 'status' | 'submit' | 'download'>,
 ): StatusHelpKey {
-  if (record.download) return 'downloading'
+  if (record.download) {
+    return 'downloading'
+  }
 
-  if (record.status !== 'submitting') return STATUS_KEYS[record.status]
+  if (record.status !== 'submitting') {
+    return STATUS_KEYS[record.status]
+  }
 
   const stage = record.submit?.stage
 

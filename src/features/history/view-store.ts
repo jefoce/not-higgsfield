@@ -61,6 +61,7 @@ export function countActiveFilters(filters: ViewFilters): number {
 
     return Boolean(value) && value !== fallback
   })
+
   const favorites = filters.favorite === true ? 1 : 0
   const query = Boolean(filters.q?.trim()) ? 1 : 0
 

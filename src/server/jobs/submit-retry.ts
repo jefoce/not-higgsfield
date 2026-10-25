@@ -14,11 +14,17 @@ interface ShouldRetryAsBase64Params {
 export function shouldRetryAsBase64(params: ShouldRetryAsBase64Params): boolean {
   const { error, hasUrlInputs, fitsBase64: canFitBase64 } = params
 
-  if (!hasUrlInputs || !canFitBase64) return false
+  if (!hasUrlInputs || !canFitBase64) {
+    return false
+  }
 
-  if (!(error instanceof OpenRouterError)) return false
+  if (!(error instanceof OpenRouterError)) {
+    return false
+  }
 
-  if (error.status !== 400 && error.status !== 422) return false
+  if (error.status !== 400 && error.status !== 422) {
+    return false
+  }
 
   return PROVIDER_URL_ERROR.test(error.message)
 }

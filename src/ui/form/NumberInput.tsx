@@ -22,7 +22,9 @@ interface NumberInputProps extends Omit<InputProps, 'value' | 'onChange' | 'type
 const format = (value: number | null): string => (isNil(value) ? '' : String(value))
 
 const parse = (text: string): number | null => {
-  if (text.trim() === '') return null
+  if (text.trim() === '') {
+    return null
+  }
 
   const value = Number(text)
 
@@ -36,7 +38,9 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     const [draft, setDraft] = useState(format(value))
 
     useEffect(() => {
-      if (parse(draft) !== value) setDraft(format(value))
+      if (parse(draft) !== value) {
+        setDraft(format(value))
+      }
     }, [value, draft])
 
     const commit = useCallback(() => {
@@ -54,6 +58,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       onValueChange(next)
       setDraft(String(next))
     }, [draft, max, min, onValueChange])
+
     const handleChange = useCallback(
       (event: ChangeEvent<HTMLInputElement>) => {
         setDraft(event.target.value)
@@ -61,6 +66,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       },
       [onValueChange],
     )
+
     const handleBlur = useCallback(
       (event: FocusEvent<HTMLInputElement>) => {
         commit()

@@ -20,6 +20,7 @@ import { usePanelPrice } from './use-panel-price'
 import { usePanelPaste, useUploadsRefresh } from './use-panel-uploads'
 
 const noop = (): void => {}
+
 const emptySubscribe = () => noop
 
 function handleOpenSettings(): void {
@@ -33,6 +34,7 @@ export function GeneratorPanel() {
   const { handlePaste } = usePanelPaste()
   const { price, listPrice, discount, isLoading: isPriceLoading } = usePanelPrice()
   const { generate, isGenerating } = useGenerate()
+
   const isMounted = useSyncExternalStore(
     emptySubscribe,
     () => true,
@@ -42,10 +44,14 @@ export function GeneratorPanel() {
   useUploadsRefresh()
 
   const handleSubmit = useCallback((): void => {
-    if (validation.ok) void generate()
+    if (validation.ok) {
+      void generate()
+    }
   }, [validation.ok, generate])
 
-  if (!isMounted) return <div className="h-full" />
+  if (!isMounted) {
+    return <div className="h-full" />
+  }
 
   return (
     <div

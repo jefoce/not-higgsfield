@@ -37,11 +37,17 @@ export class ValidationError extends Error {
 export function assertLocalRequest(request: Request, opts: { session?: boolean } = {}): void {
   const host = request.headers.get('host') ?? ''
 
-  if (!LOCAL_HOSTS.has(host.replace(/:\d+$/, ''))) throw new HttpError(403, 'Forbidden host')
+  if (!LOCAL_HOSTS.has(host.replace(/:\d+$/, ''))) {
+    throw new HttpError(403, 'Forbidden host')
+  }
 
-  if (isWrite(request)) assertSameOrigin(request)
+  if (isWrite(request)) {
+    assertSameOrigin(request)
+  }
 
-  if (opts.session !== false && !hasSession(request)) throw new HttpError(401, 'No session')
+  if (opts.session !== false && !hasSession(request)) {
+    throw new HttpError(401, 'No session')
+  }
 }
 
 function isWrite(request: Request): boolean {

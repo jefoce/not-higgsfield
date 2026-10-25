@@ -15,15 +15,21 @@ export async function POST(request: Request) {
     const body = await readJsonBody(request)
     const presetId = PresetIdSchema.safeParse(body)
 
-    if (!presetId.success) return zodError(presetId.error)
+    if (!presetId.success) {
+      return zodError(presetId.error)
+    }
 
     const preset = findPreset(presetId.data.presetId)
 
-    if (!preset) return jsonError({ status: 400, error: 'Unknown model' })
+    if (!preset) {
+      return jsonError({ status: 400, error: 'Unknown model' })
+    }
 
     const input = buildPriceInputSchema(preset).safeParse(body)
 
-    if (!input.success) return zodError(input.error)
+    if (!input.success) {
+      return zodError(input.error)
+    }
 
     const draft = await loadPriceDraft(input.data)
 

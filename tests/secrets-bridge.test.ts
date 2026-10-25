@@ -22,6 +22,7 @@ interface SentLine {
 function setup(timeoutMs = 1_000) {
   const input = new PassThrough()
   const sent: string[] = []
+
   const backend = bridgeBackend({
     input,
     output: {
@@ -40,7 +41,9 @@ function setup(timeoutMs = 1_000) {
 function request(sent: string[]): SentLine {
   const line = sent.at(-1)
 
-  if (isNil(line) || line === '') throw new Error('no request written')
+  if (isNil(line) || line === '') {
+    throw new Error('no request written')
+  }
 
   expect(line.startsWith(BRIDGE_PREFIX)).toBe(true)
 
@@ -89,6 +92,7 @@ describe('secrets bridge', () => {
     const line = request(sent)
 
     expect(line).toMatchObject({ op: 'getAll', name: '' })
+
     reply(input, {
       id: line.id,
       ok: true,
@@ -115,6 +119,7 @@ describe('secrets bridge failures', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
     const input = new PassThrough()
     const sent: string[] = []
+
     const backend = bridgeBackend({
       input,
       output: {
@@ -137,6 +142,7 @@ describe('secrets bridge failures', () => {
 
     expect(secretStatus().loadError).toBe('Keychain access was denied or timed out')
     expect(secretStatus().keys.OPENROUTER_API_KEY.set).toBe(false)
+
     await expect(setSecrets({ OPENROUTER_API_KEY: 'abc12345' })).rejects.toMatchObject({
       status: 409,
       message: 'Keychain not loaded',

@@ -10,7 +10,7 @@ import { isOwnEvent } from '@/lib/events'
 import { CardActions } from './CardActions'
 import { DetailsPanel } from './DetailsPanel'
 import { cancelGeneration } from './record-actions'
-import { isSelectable, posterSrc, videoSrc } from './record-view'
+import { isSelectable, posterForWidth, videoSrc } from './record-view'
 import { SelectionCheckbox } from './SelectionCheckbox'
 import { StatusOverlay } from './StatusOverlay'
 import { useMediaWidth } from './use-media-width'
@@ -31,28 +31,34 @@ export function HistoryRow(props: HistoryRowProps) {
   const videoShare = listVideoShare(zoom)
   const mediaRef = useRef<HTMLDivElement>(null)
   const mediaWidth = useMediaWidth(mediaRef)
-  const deviceDpr = typeof window === 'undefined' ? 1 : window.devicePixelRatio
-  const dpr = Math.max(deviceDpr, 1)
-  const posterWidth = mediaWidth > 0 ? Math.ceil((mediaWidth * dpr) / 80) * 80 : undefined
-  const poster = posterSrc(record, posterWidth)
+  const poster = posterForWidth(record, mediaWidth)
   const { selected: isSelected, selecting: isSelecting, select } = useSelectionItem(record.id)
   const canSelect = isSelectable(record)
+
   const handleSelect = useCallback(
     (event: MouseEvent<HTMLDivElement>) => {
-      if (!isOwnEvent(event)) return
+      const isRowClick =
+        isOwnEvent(event) && !(event.target as HTMLElement).closest('button, a, input')
 
-      if ((event.target as HTMLElement).closest('button, a, input')) return
+      if (!isRowClick) {
+        return
+      }
 
       if (event.shiftKey) {
-        if (canSelect) select(true)
+        if (canSelect) {
+          select(true)
+        }
 
         return
       }
 
-      if (isSelecting && !isSelected && canSelect) select(false)
+      if (isSelecting && !isSelected && canSelect) {
+        select(false)
+      }
     },
     [canSelect, isSelecting, isSelected, select],
   )
+
   const handleCancel = useCallback(() => void cancelGeneration(record.id), [record.id])
 
   return (

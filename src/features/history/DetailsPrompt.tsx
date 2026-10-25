@@ -25,6 +25,7 @@ async function copyText(text: string, label: string): Promise<void> {
 /** Prompt block with its copy button. */
 export function DetailsPrompt(props: DetailsPromptProps) {
   const { record, plain } = props
+
   const handleCopyPrompt = useCallback(() => void copyText(plain, 'Prompt'), [plain])
 
   return (

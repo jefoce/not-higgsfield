@@ -33,12 +33,16 @@ export function AudioReference(props: AudioReferenceProps) {
   const total = upload.durationSec ?? (currentSrc() === src ? currentDuration() : 0)
   const played = !isNil(elapsed) && total > 0 ? elapsed / total : 0
   const bars = waveBars(upload.originalName, AUDIO_BARS)
+
   const handleTogglePlay = useCallback(
     (event: MouseEvent<HTMLButtonElement>): void => {
       event.stopPropagation()
 
-      if (isPlaying) pauseAudio()
-      else playAudio(src)
+      if (isPlaying) {
+        pauseAudio()
+      } else {
+        playAudio(src)
+      }
     },
     [isPlaying, src],
   )

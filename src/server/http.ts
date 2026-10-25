@@ -21,23 +21,29 @@ interface JsonErrorParams {
 export function jsonError(params: JsonErrorParams): Response {
   const { status, error, details } = params
 
-  if (!isNil(details) && details.length > 0) return Response.json({ error, details }, { status })
+  if (!isNil(details) && details.length > 0) {
+    return Response.json({ error, details }, { status })
+  }
 
   return Response.json({ error }, { status })
 }
 
 /** Maps known server errors to responses. Unknown errors are logged, never exposed. */
 export function errorResponse(error: unknown): Response {
-  if (error instanceof HttpError) return jsonError({ status: error.status, error: error.message })
+  if (error instanceof HttpError) {
+    return jsonError({ status: error.status, error: error.message })
+  }
 
-  if (error instanceof ValidationError)
+  if (error instanceof ValidationError) {
     return jsonError({ status: 400, error: error.message, details: error.errors })
+  }
 
-  if (error instanceof OpenRouterError)
+  if (error instanceof OpenRouterError) {
     return jsonError({
       status: error.status === 0 || Number.isNaN(error.status) ? 502 : error.status,
       error: error.message,
     })
+  }
 
   console.error('[not-higgsfield] unhandled route error', error)
 
@@ -57,7 +63,9 @@ export function zodError(error: ZodError): Response {
 
 /** Keeps known media kinds from a comma-separated query value. */
 export function parseKinds(value: string | null): MediaKind[] {
-  if (isNil(value) || value === '') return []
+  if (isNil(value) || value === '') {
+    return []
+  }
 
   const wanted = new Set(value.split(',').map((part) => part.trim()))
 

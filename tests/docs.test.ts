@@ -16,7 +16,9 @@ function tableRows(markdown: string, heading: string): string[][] {
   const lines = markdown.split('\n')
   const start = lines.findIndex((line) => line.trim() === `## ${heading}`)
 
-  if (start === -1) throw new Error(`Missing section: ${heading}`)
+  if (start === -1) {
+    throw new Error(`Missing section: ${heading}`)
+  }
 
   const rest = lines.slice(start + 1)
   const end = rest.findIndex((line) => line.startsWith('## '))
@@ -114,10 +116,13 @@ describe('documentation tables', () => {
     for (const [title, duration, resolutions, references] of rows) {
       const preset = MODEL_PRESETS.find((item) => item.title === title)
 
-      if (!preset) throw new Error(`Unknown model: ${title}`)
+      if (!preset) {
+        throw new Error(`Unknown model: ${title}`)
+      }
 
       expect(duration, title).toBe(`${preset.duration.min}-${preset.duration.max} s`)
       expect(resolutions, title).toBe(preset.resolutions.join(', '))
+
       expect(references, title).toBe(
         `${preset.references.image} / ${preset.references.video} / ${preset.references.audio}`,
       )
@@ -126,6 +131,7 @@ describe('documentation tables', () => {
 
   it('keeps the Higgsfield trademark disclaimer', () => {
     const readme = fs.readFileSync(file('README.md'), 'utf8').replaceAll(/\s+/g, ' ')
+
     const disclaimer =
       '"Higgsfield" is a trademark of its respective owner. This project is independent and is not affiliated with, sponsored by, or endorsed by Higgsfield AI. The name is used only to describe this app as an alternative.'
 
@@ -147,11 +153,15 @@ describe('documentation tables', () => {
       for (const match of source.matchAll(/!?\[[^\]]*\]\(([^)\s]+)\)/g)) {
         const target = match[1]
 
-        if (/^(https?:|mailto:|#)/.test(target)) continue
+        if (/^(https?:|mailto:|#)/.test(target)) {
+          continue
+        }
 
         const clean = target.split('#')[0].split('?')[0]
 
-        if (clean === '') continue
+        if (clean === '') {
+          continue
+        }
 
         const resolved = path.resolve(path.dirname(file(rel)), clean)
 

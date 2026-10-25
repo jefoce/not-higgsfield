@@ -56,6 +56,7 @@ function folderPreviewItem(params: FolderPreviewItemParams): PreviewItem {
 export function FolderTab(props: FolderTabProps) {
   const { folderId, folderName, kinds, max, extensions, sub, selectedRels } = props
   const { onPickFile, onNavigate: handleNavigate, onToggleFile } = props
+
   const handleSelectFile = useCallback(
     (rel: string) => {
       if (max === 1) {
@@ -70,10 +71,13 @@ export function FolderTab(props: FolderTabProps) {
   )
 
   const [broken, setBroken] = useState<string[]>([])
+
   const { data, isLoading } = useSWR(['folder-files', folderId, sub, kinds], () =>
     fetchFolderFiles({ folderId, sub, kinds }),
   )
+
   const dirs = data?.dirs ?? []
+
   const files = (data?.files ?? []).filter((file) =>
     extensionAllowed({ kind: file.kind, ext: extWithDot(file.name), extensions }),
   )

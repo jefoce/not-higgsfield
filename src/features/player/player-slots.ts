@@ -10,11 +10,15 @@ const listeners = new Set<() => void>()
 export function acquire(id: string) {
   const next = [...active.filter((x) => x !== id), id]
 
-  while (next.length > MAX_ACTIVE) next.shift()
+  while (next.length > MAX_ACTIVE) {
+    next.shift()
+  }
 
   const isUnchanged = next.length === active.length && next.every((x, i) => x === active[i])
 
-  if (isUnchanged) return
+  if (isUnchanged) {
+    return
+  }
 
   active = next
   emit()
@@ -22,7 +26,9 @@ export function acquire(id: string) {
 
 /** Drops id from the active set, no-op when absent. */
 export function release(id: string) {
-  if (!active.includes(id)) return
+  if (!active.includes(id)) {
+    return
+  }
 
   active = active.filter((x) => x !== id)
   emit()
@@ -45,5 +51,7 @@ export function getSnapshot() {
 }
 
 function emit() {
-  for (const fn of listeners) fn()
+  for (const fn of listeners) {
+    fn()
+  }
 }

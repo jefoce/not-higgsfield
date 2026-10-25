@@ -4,7 +4,9 @@ const cache = new Map<string, boolean>()
 
 /** Browser support for a media MIME type. SSR stays optimistic. */
 export function canPlay(mime: string): boolean {
-  if (typeof document === 'undefined') return true
+  if (typeof document === 'undefined') {
+    return true
+  }
 
   let isSupported = cache.get(mime)
 

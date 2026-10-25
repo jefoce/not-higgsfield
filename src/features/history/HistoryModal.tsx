@@ -23,11 +23,15 @@ interface HistoryModalProps {
 /** Centered grid preview: 16:9 player left, details panel right. */
 export function HistoryModal(props: HistoryModalProps) {
   const { record, open: isOpen, onOpenChange: handleOpenChange, onDeleted } = props
+
   const handleCancel = useCallback(() => {
-    if (isNil(record)) return
+    if (isNil(record)) {
+      return
+    }
 
     void cancelGeneration(record.id)
   }, [record])
+
   const handleDeleted = useCallback(() => {
     handleOpenChange(false)
     onDeleted?.()

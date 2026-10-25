@@ -44,19 +44,25 @@ export function useHistoryPoll(params: HistoryPollParams): void {
   }, [records])
 
   useEffect(() => {
-    if (activeCount <= 0) return
+    if (activeCount <= 0) {
+      return
+    }
 
     let isStopped = false
     let isRunning = false
     let lastRunAt = 0
 
     const tick = async (isForced = false) => {
-      if (isRunning || shouldSkipTick(isForced, lastRunAt)) return
+      if (isRunning || shouldSkipTick(isForced, lastRunAt)) {
+        return
+      }
 
       lastRunAt = Date.now()
       const ids = activeIds(recordsRef.current)
 
-      if (ids.length === 0) return
+      if (ids.length === 0) {
+        return
+      }
 
       isRunning = true
 
@@ -65,10 +71,17 @@ export function useHistoryPoll(params: HistoryPollParams): void {
           `/api/generations?ids=${ids.map(encodeURIComponent).join(',')}`,
         )
 
-        if (isStopped) return
+        if (isStopped) {
+          return
+        }
 
-        if (result.items.length < ids.length) void revalidateHistory() // some ids no longer exist
-        if (result.items.length === 0) return
+        if (result.items.length < ids.length) {
+          void revalidateHistory()
+        } // some ids no longer exist
+
+        if (result.items.length === 0) {
+          return
+        }
 
         const byId = new Map(result.items.map((record) => [record.id, record]))
 
@@ -85,7 +98,9 @@ export function useHistoryPoll(params: HistoryPollParams): void {
     }
 
     const onVisible = () => {
-      if (!document.hidden) void tick(true)
+      if (!document.hidden) {
+        void tick(true)
+      }
     }
 
     void tick()

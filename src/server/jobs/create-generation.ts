@@ -13,11 +13,13 @@ import { startSubmit } from './submit-queue'
 /** Validates, writes a grace record, then queues upload and submit in the background. */
 export async function createGeneration(raw: GenerationInput): Promise<GenerationRecord> {
   const { preset, input, uploads } = await loadDraft(raw)
+
   const encoded = await encodeImages({
     uploads: Object.values(uploads),
     preset,
     budgetBytes: MAX_REQUEST_MB * 1024 * 1024 - REQUEST_RESERVE_MB * 1024 * 1024,
   })
+
   const estimate = await estimateGeneration({ preset, input, uploads })
   const now = new Date().toISOString()
 
@@ -45,6 +47,7 @@ export async function createGeneration(raw: GenerationInput): Promise<Generation
       billed: null,
     },
   }
+
   const saved = await saveGeneration(record)
 
   await startSubmit(saved.id)
@@ -61,6 +64,7 @@ function snapshot(
   return Object.fromEntries(
     Object.values(uploads).map((upload) => {
       const image = sent.get(upload.id)
+
       const item: GenerationRecord['inputsSnapshot'][string] = {
         kind: upload.kind,
         originalName: upload.originalName,

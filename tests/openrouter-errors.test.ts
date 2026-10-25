@@ -89,6 +89,7 @@ describe('errorFromResponse', () => {
     expect(error.message).toBe(
       'The request failed because the input image may contain real person.',
     )
+
     expect(error.code).toBe('InputImageSensitiveContentDetected.PrivacyInformation')
     expect(error.status).toBe(400)
   })

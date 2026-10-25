@@ -110,6 +110,7 @@ describe('friendlyError Seedance', () => {
 
   it('matches specific codes before their parent code', () => {
     expect(friendlyError({ raw: REAL_PERSON, family: 'seedance' }).kind).toBe('real_person')
+
     expect(
       friendlyError({
         raw: 'InputImageSensitiveContentDetected: The request failed.',
@@ -120,12 +121,14 @@ describe('friendlyError Seedance', () => {
 
   it('keeps Seedance and Wan families isolated', () => {
     expect(friendlyError({ raw: REAL_PERSON, family: 'wan' }).kind).toBe('unknown')
+
     expect(
       friendlyError({
         raw: 'DataInspectionFailed: Output data may contain inappropriate content.',
         family: 'seedance',
       }).kind,
     ).toBe('unknown')
+
     expect(friendlyError({ raw: 'DataInspectionFailed: bad input', family: 'wan' }).kind).toBe(
       'content',
     )

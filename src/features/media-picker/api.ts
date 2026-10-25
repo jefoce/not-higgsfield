@@ -16,7 +16,9 @@ function withQuery(base: string, params: Record<string, string | undefined>): st
   const query = new URLSearchParams()
 
   for (const [key, value] of Object.entries(params)) {
-    if (!isNil(value) && value !== '') query.set(key, value)
+    if (!isNil(value) && value !== '') {
+      query.set(key, value)
+    }
   }
 
   const qs = query.toString()
@@ -48,7 +50,9 @@ export function uploadFilesWithProgress(
   const { files, onProgress, signal } = params
   const form = new FormData()
 
-  for (const file of files) form.append('file', file)
+  for (const file of files) {
+    form.append('file', file)
+  }
 
   return new Promise((resolve, reject) => {
     if (signal?.aborted === true) {
@@ -62,6 +66,7 @@ export function uploadFilesWithProgress(
     xhr.open('POST', '/api/uploads')
     xhr.responseType = 'json'
     xhr.upload.onprogress = (event) => onProgress(event.loaded, event.total)
+
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         resolve((xhr.response ?? []) as UploadItem[])
@@ -71,6 +76,7 @@ export function uploadFilesWithProgress(
 
       reject(new Error(serverErrorText(xhr)))
     }
+
     xhr.onerror = () => reject(new Error('Upload failed'))
     xhr.onabort = () => reject(new DOMException('Upload cancelled', 'AbortError'))
     signal?.addEventListener('abort', () => xhr.abort(), { once: true })
@@ -144,7 +150,9 @@ export function mediaUrl(ref: string, mime?: string): string {
   const base = `/api/media/${encodeRef(pathRef)}`
   const plainUrl = isEmpty(query) ? base : `${base}?${query}`
 
-  if (isNil(mime) || mime === '' || canPlay(mime)) return plainUrl
+  if (isNil(mime) || mime === '' || canPlay(mime)) {
+    return plainUrl
+  }
 
   const params = new URLSearchParams(query)
 
@@ -158,7 +166,9 @@ export function thumbUrl(params: ThumbUrlParams): string {
   const { ref, w = THUMB_WIDTH, version } = params
   const query = new URLSearchParams({ w: String(w) })
 
-  if (!isNil(version)) query.set('v', String(version))
+  if (!isNil(version)) {
+    query.set('v', String(version))
+  }
 
   return `/api/thumbs/${encodeRef(ref)}?${query.toString()}`
 }

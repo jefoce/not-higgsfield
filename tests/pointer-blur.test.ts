@@ -21,7 +21,9 @@ afterEach(() => {
 function mountControl(attributes: Record<string, string> = {}): HTMLElement {
   const button = document.createElement('button')
 
-  for (const [name, value] of Object.entries(attributes)) button.setAttribute(name, value)
+  for (const [name, value] of Object.entries(attributes)) {
+    button.setAttribute(name, value)
+  }
 
   document.body.append(button)
 

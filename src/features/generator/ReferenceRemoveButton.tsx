@@ -17,11 +17,14 @@ interface ReferenceRemoveButtonProps {
 /** Remove control for a reference tile, pausing its audio when playing. */
 export function ReferenceRemoveButton(props: ReferenceRemoveButtonProps) {
   const { label, audioSrc, isAudio, overlayClass, onRemove } = props
+
   const handleRemoveClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>): void => {
       event.stopPropagation()
 
-      if (isAudio && currentSrc() === audioSrc) pauseAudio()
+      if (isAudio && currentSrc() === audioSrc) {
+        pauseAudio()
+      }
 
       onRemove()
     },

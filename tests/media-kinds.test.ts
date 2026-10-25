@@ -30,6 +30,7 @@ describe('acceptFiles', () => {
       { name: 'b.gif', type: 'image/gif' },
       { name: 'c.mp4', type: 'video/mp4' },
     ]
+
     const { accepted, skipped } = acceptFiles({ files, kinds: ['image'] })
 
     expect(accepted.map((file) => file.name)).toEqual(['a.png'])
@@ -41,6 +42,7 @@ describe('acceptFiles', () => {
       { name: 'a.webm', type: 'video/webm' },
       { name: 'b.mp4', type: 'video/mp4' },
     ]
+
     const { accepted, skipped } = acceptFiles({
       files,
       kinds: ['video'],

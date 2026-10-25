@@ -72,7 +72,7 @@ function isFunctionConst(statement, wrappers) {
   return declaration.declarations.some((declarator) => isFunctionValue(declarator.init, wrappers))
 }
 
-export default {
+const paddingAroundFunctions = {
   meta: {
     type: 'layout',
     fixable: 'whitespace',
@@ -142,3 +142,5 @@ export default {
     }
   },
 }
+
+export default paddingAroundFunctions

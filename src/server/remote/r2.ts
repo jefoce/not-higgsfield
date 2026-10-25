@@ -39,7 +39,9 @@ export function createR2Store(): RemoteStore {
           serverSha256: res.ChecksumSHA256 ?? null,
         }
       } catch (error) {
-        if (isNotFound(error)) return null
+        if (isNotFound(error)) {
+          return null
+        }
 
         throw error
       }
@@ -51,7 +53,9 @@ export function createR2Store(): RemoteStore {
       const isMultipart = stats.size > PART_SIZE
       const checksum: { ChecksumSHA256?: string } = {}
 
-      if (!isMultipart) checksum.ChecksumSHA256 = opts.sha256
+      if (!isMultipart) {
+        checksum.ChecksumSHA256 = opts.sha256
+      }
 
       const upload = new Upload({
         client,
@@ -71,6 +75,7 @@ export function createR2Store(): RemoteStore {
       upload.on('httpUploadProgress', ({ loaded, total }) => {
         opts.onProgress?.(loaded ?? 0, total ?? stats.size)
       })
+
       const res = await upload.done()
 
       return { key, size: stats.size, serverSha256: res.ChecksumSHA256 ?? null }
@@ -125,6 +130,7 @@ export async function testR2(): Promise<{ ok: boolean; error?: string }> {
     await client.send(
       new PutObjectCommand({ Bucket: bucket, Key: key, Body: 'test', ContentLength: 4 }),
     )
+
     await client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }))
 
     return { ok: true }
@@ -139,7 +145,9 @@ function s3ErrorCode(error: unknown): string {
   if (isObject(error)) {
     const name = (error as { name?: unknown }).name
 
-    if (isString(name) && name !== '') return name
+    if (isString(name) && name !== '') {
+      return name
+    }
   }
 
   return 'R2 test failed'
@@ -148,13 +156,17 @@ function s3ErrorCode(error: unknown): string {
 function required(name: SecretName): string {
   const value = getSecret(name)
 
-  if (isNil(value) || value === '') throw new Error(`${name} is not set`)
+  if (isNil(value) || value === '') {
+    throw new Error(`${name} is not set`)
+  }
 
   return value
 }
 
 function isNotFound(error: unknown): boolean {
-  if (!isObject(error)) return false
+  if (!isObject(error)) {
+    return false
+  }
 
   const meta = (error as { $metadata?: { httpStatusCode?: number } }).$metadata
   const name = (error as { name?: string }).name

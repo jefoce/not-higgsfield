@@ -8,9 +8,13 @@ import { cn } from '@/lib/cn'
 import { REFERENCE_ICONS } from './reference-icons'
 
 function joinList(items: string[]): string {
-  if (items.length < 2) return items[0] ?? ''
+  if (items.length < 2) {
+    return items[0] ?? ''
+  }
 
-  if (items.length === 2) return `${items[0]} and ${items[1]}`
+  if (items.length === 2) {
+    return `${items[0]} and ${items[1]}`
+  }
 
   return `${items.slice(0, -1).join(', ')}, and ${items.at(-1)}`
 }

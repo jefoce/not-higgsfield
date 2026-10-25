@@ -24,6 +24,7 @@ export interface UploadProgressTileProps {
 export function UploadProgressTile(props: UploadProgressTileProps) {
   const { item, onRetry: handleRetry, onDismiss: handleDismiss } = props
   const hasError = !isNil(item.error) && item.error !== ''
+
   const content = hasError ? (
     <>
       <span className="line-clamp-2 text-xxs break-all text-danger">{item.file.name}</span>

@@ -51,6 +51,7 @@ export function UploadsGrid(props: UploadsGridProps) {
     onSelect,
     onDelete,
   } = props
+
   const handleRetry = onRetry
   const handleDismiss = onDismiss
   const handleUploaded = onUploaded

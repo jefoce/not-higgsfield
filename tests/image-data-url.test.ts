@@ -19,6 +19,7 @@ process.env.STORAGE_ROOT = ROOT
 
 const MB = 1024 * 1024
 const BUDGET = 64 * MB
+
 const ALPHA_PRESET: ModelPreset = {
   ...WAN_30,
   referenceLimits: {
@@ -33,16 +34,22 @@ let uploadsDir: string
 
 beforeAll(async () => {
   await fs.rm(ROOT, { recursive: true, force: true })
+
   ;({ encodeImages } = await import('@/server/media/image-data-url'))
+
   ;({ removeUpload } = await import('@/server/repos/uploads'))
+
   ;({ UPLOADS_DIR: uploadsDir } = await import('@/server/paths'))
 })
 
 afterAll(async () => {
   await fs.rm(ROOT, { recursive: true, force: true })
 
-  if (isNil(PREVIOUS_ROOT)) delete process.env.STORAGE_ROOT
-  else process.env.STORAGE_ROOT = PREVIOUS_ROOT
+  if (isNil(PREVIOUS_ROOT)) {
+    delete process.env.STORAGE_ROOT
+  } else {
+    process.env.STORAGE_ROOT = PREVIOUS_ROOT
+  }
 })
 
 async function fixture(data: Buffer, ext: '.jpg' | '.png'): Promise<UploadItem> {
@@ -98,6 +105,7 @@ function pixels(image: {
 describe('encodeImages sizing', () => {
   it('caps a 6000 px Wan image at 4096 on step 1', async () => {
     const upload = await fixture(await jpeg(6000, 4000), '.jpg')
+
     const { plan, media } = await encodeImages({
       uploads: [upload],
       preset: WAN_30,
@@ -117,6 +125,7 @@ describe('encodeImages sizing', () => {
       .withMetadata({ orientation: 6 })
       .jpeg()
       .toBuffer()
+
     const upload = await fixture(source, '.jpg')
     const { media } = await encodeImages({ uploads: [upload], preset: WAN_30, budgetBytes: BUDGET })
 
@@ -141,6 +150,7 @@ describe('encodeImages formats', () => {
     })
       .png()
       .toBuffer()
+
     const upload = await fixture(source, '.png')
     const { media } = await encodeImages({ uploads: [upload], preset: WAN_30, budgetBytes: BUDGET })
 
@@ -150,6 +160,7 @@ describe('encodeImages formats', () => {
   it('flattens a white cutout on dark and a dark cutout on white', async () => {
     const light = await fixture(await transparent({ r: 255, g: 255, b: 255 }), '.png')
     const dark = await fixture(await transparent({ r: 34, g: 34, b: 34 }), '.png')
+
     const { media } = await encodeImages({
       uploads: [light, dark],
       preset: WAN_30,
@@ -167,6 +178,7 @@ describe('encodeImages formats', () => {
 
   it('keeps PNG alpha when the preset accepts it', async () => {
     const upload = await fixture(await transparent({ r: 255, g: 255, b: 255 }), '.png')
+
     const { media } = await encodeImages({
       uploads: [upload],
       preset: ALPHA_PRESET,
@@ -189,10 +201,12 @@ describe('encodeImages formats', () => {
       .withIccProfile('p3')
       .jpeg()
       .toBuffer()
+
     const upload = await fixture(source, '.jpg')
     const { media } = await encodeImages({ uploads: [upload], preset: WAN_30, budgetBytes: BUDGET })
 
     const output = Buffer.from(media[upload.id].url.split(',')[1] ?? '', 'base64')
+
     const reference = await sharp({
       create: { width: 300, height: 200, channels: 3, background: '#f80' },
     })
@@ -225,8 +239,10 @@ describe('encodeImages limits', () => {
           .toBuffer(),
       ),
     )
+
     const uploads = await Promise.all(sources.map((source) => fixture(source, '.jpg')))
     const full = await encodeImages({ uploads, preset: WAN_30, budgetBytes: BUDGET })
+
     const tight = await encodeImages({
       uploads,
       preset: WAN_30,

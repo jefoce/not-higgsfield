@@ -14,7 +14,9 @@ interface TestMessageLineProps {
 export function TestMessageLine(props: TestMessageLineProps) {
   const { result } = props
 
-  if (!result) return null
+  if (!result) {
+    return null
+  }
 
   return <p className={`text-xxs ${MESSAGE_TONES[result.tone]}`}>{result.text}</p>
 }

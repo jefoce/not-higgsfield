@@ -8,10 +8,8 @@ import type { SecretSource, SecretStatus } from '@/core/types'
 import { globalState } from '../global-state'
 import { withLock } from '../jobs/lock'
 import { HttpError } from '../request-guard'
-import { sessionRequired } from '../session'
-import { bridgeBackend, KeychainUnavailableError } from './bridge'
-import { fileBackend } from './file'
-import { keychainBackend } from './keychain'
+import { pickBackend, readStored } from './backend'
+import { KeychainUnavailableError } from './bridge'
 
 export interface SecretBackend {
   kind: Exclude<SecretSource, 'env'>
@@ -58,58 +56,11 @@ export function reloadSecrets(): Promise<void> {
   state.loadError = null
   state.values.clear()
 
-  for (const listener of state.listeners) listener()
+  for (const listener of state.listeners) {
+    listener()
+  }
 
   return secretsReady()
-}
-
-/** NH_SECRETS_BACKEND=file is a development escape, not a production backend on macOS or Windows. */
-function wantsFileBackend(): boolean {
-  if (process.env.NH_SECRETS_BACKEND?.trim() !== 'file') return false
-
-  if (process.env.NODE_ENV !== 'production') return true
-
-  if (process.platform === 'linux') return true
-
-  console.warn(
-    '[not-higgsfield] NH_SECRETS_BACKEND=file is ignored in production on macOS and Windows',
-  )
-
-  return false
-}
-
-async function pickBackend(): Promise<SecretBackend> {
-  if (wantsFileBackend()) return fileBackend()
-
-  if (sessionRequired()) return bridgeBackend()
-
-  const backend = await keychainBackend()
-
-  if (!isNil(backend)) return backend
-
-  if (process.platform === 'linux') return fileBackend()
-
-  throw new KeychainUnavailableError()
-}
-
-interface LoadedBackend {
-  backend: SecretBackend
-  stored: Partial<Record<SecretName, string>>
-}
-
-/** Linux keeps a 0600 file fallback. macOS and Windows fail loudly instead. */
-async function readStored(backend: SecretBackend): Promise<LoadedBackend> {
-  try {
-    return { backend, stored: await backend.getAll() }
-  } catch (error) {
-    if (!(error instanceof KeychainUnavailableError)) throw error
-
-    if (process.platform !== 'linux') throw error
-
-    const fallback = fileBackend()
-
-    return { backend: fallback, stored: await fallback.getAll() }
-  }
 }
 
 async function load(): Promise<void> {
@@ -130,10 +81,13 @@ async function load(): Promise<void> {
 
       const value = stored[name]
 
-      if (isNonEmptyString(value)) state.values.set(name, { value, source: backend.kind })
+      if (isNonEmptyString(value)) {
+        state.values.set(name, { value, source: backend.kind })
+      }
     }
   } catch (error) {
     console.error('[not-higgsfield] secrets load failed', error)
+
     state.loadError =
       error instanceof KeychainUnavailableError
         ? 'Keys could not be saved. The system keychain is unavailable.'
@@ -141,7 +95,9 @@ async function load(): Promise<void> {
   } finally {
     state.loaded = true
 
-    for (const listener of state.listeners) listener()
+    for (const listener of state.listeners) {
+      listener()
+    }
   }
 }
 
@@ -171,7 +127,9 @@ async function applySecrets(changes: Partial<Record<SecretName, string | null>>)
 
   const backend = state.backend
 
-  if (!backend) throw new HttpError(500, 'No secret backend available')
+  if (!backend) {
+    throw new HttpError(500, 'No secret backend available')
+  }
 
   const entries = Object.entries(changes) as [SecretName, string | null][]
   const next = nextValues({ entries, backend })
@@ -181,7 +139,9 @@ async function applySecrets(changes: Partial<Record<SecretName, string | null>>)
 
   state.values = next
 
-  for (const listener of state.listeners) listener()
+  for (const listener of state.listeners) {
+    listener()
+  }
 }
 
 interface NextValuesParams {
@@ -241,7 +201,9 @@ async function persistEntry(params: PersistEntryParams): Promise<void> {
     return
   }
 
-  if (!state.values.has(name)) return
+  if (!state.values.has(name)) {
+    return
+  }
 
   await backend.remove(name)
 }
@@ -252,7 +214,9 @@ async function recoverFromSaveFailure(error: unknown): Promise<never> {
   state.values.clear()
   await secretsReady()
 
-  for (const listener of state.listeners) listener()
+  for (const listener of state.listeners) {
+    listener()
+  }
 
   throw new HttpError(500, 'Could not save to the keychain')
 }

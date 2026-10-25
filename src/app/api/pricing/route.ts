@@ -8,7 +8,9 @@ export async function GET(request: Request) {
     const presetId = new URL(request.url).searchParams.get('preset') ?? DEFAULT_PRESET_ID
     const preset = findPreset(presetId)
 
-    if (!preset) return jsonError({ status: 400, error: 'Unknown model' })
+    if (!preset) {
+      return jsonError({ status: 400, error: 'Unknown model' })
+    }
 
     return Response.json(await getPricing(preset))
   } catch (error) {

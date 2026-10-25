@@ -23,7 +23,9 @@ interface AspectAllowedParams {
 export function aspectAllowed(params: AspectAllowedParams): boolean {
   const { preset, resolution, aspect } = params
 
-  if (!preset.outputSizes) return preset.aspectRatios.includes(aspect)
+  if (!preset.outputSizes) {
+    return preset.aspectRatios.includes(aspect)
+  }
 
   return Boolean(preset.outputSizes[resolution]?.[aspect])
 }
@@ -48,9 +50,13 @@ export function outputSize(params: OutputSizeParams): { width: number; height: n
   const short = SHORT_SIDE[resolution]
   const [a, b] = aspect.split(':').map(Number)
 
-  if (!Number.isFinite(a) || !Number.isFinite(b) || a <= 0 || b <= 0) return null
+  if (!Number.isFinite(a) || !Number.isFinite(b) || a <= 0 || b <= 0) {
+    return null
+  }
 
-  if (a >= b) return { width: even((short * a) / b), height: short }
+  if (a >= b) {
+    return { width: even((short * a) / b), height: short }
+  }
 
   return { width: short, height: even((short * b) / a) }
 }

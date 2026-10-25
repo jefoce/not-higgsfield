@@ -14,7 +14,9 @@ export function resolveTransport(params: ResolveTransportParams): ResolvedTransp
   const { preset, kind, remoteConfigured: isRemoteConfigured } = params
   const transport = preset.inputTransport[kind]
 
-  if (transport !== 'auto') return transport
+  if (transport !== 'auto') {
+    return transport
+  }
 
   return isRemoteConfigured ? 'url' : 'base64'
 }

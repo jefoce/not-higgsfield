@@ -101,11 +101,13 @@ describe('assertLocalRequest session', () => {
     const guard = await loadGuarded()
 
     expect(statusOf(() => guard.assertLocalRequest(makeRequest({}), { session: false }))).toBeNull()
+
     expect(
       statusOf(() =>
         guard.assertLocalRequest(makeRequest({ host: 'evil.example' }), { session: false }),
       ),
     ).toBe(403)
+
     const crossSite = makeRequest(
       { 'sec-fetch-site': 'cross-site', 'content-type': 'application/json' },
       { method: 'POST', body: '{}' },

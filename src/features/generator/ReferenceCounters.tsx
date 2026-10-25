@@ -28,6 +28,7 @@ export function ReferenceCounters(props: ReferenceCountersProps) {
         const Icon = REFERENCE_ICONS[MEDIA_KINDS.indexOf(kind)]
         const count = `${counts[kind]}/${preset.references[kind]}`
         const hasHint = isDownscaled && kind === 'image'
+
         const counter = (
           <span
             className={cn(

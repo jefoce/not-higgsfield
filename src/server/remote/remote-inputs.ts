@@ -20,6 +20,7 @@ import {
 } from './remote-store'
 
 type Remote = NonNullable<UploadItem['remote']>
+
 const puts = globalState('remotePuts', () => new Map<string, Promise<RemoteObjectInfo>>())
 
 interface PutOnceParams {
@@ -92,7 +93,9 @@ export async function ensureRemote(params: EnsureRemoteParams): Promise<UploadIt
 
 /** Returns a short-lived private link. Never persist the result. */
 export async function presignFor(upload: UploadItem): Promise<string> {
-  if (!upload.remote) throw new Error(`Upload has no remote object: ${upload.id}`)
+  if (!upload.remote) {
+    throw new Error(`Upload has no remote object: ${upload.id}`)
+  }
 
   return requireStore().presign({
     key: upload.remote.key,
@@ -108,19 +111,25 @@ export async function sweepRemote(
   await secretsReady()
   const remoteStore = store ?? getRemoteStore()
 
-  if (!remoteStore) return { deleted: 0, cleared: 0 }
+  if (!remoteStore) {
+    return { deleted: 0, cleared: 0 }
+  }
 
   const uploads = await listUploads()
+
   const withRemote = uploads.filter((item): item is UploadItem & { remote: Remote } =>
     Boolean(item.remote),
   )
+
   const groups = groupBy(withRemote, (item) => item.remote.key)
   const cutoff = Date.now() - REMOTE_UNUSED_DAYS * 86_400_000
   let deleted = 0
   let cleared = 0
 
   for (const items of Object.values(groups)) {
-    if (items.some((item) => Date.parse(item.remote.lastUsedAt) >= cutoff)) continue
+    if (items.some((item) => Date.parse(item.remote.lastUsedAt) >= cutoff)) {
+      continue
+    }
 
     await remoteStore.delete(items[0].remote.key)
     deleted += 1
@@ -128,7 +137,9 @@ export async function sweepRemote(
     for (const item of items) {
       const saved = await updateUpload(item.id, (current) => ({ ...current, remote: undefined }))
 
-      if (saved) cleared += 1
+      if (saved) {
+        cleared += 1
+      }
     }
   }
 
@@ -140,7 +151,9 @@ export function putOnce(params: PutOnceParams): Promise<RemoteObjectInfo> {
   const { store, key, file, opts } = params
   const running = puts.get(key)
 
-  if (running) return running
+  if (running) {
+    return running
+  }
 
   const job = store.put({ key, file, opts }).finally(() => puts.delete(key))
 
@@ -152,7 +165,9 @@ export function putOnce(params: PutOnceParams): Promise<RemoteObjectInfo> {
 async function saveRemote(id: string, remote: Remote): Promise<UploadItem> {
   const saved = await updateUpload(id, (item) => ({ ...item, remote }))
 
-  if (!saved) throw new Error('Input file was removed during upload')
+  if (!saved) {
+    throw new Error('Input file was removed during upload')
+  }
 
   return saved
 }
@@ -171,9 +186,13 @@ interface SameObjectParams {
 function sameObject(params: SameObjectParams): boolean {
   const { head, sha, size } = params
 
-  if (head.size !== size) return false
+  if (head.size !== size) {
+    return false
+  }
 
-  if (isNil(head.serverSha256)) return isNil(sha)
+  if (isNil(head.serverSha256)) {
+    return isNil(sha)
+  }
 
   return head.serverSha256 === sha
 }
@@ -187,11 +206,17 @@ interface SameDigestParams {
 function sameDigest(params: SameDigestParams): boolean {
   const { head, digest, prev } = params
 
-  if (head.size !== digest.size) return false
+  if (head.size !== digest.size) {
+    return false
+  }
 
-  if (isNil(head.serverSha256)) return true
+  if (isNil(head.serverSha256)) {
+    return true
+  }
 
-  if (head.serverSha256 === digest.sha256Base64) return true
+  if (head.serverSha256 === digest.sha256Base64) {
+    return true
+  }
 
   return prev?.sha256 === digest.sha256Hex && head.serverSha256 === prev.serverSha256
 }
@@ -199,7 +224,9 @@ function sameDigest(params: SameDigestParams): boolean {
 function requireStore(): RemoteStore {
   const store = getRemoteStore()
 
-  if (!store) throw new Error('Remote storage is not configured')
+  if (!store) {
+    throw new Error('Remote storage is not configured')
+  }
 
   return store
 }

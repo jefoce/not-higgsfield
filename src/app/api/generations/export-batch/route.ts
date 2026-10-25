@@ -21,16 +21,22 @@ const BodySchema = z.object({
 /** Copies each finished video into a real directory, never overwriting. */
 export async function POST(request: Request): Promise<Response> {
   try {
-    if (!sessionRequired()) return jsonError({ status: 404, error: 'Not found' })
+    if (!sessionRequired()) {
+      return jsonError({ status: 404, error: 'Not found' })
+    }
 
     assertLocalRequest(request)
     const body = BodySchema.safeParse(await readJsonBody(request))
 
-    if (!body.success) return zodError(body.error)
+    if (!body.success) {
+      return zodError(body.error)
+    }
 
     const { ids, dir } = body.data
 
-    if (!path.isAbsolute(dir)) return jsonError({ status: 400, error: 'Folder must be absolute' })
+    if (!path.isAbsolute(dir)) {
+      return jsonError({ status: 400, error: 'Folder must be absolute' })
+    }
 
     const folder = await fs.lstat(dir).catch(() => null)
 
@@ -44,8 +50,11 @@ export async function POST(request: Request): Promise<Response> {
     for (const id of ids) {
       const entry = await exportEntry({ id, dir })
 
-      if ('saved' in entry) saved.push(entry.saved)
-      else skipped.push(entry.skip)
+      if ('saved' in entry) {
+        saved.push(entry.saved)
+      } else {
+        skipped.push(entry.skip)
+      }
     }
 
     return Response.json({ saved, skipped })
@@ -65,13 +74,19 @@ async function exportEntry(params: ExportEntryParams): Promise<ExportEntry> {
   const { id, dir } = params
   const record = await getGeneration(id)
 
-  if (!record) return { skip: { id, reason: 'not_found' } }
+  if (!record) {
+    return { skip: { id, reason: 'not_found' } }
+  }
 
-  if (record.status !== 'completed') return { skip: { id, reason: 'not_ready' } }
+  if (record.status !== 'completed') {
+    return { skip: { id, reason: 'not_ready' } }
+  }
 
   const source = await videoSource(record.id)
 
-  if (isNil(source)) return { skip: { id, reason: 'not_ready' } }
+  if (isNil(source)) {
+    return { skip: { id, reason: 'not_ready' } }
+  }
 
   return { saved: await copyUnique({ source, dir, base: exportName(record) }) }
 }
@@ -90,7 +105,9 @@ async function copyUnique(params: CopyUniqueParams): Promise<string> {
     const name = index === 1 ? `${base}.mp4` : `${base} (${index}).mp4`
     const target = path.join(dir, name)
 
-    if (await copyExclusive(source, target)) return target
+    if (await copyExclusive(source, target)) {
+      return target
+    }
   }
 
   throw new Error('Too many files with the same name')

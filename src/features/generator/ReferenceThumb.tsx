@@ -92,9 +92,13 @@ function thumbState(params: ThumbStateParams): ThumbState {
 function thumbTitle(params: ThumbTitleParams): string {
   const { name, label, isBroken, isMissing } = params
 
-  if (isBroken) return isMissing ? `File missing: ${name}` : 'File deleted'
+  if (isBroken) {
+    return isMissing ? `File missing: ${name}` : 'File deleted'
+  }
 
-  if (!isNil(label) && label !== '') return `${label} \u00b7 ${name}`
+  if (!isNil(label) && label !== '') {
+    return `${label} \u00b7 ${name}`
+  }
 
   return name
 }
@@ -102,7 +106,9 @@ function thumbTitle(params: ThumbTitleParams): string {
 function thumbOverlay(params: ThumbOverlayParams): string {
   const { isBroken, isLifted } = params
 
-  if (isLifted) return 'hidden'
+  if (isLifted) {
+    return 'hidden'
+  }
 
   return isBroken ? 'flex' : 'hidden group-hover:flex'
 }
@@ -111,10 +117,13 @@ function thumbMedia(params: ThumbMediaParams): ThumbMedia {
   const { upload, isAudio, isVideo } = params
   let audioSrc = ''
 
-  if (isAudio && !isNil(upload)) audioSrc = mediaUrl(`uploads/${upload.id}`, upload.mime)
+  if (isAudio && !isNil(upload)) {
+    audioSrc = mediaUrl(`uploads/${upload.id}`, upload.mime)
+  }
 
   const imageSrc =
     isNil(upload) || isAudio ? null : thumbUrl({ ref: `uploads/${upload.id}`, w: 320 })
+
   const videoDuration = isVideo && !isNil(upload?.durationSec) ? upload.durationSec : null
 
   return { audioSrc, imageSrc, videoDuration }
@@ -125,6 +134,7 @@ function thumbText(params: ThumbTextParams): ThumbText {
   const name = upload?.originalName ?? label ?? 'reference'
   const title = thumbTitle({ name, label, isBroken, isMissing })
   const overlayClass = thumbOverlay({ isBroken, isLifted })
+
   const tileClass = cn(
     'group relative cursor-grab rounded-xl active:cursor-grabbing',
     isAudio ? 'col-span-2 aspect-[2.12/1]' : 'aspect-square',
@@ -152,12 +162,15 @@ export function ReferenceThumb(props: ReferenceThumbProps) {
     onOpenPreview: handleOpenPreview,
     onRemove: handleRemove,
   } = props
+
   const { isMissing, isBroken, isAudio, isVideo, isOpenable } = thumbState({
     upload,
     isMarkedMissing,
     hasPreview: !isNil(handleOpenPreview),
   })
+
   const { audioSrc, imageSrc, videoDuration } = thumbMedia({ upload, isAudio, isVideo })
+
   const { name, previewLabel, content, overlayClass, tileClass, isPreviewShown } = thumbText({
     upload,
     label,

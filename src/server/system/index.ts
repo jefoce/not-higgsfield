@@ -39,14 +39,18 @@ export function getSystem(): SystemAdapter {
 
 /** Serializes dialogs and maps killed commands to a timeout response. */
 async function withDialog<T>(task: () => Promise<T>): Promise<T> {
-  if (dialog.open) throw new DialogBusyError()
+  if (dialog.open) {
+    throw new DialogBusyError()
+  }
 
   dialog.open = true
 
   try {
     return await task()
   } catch (error) {
-    if (isTimeout(error)) throw new HttpError(504, 'Dialog timed out')
+    if (isTimeout(error)) {
+      throw new HttpError(504, 'Dialog timed out')
+    }
 
     throw error
   } finally {

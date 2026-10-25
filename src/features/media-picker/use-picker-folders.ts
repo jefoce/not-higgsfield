@@ -42,13 +42,17 @@ export function usePickerFolders(params: UsePickerFoldersParams): PickerFolders 
 
   const handleDisconnectSync = useCallback(
     async (folderId: string) => {
-      if (!(await platform.confirm('Disconnect this folder? Existing uploads stay.'))) return
+      if (!(await platform.confirm('Disconnect this folder? Existing uploads stay.'))) {
+        return
+      }
 
       try {
         await deleteFolder(folderId)
         await mutate(['folders'])
 
-        if (activeTab === folderId) onTabChange('uploads')
+        if (activeTab === folderId) {
+          onTabChange('uploads')
+        }
       } catch (error) {
         toast.error(errorMessage(error))
       }
@@ -78,7 +82,9 @@ export function usePickerFolders(params: UsePickerFoldersParams): PickerFolders 
 
   const handlePickFile = useCallback(
     (rel: string) => {
-      if (!activeFolder) return
+      if (!activeFolder) {
+        return
+      }
 
       void handleLinkFile(activeFolder.id, rel)
     },

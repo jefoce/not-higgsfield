@@ -11,9 +11,13 @@ interface StackIconProps {
 export function StackIcon(props: StackIconProps) {
   const { record } = props
 
-  if (ACTIVE_STATUSES.includes(record.status)) return <Spinner size={12} tone="muted" />
+  if (ACTIVE_STATUSES.includes(record.status)) {
+    return <Spinner size={12} tone="muted" />
+  }
 
-  if (record.status !== 'completed') return <AlertCircle size={12} aria-hidden />
+  if (record.status !== 'completed') {
+    return <AlertCircle size={12} aria-hidden />
+  }
 
   return <Video size={12} aria-hidden />
 }

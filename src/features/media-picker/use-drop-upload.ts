@@ -1,8 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { isEmpty } from 'lodash-es'
-import type { DragEvent } from 'react'
+import type { DragEvent, RefObject } from 'react'
 import { toast } from 'sonner'
 
 import { acceptFiles, type KindExtensions } from '@/core/media-kinds'
@@ -38,6 +38,42 @@ export interface DropProps {
   onDrop?: (event: DragEvent<HTMLElement>) => void
 }
 
+interface UploadDroppedParams {
+  event: DragEvent<HTMLElement>
+  kinds: MediaKind[]
+  extensions: KindExtensions | undefined
+  onFiles: ((files: File[]) => void) | undefined
+  onUploaded: RefObject<(items: UploadItem[]) => void>
+}
+
+function uploadDropped(params: UploadDroppedParams): void {
+  const { event, kinds, extensions, onFiles, onUploaded } = params
+
+  const { accepted, skipped } = acceptFiles({
+    files: Array.from(event.dataTransfer.files),
+    kinds,
+    extensions,
+  })
+
+  if (skipped > 0) {
+    toast(`Skipped ${skipped} unsupported file${skipped === 1 ? '' : 's'}`)
+  }
+
+  if (isEmpty(accepted)) {
+    return
+  }
+
+  if (onFiles) {
+    onFiles(accepted)
+
+    return
+  }
+
+  void uploadFiles(accepted)
+    .then((items) => onUploaded.current(items))
+    .catch((error) => toast.error(errorMessage(error)))
+}
+
 /** Tracks drag state and uploads files dropped on the returned handlers. */
 export function useDropUpload(params: DropUploadParams): {
   dragging: boolean
@@ -59,7 +95,9 @@ export function useDropUpload(params: DropUploadParams): {
   }, [onUploaded, onFiles, kinds, extensions])
 
   useEffect(() => {
-    if (!isEnabled || !isDesktop()) return
+    if (!isEnabled || !isDesktop()) {
+      return
+    }
 
     return registerDropZone(id, {
       kinds: () => kindsRef.current,
@@ -69,67 +107,54 @@ export function useDropUpload(params: DropUploadParams): {
     })
   }, [id, isEnabled])
 
-  const onDragEnter = useCallback(
-    (event: DragEvent<HTMLElement>) => {
-      if (!isEnabled || !hasFiles(event)) return
+  const onDragEnter = (event: DragEvent<HTMLElement>): void => {
+    if (!isEnabled || !hasFiles(event)) {
+      return
+    }
 
-      event.preventDefault()
-      depth.current += 1
-      setIsDragging(true)
-    },
-    [isEnabled],
-  )
+    event.preventDefault()
+    depth.current += 1
+    setIsDragging(true)
+  }
 
-  const onDragOver = useCallback(
-    (event: DragEvent<HTMLElement>) => {
-      if (!isEnabled || !hasFiles(event)) return
+  const onDragOver = (event: DragEvent<HTMLElement>): void => {
+    if (!isEnabled || !hasFiles(event)) {
+      return
+    }
 
-      event.preventDefault()
-    },
-    [isEnabled],
-  )
+    event.preventDefault()
+  }
 
-  const onDragLeave = useCallback(
-    (event: DragEvent<HTMLElement>) => {
-      if (!isEnabled || depth.current === 0) return
+  const onDragLeave = (event: DragEvent<HTMLElement>): void => {
+    if (!isEnabled || depth.current === 0) {
+      return
+    }
 
-      event.preventDefault()
-      depth.current = Math.max(0, depth.current - 1)
+    event.preventDefault()
+    depth.current = Math.max(0, depth.current - 1)
 
-      if (depth.current === 0) setIsDragging(false)
-    },
-    [isEnabled],
-  )
-
-  const onDrop = useCallback(
-    (event: DragEvent<HTMLElement>) => {
-      if (!isEnabled || !hasFiles(event)) return
-
-      event.preventDefault()
-      depth.current = 0
+    if (depth.current === 0) {
       setIsDragging(false)
-      const { accepted, skipped } = acceptFiles({
-        files: Array.from(event.dataTransfer.files),
-        kinds,
-        extensions,
-      })
+    }
+  }
 
-      if (skipped > 0) toast(`Skipped ${skipped} unsupported file${skipped === 1 ? '' : 's'}`)
+  const onDrop = (event: DragEvent<HTMLElement>): void => {
+    if (!isEnabled || !hasFiles(event)) {
+      return
+    }
 
-      if (isEmpty(accepted)) return
+    event.preventDefault()
+    depth.current = 0
+    setIsDragging(false)
 
-      if (filesCallback.current) {
-        filesCallback.current(accepted)
-
-        return
-      }
-
-      void uploadFiles(accepted)
-        .then((items) => callback.current(items))
-        .catch((error) => toast.error(errorMessage(error)))
-    },
-    [isEnabled, kinds, extensions],
-  )
+    uploadDropped({
+      event,
+      kinds,
+      extensions,
+      onFiles: filesCallback.current,
+      onUploaded: callback,
+    })
+  }
 
   const zone = { 'data-drop-zone': id }
   const handlers = { ...zone, onDragEnter, onDragOver, onDragLeave, onDrop }

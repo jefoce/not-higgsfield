@@ -12,6 +12,7 @@ describe('validateInput reference counts', () => {
       upload('vid', 'video', { durationSec: 5 }),
       upload('aud', 'audio', { durationSec: 3 }),
     )
+
     const result = validateInput({
       input: input({
         prompt: 'The woman from @Image 1 walks with @Video 1.',
@@ -47,6 +48,7 @@ describe('validateInput reference counts', () => {
 
   it('rejects too many videos on Seedance 2.0', () => {
     const ids = ['v1', 'v2', 'v3', 'v4']
+
     const result = validateInput({
       input: input({ presetId: 'seedance-2.0', references: ids }),
       uploads: uploadsOf(...ids.map((id) => upload(id, 'video', { durationSec: 2 }))),
@@ -106,6 +108,7 @@ describe('validateInput reference durations', () => {
       upload('v1', 'video', { durationSec: 10 }),
       upload('v2', 'video', { durationSec: 10 }),
     )
+
     const result = validateInput({
       input: input({ references: ['v1', 'v2'] }),
       uploads,
@@ -120,6 +123,7 @@ describe('validateInput reference durations', () => {
       upload('a1', 'audio', { durationSec: 10 }),
       upload('a2', 'audio', { durationSec: 10 }),
     )
+
     const result = validateInput({
       input: input({ references: ['a1', 'a2'] }),
       uploads,
@@ -204,6 +208,7 @@ describe('validateInput reference slots and files', () => {
 
     expect(result.ok).toBe(true)
     expect(result.errors).toEqual([])
+
     expect(result.warnings).toEqual<ValidationIssue[]>([
       { type: 'missing-slot', slot: { kind: 'image', n: 3 }, attached: 2 },
     ])
@@ -228,6 +233,7 @@ describe('validateInput reference slots and files', () => {
 
     expect(result.ok).toBe(true)
     expect(result.errors).toEqual([])
+
     expect(result.warnings).toEqual<ValidationIssue[]>([
       { type: 'missing-slot', slot: { kind: 'image', n: 2 }, attached: 1 },
     ])

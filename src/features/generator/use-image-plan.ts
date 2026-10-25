@@ -15,7 +15,9 @@ export function useImagePlan(presetId: string, ids: string[]): ReferencePlan | n
   useEffect(() => {
     const sequence = ++latest.current
 
-    if (key === '') return
+    if (key === '') {
+      return
+    }
 
     const timer = window.setTimeout(() => {
       void apiPost<ReferencePlan>('/api/references/plan', {
@@ -23,7 +25,9 @@ export function useImagePlan(presetId: string, ids: string[]): ReferencePlan | n
         ids: key.split(','),
       })
         .then((plan) => {
-          if (sequence === latest.current) setAnswer({ key: answerKey, plan })
+          if (sequence === latest.current) {
+            setAnswer({ key: answerKey, plan })
+          }
         })
         .catch(() => {})
     }, 400)

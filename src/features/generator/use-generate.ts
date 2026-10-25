@@ -52,7 +52,9 @@ export function useGenerate() {
   const inFlight = useRef(false)
 
   const generate = useCallback(async (): Promise<string | null> => {
-    if (inFlight.current) return null
+    if (inFlight.current) {
+      return null
+    }
 
     inFlight.current = true
     requestNotifications()

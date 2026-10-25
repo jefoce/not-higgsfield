@@ -12,7 +12,9 @@ export function FrameSlots() {
   const preset = getPreset(useGeneratorStore((state) => state.presetId))
   const startId = useGeneratorStore((state) => state.frames.start)
 
-  if (!preset.frames.start) return null
+  if (!preset.frames.start) {
+    return null
+  }
 
   return (
     <div className="rounded-panel border border-line p-1 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">

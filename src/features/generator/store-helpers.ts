@@ -40,7 +40,9 @@ export function clampReferenceDuration(params: ClampReferenceDurationParams): nu
   const limit = maxDurationFor({ input, uploads, preset })
   const duration = clamp(input.duration, minDuration(preset), limit)
 
-  if (duration === input.duration) return duration
+  if (duration === input.duration) {
+    return duration
+  }
 
   const totalVideo = sumBy(input.references, (id) => {
     const upload = uploads[id]
@@ -63,7 +65,11 @@ export function kindCounts(
 ): Record<MediaKind, number> {
   const counts: Record<MediaKind, number> = { image: 0, video: 0, audio: 0 }
 
-  for (const id of ids) if (!isNil(uploads[id])) counts[uploads[id].kind] += 1
+  for (const id of ids) {
+    if (!isNil(uploads[id])) {
+      counts[uploads[id].kind] += 1
+    }
+  }
 
   return counts
 }

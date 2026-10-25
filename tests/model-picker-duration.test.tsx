@@ -39,6 +39,7 @@ class Observer {
 beforeEach(() => {
   mockUsePricing.mockReturnValue({ pricing: undefined })
   vi.stubGlobal('ResizeObserver', Observer)
+
   vi.stubGlobal('matchMedia', () => ({
     matches: false,
     addEventListener: () => {},

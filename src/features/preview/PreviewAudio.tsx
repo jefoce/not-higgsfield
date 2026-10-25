@@ -35,16 +35,22 @@ export function PreviewAudio(props: PreviewAudioProps) {
   const played = Math.min(1, progress)
   const bars = waveBars(item.originalName, AUDIO_BARS)
   const at = elapsed ?? 0
+
   const handleToggle = useCallback(() => {
-    if (isPlaying) pauseAudio()
-    else playAudio(src)
+    if (isPlaying) {
+      pauseAudio()
+    } else {
+      playAudio(src)
+    }
   }, [isPlaying, src])
 
   useEffect(() => {
     playAudio(src)
 
     return () => {
-      if (currentSrc() === src) pauseAudio()
+      if (currentSrc() === src) {
+        pauseAudio()
+      }
     }
   }, [src])
 

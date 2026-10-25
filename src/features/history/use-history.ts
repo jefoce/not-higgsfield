@@ -20,13 +20,20 @@ function historyKey(filters: ViewFilters): string {
   const params = new URLSearchParams({ limit: String(HISTORY_PAGE_SIZE) })
   const query = filters.q?.trim()
 
-  if (!isNil(query) && query !== '') params.set('q', query)
-  if (filters.favorite === true) params.set('favorite', '1')
+  if (!isNil(query) && query !== '') {
+    params.set('q', query)
+  }
+
+  if (filters.favorite === true) {
+    params.set('favorite', '1')
+  }
 
   for (const [key, fallback] of FILTER_PARAMS) {
     const value = filters[key]
 
-    if (!isNil(value) && value !== '' && value !== fallback) params.set(key, value)
+    if (!isNil(value) && value !== '' && value !== fallback) {
+      params.set(key, value)
+    }
   }
 
   return params.toString()
@@ -50,11 +57,15 @@ export function useHistory(): HistoryResult {
   const { data, isLoading, isValidating, size, setSize, mutate } =
     useSWRInfinite<GenerationListResult>(
       (index: number, previous: GenerationListResult | null) => {
-        if (index > 0 && isNil(previous?.nextCursor)) return null
+        if (index > 0 && isNil(previous?.nextCursor)) {
+          return null
+        }
 
         const params = new URLSearchParams(query)
 
-        if (index > 0 && !isNil(previous?.nextCursor)) params.set('cursor', previous.nextCursor)
+        if (index > 0 && !isNil(previous?.nextCursor)) {
+          params.set('cursor', previous.nextCursor)
+        }
 
         return `/api/generations?${params.toString()}`
       },
@@ -81,7 +92,9 @@ export function useHistory(): HistoryResult {
   useHistoryPoll({ activeCount, records, mutate })
 
   const loadMore = useCallback(() => {
-    if (isNil(nextCursor) || nextCursor === '' || isValidating) return
+    if (isNil(nextCursor) || nextCursor === '' || isValidating) {
+      return
+    }
 
     void setSize(size + 1)
   }, [isValidating, nextCursor, setSize, size])

@@ -5,6 +5,7 @@ export async function GET(request: Request) {
   try {
     assertLocalRequest(request)
     const query = new URL(request.url).searchParams
+
     const result = await browseDirectories({
       path: query.get('path')?.trim(),
       hidden: query.get('hidden') === '1',

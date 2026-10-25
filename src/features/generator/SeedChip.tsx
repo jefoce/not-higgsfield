@@ -20,19 +20,24 @@ export function SeedChip() {
   const setSeed = useGeneratorStore((state) => state.setSeed)
   const preset = getPreset(useGeneratorStore((state) => state.presetId))
   const isRandom = isNil(seed)
+
   const handleRandomChange = useCallback(
     (isChecked: boolean): void => {
       setSeed(isChecked ? null : randomSeed())
     },
     [setSeed],
   )
+
   const handleSeedChange = useCallback(
     (value: number | null): void => setSeed(value ?? 0),
     [setSeed],
   )
+
   const handleRandomize = useCallback((): void => setSeed(randomSeed()), [setSeed])
 
-  if (!preset.seed) return null
+  if (!preset.seed) {
+    return null
+  }
 
   return (
     <Popover>

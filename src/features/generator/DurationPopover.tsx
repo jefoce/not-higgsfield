@@ -29,22 +29,27 @@ export function DurationPopover() {
       seed: state.seed,
     })),
   )
+
   const uploadsById = useGeneratorStore((state) => state.uploadsById)
   const handleDurationChange = useGeneratorStore((state) => state.setDuration)
   const preset = getPreset(draft.presetId)
   const { max } = preset.duration
   const min = minDuration(preset)
+
   const limit = maxDurationFor({
     input: inputFromState(draft),
     uploads: uploadsById,
     preset,
   })
+
   const chips = (preset.duration.options ?? []).filter((value) => value >= min && value <= max)
   const isFloored = min > preset.duration.min
+
   const totalVideo = referenceVideoSeconds({
     references: draft.references,
     uploads: uploadsById,
   })
+
   const isCapped = limit < max
   const limitText = `Up to ${limit}s with ${formatSecondsExact(totalVideo)} of reference video`
 

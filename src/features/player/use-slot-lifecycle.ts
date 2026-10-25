@@ -18,11 +18,15 @@ export function useSlotLifecycle(params: UseSlotLifecycleParams): void {
   useEffect(() => {
     const node = rootRef.current
 
-    if (!node) return
+    if (!node) {
+      return
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) release(id)
+        if (!entry.isIntersecting) {
+          release(id)
+        }
       },
       { rootMargin: '200px 0px' },
     )
@@ -36,7 +40,9 @@ export function useSlotLifecycle(params: UseSlotLifecycleParams): void {
 
   // Selection mode turns the player off for unselected list rows.
   useEffect(() => {
-    if (isInteractive || !isSlotActive) return
+    if (isInteractive || !isSlotActive) {
+      return
+    }
 
     videoRef.current?.pause()
     release(id)

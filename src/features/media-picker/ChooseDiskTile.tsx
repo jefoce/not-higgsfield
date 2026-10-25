@@ -32,7 +32,9 @@ export function ChooseDiskTile(props: ChooseDiskTileProps) {
         await getPlatform()
       ).chooseFiles({ kinds, multiple: max > 1, extensions })
 
-      if (isEmpty(items)) return
+      if (isEmpty(items)) {
+        return
+      }
 
       onUploaded(items)
     } catch (error) {

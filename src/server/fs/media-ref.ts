@@ -33,18 +33,33 @@ export async function resolveMediaRef(segments: string[]): Promise<ResolvedMedia
   const ref = mediaRefToString(segments)
   const [namespace, ...rest] = segments
 
-  if (namespace === 'downloads') return resolveDownload(rest, ref)
-  if (namespace === 'uploads') return resolveUpload(rest, ref)
-  if (namespace === 'folders') return resolveFolder(rest, ref)
+  if (namespace === 'downloads') {
+    return resolveDownload(rest, ref)
+  }
+
+  if (namespace === 'uploads') {
+    return resolveUpload(rest, ref)
+  }
+
+  if (namespace === 'folders') {
+    return resolveFolder(rest, ref)
+  }
+
   throw new MediaRefError(400, `Unknown media ref: ${ref}`)
 }
 
 function resolveDownload(rest: string[], ref: string): ResolvedMediaRef {
-  if (rest.length !== 1) throw new MediaRefError(400, `Invalid downloads ref: ${ref}`)
+  if (rest.length !== 1) {
+    throw new MediaRefError(400, `Invalid downloads ref: ${ref}`)
+  }
+
   const name = rest[0]
   const kind = kindFromName(name)
 
-  if (isNil(kind)) throw new MediaRefError(400, `Unsupported media type: ${name}`)
+  if (isNil(kind)) {
+    throw new MediaRefError(400, `Unsupported media type: ${name}`)
+  }
+
   return { absolutePath: inside(DOWNLOADS_DIR, name), kind, ref }
 }
 
@@ -56,10 +71,16 @@ async function resolveUpload(rest: string[], ref: string): Promise<ResolvedMedia
   const id = rest[0]
   const item = await readJson<UploadItem>(path.join(UPLOADS_DIR, `${id}.json`))
 
-  if (!item) throw new MediaRefError(404, `Upload not found: ${id}`)
+  if (!item) {
+    throw new MediaRefError(404, `Upload not found: ${id}`)
+  }
+
   const kind = kindFromExt(item.ext)
 
-  if (isNil(kind)) throw new MediaRefError(400, `Unsupported media type: ${item.ext}`)
+  if (isNil(kind)) {
+    throw new MediaRefError(400, `Unsupported media type: ${item.ext}`)
+  }
+
   const { media } = uploadPaths(id, item.ext)
 
   try {
@@ -72,15 +93,24 @@ async function resolveUpload(rest: string[], ref: string): Promise<ResolvedMedia
 }
 
 async function resolveFolder(rest: string[], ref: string): Promise<ResolvedMediaRef> {
-  if (rest.length < 2) throw new MediaRefError(400, `Invalid folders ref: ${ref}`)
+  if (rest.length < 2) {
+    throw new MediaRefError(400, `Invalid folders ref: ${ref}`)
+  }
+
   const [folderId, ...rel] = rest
   const folders = await readJson<FolderItem[]>(FOLDERS_FILE)
   const folder = folders?.find((item) => item.id === folderId)
 
-  if (!folder) throw new MediaRefError(404, `Folder not found: ${folderId}`)
+  if (!folder) {
+    throw new MediaRefError(404, `Folder not found: ${folderId}`)
+  }
+
   const kind = kindFromName(rel.at(-1) ?? '')
 
-  if (isNil(kind)) throw new MediaRefError(400, `Unsupported media type: ${ref}`)
+  if (isNil(kind)) {
+    throw new MediaRefError(400, `Unsupported media type: ${ref}`)
+  }
+
   return { absolutePath: inside(folder.path, rel.join('/')), kind, ref }
 }
 
@@ -88,7 +118,10 @@ function inside(root: string, rel: string): string {
   try {
     return resolveInside(root, rel)
   } catch (error) {
-    if (error instanceof SafePathError) throw new MediaRefError(400, error.message)
+    if (error instanceof SafePathError) {
+      throw new MediaRefError(400, error.message)
+    }
+
     throw error
   }
 }

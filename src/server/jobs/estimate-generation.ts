@@ -28,6 +28,7 @@ export async function loadDraft(raw: GenerationInput): Promise<GenerationDraft> 
   const base = inputForSubmit(raw)
   const uploads = await loadUploads(base)
   const input = withCanonicalPrompt(base, uploads)
+
   const validation = validateInput({
     input,
     uploads,
@@ -38,7 +39,9 @@ export async function loadDraft(raw: GenerationInput): Promise<GenerationDraft> 
     },
   })
 
-  if (!validation.ok) throw new ValidationError(validation.errors)
+  if (!validation.ok) {
+    throw new ValidationError(validation.errors)
+  }
 
   return { preset, input, uploads }
 }
@@ -56,15 +59,19 @@ export async function loadPriceDraft(raw: PriceInput): Promise<GenerationDraft> 
 export async function estimateGeneration(draft: GenerationDraft): Promise<GenerationEstimate> {
   const { preset, input, uploads } = draft
   const pricing = await getPricing(preset)
+
   const hasVideoInput =
     input.tab === 'references' && input.references.some((id) => uploads[id]?.kind === 'video')
+
   const ctx: PriceContext = {
     resolution: input.resolution,
     aspect: input.aspectRatio,
     audio: input.audio,
     hasVideoInput,
   }
+
   const refSeconds = referenceVideoSeconds({ references: input.references, uploads })
+
   const estimate = estimatePrice({
     preset,
     ctx,
@@ -73,7 +80,7 @@ export async function estimateGeneration(draft: GenerationDraft): Promise<Genera
     skus: pricing.skus,
   })
 
-  if (isNil(estimate))
+  if (isNil(estimate)) {
     return {
       estimatedUsd: 0,
       listUsd: 0,
@@ -81,6 +88,7 @@ export async function estimateGeneration(draft: GenerationDraft): Promise<Genera
       priceSource: 'unknown',
       discount: pricing.discount,
     }
+  }
 
   const list =
     pricing.discount > 0
@@ -110,7 +118,9 @@ function withCanonicalPrompt(
   const { counts } = referenceSlots(input.references, (id) => uploads[id]?.kind)
   const prompt = canonicalizePrompt(input.prompt, counts)
 
-  if (prompt === input.prompt) return input
+  if (prompt === input.prompt) {
+    return input
+  }
 
   return { ...input, prompt }
 }

@@ -34,6 +34,7 @@ describe('Field', () => {
 
 function NumberHarness({ onValueChange }: { onValueChange: (value: number | null) => void }) {
   const [value, setValue] = useState<number | null>(1)
+
   const handleValueChange = useCallback(
     (next: number | null) => {
       setValue(next)

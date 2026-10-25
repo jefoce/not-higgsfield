@@ -54,6 +54,7 @@ describe('reconcile grace cancel', () => {
     await fs.mkdir(downloads, { recursive: true })
     const id = '11111111-1111-4111-8111-111111111111'
     const notBefore = new Date(Date.now() - 120_000).toISOString()
+
     const record = {
       id,
       createdAt: notBefore,
@@ -68,6 +69,7 @@ describe('reconcile grace cancel', () => {
       isSubmitOwned: () => false,
       resumeGraceSubmits: vi.fn(),
     }))
+
     const { reconcile, GRACE_EXPIRED_TEXT } = await import('@/server/jobs/reconcile')
 
     await reconcile()

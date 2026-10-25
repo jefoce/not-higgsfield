@@ -9,7 +9,9 @@ function routeFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const full = path.join(dir, entry.name)
 
-    if (entry.isDirectory()) return routeFiles(full)
+    if (entry.isDirectory()) {
+      return routeFiles(full)
+    }
 
     return entry.isFile() && entry.name === 'route.ts' ? [full] : []
   })
@@ -26,6 +28,7 @@ describe('route guards', () => {
     const files = routeFiles(API_DIR)
 
     expect(files.length).toBeGreaterThan(0)
+
     const unguarded = files.filter(
       (file) => !readFileSync(file, 'utf8').includes('assertLocalRequest('),
     )

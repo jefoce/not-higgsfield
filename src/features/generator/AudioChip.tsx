@@ -13,9 +13,12 @@ export function AudioChip() {
   const isAudio = useGeneratorStore((state) => state.audio)
   const setAudio = useGeneratorStore((state) => state.setAudio)
   const preset = getPreset(useGeneratorStore((state) => state.presetId))
+
   const handleToggle = useCallback((): void => setAudio(!isAudio), [isAudio, setAudio])
 
-  if (!preset.audio.supported) return null
+  if (!preset.audio.supported) {
+    return null
+  }
 
   return (
     <Chip onClick={handleToggle} aria-pressed={isAudio}>

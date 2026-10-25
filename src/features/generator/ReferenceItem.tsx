@@ -40,16 +40,22 @@ export function ReferenceItem(props: ReferenceItemProps) {
     onReplace,
     onRemove,
   } = props
+
   const handleInsert = (item: UploadItem): void => {
     const slot = slots.get(item.id)
 
-    if (slot) onSelectSlot(slot)
+    if (slot) {
+      onSelectSlot(slot)
+    }
   }
+
   const handleReplace = (item: UploadItem): void => {
     const handleReplacePick = (items: UploadItem[]): void => {
       const [next] = items
 
-      if (!isNil(next)) onReplace(item.id, next)
+      if (!isNil(next)) {
+        onReplace(item.id, next)
+      }
     }
 
     openMediaPicker({
@@ -60,13 +66,17 @@ export function ReferenceItem(props: ReferenceItemProps) {
       onPick: handleReplacePick,
     })
   }
+
   const handleRemoveAction = (item: UploadItem): void => onRemove(item.id)
+
   const handleLabel = (item: UploadItem): string | null => {
     const slot = slots.get(item.id)
 
     return slot ? slotLabel(slot) : null
   }
+
   const handleRemove = useCallback((): void => onRemove(id), [id, onRemove])
+
   const handlePreview = (): void => {
     const index = previewUploads.findIndex((item) => item.id === id)
 
@@ -81,6 +91,7 @@ export function ReferenceItem(props: ReferenceItemProps) {
       },
     })
   }
+
   const canPreview = !isNil(upload) && upload.kind !== 'audio'
   const handleOpenPreview = canPreview ? handlePreview : undefined
 

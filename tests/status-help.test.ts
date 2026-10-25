@@ -22,9 +22,11 @@ describe('status help', () => {
     expect(statusHelpKey(state({ submit: { stage: 'grace' } }))).toBe('processing')
     expect(statusHelpKey(state({ submit: { stage: 'uploading' } }))).toBe('uploading')
     expect(statusHelpKey(state({ submit: { stage: 'sending' } }))).toBe('sending')
+
     expect(statusHelpKey(state({ status: 'in_progress', download: { startedAt: 'now' } }))).toBe(
       'downloading',
     )
+
     expect(statusHelpKey(state({ status: 'pending' }))).toBe('in_queue')
     expect(statusHelpKey(state({ status: 'in_progress' }))).toBe('generating')
     expect(statusHelpKey(state({ status: 'completed' }))).toBe('completed')

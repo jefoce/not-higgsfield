@@ -66,8 +66,9 @@ const checkReferenceCounts = (params: CheckReferenceCountsParams): void => {
   const { counts, preset, errors } = params
 
   for (const kind of MEDIA_KINDS) {
-    if (counts[kind] > preset.references[kind])
+    if (counts[kind] > preset.references[kind]) {
       errors.push(`Too many ${kind}s (${counts[kind]}, max ${preset.references[kind]})`)
+    }
   }
 }
 
@@ -80,9 +81,13 @@ const checkRemoteTransport = (params: CheckRemoteTransportParams): void => {
 
   for (const kind of REMOTE_REF_KINDS) {
     // Unknown while loading, so no warning until the status resolves.
-    if (counts[kind] === 0 || ctx.remoteConfigured !== false) continue
+    if (counts[kind] === 0 || ctx.remoteConfigured !== false) {
+      continue
+    }
 
-    if (resolveTransport({ preset, kind, remoteConfigured: false }) !== 'url') continue
+    if (resolveTransport({ preset, kind, remoteConfigured: false }) !== 'url') {
+      continue
+    }
 
     errors.push(
       `${KIND_TITLE[kind]} references for ${preset.title} need cloud storage (R2) configured`,
@@ -101,8 +106,13 @@ const checkAudioVisual = (params: CheckAudioVisualParams): void => {
   const { audio, counts, preset, errors } = params
   const refs = preset.references
 
-  if (refs.audioNeedsVisual !== true || audio.length === 0) return
-  if (counts.image > 0 || counts.video > 0) return
+  if (refs.audioNeedsVisual !== true || audio.length === 0) {
+    return
+  }
+
+  if (counts.image > 0 || counts.video > 0) {
+    return
+  }
 
   errors.push('Audio references need at least one image or video reference')
 }
@@ -123,15 +133,17 @@ const checkDurationTotals = (
   const videoTotal = totalDuration(videos)
   const audioTotal = totalDuration(audio)
 
-  if (videoTotal > preset.references.videoTotalSec)
+  if (videoTotal > preset.references.videoTotalSec) {
     errors.push(
       `Video references are too long in total (${seconds(videoTotal)}s, max ${preset.references.videoTotalSec}s)`,
     )
+  }
 
-  if (audioTotal > preset.references.audioTotalSec)
+  if (audioTotal > preset.references.audioTotalSec) {
     errors.push(
       `Audio references are too long in total (${seconds(audioTotal)}s, max ${preset.references.audioTotalSec}s)`,
     )
+  }
 
   return { videoTotal, audioTotal }
 }
@@ -145,14 +157,17 @@ interface CheckMaxInputParams extends ValidateFramesParams {
 const checkMaxInputPlusOutput = (params: CheckMaxInputParams): void => {
   const { input, uploads, preset, videos, videoTotal, errors } = params
 
-  if (isNil(preset.maxInputPlusOutputSec) || videos.length === 0) return
+  if (isNil(preset.maxInputPlusOutputSec) || videos.length === 0) {
+    return
+  }
 
   const limit = maxDurationFor({ input, uploads, preset })
 
-  if (input.duration > limit)
+  if (input.duration > limit) {
     errors.push(
       `Max ${limit}s: reference videos are ${seconds(videoTotal)}s in total, limit ${preset.maxInputPlusOutputSec}s`,
     )
+  }
 }
 
 interface DurationLimits {
@@ -163,7 +178,10 @@ interface DurationLimits {
 const durationLimits = (kind: 'video' | 'audio', preset: ModelPreset): DurationLimits => {
   const refs = preset.references
 
-  if (kind === 'video') return { min: refs.videoMinSec, max: refs.videoMaxSec }
+  if (kind === 'video') {
+    return { min: refs.videoMinSec, max: refs.videoMaxSec }
+  }
+
   return { min: refs.audioMinSec, max: refs.audioMaxSec }
 }
 
@@ -178,18 +196,26 @@ interface CheckItemDurationParams {
 const checkItemDuration = (params: CheckItemDurationParams): void => {
   const { duration, min, max, label, errors } = params
 
-  if (isNil(duration)) return
+  if (isNil(duration)) {
+    return
+  }
 
-  if (!isNil(min) && duration < min) errors.push(`${label} is ${seconds(duration)}s, min ${min}s`)
+  if (!isNil(min) && duration < min) {
+    errors.push(`${label} is ${seconds(duration)}s, min ${min}s`)
+  }
 
-  if (!isNil(max) && duration > max) errors.push(`${label} is ${seconds(duration)}s, max ${max}s`)
+  if (!isNil(max) && duration > max) {
+    errors.push(`${label} is ${seconds(duration)}s, max ${max}s`)
+  }
 }
 
 function checkRefDurations(params: CheckRefDurationsParams): void {
   const { kind, items, preset, errors } = params
   const { min, max } = durationLimits(kind, preset)
 
-  if (isNil(min) && isNil(max)) return
+  if (isNil(min) && isNil(max)) {
+    return
+  }
 
   const title = kind === 'video' ? 'Video' : 'Audio'
 
@@ -209,7 +235,9 @@ export function validateReferences(params: ValidateWithContextParams): RuleResul
   const errors: string[] = []
   const warnings: ValidationIssue[] = []
 
-  if (input.tab !== 'references') return { errors, warnings }
+  if (input.tab !== 'references') {
+    return { errors, warnings }
+  }
 
   if (MEDIA_KINDS.every((kind) => preset.references[kind] === 0)) {
     errors.push(`References are not supported by ${preset.title}`)

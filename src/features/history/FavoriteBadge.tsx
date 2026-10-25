@@ -18,6 +18,7 @@ interface FavoriteBadgeProps {
 export function FavoriteBadge(props: FavoriteBadgeProps) {
   const { record } = props
   const count = record.favorite ? 1 : 0
+
   const handleFavorite = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()

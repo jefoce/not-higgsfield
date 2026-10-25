@@ -25,7 +25,9 @@ export function AddFolderDialog(props: AddFolderDialogProps) {
 
   const handleOpenChange = useCallback(
     (isNext: boolean) => {
-      if (!isNext) reset()
+      if (!isNext) {
+        reset()
+      }
 
       onOpenChange(isNext)
     },
@@ -33,6 +35,7 @@ export function AddFolderDialog(props: AddFolderDialogProps) {
   )
 
   const handleClose = useCallback(() => handleOpenChange(false), [handleOpenChange])
+
   const connect = useFolderConnect({ data: browse.data, onAdded, onClose: handleClose })
   const handleNavigate = browse.navigate
   const handleNavigateRoot = browse.navigateRoot

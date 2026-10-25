@@ -15,7 +15,9 @@ export function sessionRequired(): boolean {
 }
 
 export function tokenMatches(value: string | null | undefined): boolean {
-  if (isNil(TOKEN) || TOKEN === '' || isNil(value) || value === '') return false
+  if (isNil(TOKEN) || TOKEN === '' || isNil(value) || value === '') {
+    return false
+  }
 
   const a = Buffer.from(value)
   const b = Buffer.from(TOKEN)
@@ -25,9 +27,12 @@ export function tokenMatches(value: string | null | undefined): boolean {
 
 /** Reads the session cookie. Missing or wrong values fail closed. */
 export function hasSession(request: Request): boolean {
-  if (isNil(TOKEN) || TOKEN === '') return true
+  if (isNil(TOKEN) || TOKEN === '') {
+    return true
+  }
 
   const cookie = request.headers.get('cookie') ?? ''
+
   const value = cookie
     .split(/;\s*/)
     .find((part) => part.startsWith(`${SESSION_COOKIE}=`))

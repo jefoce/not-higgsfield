@@ -19,12 +19,16 @@ const INTERRUPT_TEXT = {
 /** Cancels stale grace records, resumes fresh ones, fails orphaned submits. */
 export async function reconcile(): Promise<void> {
   for (const record of await listGenerations()) {
-    if (!isStaleGrace(record)) continue
+    if (!isStaleGrace(record)) {
+      continue
+    }
 
     await withLock(record.id, async () => {
       const current = await getGeneration(record.id)
 
-      if (!current || !isStaleGrace(current)) return
+      if (!current || !isStaleGrace(current)) {
+        return
+      }
 
       await saveGeneration({
         ...current,
@@ -38,14 +42,20 @@ export async function reconcile(): Promise<void> {
   await resumeGraceSubmits()
 
   for (const record of await listGenerations()) {
-    if (record.status === 'submitting' && record.submit?.stage === 'grace') continue
+    if (record.status === 'submitting' && record.submit?.stage === 'grace') {
+      continue
+    }
 
-    if (!needsInterruptFail(record)) continue
+    if (!needsInterruptFail(record)) {
+      continue
+    }
 
     await withLock(record.id, async () => {
       const current = await getGeneration(record.id)
 
-      if (!current || !needsInterruptFail(current)) return
+      if (!current || !needsInterruptFail(current)) {
+        return
+      }
 
       await saveGeneration({
         ...current,

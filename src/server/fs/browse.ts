@@ -20,7 +20,9 @@ export interface BrowseInput {
 export async function browseDirectories(input: BrowseInput): Promise<BrowseResult> {
   const requested = isNil(input.path) || input.path.trim() === '' ? os.homedir() : input.path
 
-  if (!path.isAbsolute(requested)) throw new BrowseError(400, 'Path must be absolute')
+  if (!path.isAbsolute(requested)) {
+    throw new BrowseError(400, 'Path must be absolute')
+  }
 
   let real: string
 
@@ -32,9 +34,12 @@ export async function browseDirectories(input: BrowseInput): Promise<BrowseResul
 
   const stats = await fs.stat(real)
 
-  if (!stats.isDirectory()) throw new BrowseError(400, 'Not a directory')
+  if (!stats.isDirectory()) {
+    throw new BrowseError(400, 'Not a directory')
+  }
 
   const entries = await fs.readdir(real, { withFileTypes: true })
+
   const dirs = orderBy(
     entries
       .filter((entry) => entry.isDirectory())

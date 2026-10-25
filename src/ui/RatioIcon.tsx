@@ -11,7 +11,9 @@ interface RatioIconProps {
 export function RatioIcon(props: RatioIconProps) {
   const { ratio, size = 14 } = props
 
-  if (ratio === 'auto') return <Ratio size={size} aria-hidden />
+  if (ratio === 'auto') {
+    return <Ratio size={size} aria-hidden />
+  }
 
   const [width, height] = ratio.split(':').map(Number)
   const scale = size / Math.max(width, height)

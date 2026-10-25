@@ -35,16 +35,20 @@ export async function GET(request: Request) {
     const body = Object.fromEntries(new URL(request.url).searchParams)
     const query = QuerySchema.safeParse(body)
 
-    if (!query.success) return zodError(query.error)
+    if (!query.success) {
+      return zodError(query.error)
+    }
 
     const records = await listGenerations()
+
     const ids = (query.data.ids ?? '')
       .split(',')
       .map((part) => part.trim())
       .filter(Boolean)
 
-    if (ids.length > MAX_IDS)
+    if (ids.length > MAX_IDS) {
       return jsonError({ status: 400, error: `Too many ids (max ${MAX_IDS})` })
+    }
 
     if (ids.length > 0) {
       const wanted = new Set(ids)
@@ -69,6 +73,7 @@ export async function GET(request: Request) {
         audio: query.data.audio,
       }),
     )
+
     const page = paginate({
       records: filtered,
       cursor: query.data.cursor ?? null,
@@ -91,15 +96,21 @@ export async function POST(request: Request) {
     const body = await readJsonBody(request)
     const presetId = PresetIdSchema.safeParse(body)
 
-    if (!presetId.success) return zodError(presetId.error)
+    if (!presetId.success) {
+      return zodError(presetId.error)
+    }
 
     const preset = findPreset(presetId.data.presetId)
 
-    if (!preset) return jsonError({ status: 400, error: 'Unknown model' })
+    if (!preset) {
+      return jsonError({ status: 400, error: 'Unknown model' })
+    }
 
     const input = buildInputSchema(preset).safeParse(body)
 
-    if (!input.success) return zodError(input.error)
+    if (!input.success) {
+      return zodError(input.error)
+    }
 
     await secretsReady()
 

@@ -19,12 +19,14 @@ function handleStopPropagation(event: MouseEvent<HTMLSpanElement>): void {
 /** Inline checkbox for a card's media area. */
 export function SelectionCheckbox(props: SelectionCheckboxProps) {
   const { id, className } = props
+
   const {
     selected: isSelected,
     selecting: isSelecting,
     selectable: canSelect,
     select,
   } = useSelectionItem(id)
+
   const handleClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()
@@ -32,9 +34,12 @@ export function SelectionCheckbox(props: SelectionCheckboxProps) {
     },
     [select],
   )
+
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLButtonElement>) => {
-      if (event.key !== ' ') return
+      if (event.key !== ' ') {
+        return
+      }
 
       event.preventDefault()
       select(event.shiftKey)
@@ -42,7 +47,9 @@ export function SelectionCheckbox(props: SelectionCheckboxProps) {
     [select],
   )
 
-  if (!canSelect) return null
+  if (!canSelect) {
+    return null
+  }
 
   return (
     <span

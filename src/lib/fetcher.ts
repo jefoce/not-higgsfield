@@ -37,11 +37,15 @@ async function throwApiError(response: Response): Promise<never> {
 }
 
 async function readJson<T>(response: Response): Promise<T> {
-  if (response.status === 204) return undefined as T
+  if (response.status === 204) {
+    return undefined as T
+  }
 
   const text = await response.text()
 
-  if (text === '') return undefined as T
+  if (text === '') {
+    return undefined as T
+  }
 
   return JSON.parse(text) as T
 }
@@ -50,7 +54,9 @@ async function readJson<T>(response: Response): Promise<T> {
 export async function fetcher<T>(url: string): Promise<T> {
   const response = await fetch(url, { method: 'GET', credentials: 'same-origin' })
 
-  if (!response.ok) return throwApiError(response)
+  if (!response.ok) {
+    return throwApiError(response)
+  }
 
   return readJson<T>(response)
 }
@@ -61,12 +67,15 @@ export async function apiRequest<T>(url: string, init?: RequestInit): Promise<T>
   const body = init?.body
   const isForm = body instanceof FormData
 
-  if (!isNil(body) && body !== '' && !isForm && !headers.has('Content-Type'))
+  if (!isNil(body) && body !== '' && !isForm && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
+  }
 
   const response = await fetch(url, { credentials: 'same-origin', ...init, headers })
 
-  if (!response.ok) return throwApiError(response)
+  if (!response.ok) {
+    return throwApiError(response)
+  }
 
   return readJson<T>(response)
 }

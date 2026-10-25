@@ -37,7 +37,9 @@ export async function runSubmit(id: string, signal?: AbortSignal): Promise<void>
   await secretsReady()
   const record = await getGeneration(id)
 
-  if (record?.status !== 'submitting') return
+  if (record?.status !== 'submitting') {
+    return
+  }
 
   if (record.submit?.stage === 'grace' && graceDelayMs(record.submit.notBefore) > 0) {
     await import('./submit-queue').then(({ startSubmit }) => startSubmit(id))
@@ -47,7 +49,9 @@ export async function runSubmit(id: string, signal?: AbortSignal): Promise<void>
 
   const prepared = await beginUpload(id)
 
-  if (!prepared) return
+  if (!prepared) {
+    return
+  }
 
   setSubmitStage(id, 'uploading')
 
@@ -66,15 +70,19 @@ async function beginUpload(id: string): Promise<Prepared | null> {
   return withLock(id, async () => {
     const record = await getGeneration(id)
 
-    if (record?.status !== 'submitting' || record.submit?.stage !== 'grace') return null
+    if (record?.status !== 'submitting' || record.submit?.stage !== 'grace') {
+      return null
+    }
 
     const uploads = await loadUploads(record.input)
     const preset = getPreset(record.input.presetId)
+
     const transports = transportsFor({
       uploads,
       preset,
       remoteConfigured: !isNil(getRemoteStore()),
     })
+
     const saved = await saveGeneration({
       ...record,
       inputsSnapshot: withTransports(record.inputsSnapshot, transports),
@@ -96,7 +104,9 @@ async function uploadAndSend(params: Prepared, signal?: AbortSignal): Promise<vo
 
   const gone = Object.values(uploads).find((upload) => upload.missing === true)
 
-  if (gone) throw new Error(`File missing: ${gone.originalName}`)
+  if (gone) {
+    throw new Error(`File missing: ${gone.originalName}`)
+  }
 
   const preset = getPreset(record.input.presetId)
 
@@ -119,7 +129,9 @@ async function uploadAndSend(params: Prepared, signal?: AbortSignal): Promise<vo
 
   try {
     marked = await updateSubmit(record.id, (current) => {
-      if (current.submit?.stage !== 'uploading') return null
+      if (current.submit?.stage !== 'uploading') {
+        return null
+      }
 
       return { ...current, submit: { ...current.submit, stage: 'sending' } }
     })
@@ -138,7 +150,9 @@ async function uploadAndSend(params: Prepared, signal?: AbortSignal): Promise<vo
   const response = await send({ record, preset, uploads, transports, built })
   const saved = await complete(record.id, response)
 
-  if (saved) void import('./poller').then(({ startPoller }) => startPoller())
+  if (saved) {
+    void import('./poller').then(({ startPoller }) => startPoller())
+  }
 }
 
 async function complete(
@@ -146,7 +160,9 @@ async function complete(
   response: { id: string; status: string },
 ): Promise<GenerationRecord | null> {
   return updateSubmit(id, (record) => {
-    if (record.status !== 'submitting') return null
+    if (record.status !== 'submitting') {
+      return null
+    }
 
     return {
       ...record,
@@ -159,7 +175,9 @@ async function complete(
 
 async function fail(id: string, error: unknown): Promise<void> {
   await updateSubmit(id, (record) => {
-    if (record.status !== 'submitting' || (!isNil(record.job) && record.job.id !== '')) return null
+    if (record.status !== 'submitting' || (!isNil(record.job) && record.job.id !== '')) {
+      return null
+    }
 
     return { ...record, status: 'failed', error: submitError(error), submit: undefined }
   })

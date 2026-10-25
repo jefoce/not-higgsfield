@@ -15,11 +15,15 @@ export function noteFor(params: NoteForParams): string | undefined {
   const { id, planned } = params
   const image = planned[id]
 
-  if (isNil(image)) return undefined
+  if (isNil(image)) {
+    return undefined
+  }
 
   const size = `Sent at ${image.width}x${image.height}`
 
-  if (isNil(image.flattened)) return size
+  if (isNil(image.flattened)) {
+    return size
+  }
 
   return `${size} \u00b7 Transparent, sent on ${image.flattened === '#ffffff' ? 'white' : 'dark'}`
 }
@@ -39,7 +43,9 @@ export function referenceUploads(
   return references.flatMap((id) => {
     const upload = uploadsById[id]
 
-    if (isNil(upload)) return []
+    if (isNil(upload)) {
+      return []
+    }
 
     return [upload]
   })

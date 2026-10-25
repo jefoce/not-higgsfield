@@ -29,7 +29,9 @@ interface DescriptionParams {
 }
 
 function softHintFor(name: SecretName, value: string): string | null {
-  if (name !== 'OPENROUTER_API_KEY' || value === '' || value.startsWith('sk-or-')) return null
+  if (name !== 'OPENROUTER_API_KEY' || value === '' || value.startsWith('sk-or-')) {
+    return null
+  }
 
   return 'OpenRouter keys usually start with sk-or-'
 }
@@ -37,9 +39,17 @@ function softHintFor(name: SecretName, value: string): string | null {
 function noteFor(params: DescriptionParams): string | null {
   const { isReadOnly, isStored, value } = params
 
-  if (isReadOnly) return 'Set by environment'
-  if (value !== '') return 'Unsaved change'
-  if (isStored) return 'Stored'
+  if (isReadOnly) {
+    return 'Set by environment'
+  }
+
+  if (value !== '') {
+    return 'Unsaved change'
+  }
+
+  if (isStored) {
+    return 'Stored'
+  }
 
   return null
 }
@@ -59,7 +69,9 @@ function descriptionFor(params: DescriptionParams): ReactNode {
 
   const note = noteFor({ isRemoved, isReadOnly, isStored, value, hint })
 
-  if (isEmpty(note)) return null
+  if (isEmpty(note)) {
+    return null
+  }
 
   return <p className="text-xxs text-fg-2">{note}</p>
 }
@@ -70,11 +82,14 @@ export function SecretField(props: SecretFieldProps) {
   const isReadOnly = status.source === 'env'
   let schemaError: string | null = null
 
-  if (value !== '') schemaError = secretError(name, value)
+  if (value !== '') {
+    schemaError = secretError(name, value)
+  }
 
   const softHint = softHintFor(name, value)
   const hasHint = !isEmpty(status.hint)
   const placeholder = status.set && hasHint ? `•••• ${status.hint}` : 'Not set'
+
   const description = descriptionFor({
     isRemoved,
     isReadOnly,
@@ -87,6 +102,7 @@ export function SecretField(props: SecretFieldProps) {
     () => onChange(name, { remove: !isRemoved }),
     [name, onChange, isRemoved],
   )
+
   const handleValueChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => onChange(name, { value: event.target.value.trim() }),
     [name, onChange],

@@ -35,10 +35,13 @@ const promptTextErrors = (params: PromptErrorParams): string[] => {
   const prompt = input.prompt.trim()
   const errors: string[] = []
 
-  if (prompt.length > preset.promptMaxChars)
+  if (prompt.length > preset.promptMaxChars) {
     errors.push(`Prompt is too long (max ${preset.promptMaxChars} characters)`)
+  }
 
-  if (prompt === '' && !(preset.promptOptional && hasStartFrame)) errors.push('Prompt is required')
+  if (prompt === '' && !(preset.promptOptional && hasStartFrame)) {
+    errors.push('Prompt is required')
+  }
 
   return errors
 }
@@ -50,11 +53,16 @@ const aspectErrors = (params: PromptErrorParams): string[] => {
   if (aspect === 'auto') {
     const hasAutoFrame = input.tab === 'frames' && hasStartFrame && preset.autoAspectWithFrames
 
-    if (hasAutoFrame) return []
+    if (hasAutoFrame) {
+      return []
+    }
+
     return ['Auto aspect ratio needs a start frame']
   }
 
-  if (aspectAllowed({ preset, resolution: input.resolution, aspect })) return []
+  if (aspectAllowed({ preset, resolution: input.resolution, aspect })) {
+    return []
+  }
 
   const resolutions = preset.resolutions.filter((resolution) => {
     const size = preset.outputSizes?.[resolution]?.[aspect]
@@ -78,23 +86,31 @@ const checkFrameOrder = (params: ValidateFramesParams & { errors: string[] }): v
   const hasEnd = !isNil(input.frames.end) && input.frames.end !== ''
   const hasStart = !isNil(input.frames.start) && input.frames.start !== ''
 
-  if (hasEnd && !hasStart) errors.push('Add a start frame first')
+  if (hasEnd && !hasStart) {
+    errors.push('Add a start frame first')
+  }
 
-  if (hasEnd && !preset.frames.end) errors.push('End frame is not supported by this model')
+  if (hasEnd && !preset.frames.end) {
+    errors.push('End frame is not supported by this model')
+  }
 }
 
 const checkFrameKind = (params: CheckUploadParams): void => {
   const { role, errors } = params
   const upload = checkUpload(params)
 
-  if (upload && upload.kind !== 'image') errors.push(`${role} must be an image`)
+  if (upload && upload.kind !== 'image') {
+    errors.push(`${role} must be an image`)
+  }
 }
 
 export function validateFrames(params: ValidateFramesParams): RuleResult {
   const { input, uploads, preset } = params
   const errors: string[] = []
 
-  if (input.tab !== 'frames') return { errors, warnings: [] }
+  if (input.tab !== 'frames') {
+    return { errors, warnings: [] }
+  }
 
   checkFrameOrder({ input, uploads, preset, errors })
   checkFrameKind({ id: input.frames.start, role: 'Start frame', uploads, errors })
@@ -109,7 +125,9 @@ export function validateFrames(params: ValidateFramesParams): RuleResult {
   }
 
   for (const upload of attachedMedia(input, uploads)) {
-    if (upload.kind === 'image') checkReferenceLimits({ upload, preset, errors })
+    if (upload.kind === 'image') {
+      checkReferenceLimits({ upload, preset, errors })
+    }
   }
 
   return { errors, warnings: [] }
@@ -122,7 +140,9 @@ export function validateLimits(params: ValidateWithContextParams): RuleResult {
   const attached = attachedMedia(input, uploads)
 
   for (const upload of attached) {
-    if (upload.kind === 'image') continue
+    if (upload.kind === 'image') {
+      continue
+    }
 
     const transport = resolveTransport({
       preset,
@@ -130,7 +150,9 @@ export function validateLimits(params: ValidateWithContextParams): RuleResult {
       remoteConfigured: ctx.remoteConfigured ?? false,
     })
 
-    if (transport !== 'base64') continue
+    if (transport !== 'base64') {
+      continue
+    }
 
     if (upload.sizeBytes > byteLimit) {
       const mb = Math.ceil(upload.sizeBytes / (1024 * 1024))
@@ -147,10 +169,13 @@ export function validateLimits(params: ValidateWithContextParams): RuleResult {
       Math.min(upload.width, upload.height) < LOW_RES_MIN_PX,
   )
 
-  if (isLowRes) warnings.push({ type: 'text', text: 'Low resolution input, output may look soft' })
+  if (isLowRes) {
+    warnings.push({ type: 'text', text: 'Low resolution input, output may look soft' })
+  }
 
-  if ((ctx.activeCount ?? 0) >= MAX_ACTIVE_JOBS)
+  if ((ctx.activeCount ?? 0) >= MAX_ACTIVE_JOBS) {
     errors.push(`${MAX_ACTIVE_JOBS} videos already generating. Wait for one to finish.`)
+  }
 
   return { errors, warnings }
 }
@@ -180,7 +205,9 @@ function attachedMedia(input: GenerationInput, uploads: Record<string, UploadIte
 function checkUpload(params: CheckUploadParams): UploadItem | null {
   const { id, role, uploads, errors } = params
 
-  if (isNil(id) || id === '') return null
+  if (isNil(id) || id === '') {
+    return null
+  }
 
   const upload = uploads[id]
 
@@ -190,7 +217,9 @@ function checkUpload(params: CheckUploadParams): UploadItem | null {
     return null
   }
 
-  if (upload.missing === true) errors.push(`File missing: ${upload.originalName}`)
+  if (upload.missing === true) {
+    errors.push(`File missing: ${upload.originalName}`)
+  }
 
   return upload
 }

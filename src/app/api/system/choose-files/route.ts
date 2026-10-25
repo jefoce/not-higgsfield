@@ -17,7 +17,9 @@ export async function POST(request: Request) {
     assertLocalRequest(request)
     const body = BodySchema.safeParse(await readJsonBody(request))
 
-    if (!body.success) return zodError(body.error)
+    if (!body.success) {
+      return zodError(body.error)
+    }
 
     const paths = await getSystem().chooseFiles({ ...body.data, prompt: PROMPT })
     const items = await Promise.all(paths.map((absPath) => createLinkUpload({ absPath })))

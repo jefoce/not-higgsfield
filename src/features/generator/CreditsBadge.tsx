@@ -17,25 +17,34 @@ function summarize(credits: CreditsInfo | undefined): { text: string; amount: nu
     return { text: '--', amount: null }
   }
 
-  if (!isNil(credits.balance)) return { text: formatUsd(credits.balance), amount: credits.balance }
+  if (!isNil(credits.balance)) {
+    return { text: formatUsd(credits.balance), amount: credits.balance }
+  }
 
   if (!isNil(credits.keyLimitRemaining)) {
     return { text: formatUsd(credits.keyLimitRemaining), amount: credits.keyLimitRemaining }
   }
 
-  if (!isNil(credits.usageDaily))
+  if (!isNil(credits.usageDaily)) {
     return { text: `Today ${formatUsd(credits.usageDaily)}`, amount: null }
+  }
 
   return { text: '--', amount: null }
 }
 
 /** Balance tone. */
 function toneFor(amount: number | null): string {
-  if (isNil(amount)) return 'text-fg-2'
+  if (isNil(amount)) {
+    return 'text-fg-2'
+  }
 
-  if (amount < CREDIT_DANGER_USD) return 'text-danger'
+  if (amount < CREDIT_DANGER_USD) {
+    return 'text-danger'
+  }
 
-  if (amount < CREDIT_WARN_USD) return 'text-amber'
+  if (amount < CREDIT_WARN_USD) {
+    return 'text-amber'
+  }
 
   return 'text-fg'
 }

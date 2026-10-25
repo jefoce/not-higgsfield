@@ -42,7 +42,9 @@ export async function mockSubmit(body: unknown): Promise<{ id: string; status: s
 
   collectMockLinks(body, links)
 
-  for (const link of links) await assertMockFetch(link)
+  for (const link of links) {
+    await assertMockFetch(link)
+  }
 
   const shouldFail = JSON.stringify(body).includes('[fail]')
   const id = `${shouldFail ? 'mockfail' : 'mock'}-${randomUUID()}`
@@ -64,22 +66,29 @@ async function assertMockFetch(link: string): Promise<void> {
     .then((res) => res.status)
     .catch(() => 0)
 
-  if (status !== 200)
+  if (status !== 200) {
     throw new OpenRouterError({ message: `Mock provider could not fetch ${link}`, status: 400 })
+  }
 }
 
 function collectMockLinks(value: unknown, out: string[]): void {
   if (Array.isArray(value)) {
-    for (const child of value) collectMockLinks(child, out)
+    for (const child of value) {
+      collectMockLinks(child, out)
+    }
 
     return
   }
 
-  if (!isRecord(value)) return
+  if (!isRecord(value)) {
+    return
+  }
 
   for (const [key, child] of Object.entries(value)) {
     if (key === 'url' && isString(child)) {
-      if (child.startsWith(MOCK_REMOTE_PREFIX)) out.push(child)
+      if (child.startsWith(MOCK_REMOTE_PREFIX)) {
+        out.push(child)
+      }
 
       continue
     }
@@ -91,11 +100,17 @@ function collectMockLinks(value: unknown, out: string[]): void {
 export function mockJob(id: string, submittedAt?: string): VideoJobResponse {
   const elapsed = Date.now() - mockStarted(id, submittedAt)
 
-  if (elapsed < MOCK_QUEUE_MS) return { id, status: 'pending' }
+  if (elapsed < MOCK_QUEUE_MS) {
+    return { id, status: 'pending' }
+  }
 
-  if (elapsed < MOCK_QUEUE_MS + MOCK_GENERATE_MS) return { id, status: 'in_progress' }
+  if (elapsed < MOCK_QUEUE_MS + MOCK_GENERATE_MS) {
+    return { id, status: 'in_progress' }
+  }
 
-  if (id.startsWith('mockfail-')) return { id, status: 'failed', error: 'Mock failure' }
+  if (id.startsWith('mockfail-')) {
+    return { id, status: 'failed', error: 'Mock failure' }
+  }
 
   return { id, status: 'completed', usage: { cost: 0, is_byok: false } }
 }
@@ -103,7 +118,9 @@ export function mockJob(id: string, submittedAt?: string): VideoJobResponse {
 function mockStarted(id: string, submittedAt?: string): number {
   const stored = mockState.mockStart.get(id)
 
-  if (!isNil(stored)) return stored
+  if (!isNil(stored)) {
+    return stored
+  }
 
   const parsed = isNil(submittedAt) || submittedAt === '' ? Number.NaN : Date.parse(submittedAt)
 
@@ -116,12 +133,14 @@ export async function mockContent(id: string, fallback?: MockContentFallback): P
   const aspect = field(body, 'aspect_ratio') ?? fallback?.aspectRatio
   const rawDuration = field(body, 'duration') ?? fallback?.duration
   const duration = typeof rawDuration === 'number' ? rawDuration : 5
+
   const { width, height } = mockDimensions({
     model: field(body, 'model'),
     presetId: fallback?.presetId,
     resolution,
     aspect,
   })
+
   const file = path.join(os.tmpdir(), `wan-mock-${randomUUID()}.mp4`)
 
   try {
@@ -144,12 +163,16 @@ interface MockDimensionsParams {
 /** Sizes the mock from the model slug or preset id, falling back to 720p 16:9. */
 function mockDimensions(params: MockDimensionsParams): { width: number; height: number } {
   const { model, presetId, resolution, aspect } = params
+
   const preset =
     MODEL_PRESETS.find((item) => item.slug === model) ??
     MODEL_PRESETS.find((item) => item.id === presetId)
+
   const res = preset?.resolutions.find((item) => item === resolution)
 
-  if (isNil(preset) || isNil(res)) return { width: 1280, height: 720 }
+  if (isNil(preset) || isNil(res)) {
+    return { width: 1280, height: 720 }
+  }
 
   const ratio = aspect === 'auto' ? undefined : preset.aspectRatios.find((item) => item === aspect)
 
@@ -162,7 +185,9 @@ function mockDimensions(params: MockDimensionsParams): { width: number; height: 
 }
 
 function field(body: unknown, key: string): unknown {
-  if (!isRecord(body)) return undefined
+  if (!isRecord(body)) {
+    return undefined
+  }
 
   return body[key]
 }

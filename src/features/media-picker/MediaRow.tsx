@@ -25,12 +25,16 @@ export function MediaRow(props: MediaRowProps) {
   const version = Number.isNaN(stamp) ? item.id : stamp
   const isSelected = selectedIndex >= 0
   const isDisabled = !isSelected && isAtMax
+
   const handlePreview = useCallback(
     () => openPreview({ items, index: previewIndex, actions }),
     [actions, items, previewIndex],
   )
+
   const handleDelete = useCallback(() => onDelete(item), [item, onDelete])
+
   const handleSelect = useCallback(() => onSelect(item), [item, onSelect])
+
   const handlePreviewAction = item.missing === true ? undefined : handlePreview
 
   return (

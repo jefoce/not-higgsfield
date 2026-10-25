@@ -20,16 +20,21 @@ export function InputThumb(props: InputThumbProps) {
   const [isBroken, setIsBroken] = useState(false)
   const firstChar = item.name.charAt(0).toUpperCase()
   const initial = firstChar === '' ? '?' : firstChar
+
   const handleOpen = useCallback(() => void openThumb(item), [item])
+
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
-      if (event.key !== 'Enter' && event.key !== ' ') return
+      if (event.key !== 'Enter' && event.key !== ' ') {
+        return
+      }
 
       event.preventDefault()
       handleOpen()
     },
     [handleOpen],
   )
+
   const handleError = useCallback(() => setIsBroken(true), [])
 
   const title = `${item.label} \u00b7 ${item.name}`

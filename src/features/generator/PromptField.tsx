@@ -53,6 +53,7 @@ export function PromptField(props: PromptFieldProps) {
 
   const handleFocusSlot = useGeneratorStore((state) => state.focusSlot)
   const items = useMemo(() => mentionItems({ references, uploadsById }), [references, uploadsById])
+
   const handleChange = useCallback(
     (state: EditorState) => setPrompt(serializeEditor(state)),
     [setPrompt],

@@ -14,6 +14,8 @@ export async function withLock<T>(key: string, fn: () => Promise<T>): Promise<T>
   try {
     return await run
   } finally {
-    if (chains.get(key) === run) chains.delete(key)
+    if (chains.get(key) === run) {
+      chains.delete(key)
+    }
   }
 }

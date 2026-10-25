@@ -22,15 +22,19 @@ export function AspectRatioPopover() {
   const isAutoAllowed = tab === 'frames' && Boolean(start) && preset.autoAspectWithFrames
   const options: AspectChoice[] = [...preset.aspectRatios]
 
-  if (isAutoAllowed) options.unshift('auto')
+  if (isAutoAllowed) {
+    options.unshift('auto')
+  }
 
   const handleOpenChange = useCallback(
     (isOpen: boolean): void => {
-      if (isOpen && aspectRatio === 'auto' && !isAutoAllowed)
+      if (isOpen && aspectRatio === 'auto' && !isAutoAllowed) {
         setAspectRatio(preset.defaultAspectRatio)
+      }
     },
     [aspectRatio, isAutoAllowed, preset.defaultAspectRatio, setAspectRatio],
   )
+
   const handleSelectAspect = useCallback(
     (option: AspectChoice): void => setAspectRatio(option),
     [setAspectRatio],

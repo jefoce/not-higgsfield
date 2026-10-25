@@ -31,6 +31,7 @@ interface PollerState {
   booted: boolean
   stopped: boolean
 }
+
 const state = globalState<PollerState>('poller', () => ({
   timer: null,
   sweepTimer: null,
@@ -43,10 +44,13 @@ const state = globalState<PollerState>('poller', () => ({
 
 /** Starts the singleton poller. Safe to call many times. */
 export function startPoller(): void {
-  if (state.started) return
+  if (state.started) {
+    return
+  }
 
   state.started = true
   state.stopped = false
+
   void boot().catch((error) => {
     state.started = false
     console.error('[not-higgsfield] poller boot failed', error)
@@ -64,11 +68,17 @@ export function stopPoller(): void {
   state.started = false
   state.booted = false
 
-  if (state.timer) clearInterval(state.timer)
+  if (state.timer) {
+    clearInterval(state.timer)
+  }
 
-  if (state.sweepTimer) clearInterval(state.sweepTimer)
+  if (state.sweepTimer) {
+    clearInterval(state.sweepTimer)
+  }
 
-  if (state.sweepFirst) clearTimeout(state.sweepFirst)
+  if (state.sweepFirst) {
+    clearTimeout(state.sweepFirst)
+  }
 
   state.timer = null
   state.sweepTimer = null
@@ -82,7 +92,9 @@ async function boot(): Promise<void> {
   assertFfmpeg()
   await reconcile()
 
-  if (state.stopped) return
+  if (state.stopped) {
+    return
+  }
 
   state.timer = setInterval(() => void tick(), POLL_INTERVAL_MS)
   state.timer.unref()
@@ -113,7 +125,9 @@ async function sweepUnusedRemote(): Promise<void> {
 }
 
 async function tick(): Promise<void> {
-  if (state.running) return
+  if (state.running) {
+    return
+  }
 
   state.running = true
 
@@ -143,9 +157,13 @@ async function tick(): Promise<void> {
 async function processById(id: string): Promise<void> {
   const record = await getGeneration(id)
 
-  if (!record || !ACTIVE_STATUSES.includes(record.status)) return
+  if (!record || !ACTIVE_STATUSES.includes(record.status)) {
+    return
+  }
 
-  if (isDownloadQueued(id)) return
+  if (isDownloadQueued(id)) {
+    return
+  }
 
   if (isNil(record.job) || record.job.id === '') {
     if (needsInterruptFail(record)) {

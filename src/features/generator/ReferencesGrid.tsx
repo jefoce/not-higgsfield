@@ -39,6 +39,7 @@ export function ReferencesGrid(props: ReferencesGridProps) {
   const handleSelectSlot = useGeneratorStore((state) => state.insertMention)
   const handleReplace = useGeneratorStore((state) => state.replaceReference)
   const handleRemove = useGeneratorStore((state) => state.removeReference)
+
   const {
     activeId,
     order,
@@ -48,11 +49,14 @@ export function ReferencesGrid(props: ReferencesGridProps) {
     handleDragEnd,
     handleDragCancel,
   } = useReferencesDnd(references)
+
   const { counts, slots } = referenceSlots(order, (id) => uploadsById[id]?.kind)
+
   const plan = useImagePlan(
     preset.id,
     references.filter((id) => uploadsById[id]?.kind === 'image'),
   )
+
   const planned = keyBy(plan?.images ?? [], 'id')
   const previewUploads = referenceUploads(references, uploadsById)
 

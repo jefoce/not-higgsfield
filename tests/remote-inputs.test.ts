@@ -101,23 +101,31 @@ class GatedStore extends FakeStore {
 }
 
 function remoteOf(upload: UploadItem): NonNullable<UploadItem['remote']> {
-  if (isNil(upload.remote)) throw new Error(`Missing remote for ${upload.id}`)
+  if (isNil(upload.remote)) {
+    throw new Error(`Missing remote for ${upload.id}`)
+  }
 
   return upload.remote
 }
 
 beforeAll(async () => {
   await fs.rm(ROOT, { recursive: true, force: true })
+
   ;({ ensureRemote, putOnce } = await import('@/server/remote/remote-inputs'))
+
   ;({ saveUploadItem, removeUpload } = await import('@/server/repos/uploads'))
+
   ;({ hashFile } = await import('@/server/remote/hash'))
 })
 
 afterAll(async () => {
   await fs.rm(ROOT, { recursive: true, force: true })
 
-  if (isNil(PREVIOUS_ROOT)) delete process.env.STORAGE_ROOT
-  else process.env.STORAGE_ROOT = PREVIOUS_ROOT
+  if (isNil(PREVIOUS_ROOT)) {
+    delete process.env.STORAGE_ROOT
+  } else {
+    process.env.STORAGE_ROOT = PREVIOUS_ROOT
+  }
 })
 
 describe('ensureRemote', () => {
@@ -226,6 +234,7 @@ async function makeUpload(text: string): Promise<UploadItem> {
 
   await fs.mkdir(path.join(ROOT, 'uploads'), { recursive: true })
   await fs.writeFile(mediaPath(id), text)
+
   const item: UploadItem = {
     id,
     source: 'file',

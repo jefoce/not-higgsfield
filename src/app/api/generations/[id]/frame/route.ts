@@ -22,13 +22,18 @@ export async function POST(request: Request, { params }: Params) {
     const { id } = await params
     const body = BodySchema.safeParse(await readJsonBody(request))
 
-    if (!body.success) return zodError(body.error)
+    if (!body.success) {
+      return zodError(body.error)
+    }
 
     const record = await getGeneration(id)
 
-    if (!record) return jsonError({ status: 404, error: 'Generation not found' })
+    if (!record) {
+      return jsonError({ status: 404, error: 'Generation not found' })
+    }
 
     const videoPath = downloadPaths(record.id).video
+
     const isReady =
       record.status === 'completed' &&
       Boolean(record.output?.video) &&
@@ -37,7 +42,9 @@ export async function POST(request: Request, { params }: Params) {
         () => false,
       ))
 
-    if (!isReady) return jsonError({ status: 409, error: 'Video is not ready' })
+    if (!isReady) {
+      return jsonError({ status: 409, error: 'Video is not ready' })
+    }
 
     const temp = path.join(DOWNLOADS_DIR, `${record.id}.frame-${randomUUID()}.tmp.png`)
 
@@ -51,6 +58,7 @@ export async function POST(request: Request, { params }: Params) {
       }
 
       const bytes = new Uint8Array(await fs.readFile(temp))
+
       const item = await saveFileUpload({
         bytes,
         originalName: `${record.id}-${body.data.at}-frame.png`,

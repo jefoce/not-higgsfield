@@ -59,6 +59,7 @@ describe('portal clicks', () => {
       button: 0,
       ctrlKey: false,
     })
+
     fireEvent.click(await screen.findByRole('menuitem', { name: 'Copy prompt' }))
 
     expect(handleOpenMock).not.toHaveBeenCalled()
@@ -74,6 +75,7 @@ describe('portal clicks', () => {
       button: 0,
       ctrlKey: false,
     })
+
     fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }))
 
     const dialog = await screen.findByRole('dialog')
@@ -133,11 +135,14 @@ describe('prompt chips', () => {
 describe('cancel fade', () => {
   it('fades the Cancel button over the remaining grace, then drops it', async () => {
     const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(Date.parse('2026-01-01T00:00:00.000Z'))
+
     const graced = record('grace', {
       status: 'submitting',
       submit: { stage: 'grace', notBefore: '2026-01-01T00:00:04.000Z' },
     })
+
     const handleCancel = vi.fn()
+
     const { container, rerender } = render(
       <StatusOverlay record={graced} onCancel={handleCancel} />,
     )
@@ -161,6 +166,7 @@ describe('cancel fade', () => {
         onCancel={handleCancel}
       />,
     )
+
     expect(screen.queryByRole('button', { name: 'Cancel' })).toBeNull()
     nowSpy.mockRestore()
   })

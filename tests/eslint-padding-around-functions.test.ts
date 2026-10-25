@@ -1,4 +1,4 @@
-import { RuleTester, type Rule } from 'eslint'
+import { type Rule, RuleTester } from 'eslint'
 import tseslint from 'typescript-eslint'
 import { describe, it } from 'vitest'
 

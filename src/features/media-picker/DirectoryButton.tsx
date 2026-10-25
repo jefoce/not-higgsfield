@@ -11,6 +11,7 @@ export interface DirectoryButtonProps {
 /** Directory row in the add-folder browser. */
 export function DirectoryButton(props: DirectoryButtonProps) {
   const { dir, onNavigate } = props
+
   const handleSelect = useCallback(() => onNavigate(dir.path), [dir.path, onNavigate])
 
   return (

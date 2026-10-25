@@ -80,12 +80,16 @@ export async function readCache(id: string, step: number): Promise<EncodedImage 
   const raw = await readJson<unknown>(`${cacheStem(id, step)}.json`)
   const parsed = CacheSchema.safeParse(raw)
 
-  if (!parsed.success) return null
+  if (!parsed.success) {
+    return null
+  }
 
   const file = cacheFile({ id, step, format: parsed.data.format })
   const data = await fs.readFile(file).catch(() => null)
 
-  if (!data) return null
+  if (!data) {
+    return null
+  }
 
   return toEncoded(parsed.data, data)
 }

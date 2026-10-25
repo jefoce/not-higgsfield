@@ -58,7 +58,9 @@ describe('preset contract', () => {
 
   it('has a size for every allowed aspect and resolution pair', () => {
     for (const preset of MODEL_PRESETS) {
-      if (!preset.outputSizes) continue
+      if (!preset.outputSizes) {
+        continue
+      }
 
       for (const resolution of preset.resolutions) {
         for (const aspect of preset.aspectRatios) {
@@ -88,7 +90,9 @@ describe('preset contract', () => {
   it('has limits for every enabled reference kind', () => {
     for (const preset of MODEL_PRESETS) {
       for (const kind of MEDIA_KINDS) {
-        if (preset.references[kind] === 0) continue
+        if (preset.references[kind] === 0) {
+          continue
+        }
 
         expect(preset.referenceLimits?.[kind], `${preset.id} ${kind}`).toBeDefined()
       }

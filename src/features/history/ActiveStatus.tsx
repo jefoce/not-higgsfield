@@ -33,6 +33,7 @@ export function ActiveStatus(props: ActiveStatusProps) {
     help,
     onCancel: handleCancel,
   } = props
+
   const handleCancelClick = handleCancel ?? noop
 
   return (

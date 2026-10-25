@@ -12,6 +12,7 @@ interface BreadcrumbSegmentProps {
 /** One clickable sub-path segment. */
 export function BreadcrumbSegment(props: BreadcrumbSegmentProps) {
   const { label, target, isCurrent, onNavigate } = props
+
   const handleSelect = useCallback(() => onNavigate(target), [onNavigate, target])
 
   return (

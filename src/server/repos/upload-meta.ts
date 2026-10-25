@@ -18,7 +18,9 @@ export function assertSupported(ext: string): MediaKind {
 
   const kind = kindFromExt(ext)
 
-  if (isNil(kind)) throw new UploadError(400, `Unsupported file type: ${ext}`)
+  if (isNil(kind)) {
+    throw new UploadError(400, `Unsupported file type: ${ext}`)
+  }
 
   return kind
 }

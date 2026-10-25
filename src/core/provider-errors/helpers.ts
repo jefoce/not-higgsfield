@@ -10,7 +10,9 @@ const SEEDANCE_SUBJECT = {
 export function matchedSubject(raw: string, pattern: RegExp): string | null {
   const found = raw.match(pattern)
 
-  if (!found) return null
+  if (!found) {
+    return null
+  }
 
   return SEEDANCE_SUBJECT[found[1] as keyof typeof SEEDANCE_SUBJECT] ?? null
 }
@@ -19,7 +21,9 @@ export function matchedSubject(raw: string, pattern: RegExp): string | null {
 function parameterName(raw: string): string | null {
   const dotted = raw.match(/(?:InvalidParameter|MissingParameter)\.([A-Za-z0-9_]+)/)
 
-  if (dotted) return dotted[1]
+  if (dotted) {
+    return dotted[1]
+  }
 
   const after = raw.match(/(?:InvalidParameter|MissingParameter)[^:\n]*:\s*([A-Za-z0-9_.-]+)/)
 

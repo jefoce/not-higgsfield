@@ -11,6 +11,7 @@ import { useGeneratorStore } from './store'
 export function usePricing(presetIdOverride?: string) {
   const storePresetId = useGeneratorStore((state) => state.presetId)
   const presetId = presetIdOverride ?? storePresetId
+
   const { data: pricing } = useSWR<PricingInfo>(
     `/api/pricing?preset=${encodeURIComponent(presetId)}`,
     fetcher,

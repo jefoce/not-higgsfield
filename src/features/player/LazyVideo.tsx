@@ -37,7 +37,9 @@ export interface LazyVideoProps {
 const NO_HANDLERS: ComponentProps<'div'> = {}
 
 function fitClass(videoFit: 'cover' | 'contain', isFullscreen: boolean): string {
-  if (isFullscreen || videoFit !== 'cover') return 'object-contain'
+  if (isFullscreen || videoFit !== 'cover') {
+    return 'object-contain'
+  }
 
   return 'object-cover'
 }
@@ -59,12 +61,14 @@ export function LazyVideo(props: LazyVideoProps) {
     hoverPlay: isHoverPlay = false,
     interactive: isInteractive = true,
   } = props
+
   const { acquire, release, isActive } = usePlayerSlot()
   const isSlotActive = isActive(id)
   const rootRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const video = useVideoState({ videoRef, rootRef, active: isSlotActive, src })
   const inputHandlers = usePlayerInput({ isActive: isSlotActive, video })
+
   const hoverHandlers = useHoverPlay({
     id,
     src,

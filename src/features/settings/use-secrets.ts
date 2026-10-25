@@ -74,16 +74,22 @@ export function testTarget(target: SettingsSection): Promise<TestResult> {
 function keychainLabel(): string {
   const platform = typeof navigator === 'undefined' ? '' : navigator.userAgent
 
-  if (/Mac/.test(platform)) return 'macOS Keychain'
+  if (/Mac/.test(platform)) {
+    return 'macOS Keychain'
+  }
 
-  if (/Win/.test(platform)) return 'Windows Credential Manager'
+  if (/Win/.test(platform)) {
+    return 'Windows Credential Manager'
+  }
 
   return 'system keychain'
 }
 
 /** Turns a test response into display text. */
 export function testLine(target: SettingsSection, result: TestResult): TestMessage {
-  if (!result.ok) return { tone: 'error', text: result.error ?? 'Test failed' }
+  if (!result.ok) {
+    return { tone: 'error', text: result.error ?? 'Test failed' }
+  }
 
   if (target === 'r2') {
     return {
@@ -101,9 +107,13 @@ export function testLine(target: SettingsSection, result: TestResult): TestMessa
 
 /** Footer text for the active backend. */
 export function backendNote(backend: SecretStatus['backend'] | undefined): string | null {
-  if (backend === 'keychain') return `Stored in ${keychainLabel()}`
+  if (backend === 'keychain') {
+    return `Stored in ${keychainLabel()}`
+  }
 
-  if (backend === 'file') return 'Stored in a file: no system keychain found'
+  if (backend === 'file') {
+    return 'Stored in a file: no system keychain found'
+  }
 
   return null
 }
@@ -114,15 +124,23 @@ export function useSettingsPrompt(
   isMock: boolean | undefined,
 ): void {
   useEffect(() => {
-    if (!status || isNil(isMock) || status.loading) return
+    if (!status || isNil(isMock) || status.loading) {
+      return
+    }
 
-    if (status.keys.OPENROUTER_API_KEY.set || isMock) return
+    if (status.keys.OPENROUTER_API_KEY.set || isMock) {
+      return
+    }
 
     const stored = readLocal(PROMPTED_KEY, PROMPTED_VALUE)
 
-    if (!stored.ok) return
+    if (!stored.ok) {
+      return
+    }
 
-    if (!isNil(stored.value) && Boolean(stored.value)) return
+    if (!isNil(stored.value) && Boolean(stored.value)) {
+      return
+    }
 
     writeLocal(PROMPTED_KEY, true)
     openSettings('openrouter')

@@ -17,14 +17,17 @@ export function ResolutionPopover() {
   const setResolution = useGeneratorStore((state) => state.setResolution)
   const isAudio = useGeneratorStore((state) => state.audio)
   const aspect = useGeneratorStore((state) => state.aspectRatio)
+
   const hasVideoInput = useGeneratorStore(
     (state) =>
       state.tab === 'references' &&
       state.references.some((id) => state.uploadsById[id]?.kind === 'video'),
   )
+
   const preset = getPreset(useGeneratorStore((state) => state.presetId))
   const { pricing } = usePricing()
   const discount = pricing?.discount ?? 0
+
   const handleSelectResolution = useCallback(
     (option: Resolution): void => setResolution(option),
     [setResolution],
@@ -47,7 +50,9 @@ export function ResolutionPopover() {
           const rate = pricePerSec({ preset, ctx, skus: pricing?.skus })
           let listRate: number | null = null
 
-          if (discount > 0) listRate = pricePerSec({ preset, ctx, skus: pricing?.listSkus })
+          if (discount > 0) {
+            listRate = pricePerSec({ preset, ctx, skus: pricing?.listSkus })
+          }
 
           return (
             <ResolutionOption

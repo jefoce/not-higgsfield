@@ -20,6 +20,7 @@ interface SettingsBodyProps {
 /** Loading, error and key sections inside the settings modal. */
 export function SettingsBody(props: SettingsBodyProps) {
   const { status, draft, openrouterRef, r2Ref } = props
+
   const {
     edits,
     results,
@@ -32,8 +33,11 @@ export function SettingsBody(props: SettingsBodyProps) {
     onTest,
     onRetry,
   } = draft
+
   const handleRetry = useCallback(() => void onRetry(), [onRetry])
+
   const handleTestOpenRouter = useCallback(() => void onTest('openrouter'), [onTest])
+
   const handleTestR2 = useCallback(() => void onTest('r2'), [onTest])
 
   const loadError = status?.loadError
@@ -53,7 +57,9 @@ export function SettingsBody(props: SettingsBodyProps) {
     return <p className="text-xs text-fg-2">Waiting for keychain access...</p>
   }
 
-  if (!status) return <p className="text-xs text-fg-2">Loading keys...</p>
+  if (!status) {
+    return <p className="text-xs text-fg-2">Loading keys...</p>
+  }
 
   return (
     <>

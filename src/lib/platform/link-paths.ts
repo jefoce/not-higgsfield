@@ -14,8 +14,11 @@ export async function linkPaths(paths: string[]): Promise<UploadItem[]> {
     const results = await Promise.allSettled(group.map((file) => linkAbsPath(file)))
 
     for (const result of results) {
-      if (result.status === 'fulfilled') items.push(result.value)
-      else toast.error(errorMessage(result.reason))
+      if (result.status === 'fulfilled') {
+        items.push(result.value)
+      } else {
+        toast.error(errorMessage(result.reason))
+      }
     }
   }
 

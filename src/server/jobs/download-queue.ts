@@ -9,16 +9,13 @@ import type { ReadableStream } from 'node:stream/web'
 
 import { isNil } from 'lodash-es'
 
-import {
-  FETCH_TIMEOUTS,
-  MAX_DOWNLOAD_RETRIES,
-  PREVIEW_AT_SEC,
-  PREVIEW_WIDTH,
-} from '@/core/constants'
+import { FETCH_TIMEOUTS, MAX_DOWNLOAD_RETRIES } from '@/core/constants'
 import type { GenerationRecord } from '@/core/types'
 
+import { exists, isDiskFull } from '../fs/stat'
 import { globalState } from '../global-state'
-import { extractFrame, probeMedia } from '../media/ffmpeg'
+import { probeMedia } from '../media/ffmpeg'
+import { makePreview } from '../media/preview'
 import { fetchVideoContent, type VideoJobResponse } from '../openrouter/client'
 import { downloadPaths } from '../paths'
 import { getGeneration, saveGeneration } from '../repos/generations'
@@ -43,12 +40,6 @@ interface DownloadParams {
   id: string
   job: VideoJobResponse
   input: GenerationRecord['input']
-}
-
-interface MakePreviewParams {
-  id: string
-  video: string
-  out: string
 }
 
 const DISK_FULL = 'Disk is full. Free some space, the download retries every minute.'
@@ -84,9 +75,13 @@ export async function queueDownload(
 ): Promise<void> {
   const fullAt = downloads.diskFullAt.get(record.id)
 
-  if (downloads.stopped || isDownloadQueued(record.id)) return
+  if (downloads.stopped || isDownloadQueued(record.id)) {
+    return
+  }
 
-  if (!isNil(fullAt) && Date.now() - fullAt < DISK_FULL_RETRY_MS) return
+  if (!isNil(fullAt) && Date.now() - fullAt < DISK_FULL_RETRY_MS) {
+    return
+  }
 
   let marked = record
 
@@ -102,16 +97,21 @@ function drainDownloads(): void {
   while (!downloads.stopped && downloads.active.size < MAX_DOWNLOADS) {
     const entry = downloads.pending.entries().next().value
 
-    if (!entry) return
+    if (!entry) {
+      return
+    }
 
     const [id, task] = entry
 
     downloads.pending.delete(id)
     downloads.active.add(id)
+
     void withLock(id, async () => {
       const current = await getGeneration(id)
 
-      if (!current || current.output) return
+      if (!current || current.output) {
+        return
+      }
 
       await finalize({ ...task.record, favorite: current.favorite }, task.job)
     })
@@ -156,7 +156,9 @@ interface ExpiryParams {
 async function isExpiredBeforeDownload(params: ExpiryParams): Promise<boolean> {
   const { job, video } = params
 
-  if (isNil(job.expires_at) || Date.now() <= job.expires_at * 1000) return false
+  if (isNil(job.expires_at) || Date.now() <= job.expires_at * 1000) {
+    return false
+  }
 
   return !(await exists(video))
 }
@@ -170,6 +172,7 @@ async function handleDownloadFailure(record: GenerationRecord, error: unknown): 
 
   downloads.failures.delete(record.id)
   downloads.diskFullAt.set(record.id, Date.now())
+
   await saveGeneration({
     ...record,
     download: undefined,
@@ -191,23 +194,35 @@ async function completeDownload(params: CompleteDownloadParams): Promise<void> {
   downloads.diskFullAt.delete(record.id)
   const preview = await makePreview({ id: record.id, video, out: previewPath })
   const probe = await probeMedia(video).catch(() => null)
+
   const bytes = await fs
     .stat(video)
     .then((stat) => stat.size)
     .catch(() => null)
+
   const output: NonNullable<GenerationRecord['output']> = {
     video: `${record.id}.mp4`,
   }
 
-  if (!isNil(preview)) output.preview = preview
+  if (!isNil(preview)) {
+    output.preview = preview
+  }
 
-  if (!isNil(probe?.width)) output.width = probe.width
+  if (!isNil(probe?.width)) {
+    output.width = probe.width
+  }
 
-  if (!isNil(probe?.height)) output.height = probe.height
+  if (!isNil(probe?.height)) {
+    output.height = probe.height
+  }
 
-  if (!isNil(probe?.durationSec)) output.durationSec = probe.durationSec
+  if (!isNil(probe?.durationSec)) {
+    output.durationSec = probe.durationSec
+  }
 
-  if (!isNil(bytes)) output.bytes = bytes
+  if (!isNil(bytes)) {
+    output.bytes = bytes
+  }
 
   await saveGeneration({
     ...record,
@@ -226,7 +241,9 @@ async function saveRetry(record: GenerationRecord, error: unknown): Promise<void
   const message = error instanceof Error ? error.message : 'Download failed'
   const isFailed = count >= MAX_DOWNLOAD_RETRIES
 
-  if (isFailed) downloads.failures.delete(record.id)
+  if (isFailed) {
+    downloads.failures.delete(record.id)
+  }
 
   await saveGeneration({
     ...record,
@@ -236,31 +253,14 @@ async function saveRetry(record: GenerationRecord, error: unknown): Promise<void
   })
 }
 
-async function makePreview(params: MakePreviewParams): Promise<string | undefined> {
-  const { id, video, out } = params
-
-  try {
-    await extractFrame({
-      videoPath: video,
-      atSec: PREVIEW_AT_SEC,
-      width: PREVIEW_WIDTH,
-      outPath: out,
-    })
-
-    return `${id}.preview.png`
-  } catch (error) {
-    console.error(`[not-higgsfield] preview failed for ${id}`, error)
-
-    return undefined
-  }
-}
-
 async function download(params: DownloadParams): Promise<void> {
   const { id, job, input } = params
   const paths = downloadPaths(id)
   const response = await openContent({ id, job, input })
 
-  if (!response.body) throw new Error('Empty video response')
+  if (!response.body) {
+    throw new Error('Empty video response')
+  }
 
   await fs.mkdir(path.dirname(paths.part), { recursive: true })
 
@@ -270,6 +270,7 @@ async function download(params: DownloadParams): Promise<void> {
     await pipeline(Readable.fromWeb(body), createWriteStream(paths.part), {
       signal: AbortSignal.timeout(FETCH_TIMEOUTS.content),
     })
+
     await fs.rename(paths.part, paths.video)
   } catch (error) {
     await fs.unlink(paths.part).catch(() => {})
@@ -286,24 +287,16 @@ async function openContent(params: DownloadParams): Promise<Response> {
   } catch (error) {
     const url = job.urls?.[0]
 
-    if (isNil(url) || url === '') throw error
+    if (isNil(url) || url === '') {
+      throw error
+    }
 
     const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUTS.content) })
 
-    if (!res.ok) throw new Error(`Video download failed (${res.status})`)
+    if (!res.ok) {
+      throw new Error(`Video download failed (${res.status})`)
+    }
 
     return res
   }
-}
-
-async function exists(file: string): Promise<boolean> {
-  return fs.stat(file).then(
-    () => true,
-    () => false,
-  )
-}
-
-/** ENOSPC is retried after a pause, not only after a restart. */
-function isDiskFull(error: unknown): boolean {
-  return (error as NodeJS.ErrnoException | undefined)?.code === 'ENOSPC'
 }

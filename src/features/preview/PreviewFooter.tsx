@@ -32,14 +32,20 @@ interface PreviewFooterProps {
 export function PreviewFooter(props: PreviewFooterProps) {
   const { item, actions, onRun: handleRun } = props
 
-  if (!item) return null
+  if (!item) {
+    return null
+  }
 
   const available = actions?.available?.(item)
+
   const isVisible = (action: (typeof ACTIONS)[number]) =>
     !isNil(actions?.[action.key]) && (isNil(available) || available.includes(action.key))
+
   const provided = ACTIONS.filter(isVisible)
 
-  if (provided.length === 0) return null
+  if (provided.length === 0) {
+    return null
+  }
 
   return (
     <footer className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-line px-4 py-3">

@@ -50,7 +50,9 @@ const cache = globalState('credits', () => ({ entry: undefined as CacheEntry | u
 export async function getCredits(opts?: { fresh?: boolean }): Promise<CreditsInfo> {
   const cached = cache.entry
 
-  if (opts?.fresh !== true && cached && Date.now() - cached.at < CACHE_MS) return cached.info
+  if (opts?.fresh !== true && cached && Date.now() - cached.at < CACHE_MS) {
+    return cached.info
+  }
 
   try {
     const info = await loadCredits()
@@ -83,9 +85,12 @@ async function loadCredits(): Promise<CreditsInfo> {
 
   const key = getSecret('OPENROUTER_API_KEY')
 
-  if (!isNonEmptyString(key)) throw new Error('OpenRouter key is not set. Open Settings.')
+  if (!isNonEmptyString(key)) {
+    throw new Error('OpenRouter key is not set. Open Settings.')
+  }
 
   const keyInfo = await fetchKey(key)
+
   const info: CreditsInfo = {
     balance: null,
     keyLimitRemaining: keyInfo.limit_remaining ?? null,
@@ -99,7 +104,9 @@ async function loadCredits(): Promise<CreditsInfo> {
 
   const managementKey = getSecret('OPENROUTER_MANAGEMENT_KEY')
 
-  if (!isNonEmptyString(managementKey)) return info
+  if (!isNonEmptyString(managementKey)) {
+    return info
+  }
 
   try {
     const credits = await fetchCredits(managementKey)
@@ -117,7 +124,9 @@ async function loadCredits(): Promise<CreditsInfo> {
 async function fetchKey(key: string): Promise<z.infer<typeof KeySchema>['data']> {
   const parsed = KeySchema.safeParse(await getJson(`${BASE_URL}/api/v1/key`, key))
 
-  if (!parsed.success) throw new Error('Invalid OpenRouter key response')
+  if (!parsed.success) {
+    throw new Error('Invalid OpenRouter key response')
+  }
 
   return parsed.data.data
 }
@@ -125,7 +134,9 @@ async function fetchKey(key: string): Promise<z.infer<typeof KeySchema>['data']>
 async function fetchCredits(key: string): Promise<z.infer<typeof CreditsSchema>['data']> {
   const parsed = CreditsSchema.safeParse(await getJson(`${BASE_URL}/api/v1/credits`, key))
 
-  if (!parsed.success) throw new Error('Invalid OpenRouter credits response')
+  if (!parsed.success) {
+    throw new Error('Invalid OpenRouter credits response')
+  }
 
   return parsed.data.data
 }
@@ -137,7 +148,9 @@ async function getJson(url: string, key: string): Promise<unknown> {
     signal: AbortSignal.timeout(FETCH_TIMEOUTS.meta),
   })
 
-  if (!res.ok) throw new Error(`OpenRouter ${res.status} ${res.statusText}`)
+  if (!res.ok) {
+    throw new Error(`OpenRouter ${res.status} ${res.statusText}`)
+  }
 
   return res.json()
 }
@@ -147,7 +160,9 @@ function spentLocally(): Promise<number> {
 }
 
 function withError(last: CreditsInfo | null, message: string): CreditsInfo {
-  if (last) return { ...last, error: message }
+  if (last) {
+    return { ...last, error: message }
+  }
 
   const fetchedAt = new Date().toISOString()
 

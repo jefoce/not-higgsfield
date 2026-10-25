@@ -30,7 +30,9 @@ function route(items: UploadItem[]): void {
   const hasStart = !isNil(state.frames.start) && state.frames.start !== ''
   const hasEnd = !isNil(state.frames.end) && state.frames.end !== ''
 
-  if (hasStart && preset.frames.end && !hasEnd) slot = 'end'
+  if (hasStart && preset.frames.end && !hasEnd) {
+    slot = 'end'
+  }
 
   const image = items.find((item) => item.kind === 'image')
 
@@ -47,7 +49,9 @@ function route(items: UploadItem[]): void {
 function allowedKinds(): MediaKind[] {
   const state = useGeneratorStore.getState()
 
-  if (state.tab !== 'references') return ['image']
+  if (state.tab !== 'references') {
+    return ['image']
+  }
 
   const preset = getPreset(state.presetId)
   const { counts } = referenceSlots(state.references, (id) => state.uploadsById[id]?.kind)
@@ -67,6 +71,7 @@ export function usePanelPaste() {
       .then(route)
       .catch((error) => toast.error(errorMessage(error)))
   }
+
   const { onPaste: handlePaste } = usePasteMedia({
     enabled: true,
     scope: 'element',
@@ -85,6 +90,7 @@ export function usePanelPaste() {
 export function useUploadsRefresh() {
   const frames = useGeneratorStore((state) => state.frames)
   const references = useGeneratorStore((state) => state.references)
+
   const idsKey = useMemo(
     () =>
       [...new Set([frames.start, frames.end, ...references])]
@@ -98,7 +104,9 @@ export function useUploadsRefresh() {
     const refresh = () => {
       const ids = idsKey.split(',').filter(Boolean)
 
-      if (ids.length === 0) return
+      if (ids.length === 0) {
+        return
+      }
 
       void fetchUploads({ ids })
         .then((items) => useGeneratorStore.getState().upsertUploads(items))

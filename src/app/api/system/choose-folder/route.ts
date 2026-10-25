@@ -14,11 +14,15 @@ export async function POST(request: Request) {
     assertLocalRequest(request)
     const body = BodySchema.safeParse(await readJsonBody(request))
 
-    if (!body.success) return zodError(body.error)
+    if (!body.success) {
+      return zodError(body.error)
+    }
 
     const path = await getSystem().chooseFolder({ prompt: PROMPT })
 
-    if (isNil(path) || path === '') return Response.json(null, { status: 201 })
+    if (isNil(path) || path === '') {
+      return Response.json(null, { status: 201 })
+    }
 
     return Response.json(await addFolder({ path }), { status: 201 })
   } catch (error) {

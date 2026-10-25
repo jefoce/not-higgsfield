@@ -39,6 +39,7 @@ export function StatusOverlay(props: StatusOverlayProps) {
     fill: isFill = false,
     onCancel: handleCancel,
   } = props
+
   const key = statusHelpKey(record)
   const help = STATUS_HELP[key]
   const isGrace = isGraceRecord(record)
@@ -56,6 +57,7 @@ export function StatusOverlay(props: StatusOverlayProps) {
   const canCancel = isGraceCancelVisible({ record, remainingMs, onCancel: handleCancel })
   const aspectStyle = { aspectRatio: boxAspect ?? recordAspect(record), margin: '0 auto' }
   const boxStyle = isFill ? undefined : aspectStyle
+
   const handleRerun = useCallback(() => void rerunRecord(record), [record])
 
   return (

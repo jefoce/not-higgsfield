@@ -8,6 +8,7 @@ const EXT_BY_KIND = { image: '.png', video: '.mp4', audio: '.mp3' } satisfies Re
   MediaKind,
   string
 >
+
 const MIME_BY_KIND = {
   image: 'image/png',
   video: 'video/mp4',

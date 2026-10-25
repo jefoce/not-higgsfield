@@ -33,8 +33,11 @@ export const useSelectionStore = create<SelectionState>()((set, get) => ({
     set((state) => {
       const ids = new Set(state.ids)
 
-      if (ids.has(id)) ids.delete(id)
-      else ids.add(id)
+      if (ids.has(id)) {
+        ids.delete(id)
+      } else {
+        ids.add(id)
+      }
 
       return { ids, anchorId: id }
     }),
@@ -56,7 +59,9 @@ export const useSelectionStore = create<SelectionState>()((set, get) => ({
     set((state) => {
       const ids = new Set(state.ids)
 
-      for (const id of order.slice(start, end + 1)) ids.add(id)
+      for (const id of order.slice(start, end + 1)) {
+        ids.add(id)
+      }
 
       return { ids }
     })
@@ -69,8 +74,11 @@ export const useSelectionStore = create<SelectionState>()((set, get) => ({
       const ids = new Set(state.ids)
 
       for (const id of list) {
-        if (isOn) ids.add(id)
-        else ids.delete(id)
+        if (isOn) {
+          ids.add(id)
+        } else {
+          ids.delete(id)
+        }
       }
 
       return { ids }
@@ -81,12 +89,15 @@ export const useSelectionStore = create<SelectionState>()((set, get) => ({
   prune: (existing) =>
     set((state) => {
       const ids = new Set([...state.ids].filter((id) => existing.has(id)))
+
       const anchorId =
         !isNil(state.anchorId) && state.anchorId !== '' && existing.has(state.anchorId)
           ? state.anchorId
           : null
 
-      if (ids.size === state.ids.size && anchorId === state.anchorId) return state
+      if (ids.size === state.ids.size && anchorId === state.anchorId) {
+        return state
+      }
 
       return { ids, anchorId }
     }),

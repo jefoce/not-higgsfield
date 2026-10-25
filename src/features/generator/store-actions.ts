@@ -20,11 +20,14 @@ import { createReferenceActions } from './store-reference-actions'
 type MentionInserter = (slot: RefSlot) => void
 
 type SlotFocuser = (slot: RefSlot, occurrence: number) => void
+
 let mentionInserter: MentionInserter | null = null
 let slotFocuser: SlotFocuser | null = null
 
 function clampSeed(seed: number | null): number | null {
-  if (isNil(seed)) return null
+  if (isNil(seed)) {
+    return null
+  }
 
   return clamp(Math.round(seed), 0, SEED_MAX)
 }
@@ -65,13 +68,16 @@ interface NormalizedDraftParams {
 /** Normalizes a draft to the preset, toasts the notes and drops the per-tab prompt. */
 function normalizedDraft(params: NormalizedDraftParams): Partial<GeneratorState> {
   const { state, preset, overrides } = params
+
   const { input, notes } = normalizeForPreset({
     input: { ...inputFromState(state), ...overrides },
     preset,
     uploads: state.uploadsById,
   })
 
-  if (notes.length > 0) toast(notes.join(' \u00b7 '))
+  if (notes.length > 0) {
+    toast(notes.join(' \u00b7 '))
+  }
 
   return omit(input, 'prompt')
 }
@@ -90,13 +96,16 @@ export const createGeneratorState: StateCreator<
     set((state) => {
       const preset = findPreset(id)
 
-      if (!preset) return {}
+      if (!preset) {
+        return {}
+      }
 
       return normalizedDraft({ state, preset })
     }),
   setTab: (tab) =>
     set((state) => {
       const preset = getPreset(state.presetId)
+
       const isInvalid =
         state.aspectRatio === 'auto' &&
         (tab !== 'frames' || isNil(state.frames.start) || state.frames.start === '')
@@ -116,6 +125,7 @@ export const createGeneratorState: StateCreator<
   setDuration: (duration) =>
     set((state) => {
       const preset = getPreset(state.presetId)
+
       const limit = maxDurationFor({
         input: inputFromState(state),
         uploads: state.uploadsById,
@@ -126,9 +136,12 @@ export const createGeneratorState: StateCreator<
     }),
   setAspectRatio: (aspectRatio) =>
     set((state) => {
-      if (aspectRatio !== 'auto') return { aspectRatio }
+      if (aspectRatio !== 'auto') {
+        return { aspectRatio }
+      }
 
       const preset = getPreset(state.presetId)
+
       const isAllowed =
         state.tab === 'frames' && Boolean(state.frames.start) && preset.autoAspectWithFrames
 

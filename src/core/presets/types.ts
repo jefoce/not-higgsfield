@@ -14,6 +14,7 @@ export const ASPECT_RATIOS = [
   '9:16',
   '9:21',
 ] as const
+
 export type AspectRatio = (typeof ASPECT_RATIOS)[number]
 export type AspectChoice = AspectRatio | 'auto'
 

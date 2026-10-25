@@ -186,6 +186,7 @@ describe('paginate', () => {
       record({ id: 'z', createdAt: at(5) }),
       record({ id: 'y', createdAt: at(5) }),
     ])
+
     const first = paginate({ records: same, cursor: null, limit: 1 })
 
     expect(first.items.map((r) => r.id)).toEqual(['z'])
@@ -195,6 +196,7 @@ describe('paginate', () => {
     const third = paginate({ records: same, cursor: second.nextCursor, limit: 1 })
 
     expect(third.items.map((r) => r.id)).toEqual(['x'])
+
     expect(paginate({ records: same, cursor: at(5), limit: 10 }).items.map((r) => r.id)).toEqual([
       'z',
       'y',

@@ -13,12 +13,17 @@ export async function POST(request: Request, { params }: Params) {
   try {
     assertLocalRequest(request)
     const { id } = await params
+
     const result = await withLock(id, async () => {
       const record = await getGeneration(id)
 
-      if (!record) return 'missing'
+      if (!record) {
+        return 'missing'
+      }
 
-      if (!canCancelInGrace(record)) return 'sent'
+      if (!canCancelInGrace(record)) {
+        return 'sent'
+      }
 
       cancelScheduledSubmit(id)
       await deleteGenerationFiles(id)
@@ -26,9 +31,13 @@ export async function POST(request: Request, { params }: Params) {
       return 'cancelled'
     })
 
-    if (result === 'missing') return jsonError({ status: 404, error: 'Generation not found' })
+    if (result === 'missing') {
+      return jsonError({ status: 404, error: 'Generation not found' })
+    }
 
-    if (result === 'sent') return jsonError({ status: 409, error: 'Already sent, cannot cancel' })
+    if (result === 'sent') {
+      return jsonError({ status: 409, error: 'Already sent, cannot cancel' })
+    }
 
     return new Response(null, { status: 204 })
   } catch (error) {

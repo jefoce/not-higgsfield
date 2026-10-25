@@ -24,7 +24,9 @@ export type { ValidationIssue, ValidationResult } from './validation-types'
 
 /** Exact display text for a warning. */
 export function issueText(issue: ValidationIssue): string {
-  if (issue.type === 'text') return issue.text
+  if (issue.type === 'text') {
+    return issue.text
+  }
 
   return `@${slotLabel(issue.slot)} is not attached (${issue.attached} ${KIND_PLURAL[issue.slot.kind]})`
 }
@@ -96,6 +98,7 @@ export function validateInput(params: ValidateInputParams): ValidationResult {
     validateReferences({ input, uploads, preset, ctx }),
     validateLimits({ input, uploads, preset, ctx }),
   ]
+
   const errors = groups.flatMap((group) => group.errors)
   const warnings = groups.flatMap((group) => group.warnings)
 

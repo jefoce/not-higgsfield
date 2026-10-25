@@ -27,7 +27,9 @@ export function useAddFolderBrowse(isOpen: boolean): AddFolderBrowse {
   const [reload, setReload] = useState(0)
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) {
+      return
+    }
 
     let isAlive = true
 
@@ -47,6 +49,7 @@ export function useAddFolderBrowse(isOpen: boolean): AddFolderBrowse {
   }, [])
 
   const navigateRoot = useCallback(() => navigate('/'), [navigate])
+
   const navigateParent = useCallback(() => navigate(data?.parent ?? '/'), [data?.parent, navigate])
 
   const reset = useCallback(() => {

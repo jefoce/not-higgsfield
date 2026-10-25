@@ -32,8 +32,11 @@ export function DetailsActions(props: DetailsActionsProps) {
   const friendly = isFailed ? recordError(record) : null
 
   const handleReuse = useCallback(() => void rerunRecord(record), [record])
+
   const handleDownload = useCallback(() => void saveRecordVideo(record), [record])
+
   const handleFavorite = useCallback(() => void toggleFavorite(record), [record])
+
   const handleOpenDelete = useCallback(() => setIsConfirmOpen(true), [])
 
   return (

@@ -6,6 +6,7 @@ import { downloadPaths } from '@/server/paths'
 /** Existing absolute path of the record's video, or null. */
 export async function videoSource(id: string): Promise<string | null> {
   const source = downloadPaths(id).video
+
   const isFile = await fs.stat(source).then(
     (stats) => stats.isFile(),
     () => false,
@@ -21,7 +22,9 @@ export async function copyExclusive(source: string, target: string): Promise<boo
 
     return true
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'EEXIST') return false
+    if ((error as NodeJS.ErrnoException).code === 'EEXIST') {
+      return false
+    }
 
     throw error
   }

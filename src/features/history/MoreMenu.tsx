@@ -38,13 +38,21 @@ export function MoreMenu(props: MoreMenuProps) {
   const hasFullVideoRefs = getPreset(record.preset.id).references.video === 0
 
   const handleCaptureLast = useCallback(() => void captureFrame(record, 'last'), [record])
+
   const handleCaptureFirst = useCallback(() => void captureFrame(record, 'first'), [record])
+
   const handleAddReference = useCallback(() => void addReference(record), [record])
+
   const handleCopyPrompt = useCallback(() => void copyPrompt(record), [record])
+
   const handleCopySeed = useCallback(() => void copySeed(record), [record])
+
   const handleReveal = useCallback(() => void revealRecord(record), [record])
+
   const handleRemove = useCallback(() => {
-    if (!cancelInGrace(record)) setIsConfirmOpen(true)
+    if (!cancelInGrace(record)) {
+      setIsConfirmOpen(true)
+    }
   }, [record])
 
   return (

@@ -81,6 +81,7 @@ describe('validateInput submit and inline limits', () => {
       ...preset,
       inputTransport: { image: 'base64', video: 'base64', audio: 'base64' },
     } as const
+
     const result = validateInput({
       input: input({ references: ['v'] }),
       uploads: uploadsOf(upload('v', 'video', { sizeBytes: 60 * MB })),
@@ -112,6 +113,7 @@ describe('validateInput media limits', () => {
     })
 
     expect(result.ok).toBe(true)
+
     expect(result.warnings).toContainEqual({
       type: 'text',
       text: 'Low resolution input, output may look soft',

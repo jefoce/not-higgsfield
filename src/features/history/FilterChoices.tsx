@@ -51,23 +51,28 @@ export function FilterChoices() {
     (status: NonNullable<ViewFilters['status']>) => setFilters({ status }),
     [setFilters],
   )
+
   const handleModeChange = useCallback(
     (mode: NonNullable<ViewFilters['mode']>) =>
       setFilters({ mode, tab: mode === 'frames' || mode === 'references' ? mode : 'all' }),
     [setFilters],
   )
+
   const handleModelChange = useCallback(
     (model: NonNullable<ViewFilters['model']>) => setFilters({ model }),
     [setFilters],
   )
+
   const handleResolutionChange = useCallback(
     (resolution: NonNullable<ViewFilters['resolution']>) => setFilters({ resolution }),
     [setFilters],
   )
+
   const handleAspectChange = useCallback(
     (aspect: NonNullable<ViewFilters['aspect']>) => setFilters({ aspect }),
     [setFilters],
   )
+
   const handleAudioChange = useCallback(
     (audio: NonNullable<ViewFilters['audio']>) => setFilters({ audio }),
     [setFilters],

@@ -14,10 +14,12 @@ describe('outputSize', () => {
       width: 1280,
       height: 720,
     })
+
     expect(outputSize({ preset: seedance, resolution: '4K', aspect: '21:9' })).toEqual({
       width: 5040,
       height: 2160,
     })
+
     expect(outputSize({ preset: seedance25, resolution: '480p', aspect: '4:3' })).toEqual({
       width: 752,
       height: 560,
@@ -29,6 +31,7 @@ describe('outputSize', () => {
       width: 720,
       height: 1680,
     })
+
     expect(outputSize({ preset: wan, resolution: '1080p', aspect: '21:9' })).toEqual({
       width: 2520,
       height: 1080,

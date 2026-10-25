@@ -20,7 +20,9 @@ export async function POST(request: Request) {
     assertLocalRequest(request)
     const body = BodySchema.safeParse(await readJsonBody(request))
 
-    if (!body.success) return zodError(body.error)
+    if (!body.success) {
+      return zodError(body.error)
+    }
 
     const { action, ids, favorite: isFavorite } = body.data
 
@@ -34,8 +36,11 @@ export async function POST(request: Request) {
     for (const id of ids) {
       const reason = await runAction({ action, id, isFavorite: isFavorite === true })
 
-      if (isNil(reason)) done.push(id)
-      else skipped.push({ id, reason })
+      if (isNil(reason)) {
+        done.push(id)
+      } else {
+        skipped.push({ id, reason })
+      }
     }
 
     return Response.json({ done, skipped })
@@ -53,7 +58,9 @@ interface RunActionParams {
 async function runAction(params: RunActionParams): Promise<SkipReason | null> {
   const { action, id, isFavorite } = params
 
-  if (action === 'favorite') return favoriteOne(id, isFavorite)
+  if (action === 'favorite') {
+    return favoriteOne(id, isFavorite)
+  }
 
   return deleteOne(id)
 }
@@ -67,9 +74,13 @@ async function favoriteOne(id: string, isFavorite: boolean): Promise<SkipReason 
 async function deleteOne(id: string): Promise<SkipReason | null> {
   const result = await deleteGeneration(id)
 
-  if (result === 'deleted') return null
+  if (result === 'deleted') {
+    return null
+  }
 
-  if (result === 'not_found') return 'not_found'
+  if (result === 'not_found') {
+    return 'not_found'
+  }
 
   return 'active'
 }

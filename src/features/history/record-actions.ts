@@ -13,7 +13,9 @@ import { refreshHistory } from '@/lib/swr-keys'
 /** Saves a finished video, surfacing only real saves and failures as a toast. */
 export async function saveRecordVideo(record: GenerationRecord): Promise<void> {
   try {
-    if (await platform.saveVideo(record)) toast.success('Video saved')
+    if (await platform.saveVideo(record)) {
+      toast.success('Video saved')
+    }
   } catch (error) {
     toast.error(errorMessage(error))
   }
@@ -105,14 +107,20 @@ export async function rerunRecord(record: GenerationRecord, presetId?: string): 
         { ...record.input, presetId: presetId ?? record.input.presetId, seed: record.seedUsed },
         [...uploads, ...ghosts],
       )
+
     toast.success('Settings loaded')
 
-    if (ghosts.length > 0) toast(`${ghosts.length} inputs no longer exist`)
+    if (ghosts.length > 0) {
+      toast(`${ghosts.length} inputs no longer exist`)
+    }
 
     const panel = document.getElementById('generator-panel')
 
-    if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    else window.scrollTo({ top: 0, behavior: 'smooth' })
+    if (panel) {
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   } catch (error) {
     toast.error(errorMessage(error))
   }

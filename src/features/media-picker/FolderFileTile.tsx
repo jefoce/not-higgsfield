@@ -23,8 +23,11 @@ interface FolderFileTileProps {
 export function FolderFileTile(props: FolderFileTileProps) {
   const { file, src, isBroken, isSelected, onPickFile, onExpand, onBroken } = props
   const isAudio = file.kind === 'audio'
+
   const handleSelect = useCallback(() => onPickFile(file.rel), [file.rel, onPickFile])
+
   const handleImageError = useCallback(() => onBroken(src), [onBroken, src])
+
   const handleExpandClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()

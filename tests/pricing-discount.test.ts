@@ -30,12 +30,16 @@ function stubFetch(
       const url = String(input)
 
       if (url.endsWith('/endpoints')) {
-        if (options.endpointsFail === true) throw new Error('endpoints down')
+        if (options.endpointsFail === true) {
+          throw new Error('endpoints down')
+        }
 
         return response({ data: { endpoints: [{ pricing: { discount } }] } })
       }
 
-      if (options.modelsFail === true) throw new Error('models down')
+      if (options.modelsFail === true) {
+        throw new Error('models down')
+      }
 
       return response({
         data: [{ id: options.id ?? 'alibaba/wan-3.0', pricing_skus: options.skus ?? WAN_SKUS }],
@@ -57,16 +61,19 @@ describe('getPricing discounts', () => {
     const info = await getPricing(getPreset('wan-3.0'), true)
 
     expect(info).toMatchObject({ source: 'live', discount: 0.15 })
+
     expect(info.skus).toEqual({
       duration_seconds_480p: 0.0425,
       duration_seconds_720p: 0.085,
       duration_seconds_1080p: 0.17,
     })
+
     expect(info.listSkus).toEqual({
       duration_seconds_480p: 0.05,
       duration_seconds_720p: 0.1,
       duration_seconds_1080p: 0.2,
     })
+
     expect(Object.keys(info).sort()).toEqual([
       'discount',
       'fetchedAt',
@@ -78,6 +85,7 @@ describe('getPricing discounts', () => {
 
   it('keeps Seedance token precision after a discount', async () => {
     vi.stubEnv('OPENROUTER_MOCK', '')
+
     stubFetch(0.15, {
       id: 'bytedance/seedance-2.0',
       skus: { video_tokens: '0.0000043', video_tokens_sd: '0.000007' },

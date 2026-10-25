@@ -20,13 +20,17 @@ export function usePickerSelection(request: PickerRequest): PickerSelection {
 
   const commit = useCallback(
     (items: UploadItem[]) => {
-      if (request !== useMediaPickerStore.getState().request) return
+      if (request !== useMediaPickerStore.getState().request) {
+        return
+      }
 
       const allowed = items.filter(
         (item) => item.missing !== true && request.kinds.includes(item.kind),
       )
 
-      if (isEmpty(allowed)) return
+      if (isEmpty(allowed)) {
+        return
+      }
 
       if (request.max === 1) {
         request.onPick([allowed[0]])
@@ -46,7 +50,9 @@ export function usePickerSelection(request: PickerRequest): PickerSelection {
             continue
           }
 
-          if (next.length < request.max) next.push(item)
+          if (next.length < request.max) {
+            next.push(item)
+          }
         }
 
         return next

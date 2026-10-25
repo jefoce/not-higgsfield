@@ -37,16 +37,19 @@ describe('useImagePlan', () => {
     act(() => {
       vi.advanceTimersByTime(399)
     })
+
     expect(post).not.toHaveBeenCalled()
 
     act(() => {
       vi.advanceTimersByTime(1)
     })
+
     expect(post).toHaveBeenCalledWith('/api/references/plan', { presetId: 'wan-3.0', ids: ['a'] })
 
     await act(async () => {
       answer.resolve(plan(2))
     })
+
     expect(result.current?.step).toBe(2)
   })
 
@@ -55,6 +58,7 @@ describe('useImagePlan', () => {
     const newer = deferred<ReferencePlan>()
 
     post.mockReturnValueOnce(older.promise).mockReturnValueOnce(newer.promise)
+
     const { result, rerender } = renderHook(({ ids }) => useImagePlan('wan-3.0', ids), {
       initialProps: { ids: ['a'] },
     })
@@ -62,28 +66,35 @@ describe('useImagePlan', () => {
     act(() => {
       vi.advanceTimersByTime(400)
     })
+
     rerender({ ids: ['b'] })
+
     act(() => {
       vi.advanceTimersByTime(400)
     })
+
     expect(post).toHaveBeenCalledTimes(2)
 
     await act(async () => {
       newer.resolve(plan(3))
     })
+
     expect(result.current?.step).toBe(3)
 
     await act(async () => {
       older.resolve(plan(1))
     })
+
     expect(result.current?.step).toBe(3)
   })
 
   it('does nothing without images', () => {
     renderHook(() => useImagePlan('wan-3.0', []))
+
     act(() => {
       vi.advanceTimersByTime(400)
     })
+
     expect(post).not.toHaveBeenCalled()
   })
 })

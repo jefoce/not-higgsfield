@@ -40,12 +40,16 @@ const cache = globalState<Map<string, CacheEntry>>('pricing', () => new Map())
 
 /** List and discounted rates. Live results cache for an hour, fallback for five minutes. */
 export async function getPricing(preset: ModelPreset, isForce = false): Promise<PricingInfo> {
-  if (isMockMode()) return mockPricing(preset)
+  if (isMockMode()) {
+    return mockPricing(preset)
+  }
 
   const cached = cache.get(preset.id)
   const ttl = cached?.info.source === 'live' ? LIVE_TTL_MS : PRICING_FALLBACK_TTL_MS
 
-  if (!isForce && cached && Date.now() - cached.at < ttl) return cached.info
+  if (!isForce && cached && Date.now() - cached.at < ttl) {
+    return cached.info
+  }
 
   const info = await fetchPricing(preset)
 
@@ -82,11 +86,15 @@ function fallback(preset: ModelPreset): PricingInfo {
 async function fetchPricing(preset: ModelPreset): Promise<PricingInfo> {
   const [listSkus, discount] = await Promise.all([fetchListSkus(preset), fetchDiscount(preset)])
 
-  if (!listSkus) return fallback(preset)
+  if (!listSkus) {
+    return fallback(preset)
+  }
 
   let skus = { ...listSkus }
 
-  if (discount > 0) skus = applyDiscount(listSkus, discount)
+  if (discount > 0) {
+    skus = applyDiscount(listSkus, discount)
+  }
 
   return {
     skus,
@@ -104,11 +112,15 @@ async function fetchListSkus(preset: ModelPreset): Promise<Record<string, number
       signal: AbortSignal.timeout(FETCH_TIMEOUTS.meta),
     })
 
-    if (!res.ok) return null
+    if (!res.ok) {
+      return null
+    }
 
     const parsed = ModelsSchema.safeParse(await res.json())
 
-    if (!parsed.success) return null
+    if (!parsed.success) {
+      return null
+    }
 
     const model = parsed.data.data.find((item) => item.id === preset.slug)
 
@@ -125,11 +137,15 @@ async function fetchDiscount(preset: ModelPreset): Promise<number> {
       signal: AbortSignal.timeout(FETCH_TIMEOUTS.meta),
     })
 
-    if (!res.ok) return 0
+    if (!res.ok) {
+      return 0
+    }
 
     const parsed = EndpointsSchema.safeParse(await res.json())
 
-    if (!parsed.success) return 0
+    if (!parsed.success) {
+      return 0
+    }
 
     // Reads the first endpoint. Each model has one provider today, add per-endpoint pricing before a second provider.
     const raw = parsed.data.data.endpoints[0]?.pricing?.discount
@@ -153,14 +169,18 @@ function applyDiscount(listSkus: Record<string, number>, discount: number): Reco
 
 /** Converts every SKU value to a number, dropping non-finite entries. */
 function readSkus(skus: Record<string, unknown> | undefined): Record<string, number> | null {
-  if (!skus) return null
+  if (!skus) {
+    return null
+  }
 
   const result: Record<string, number> = {}
 
   for (const [key, raw] of Object.entries(skus)) {
     const value = Number(raw)
 
-    if (Number.isFinite(value)) result[key] = value
+    if (Number.isFinite(value)) {
+      result[key] = value
+    }
   }
 
   return isEmpty(result) ? null : result

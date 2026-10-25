@@ -21,16 +21,22 @@ export async function POST(request: Request) {
     assertLocalRequest(request)
     const body = PlanSchema.safeParse(await readJsonBody(request))
 
-    if (!body.success) return zodError(body.error)
+    if (!body.success) {
+      return zodError(body.error)
+    }
 
     const preset = findPreset(body.data.presetId)
 
-    if (!preset) return jsonError({ status: 400, error: 'Unknown model' })
+    if (!preset) {
+      return jsonError({ status: 400, error: 'Unknown model' })
+    }
 
     const items = await Promise.all(uniq(body.data.ids).map((id) => getUpload(id)))
+
     const uploads = items.filter(
       (item): item is UploadItem => !isNil(item) && item.kind === 'image' && item.missing !== true,
     )
+
     const { plan } = await encodeImages({
       uploads,
       preset,

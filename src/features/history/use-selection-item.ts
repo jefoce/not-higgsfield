@@ -16,8 +16,11 @@ export function useSelectionItem(id: string): {
   const selectRange = useSelectionStore((state) => state.selectRange)
 
   const select = (isShift: boolean) => {
-    if (isShift) selectRange(id)
-    else toggle(id)
+    if (isShift) {
+      selectRange(id)
+    } else {
+      toggle(id)
+    }
   }
 
   return { selected: isSelected, selecting: isSelecting, selectable: isSelectable, select }

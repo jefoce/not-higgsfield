@@ -16,16 +16,20 @@ export { randomSeed, slotCounts, uploadForSlot } from './store-helpers'
 
 /** Normalizes the restored draft to the preset once persistence finishes. */
 function rehydrate(state?: GeneratorState): void {
-  if (isNil(state)) return
+  if (isNil(state)) {
+    return
+  }
 
   queueMicrotask(() => {
     const current = useGeneratorStore.getState()
     const preset = findPreset(current.presetId) ?? getPreset(DEFAULT_PRESET_ID)
+
     const { input } = normalizeForPreset({
       input: inputFromState(current),
       preset,
       uploads: current.uploadsById,
     })
+
     const { prompt, ...rest } = input
 
     useGeneratorStore.setState({

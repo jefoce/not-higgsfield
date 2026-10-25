@@ -87,6 +87,7 @@ describe('duration normalization', () => {
 
   it('allows any integer up to the exact reference limit', () => {
     const uploads = { v1: videoReference('v1') }
+
     const allowed = normalizeForPreset({
       input: draft('wan-3.0', 23, ['v1']),
       preset: wan,
@@ -95,6 +96,7 @@ describe('duration normalization', () => {
 
     expect(allowed.input.duration).toBe(23)
     expect(allowed.notes).toEqual([])
+
     const valid = validateInput({
       input: draft('wan-3.0', 23, ['v1']),
       uploads,

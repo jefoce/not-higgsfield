@@ -14,6 +14,7 @@ interface FilterChoiceProps<T extends string> {
 /** One labelled row of single-choice filter buttons. */
 export function FilterChoice<T extends string>(props: FilterChoiceProps<T>) {
   const { label, value, options, onChange } = props
+
   const handleSelect = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => onChange(event.currentTarget.value as T),
     [onChange],

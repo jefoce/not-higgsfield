@@ -29,7 +29,9 @@ export function useFolderConnect(params: UseFolderConnectParams): FolderConnect 
   const [isChoosing, setIsChoosing] = useState(false)
 
   const addFolder = useCallback(async () => {
-    if (!data) return
+    if (!data) {
+      return
+    }
 
     setIsAdding(true)
 
@@ -52,7 +54,9 @@ export function useFolderConnect(params: UseFolderConnectParams): FolderConnect 
     try {
       const folder = await (await getPlatform()).chooseFolder()
 
-      if (!folder) return
+      if (!folder) {
+        return
+      }
 
       toast.success('Folder connected')
       onAdded(folder)
@@ -65,6 +69,7 @@ export function useFolderConnect(params: UseFolderConnectParams): FolderConnect 
   }, [onAdded, onClose])
 
   const add = useCallback(() => void addFolder(), [addFolder])
+
   const chooseNative = useCallback(() => void chooseFolder(), [chooseFolder])
 
   return { isAdding, isChoosing, add, chooseNative }

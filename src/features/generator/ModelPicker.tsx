@@ -24,17 +24,23 @@ export function ModelPicker() {
   const preset = getPreset(presetId)
   const { pricing } = usePricing()
   const discount = pricing?.discount ?? 0
+
   const options = MODEL_PRESETS.filter((option) =>
     option.title.toLowerCase().includes(query.trim().toLowerCase()),
   )
+
   const handleOpenChange = useCallback((isOpen: boolean): void => {
     setIsOpen(isOpen)
 
-    if (!isOpen) setQuery('')
+    if (!isOpen) {
+      setQuery('')
+    }
   }, [])
+
   const handleQueryChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
     setQuery(event.target.value)
   }, [])
+
   const handleSelectPreset = useCallback(
     (id: string): void => {
       setPreset(id)

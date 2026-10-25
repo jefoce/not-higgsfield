@@ -14,7 +14,9 @@ const listeners = new Set<Listener>()
 function notify(): void {
   isPlayingNow = Boolean(audio && !audio.paused)
 
-  for (const listener of listeners) listener()
+  for (const listener of listeners) {
+    listener()
+  }
 }
 
 function syncTime(): void {
@@ -24,13 +26,19 @@ function syncTime(): void {
 }
 
 function element(): HTMLAudioElement | null {
-  if (typeof window === 'undefined') return null
+  if (typeof window === 'undefined') {
+    return null
+  }
 
-  if (audio) return audio
+  if (audio) {
+    return audio
+  }
 
   const next = new Audio()
 
-  for (const event of ['play', 'pause', 'ended'] as const) next.addEventListener(event, notify)
+  for (const event of ['play', 'pause', 'ended'] as const) {
+    next.addEventListener(event, notify)
+  }
 
   next.addEventListener('timeupdate', syncTime)
   next.addEventListener('loadedmetadata', syncTime)
@@ -43,7 +51,9 @@ function element(): HTMLAudioElement | null {
 export function playAudio(src: string): void {
   const player = element()
 
-  if (!player) return
+  if (!player) {
+    return
+  }
 
   if (current !== src) {
     player.pause()
@@ -72,7 +82,9 @@ export function pauseAudio(): void {
 export function seekAudio(seconds: number): void {
   const player = element()
 
-  if (!player || current === '') return
+  if (!player || current === '') {
+    return
+  }
 
   const max = Number.isFinite(player.duration) ? player.duration : length
 

@@ -41,6 +41,7 @@ export function SelectionToolbar(props: SelectionToolbarProps) {
     onDelete: handleDelete,
     onClear: handleClear,
   } = props
+
   const likeLabel = isAllLiked ? 'Unlike selected videos' : 'Like selected videos'
   const downloadTitle = isAllCompleted ? 'Download selected videos' : MIXED_TITLE
   const likeTitle = isAllCompleted ? likeLabel : MIXED_TITLE

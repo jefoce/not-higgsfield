@@ -62,6 +62,7 @@ describe('pricePerSec Wan', () => {
       fallback: { with_audio: 0.3, without_audio: 0.2 },
       referenceVideoFactor: 0,
     }
+
     const preset = withPricing(pricing)
 
     expect(pricePerSec({ preset, ctx: ctx('1080p') })).toBe(0.3)
@@ -79,6 +80,7 @@ describe('pricePerSec Wan', () => {
 
   it('returns null for missing or non-finite keys', () => {
     expect(pricePerSec({ preset: wan, ctx: ctx('768p') })).toBeNull()
+
     const pricing: PresetPricing = {
       kind: 'perSecond',
       unit: 'usd',
@@ -103,6 +105,7 @@ describe('pricePerSec Seedance', () => {
     expect(
       pricePerSec({ preset: seedance, ctx: ctx('720p', { hasVideoInput: true }) }),
     ).toBeCloseTo(0.09288, 6)
+
     expect(
       pricePerSec({ preset: seedance, ctx: ctx('1080p', { hasVideoInput: true }) }),
     ).toBeCloseTo(0.22842, 6)
@@ -125,6 +128,7 @@ describe('pricePerSec Seedance', () => {
   it('computes Seedance 2.5 token rates', () => {
     expect(pricePerSec({ preset: seedance25, ctx: ctx('720p') })).toBeCloseTo(0.23112, 6)
     expect(pricePerSec({ preset: seedance25, ctx: ctx('480p') })).toBeCloseTo(0.1028, 6)
+
     expect(
       pricePerSec({ preset: seedance25, ctx: ctx('720p', { hasVideoInput: true }) }),
     ).toBeCloseTo(0.13824, 6)
@@ -140,6 +144,7 @@ describe('estimatePrice', () => {
       fallback: { per_sec: 0.2 },
       referenceVideoFactor: 0,
     }
+
     const result = estimatePrice({
       preset: withPricing(pricing),
       ctx: ctx('1080p'),

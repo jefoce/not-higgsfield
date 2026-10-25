@@ -46,7 +46,9 @@ export async function saveFileUpload(params: SaveFileUploadParams): Promise<Uplo
   const kind = assertSupported(ext)
   const mime = mimeFromExt(ext)
 
-  if (isNil(mime) || mime === '') throw new UploadError(400, `Unsupported file type: ${ext}`)
+  if (isNil(mime) || mime === '') {
+    throw new UploadError(400, `Unsupported file type: ${ext}`)
+  }
 
   const id = randomUUID()
   const paths = uploadPaths(id, ext)
@@ -83,10 +85,13 @@ export async function listUploads(params: ListUploadsParams = {}): Promise<Uploa
   const { kinds, ids } = params
   let records = await listUploadRecords()
 
-  if (!isNil(kinds) && kinds.length > 0)
+  if (!isNil(kinds) && kinds.length > 0) {
     records = filter(records, (record) => kinds.includes(record.kind))
+  }
 
-  if (!isNil(ids) && ids.length > 0) records = filter(records, (record) => ids.includes(record.id))
+  if (!isNil(ids) && ids.length > 0) {
+    records = filter(records, (record) => ids.includes(record.id))
+  }
 
   const sorted = orderBy(records, ['createdAt'], ['desc'])
 
@@ -101,21 +106,29 @@ export async function getUpload(id: string): Promise<UploadItem | null> {
 
 /** Unlinks the media path and json only. A link's target is never touched. */
 export async function removeUpload(id: string): Promise<void> {
-  if (!isUuid(id)) return
+  if (!isUuid(id)) {
+    return
+  }
 
   await withLock(`upload:${id}`, async () => {
     const record = await loadUploadRecord(id)
     let isShared = true
 
-    if (record?.remote) isShared = await sharesRemote(record)
+    if (record?.remote) {
+      isShared = await sharesRemote(record)
+    }
 
-    if (record) await removeFile(uploadPaths(id, record.ext).media)
+    if (record) {
+      await removeFile(uploadPaths(id, record.ext).media)
+    }
 
     await removeFile(jsonPath(id))
     await removeEncoded(id)
     await forgetUpload(id)
 
-    if (record?.remote && !isShared) await deleteRemote(record.remote.key)
+    if (record?.remote && !isShared) {
+      await deleteRemote(record.remote.key)
+    }
   })
 }
 
@@ -144,10 +157,12 @@ async function pathExists(file: string): Promise<boolean> {
 
 async function withMissing(item: UploadItem): Promise<UploadItem> {
   const mode = item.linkMode ?? 'symlink'
+
   const check =
     item.source === 'link' && !isNil(item.target) && item.target !== '' && mode === 'symlink'
       ? item.target
       : uploadPaths(item.id, item.ext).media
+
   const hasFile = await pathExists(check)
 
   return { ...item, missing: !hasFile }

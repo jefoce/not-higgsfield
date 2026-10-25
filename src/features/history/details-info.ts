@@ -10,7 +10,9 @@ export function costInfo(record: GenerationRecord): { text: string; note: string
     return { text: formatEstimate(record.cost.estimatedUsd), note: '' }
   }
 
-  if (record.status !== 'completed') return { text: 'Not billed', note: '' }
+  if (record.status !== 'completed') {
+    return { text: 'Not billed', note: '' }
+  }
 
   if (isNil(record.cost.actualUsd)) {
     return { text: formatEstimate(record.cost.estimatedUsd), note: 'Cost not reported' }

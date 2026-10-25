@@ -33,6 +33,7 @@ export function HistoryTile(props: HistoryTileProps) {
   const poster = posterSrc(record, Math.ceil((tileWidth * dpr) / 80) * 80)
   const { selected: isSelected, selecting: isSelecting, select } = useSelectionItem(record.id)
   const canSelect = isSelectable(record)
+
   const { handleClick, handleKeyDown } = useTileActivation({
     record,
     isSelecting,
@@ -40,6 +41,7 @@ export function HistoryTile(props: HistoryTileProps) {
     select,
     onOpen,
   })
+
   const handleCancel = useCallback(() => void cancelGeneration(record.id), [record.id])
 
   return (

@@ -39,6 +39,7 @@ export function usePanelDraft() {
       seed: state.seed,
     })),
   )
+
   const uploadsById = useGeneratorStore((state) => state.uploadsById)
   const activeCount = useGeneratorStore((state) => state.activeCount)
   const preset = getPreset(presetId)
@@ -62,6 +63,7 @@ export function usePanelDraft() {
     }),
     [presetId, tab, prompt, isAudio, duration, aspectRatio, resolution, frames, references, seed],
   )
+
   const validation = useMemo(
     () =>
       validateInput({

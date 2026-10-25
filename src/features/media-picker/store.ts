@@ -27,7 +27,9 @@ export function extensionsFromLimits(
   const entries = MEDIA_KINDS.flatMap((kind) => {
     const formats = limits?.[kind]?.formats
 
-    if (isNil(formats) || formats.length === 0) return []
+    if (isNil(formats) || formats.length === 0) {
+      return []
+    }
 
     return [[kind, formats] as const]
   })

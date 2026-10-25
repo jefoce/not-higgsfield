@@ -125,10 +125,13 @@ describe('friendlyError Wan', () => {
       friendlyError({ raw: 'Interrupted while sending. Check OpenRouter activity', family: 'wan' })
         .kind,
     ).toBe('app')
+
     expect(
       friendlyError({ raw: 'OpenRouter copy expired before download', family: 'wan' }).title,
     ).toBe('The finished video was not saved.')
+
     expect(friendlyError({ raw: 'Disk is full. Free some space', family: 'wan' }).kind).toBe('app')
+
     expect(
       friendlyError({ raw: 'OpenRouter key is not set. Open Settings.', family: 'wan' }).kind,
     ).toBe('account')

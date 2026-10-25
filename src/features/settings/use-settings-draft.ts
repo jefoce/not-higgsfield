@@ -47,9 +47,13 @@ function applyChange(params: ApplyChangeParams): Edits {
   const { current, name, change } = params
   const next = { ...current }
 
-  if (change.remove === true) next[name] = null
-  else if (isEmpty(change.value)) delete next[name]
-  else next[name] = change.value
+  if (change.remove === true) {
+    next[name] = null
+  } else if (isEmpty(change.value)) {
+    delete next[name]
+  } else {
+    next[name] = change.value
+  }
 
   return next
 }
@@ -58,16 +62,21 @@ function getDraftFlags(params: DraftFlagsParams): DraftFlags {
   const { edits, status, isMock, isSaving } = params
   const changed = Object.keys(edits) as SecretName[]
   const isDirty = !isEmpty(changed)
+
   const isAllValid = changed.every(
     (name) => isNull(edits[name]) || isNull(secretError(name, edits[name] ?? '')),
   )
+
   const r2Set = R2_NAMES.filter((name) => {
     const edit = edits[name]
 
-    if (isNull(edit)) return false
+    if (isNull(edit)) {
+      return false
+    }
 
     return isUndefined(edit) ? status?.keys[name].set === true : true
   }).length
+
   const isR2Valid = r2Set === 0 || r2Set === R2_NAMES.length
   const canSave = isEmpty(status?.loadError) && isDirty && isAllValid && isR2Valid && !isSaving
   const isOpenrouterReady = isMock === true || Boolean(status?.keys.OPENROUTER_API_KEY.set)
@@ -81,12 +90,14 @@ export function useSettingsDraft(params: UseSettingsDraftParams) {
   const { status, mock: isMock, closeSettings } = params
   const [edits, setEdits] = useState<Edits>({})
   const [isSaving, setIsSaving] = useState(false)
+
   const { isDirty, canSave, isR2Valid, isOpenrouterReady, isR2Ready } = getDraftFlags({
     edits,
     status,
     isMock,
     isSaving,
   })
+
   const { results, testing, isRetrying, onTest, onRetry, resetResults } = useSecretActions({
     isDirty,
   })
@@ -96,9 +107,13 @@ export function useSettingsDraft(params: UseSettingsDraftParams) {
   }
 
   const onClose = async (shouldOpen: boolean) => {
-    if (shouldOpen) return
+    if (shouldOpen) {
+      return
+    }
 
-    if (isDirty && !(await platform.confirm('Discard changes?'))) return
+    if (isDirty && !(await platform.confirm('Discard changes?'))) {
+      return
+    }
 
     closeSettings()
     setEdits({})
@@ -106,7 +121,9 @@ export function useSettingsDraft(params: UseSettingsDraftParams) {
   }
 
   const onSave = async () => {
-    if (!canSave) return
+    if (!canSave) {
+      return
+    }
 
     setIsSaving(true)
 

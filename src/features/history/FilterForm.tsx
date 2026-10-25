@@ -33,6 +33,7 @@ export function FilterForm() {
     setQuery('')
     resetFilters()
   }, [commitQuery, resetFilters])
+
   const handleQueryChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       setQuery(event.target.value)

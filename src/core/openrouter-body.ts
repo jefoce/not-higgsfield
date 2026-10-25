@@ -43,9 +43,13 @@ const framePart = (
 })
 
 const referencePart = (media: ResolvedMedia): OpenRouterReferencePart => {
-  if (media.kind === 'image') return { type: 'image_url', image_url: { url: media.url } }
+  if (media.kind === 'image') {
+    return { type: 'image_url', image_url: { url: media.url } }
+  }
 
-  if (media.kind === 'video') return { type: 'video_url', video_url: { url: media.url } }
+  if (media.kind === 'video') {
+    return { type: 'video_url', video_url: { url: media.url } }
+  }
 
   return { type: 'audio_url', audio_url: { url: media.url } }
 }
@@ -59,7 +63,10 @@ export interface BuildOpenRouterBodyParams {
 const audioFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVideoBody> => {
   const { input, preset } = params
 
-  if (!preset.audio.supported) return {}
+  if (!preset.audio.supported) {
+    return {}
+  }
+
   return { generate_audio: input.audio }
 }
 
@@ -67,21 +74,30 @@ const promptFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVide
   const { input, preset } = params
   const prompt = input.prompt.trim()
 
-  if (prompt === '') return {}
+  if (prompt === '') {
+    return {}
+  }
+
   return { prompt: renderPromptForApi(prompt, preset) }
 }
 
 const seedFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVideoBody> => {
   const { input, preset } = params
 
-  if (isNil(input.seed) || !preset.seed) return {}
+  if (isNil(input.seed) || !preset.seed) {
+    return {}
+  }
+
   return { seed: input.seed }
 }
 
 const aspectFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVideoBody> => {
   const { input } = params
 
-  if (input.aspectRatio === 'auto') return {}
+  if (input.aspectRatio === 'auto') {
+    return {}
+  }
+
   return { aspect_ratio: input.aspectRatio }
 }
 
@@ -112,11 +128,17 @@ const mediaFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVideo
   if (input.tab === 'frames') {
     const frames = frameParts(params)
 
-    if (frames.length === 0) return {}
+    if (frames.length === 0) {
+      return {}
+    }
+
     return { frame_images: frames }
   }
 
-  if (input.references.length === 0) return {}
+  if (input.references.length === 0) {
+    return {}
+  }
+
   return { input_references: input.references.map((id) => referencePart(media[id])) }
 }
 

@@ -18,6 +18,7 @@ const ICONS = { list: List, grid: Grid2x2 }
 export function ViewToggle() {
   const view = useHistoryViewStore((state) => state.view)
   const setView = useHistoryViewStore((state) => state.setView)
+
   const handleSelect = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => setView(event.currentTarget.value as HistoryView),
     [setView],

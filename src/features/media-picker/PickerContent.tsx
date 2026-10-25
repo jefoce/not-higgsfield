@@ -40,6 +40,7 @@ export function PickerContent(props: PickerContentProps) {
     onFolderNavigate: handleFolderNavigate,
     onToggleFolderFile: handleToggleFolderFile,
   } = props
+
   const handleSelectUpload = onSelectUpload
   const handleDeleted = selection.removeSelected
   const handlePickFile = foldersState.handlePickFile

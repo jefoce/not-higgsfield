@@ -6,6 +6,7 @@ export async function GET(request: Request) {
   try {
     assertLocalRequest(request)
     const hasDialog = await getSystem().canChooseFiles()
+
     const result: SystemCapabilities = {
       chooseFiles: hasDialog,
       chooseFolder: hasDialog,

@@ -39,6 +39,7 @@ export interface UploadPaths {
 export async function ensureDirs(): Promise<void> {
   await fs.mkdir(STORAGE_ROOT, { recursive: true, mode: 0o700 })
   await fs.chmod(STORAGE_ROOT, 0o700)
+
   await Promise.all(
     [DOWNLOADS_DIR, UPLOADS_DIR, DATA_DIR, THUMBS_DIR, COMPAT_DIR, LOGS_DIR].map((dir) =>
       fs.mkdir(dir, { recursive: true, mode: 0o700 }),
@@ -66,6 +67,7 @@ export function uploadPaths(id: string, ext: string): UploadPaths {
 /** Deletes stale `*.part` and `*.tmp-*` files. Skips symlinks. */
 export async function cleanupStale(): Promise<{ removed: number }> {
   const cutoff = Date.now() - UPLOAD_CLEANUP_MS
+
   const [downloads, uploads] = await Promise.all([
     removeStale(DOWNLOADS_DIR, cutoff),
     removeStale(UPLOADS_DIR, cutoff),
@@ -79,16 +81,22 @@ async function removeStale(dir: string, cutoff: number): Promise<number> {
   let removed = 0
 
   for (const entry of entries) {
-    if (!entry.isFile()) continue
+    if (!entry.isFile()) {
+      continue
+    }
 
-    if (!entry.name.endsWith('.part') && !entry.name.includes('.tmp-')) continue
+    if (!entry.name.endsWith('.part') && !entry.name.includes('.tmp-')) {
+      continue
+    }
 
     const file = path.join(dir, entry.name)
 
     try {
       const stats = await fs.lstat(file)
 
-      if (stats.mtimeMs >= cutoff) continue
+      if (stats.mtimeMs >= cutoff) {
+        continue
+      }
 
       await fs.unlink(file)
       removed += 1

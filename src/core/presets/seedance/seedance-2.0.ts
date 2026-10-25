@@ -44,9 +44,13 @@ const PRICING = videoTokenPricing({
   key: ({ resolution, audio: hasAudio, hasVideoInput: hasVideo }) => {
     const tier = RESOLUTION_TIER[resolution] ?? ''
 
-    if (hasVideo) return `video_tokens${tier}_with_video_input`
+    if (hasVideo) {
+      return `video_tokens${tier}_with_video_input`
+    }
 
-    if (tier !== '') return `video_tokens${tier}`
+    if (tier !== '') {
+      return `video_tokens${tier}`
+    }
 
     return hasAudio ? 'video_tokens' : 'video_tokens_without_audio'
   },

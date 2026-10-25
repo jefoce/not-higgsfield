@@ -31,10 +31,15 @@ export function HistorySection() {
   const selected = records.find((record) => record.id === selectedId) ?? null
   const sentinel = useRef<HTMLDivElement>(null)
   const order = useMemo(() => records.filter(isSelectable).map((record) => record.id), [records])
+
   const handleOpen = useCallback((record: GenerationRecord) => setSelectedId(record.id), [])
+
   const handleDeleted = useCallback(() => setSelectedId(null), [])
+
   const handleOpenChange = useCallback((isOpen: boolean) => {
-    if (!isOpen) setSelectedId(null)
+    if (!isOpen) {
+      setSelectedId(null)
+    }
   }, [])
 
   useJobNotifications({ records, activeCount, isLoading })
@@ -59,11 +64,15 @@ export function HistorySection() {
   useEffect(() => {
     const node = sentinel.current
 
-    if (!node || !hasMore) return
+    if (!node || !hasMore) {
+      return
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) loadMore()
+        if (entry.isIntersecting) {
+          loadMore()
+        }
       },
       { rootMargin: '400px 0px' },
     )

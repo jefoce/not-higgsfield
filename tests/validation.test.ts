@@ -30,6 +30,7 @@ describe('validateInput prompt', () => {
 
   it('accepts an empty prompt when the preset marks it optional and a start frame exists', () => {
     const optional = { ...preset, promptOptional: true }
+
     const result = validateInput({
       input: input({
         tab: 'frames',
@@ -47,6 +48,7 @@ describe('validateInput prompt', () => {
 
   it('rejects an empty prompt with an optional preset and no start frame', () => {
     const optional = { ...preset, promptOptional: true }
+
     const result = validateInput({
       input: input({
         tab: 'frames',
@@ -82,11 +84,13 @@ describe('validateInput prompt', () => {
 describe('validateInput duration', () => {
   it('rejects a non-integer or out-of-range duration', () => {
     const low = validateInput({ input: input({ duration: 1 }), uploads: {}, preset })
+
     const fractional = validateInput({
       input: input({ duration: 5.5 }),
       uploads: {},
       preset,
     })
+
     const high = validateInput({ input: input({ duration: 31 }), uploads: {}, preset })
 
     expect(low.ok).toBe(false)
@@ -102,6 +106,7 @@ describe('validateInput duration', () => {
     expect(wanLow.errors).toContain('duration: Minimum 5s')
 
     const seedance = getPreset('seedance-2.0')
+
     const seedanceLow = validateInput({
       input: input({ presetId: seedance.id, duration: 2 }),
       uploads: {},
@@ -121,6 +126,7 @@ describe('validateInput duration', () => {
     expect(
       validateInput({ input: input({ duration: 5 }), uploads: {}, preset: optionPreset }).ok,
     ).toBe(true)
+
     const result = validateInput({
       input: input({ duration: 9 }),
       uploads: {},
@@ -158,6 +164,7 @@ describe('validateInput resolution and aspect', () => {
 
   it('allows Seedance 2.0 9:21 only at 720p', () => {
     const seedance = getPreset('seedance-2.0')
+
     const wide = validateInput({
       input: input({ presetId: seedance.id, aspectRatio: '9:21', resolution: '720p' }),
       uploads: {},
@@ -165,6 +172,7 @@ describe('validateInput resolution and aspect', () => {
     })
 
     expect(wide.ok).toBe(true)
+
     const hd = validateInput({
       input: input({ presetId: seedance.id, aspectRatio: '9:21', resolution: '1080p' }),
       uploads: {},
@@ -198,6 +206,7 @@ describe('validateInput frames', () => {
 
   it('rejects an end frame when the preset disables it', () => {
     const noEnd = { ...preset, frames: { start: true, end: false } }
+
     const result = validateInput({
       input: input({ tab: 'frames', prompt: '', frames: { start: 'start', end: 'end' } }),
       uploads: uploadsOf(upload('start', 'image'), upload('end', 'image')),

@@ -12,7 +12,9 @@ export function InputThumbs(props: InputThumbsProps) {
   const { record } = props
   const items = thumbItems(record)
 
-  if (items.length === 0) return null
+  if (items.length === 0) {
+    return null
+  }
 
   return (
     <div className="flex flex-wrap gap-2">

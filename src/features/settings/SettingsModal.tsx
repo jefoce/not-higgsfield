@@ -20,9 +20,11 @@ export function SettingsModal() {
   const section = useSettingsStore((state) => state.section)
   const closeSettings = useSettingsStore((state) => state.closeSettings)
   const { status } = useSecrets()
+
   const { data: credits } = useSWR<CreditsInfo>('/api/credits', fetcher, {
     revalidateOnFocus: false,
   })
+
   const isMock = credits ? credits.source === 'mock' : undefined
 
   useSettingsPrompt(status, isMock)
@@ -32,11 +34,15 @@ export function SettingsModal() {
   const r2Ref = useRef<HTMLElement>(null)
   const note = backendNote(status?.backend)
   const handleOpenChange = draft.onClose
+
   const handleClose = useCallback(() => void handleOpenChange(false), [handleOpenChange])
+
   const handleSave = useCallback(() => void draft.onSave(), [draft])
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) {
+      return
+    }
 
     const target = section === 'r2' ? r2Ref.current : openrouterRef.current
 

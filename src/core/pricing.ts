@@ -19,6 +19,7 @@ interface PricePerSecParams {
 const rawRate = (params: PricePerSecParams): number | null => {
   const { preset, ctx, skus } = params
   const table = skus ?? preset.pricing.fallback
+
   const raw =
     table[
       preset.pricing.key({
@@ -28,7 +29,10 @@ const rawRate = (params: PricePerSecParams): number | null => {
       })
     ]
 
-  if (isNil(raw) || !Number.isFinite(raw)) return null
+  if (isNil(raw) || !Number.isFinite(raw)) {
+    return null
+  }
+
   return raw
 }
 
@@ -37,7 +41,9 @@ export function pricePerSec(params: PricePerSecParams): number | null {
   const { preset, ctx } = params
   const raw = rawRate(params)
 
-  if (isNil(raw)) return null
+  if (isNil(raw)) {
+    return null
+  }
 
   if (preset.pricing.kind === 'perSecond') {
     return preset.pricing.unit === 'cents' ? raw / 100 : raw
@@ -46,7 +52,9 @@ export function pricePerSec(params: PricePerSecParams): number | null {
   const aspect = ctx.aspect === 'auto' ? preset.defaultAspectRatio : ctx.aspect
   const size = outputSize({ preset, resolution: ctx.resolution, aspect })
 
-  if (!size) return null
+  if (!size) {
+    return null
+  }
 
   return ((size.width * size.height * preset.pricing.fps) / 1024) * raw
 }
@@ -79,7 +87,9 @@ export function estimatePrice(params: EstimatePriceParams): PriceEstimate | null
   const { preset, ctx, duration, referenceSeconds, skus } = params
   const rate = pricePerSec({ preset, ctx, skus })
 
-  if (isNil(rate)) return null
+  if (isNil(rate)) {
+    return null
+  }
 
   const seconds =
     billableSeconds(preset, duration) + referenceSeconds * preset.pricing.referenceVideoFactor

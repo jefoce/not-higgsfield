@@ -28,6 +28,7 @@ interface CardActionsProps {
 export function CardActions(props: CardActionsProps) {
   const { record, className, pinHeart: isPinHeart = false } = props
   const isPinned = isPinHeart && record.favorite
+
   const handleDownload = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()

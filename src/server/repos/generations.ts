@@ -19,7 +19,9 @@ export async function listGenerations(): Promise<GenerationRecord[]> {
 }
 
 export async function getGeneration(id: string): Promise<GenerationRecord | null> {
-  if (!isUuid(id)) return null
+  if (!isUuid(id)) {
+    return null
+  }
 
   return store.get(id)
 }
@@ -35,7 +37,9 @@ export async function saveGeneration(record: GenerationRecord): Promise<Generati
 
 /** Removes only the generation's own json, video, preview and partial files. */
 export async function deleteGenerationFiles(id: string): Promise<void> {
-  if (!isUuid(id)) return
+  if (!isUuid(id)) {
+    return
+  }
 
   const paths = downloadPaths(id)
 
@@ -45,6 +49,7 @@ export async function deleteGenerationFiles(id: string): Promise<void> {
     removeFile(paths.preview),
     removeFile(paths.part),
   ])
+
   await store.forget(id)
 }
 

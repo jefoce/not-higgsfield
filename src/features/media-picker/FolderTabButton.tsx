@@ -19,7 +19,9 @@ interface FolderTabButtonProps {
 /** Folder tab with its disconnect control. */
 export function FolderTabButton(props: FolderTabButtonProps) {
   const { folder, isActive, onTabChange, onDisconnectFolder } = props
+
   const handleSelect = useCallback(() => onTabChange(folder.id), [folder.id, onTabChange])
+
   const handleDisconnect = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()

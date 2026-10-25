@@ -29,9 +29,13 @@ export function createReferenceActions(set: SetState): ReferenceActions {
         for (const item of items) {
           uploadsById[item.id] = item
 
-          if (references.includes(item.id)) continue
+          if (references.includes(item.id)) {
+            continue
+          }
 
-          if (counts[item.kind] >= preset.references[item.kind]) continue
+          if (counts[item.kind] >= preset.references[item.kind]) {
+            continue
+          }
 
           references.push(item.id)
           counts[item.kind] += 1
@@ -52,10 +56,13 @@ export function createReferenceActions(set: SetState): ReferenceActions {
         const swapped = state.references.map((ref) => (ref === id ? upload.id : ref))
         let candidates = swapped
 
-        if (index < 0) candidates = [...swapped, upload.id]
+        if (index < 0) {
+          candidates = [...swapped, upload.id]
+        }
 
         const references = uniq(candidates)
         const preset = getPreset(state.presetId)
+
         const duration = clampReferenceDuration({
           input: inputFromState({ ...state, references }),
           uploads: uploadsById,
@@ -68,6 +75,7 @@ export function createReferenceActions(set: SetState): ReferenceActions {
       set((state) => {
         const references = state.references.filter((ref) => ref !== id)
         const preset = getPreset(state.presetId)
+
         const duration = clampReferenceDuration({
           input: inputFromState({ ...state, references }),
           uploads: state.uploadsById,

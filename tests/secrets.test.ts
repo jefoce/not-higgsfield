@@ -20,21 +20,15 @@ function memoryBackend(values: Partial<Record<SecretName, string>> = {}): Backen
   const store = new Map<string, string>()
 
   for (const [name, value] of Object.entries(values)) {
-    if (!isNil(value)) store.set(name, value)
-  }
-
-  const all = async (): Promise<Partial<Record<SecretName, string>>> => {
-    const values: Partial<Record<SecretName, string>> = {}
-
-    for (const [name, value] of store) values[name as SecretName] = value
-
-    return values
+    if (!isNil(value)) {
+      store.set(name, value)
+    }
   }
 
   return {
     kind: 'file',
     store,
-    getAll: all,
+    getAll: async () => Object.fromEntries(store),
     get: async (name) => store.get(name) ?? null,
     set: async (name, value) => {
       store.set(name, value)
@@ -64,7 +58,9 @@ beforeEach(async () => {
   root = await fs.mkdtemp(path.join(os.tmpdir(), 'nh-secrets-'))
   vi.stubEnv('STORAGE_ROOT', root)
 
-  for (const name of SECRET_NAMES) vi.stubEnv(name, '')
+  for (const name of SECRET_NAMES) {
+    vi.stubEnv(name, '')
+  }
 })
 
 afterEach(async () => {
@@ -81,10 +77,12 @@ describe('secrets', () => {
 
     expect(secrets.getSecret('OPENROUTER_API_KEY')).toBe('env-key')
     expect(secrets.secretStatus().keys.OPENROUTER_API_KEY.source).toBe('env')
+
     await expect(secrets.setSecrets({ OPENROUTER_API_KEY: 'next' })).rejects.toMatchObject({
       status: 409,
       message: 'OPENROUTER_API_KEY is set by environment',
     })
+
     await expect(secrets.setSecrets({ OPENROUTER_API_KEY: null })).rejects.toMatchObject({
       status: 409,
     })
@@ -118,6 +116,7 @@ describe('secrets', () => {
       status: 400,
       message: 'R2 needs all four fields',
     })
+
     expect(backend.store.size).toBe(0)
   })
 
@@ -130,6 +129,7 @@ describe('secrets', () => {
       OPENROUTER_API_KEY: 'abc12345',
       OPENROUTER_MANAGEMENT_KEY: 'def67890',
     })
+
     expect(listener).toHaveBeenCalledTimes(1)
 
     off()
@@ -155,6 +155,7 @@ describe('secrets backend', () => {
     backend.set = async () => {
       throw new Error('keychain denied')
     }
+
     const { secrets } = await setup(backend)
 
     vi.spyOn(console, 'error').mockImplementation(() => {})
@@ -163,6 +164,7 @@ describe('secrets backend', () => {
       status: 500,
       message: 'Could not save to the keychain',
     })
+
     expect(secrets.getSecret('OPENROUTER_MANAGEMENT_KEY')).toBeNull()
     expect(secrets.getSecret('OPENROUTER_API_KEY')).toBe('stored')
   })
@@ -185,6 +187,7 @@ describe('secrets backend', () => {
       JSON.stringify({ R2_ACCOUNT_ID: 'not-hex', R2_BUCKET: 'bucket' }),
       { mode: 0o600 },
     )
+
     vi.resetModules()
     const { fileBackend } = await import('@/server/secrets/file')
     const backend = fileBackend()
@@ -200,10 +203,12 @@ describe('secrets backend', () => {
     backend.getAll = async () => {
       throw new Error('denied')
     }
+
     const { secrets } = await setup(backend)
 
     expect(secrets.secretStatus().loadError).toBe('Keychain access was denied or timed out')
     expect(secrets.secretStatus().keys.OPENROUTER_API_KEY.set).toBe(false)
+
     await expect(secrets.setSecrets({ OPENROUTER_MANAGEMENT_KEY: 'next' })).rejects.toMatchObject({
       status: 409,
       message: 'Keychain not loaded',
@@ -219,6 +224,7 @@ describe('secrets backend', () => {
     bridge.getAll = async () => {
       throw new KeychainUnavailableError('no secret service')
     }
+
     const secrets = await import('@/server/secrets')
 
     secrets.__resetSecretsForTests()
@@ -258,6 +264,7 @@ describe('secrets backend', () => {
       bridge.getAll = async () => {
         throw new KeychainUnavailableError('no keychain')
       }
+
       const secrets = await import('@/server/secrets')
 
       secrets.__resetSecretsForTests()
@@ -266,6 +273,7 @@ describe('secrets backend', () => {
 
       expect(secrets.getSecret('OPENROUTER_API_KEY')).toBeNull()
       expect(secrets.secretStatus().loadError).toContain('Keys could not be saved')
+
       await expect(fs.stat(path.join(root, 'secrets.json'))).rejects.toMatchObject({
         code: 'ENOENT',
       })
@@ -281,10 +289,13 @@ describe('secrets reload', () => {
     let isDenied = true
 
     backend.getAll = async () => {
-      if (isDenied) throw new Error('denied')
+      if (isDenied) {
+        throw new Error('denied')
+      }
 
       return read()
     }
+
     const { secrets } = await setup(backend)
 
     expect(secrets.secretStatus().loadError).not.toBeNull()
@@ -312,6 +323,7 @@ describe('secrets status', () => {
       set: true,
       hint: 'ijkl',
     })
+
     expect(status.keys.OPENROUTER_MANAGEMENT_KEY.hint).toBeNull()
     expect(JSON.stringify(status)).not.toContain('abcdefghijkl')
   })

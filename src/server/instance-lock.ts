@@ -18,6 +18,7 @@ const HEALTH_TIMEOUT_MS = 1500
 /** Takes server.lock or exits. A dead owner's lock is taken over. */
 export async function acquireInstanceLock(): Promise<void> {
   await fs.mkdir(STORAGE_ROOT, { recursive: true, mode: 0o700 })
+
   const mine: LockInfo = {
     pid: process.pid,
     port: Number(process.env.PORT ?? 3000),
@@ -35,7 +36,9 @@ export async function acquireInstanceLock(): Promise<void> {
 
       return
     } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') {
+        throw error
+      }
     }
 
     const owner = await readLock()
@@ -58,7 +61,9 @@ export function releaseInstanceLock(): void {
   try {
     const owner = JSON.parse(fsSync.readFileSync(LOCK_FILE, 'utf8')) as Partial<LockInfo>
 
-    if (owner.pid === process.pid) fsSync.unlinkSync(LOCK_FILE)
+    if (owner.pid === process.pid) {
+      fsSync.unlinkSync(LOCK_FILE)
+    }
   } catch {
     // Missing or unreadable: nothing of ours to remove.
   }
@@ -75,6 +80,7 @@ async function isAlive(owner: LockInfo): Promise<boolean> {
   const res = await fetch(`http://127.0.0.1:${owner.port}/api/health`, {
     signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
   }).catch(() => null)
+
   const body = (await res?.json().catch(() => null)) as { app?: string; pid?: number } | null
 
   return body?.app === 'not-higgsfield' && body.pid === owner.pid

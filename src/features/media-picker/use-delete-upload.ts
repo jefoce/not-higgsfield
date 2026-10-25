@@ -29,7 +29,9 @@ export function useDeleteUpload(params: UseDeleteUploadParams): DeleteUpload {
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDelete = useCallback(async () => {
-    if (!pending) return
+    if (!pending) {
+      return
+    }
 
     setIsDeleting(true)
 
@@ -47,10 +49,15 @@ export function useDeleteUpload(params: UseDeleteUploadParams): DeleteUpload {
   }, [mutate, onDeleted, pending])
 
   const handleDeleteRequest = useCallback((item: UploadItem) => setPending(item), [])
+
   const handlePendingOpenChange = useCallback((isOpen: boolean) => {
-    if (!isOpen) setPending(null)
+    if (!isOpen) {
+      setPending(null)
+    }
   }, [])
+
   const handleCancelDelete = useCallback(() => setPending(null), [])
+
   const handleConfirmDelete = useCallback(() => void handleDelete(), [handleDelete])
 
   return {

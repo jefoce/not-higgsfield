@@ -9,6 +9,7 @@ export const KIND_TITLE: Record<MediaKind, string> = {
   video: 'Video',
   audio: 'Audio',
 }
+
 export const KIND_PLURAL: Record<MediaKind, string> = {
   image: 'images',
   video: 'videos',
@@ -66,16 +67,21 @@ interface PastedPathParams {
 /** Absolute media path pasted as text, filtered to the requested kinds and formats. */
 export function pastedPath(params: PastedPathParams): string | null {
   const { text, kinds, extensions } = params
+
   const path = text
     .trim()
     .replaceAll(/^["']+|["']+$/g, '')
     .trim()
 
-  if (!ABSOLUTE_PATH.test(path)) return null
+  if (!ABSOLUTE_PATH.test(path)) {
+    return null
+  }
 
   const kind = kindFromName(path)
 
-  if (isNil(kind) || !kinds.includes(kind)) return null
+  if (isNil(kind) || !kinds.includes(kind)) {
+    return null
+  }
 
   return extensionAllowed({ kind, ext: extWithDot(path), extensions }) ? path : null
 }
@@ -95,7 +101,9 @@ interface FileInfo {
 export function kindFromFile(file: FileInfo): MediaKind | null {
   const byName = kindFromName(file.name)
 
-  if (!isNil(byName)) return byName
+  if (!isNil(byName)) {
+    return byName
+  }
 
   const ext = Object.entries(MIME_TYPES).find(([, mime]) => mime === file.type)?.[0]
 
@@ -121,10 +129,13 @@ export function acceptFiles<T extends FileInfo>(
   params: AcceptFilesParams<T>,
 ): { accepted: T[]; skipped: number } {
   const { files, kinds, extensions } = params
+
   const accepted = files.filter((file) => {
     const kind = kindFromFile(file)
 
-    if (isNil(kind) || !kinds.includes(kind)) return false
+    if (isNil(kind) || !kinds.includes(kind)) {
+      return false
+    }
 
     return extensionAllowed({ kind, ext: extensionOf(file), extensions })
   })
@@ -159,7 +170,9 @@ export function extensionsForKinds(
 function extensionOf(file: FileInfo): string {
   const dot = file.name.lastIndexOf('.')
 
-  if (dot >= 0) return file.name.slice(dot + 1)
+  if (dot >= 0) {
+    return file.name.slice(dot + 1)
+  }
 
   return Object.entries(MIME_TYPES).find(([, mime]) => mime === file.type)?.[0] ?? ''
 }

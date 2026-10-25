@@ -21,6 +21,7 @@ export function PromptWarnings(props: PromptWarningsProps) {
   const [isOpen, setIsOpen] = useState(false)
   const handleOpenChange = setIsOpen
   const occurrences = useRef<Record<string, number>>({})
+
   const handleGo = useCallback(
     (slot: RefSlot): void => {
       const key = `${slot.kind}-${slot.n}`
@@ -33,7 +34,9 @@ export function PromptWarnings(props: PromptWarningsProps) {
     [onFocus],
   )
 
-  if (warnings.length === 0) return null
+  if (warnings.length === 0) {
+    return null
+  }
 
   return (
     <Popover open={isOpen} onOpenChange={handleOpenChange}>

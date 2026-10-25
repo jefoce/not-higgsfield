@@ -15,9 +15,13 @@ interface Params {
 
 /** Download names are immutable uuids, uploads and folders can change. */
 function cacheControlFor(ref: string, isCompat: boolean): string {
-  if (isCompat) return 'private, max-age=3600'
+  if (isCompat) {
+    return 'private, max-age=3600'
+  }
 
-  if (ref.startsWith('downloads/')) return 'private, max-age=31536000, immutable'
+  if (ref.startsWith('downloads/')) {
+    return 'private, max-age=31536000, immutable'
+  }
 
   return 'private, max-age=0, must-revalidate'
 }
@@ -51,8 +55,9 @@ export async function GET(request: Request, { params }: Params) {
 
     return response.status === 404 ? jsonError({ status: 404, error: 'File not found' }) : response
   } catch (error) {
-    if (error instanceof CompatError)
+    if (error instanceof CompatError) {
       return jsonError({ status: error.status, error: error.message })
+    }
 
     return errorResponse(error)
   }

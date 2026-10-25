@@ -58,10 +58,12 @@ describe('acquireInstanceLock', () => {
   it('exits with 75 when the owner answers health', async () => {
     await writeLock(4242, 47821)
     vi.spyOn(process, 'kill').mockReturnValue(true)
+
     vi.stubGlobal(
       'fetch',
       vi.fn(async () => ({ json: async () => ({ app: APP, pid: 4242 }) })),
     )
+
     const exit = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
       throw new Error(`exit ${code}`)
     }) as never)

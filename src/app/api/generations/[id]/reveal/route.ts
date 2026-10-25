@@ -15,15 +15,20 @@ export async function POST(request: Request, { params }: Params) {
     const { id } = await params
     const record = await getGeneration(id)
 
-    if (!record) return jsonError({ status: 404, error: 'Video not found' })
+    if (!record) {
+      return jsonError({ status: 404, error: 'Video not found' })
+    }
 
     const video = downloadPaths(record.id).video
+
     const hasVideo = await fs.stat(video).then(
       (stats) => stats.isFile(),
       () => false,
     )
 
-    if (!hasVideo) return jsonError({ status: 404, error: 'Video not found' })
+    if (!hasVideo) {
+      return jsonError({ status: 404, error: 'Video not found' })
+    }
 
     await getSystem().reveal(video)
 

@@ -45,17 +45,22 @@ interface FocusSlotParams {
 /** Mention nodes matching a slot, in document order. */
 function $chipsFor(slot: RefSlot): LexicalNode[] {
   const found: LexicalNode[] = []
+
   const walk = (node: LexicalNode) => {
     if ($isBeautifulMentionNode(node)) {
       const target = mentionSlot(node.getValue(), node.getData())
 
-      if (target.kind === slot.kind && target.n === slot.n) found.push(node)
+      if (target.kind === slot.kind && target.n === slot.n) {
+        found.push(node)
+      }
 
       return
     }
 
     if ($isElementNode(node)) {
-      for (const child of node.getChildren()) walk(child)
+      for (const child of node.getChildren()) {
+        walk(child)
+      }
     }
   }
 
@@ -68,17 +73,22 @@ function $chipsFor(slot: RefSlot): LexicalNode[] {
 function focusSlotInEditor(params: FocusSlotParams): void {
   const { editor, slot, occurrence } = params
   let key: string | null = null
+
   const handleUpdate = (): void => {
-    if (isNil(key) || key === '') return
+    if (isNil(key) || key === '') {
+      return
+    }
 
     editor.focus()
     const element = editor.getElementByKey(key)
 
     element?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+
     element?.animate(
       [{ boxShadow: '0 0 0 2px var(--color-warn)' }, { boxShadow: '0 0 0 0 transparent' }],
       { duration: 900 },
     )
+
     editor.update(() => $setSelection(null))
   }
 
@@ -86,7 +96,9 @@ function focusSlotInEditor(params: FocusSlotParams): void {
     () => {
       const chips = $chipsFor(slot)
 
-      if (chips.length === 0) return
+      if (chips.length === 0) {
+        return
+      }
 
       const target = chips[occurrence % chips.length]
 
@@ -104,13 +116,19 @@ function focusSlotInEditor(params: FocusSlotParams): void {
 function handlePaste(editor: LexicalEditor, event: Event): boolean {
   const data = (event as ClipboardEvent).clipboardData
 
-  if (!data || data.files.length > 0) return false
+  if (!data || data.files.length > 0) {
+    return false
+  }
 
-  if (data.types.includes('application/x-lexical-editor')) return false
+  if (data.types.includes('application/x-lexical-editor')) {
+    return false
+  }
 
   const text = data.getData('text/plain')
 
-  if (text === '' || useGeneratorStore.getState().tab !== 'references') return false
+  if (text === '' || useGeneratorStore.getState().tab !== 'references') {
+    return false
+  }
 
   event.preventDefault()
   const counts = slotCounts(useGeneratorStore.getState())
@@ -118,7 +136,9 @@ function handlePaste(editor: LexicalEditor, event: Event): boolean {
   editor.update(() => {
     const selection = $getSelection()
 
-    if (!$isRangeSelection(selection)) return
+    if (!$isRangeSelection(selection)) {
+      return
+    }
 
     selection.insertNodes($nodesFromText(text, counts))
   })
@@ -133,6 +153,7 @@ export function PromptEditorBridge(props: PromptEditorBridgeProps) {
   const { insertMention } = useBeautifulMentions()
   const registerInserter = useGeneratorStore((state) => state.registerMentionInserter)
   const registerFocuser = useGeneratorStore((state) => state.registerSlotFocuser)
+
   const refsKey = useGeneratorStore((state) =>
     [...referenceSlots(state.references, (id) => state.uploadsById[id]?.kind).slots]
       .map(([id, slot]) => `${id}:${slot.kind}`)
@@ -154,6 +175,7 @@ export function PromptEditorBridge(props: PromptEditorBridgeProps) {
   useEffect(() => {
     registerInserter((slot) => {
       editor.focus()
+
       insertMention({
         trigger: '@',
         value: slotLabel(slot),
@@ -176,7 +198,9 @@ export function PromptEditorBridge(props: PromptEditorBridgeProps) {
       editor.registerCommand(
         KEY_ENTER_COMMAND,
         (event) => {
-          if (event?.metaKey !== true && event?.ctrlKey !== true) return false
+          if (event?.metaKey !== true && event?.ctrlKey !== true) {
+            return false
+          }
 
           event.preventDefault()
           onSubmit()

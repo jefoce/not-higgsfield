@@ -33,9 +33,11 @@ export async function addReference(record: GenerationRecord): Promise<void> {
     store.setTab('references')
     store.addReferences([upload])
 
-    if (useGeneratorStore.getState().references.includes(upload.id))
+    if (useGeneratorStore.getState().references.includes(upload.id)) {
       toast.success('Added as reference')
-    else toast.error('Reference limit reached')
+    } else {
+      toast.error('Reference limit reached')
+    }
   } catch (error) {
     toast.error(errorMessage(error))
   }
@@ -77,7 +79,9 @@ export async function revealRecord(record: GenerationRecord): Promise<void> {
 
 /** Cancels a grace-window record, true means the menu should not open the dialog. */
 export function cancelInGrace(record: GenerationRecord): boolean {
-  if (!canCancelInGrace(record)) return false
+  if (!canCancelInGrace(record)) {
+    return false
+  }
 
   void cancelGeneration(record.id)
 

@@ -12,7 +12,9 @@ import { PreviewHeader } from './PreviewHeader'
 import { PreviewNavButton } from './PreviewNavButton'
 
 function handleOpenChange(isOpen: boolean): void {
-  if (!isOpen) closePreview()
+  if (!isOpen) {
+    closePreview()
+  }
 }
 
 /** Full-size media preview with header, navigation and opener actions. */
@@ -32,7 +34,9 @@ export function MediaPreviewModal() {
   const playerId = item ? `preview:${item.id}` : ''
 
   useEffect(() => {
-    if (item?.kind !== 'video') return
+    if (item?.kind !== 'video') {
+      return
+    }
 
     acquire(playerId)
 
@@ -40,12 +44,18 @@ export function MediaPreviewModal() {
   }, [acquire, item, playerId, release])
 
   useEffect(() => {
-    if (!request) return
+    if (!request) {
+      return
+    }
 
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft') setIndex((current) => Math.max(0, current - 1))
+      if (event.key === 'ArrowLeft') {
+        setIndex((current) => Math.max(0, current - 1))
+      }
 
-      if (event.key === 'ArrowRight') setIndex((current) => Math.min(items.length - 1, current + 1))
+      if (event.key === 'ArrowRight') {
+        setIndex((current) => Math.min(items.length - 1, current + 1))
+      }
     }
 
     window.addEventListener('keydown', onKey)
@@ -57,21 +67,27 @@ export function MediaPreviewModal() {
     (key: ActionKey) => {
       const action = request?.actions?.[key]
 
-      if (!action || !item) return
+      if (!action || !item) {
+        return
+      }
 
       closePreview() // close first so an opener action cannot stack modals
       action(item)
     },
     [item, request],
   )
+
   const handlePrevious = useCallback(() => {
     setIndex((current) => Math.max(0, current - 1))
   }, [])
+
   const handleNext = useCallback(() => {
     setIndex((current) => Math.min(items.length - 1, current + 1))
   }, [items.length])
 
-  if (!request) return null
+  if (!request) {
+    return null
+  }
 
   return (
     <Modal

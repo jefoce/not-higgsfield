@@ -13,6 +13,7 @@ interface FolderDirTileProps {
 /** Directory tile in the folder grid. */
 export function FolderDirTile(props: FolderDirTileProps) {
   const { dir, onNavigate } = props
+
   const handleSelect = useCallback(() => onNavigate(dir.rel), [dir.rel, onNavigate])
 
   return (

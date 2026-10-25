@@ -22,6 +22,7 @@ interface GraceCancelProps {
 export function GraceCancel(props: GraceCancelProps) {
   const { notBefore, seconds, compact: isCompact, onCancel: handleCancel } = props
   const remainingMs = useMemo(() => graceDelayMs(notBefore), [notBefore])
+
   const style = {
     '--grace-start': Math.min(1, remainingMs / SUBMIT_GRACE_MS),
     animationDuration: `${remainingMs}ms`,

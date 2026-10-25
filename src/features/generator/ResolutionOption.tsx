@@ -23,6 +23,7 @@ interface ResolutionOptionProps {
 /** One resolution row with its per-second rate. */
 export function ResolutionOption(props: ResolutionOptionProps) {
   const { option, isSelected, rate, listRate, discount, onSelect } = props
+
   const handleSelect = useCallback((): void => onSelect(option), [onSelect, option])
 
   return (

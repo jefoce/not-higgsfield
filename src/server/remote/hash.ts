@@ -16,7 +16,9 @@ export async function hashFile(file: string): Promise<FileHash> {
   const stats = await fs.stat(file)
   const hash = createHash('sha256')
 
-  for await (const chunk of createReadStream(file)) hash.update(chunk)
+  for await (const chunk of createReadStream(file)) {
+    hash.update(chunk)
+  }
 
   const digest = hash.digest()
 

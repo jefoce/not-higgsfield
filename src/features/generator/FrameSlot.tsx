@@ -37,9 +37,13 @@ const LABELS = { start: 'Start frame', end: 'End frame' } as const
 function frameState(params: FrameStateParams): { isBroken: boolean; isPreviewable: boolean } {
   const { hasFrame, upload } = params
 
-  if (!hasFrame) return { isBroken: false, isPreviewable: false }
+  if (!hasFrame) {
+    return { isBroken: false, isPreviewable: false }
+  }
 
-  if (isNil(upload) || upload.missing === true) return { isBroken: true, isPreviewable: false }
+  if (isNil(upload) || upload.missing === true) {
+    return { isBroken: true, isPreviewable: false }
+  }
 
   return { isBroken: false, isPreviewable: true }
 }
@@ -47,7 +51,9 @@ function frameState(params: FrameStateParams): { isBroken: boolean; isPreviewabl
 function slotTooltip(params: SlotTooltipParams): string | undefined {
   const { isBroken, isDisabled, disabledReason } = params
 
-  if (isDisabled) return disabledReason
+  if (isDisabled) {
+    return disabledReason
+  }
 
   return isBroken ? 'File missing' : undefined
 }
@@ -56,17 +62,23 @@ function slotTooltip(params: SlotTooltipParams): string | undefined {
 export function FrameSlot(props: FrameSlotProps) {
   const { slot, disabled: isDisabled = false, disabledReason } = props
   const frameId = useGeneratorStore((state) => state.frames[slot])
+
   const upload = useGeneratorStore((state) =>
     isNil(frameId) || frameId === '' ? undefined : state.uploadsById[frameId],
   )
+
   const setFrame = useGeneratorStore((state) => state.setFrame)
   const preset = getPreset(useGeneratorStore((state) => state.presetId))
   const extensions = extensionsFromLimits(preset.referenceLimits)
+
   const handleUploaded = (items: UploadItem[]): void => {
     const [item] = items
 
-    if (!isNil(item)) setFrame(slot, item)
+    if (!isNil(item)) {
+      setFrame(slot, item)
+    }
   }
+
   const { dragging: isDragging, dropProps } = useDropUpload({
     id: `frame-${slot}`,
     enabled: !isDisabled,
@@ -74,6 +86,7 @@ export function FrameSlot(props: FrameSlotProps) {
     extensions,
     onUploaded: handleUploaded,
   })
+
   const hasFrame = Boolean(frameId)
   const { isBroken, isPreviewable } = frameState({ hasFrame, upload })
 
@@ -89,7 +102,9 @@ export function FrameSlot(props: FrameSlotProps) {
   const handleRemove = useCallback((): void => setFrame(slot, null), [setFrame, slot])
 
   const handlePreview = (): void => {
-    if (!upload) return
+    if (!upload) {
+      return
+    }
 
     openPreview({
       items: [upload],
@@ -102,6 +117,7 @@ export function FrameSlot(props: FrameSlotProps) {
   }
 
   const handleSlotPress = isPreviewable ? handlePreview : handlePick
+
   const handleRemoveClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>): void => {
       event.stopPropagation()

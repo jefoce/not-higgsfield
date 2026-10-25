@@ -11,6 +11,7 @@ describe('resolveTransport', () => {
     expect(resolveTransport({ preset: seedance, kind: 'video', remoteConfigured: false })).toBe(
       'url',
     )
+
     expect(resolveTransport({ preset: wan, kind: 'image', remoteConfigured: true })).toBe('base64')
   })
 
@@ -24,6 +25,7 @@ describe('resolveTransport', () => {
     expect(resolveTransport({ preset: seedance, kind: 'audio', remoteConfigured: true })).toBe(
       'url',
     )
+
     expect(resolveTransport({ preset: seedance, kind: 'audio', remoteConfigured: false })).toBe(
       'base64',
     )

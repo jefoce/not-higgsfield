@@ -23,11 +23,13 @@ vi.mock('@/server/repos/uploads', () => ({ getUpload: async () => null }))
 vi.mock('@/server/remote/remote-store', () => ({ getRemoteStore: () => null }))
 vi.mock('@/server/jobs/poller', () => ({ startPoller: () => {} }))
 vi.mock('@/server/jobs/submit-retry', () => ({ shouldRetryAsBase64: () => false }))
+
 vi.mock('@/server/openrouter/client', () => ({
   OpenRouterError: class OpenRouterError extends Error {},
   stripStatusPrefix: (message: string) => message,
   submitVideo,
 }))
+
 vi.mock('@/server/repos/generations', () => ({
   getGeneration: async () => control.current,
   saveGeneration: async (record: GenerationRecord) => {

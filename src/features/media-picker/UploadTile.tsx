@@ -31,7 +31,9 @@ export function UploadTile(props: UploadTileProps) {
 
   const handleFiles = useCallback(
     async (files: File[]) => {
-      if (isEmpty(files)) return
+      if (isEmpty(files)) {
+        return
+      }
 
       setProgress(0)
 
@@ -53,10 +55,15 @@ export function UploadTile(props: UploadTileProps) {
   )
 
   const handleOpenFile = useCallback(() => inputRef.current?.click(), [])
+
   const handleDragEnter = useCallback(() => setIsOver(true), [])
+
   const handleDragOver = useCallback(() => setIsOver(true), [])
+
   const handleDragLeave = useCallback(() => setIsOver(false), [])
+
   const handleDrop = useCallback(() => setIsOver(false), [])
+
   const handleFileChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(event.target.files ?? [])

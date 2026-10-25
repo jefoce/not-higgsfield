@@ -8,6 +8,7 @@ import { ResolutionPopover } from '@/features/generator/ResolutionPopover'
 import { useGeneratorStore } from '@/features/generator/store'
 
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
+
 vi.mock('@/features/generator/use-pricing', () => ({
   usePricing: () => ({ pricing: null }),
 }))
@@ -20,6 +21,7 @@ class Observer {
 
 beforeEach(() => {
   vi.stubGlobal('ResizeObserver', Observer)
+
   useGeneratorStore.setState({
     presetId: 'wan-3.0',
     tab: 'frames',
@@ -75,6 +77,7 @@ describe('single-choice pickers close on pick', () => {
       y: 0,
       toJSON: () => ({}),
     })
+
     render(<DurationPopover />)
     const dialog = open('5s')
     const thumb = within(dialog).getByRole('slider')

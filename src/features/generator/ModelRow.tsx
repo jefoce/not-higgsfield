@@ -36,6 +36,7 @@ function fromRate(preset: ModelPreset, skus?: Record<string, number>): number | 
     audio: preset.audio.default,
     hasVideoInput: false,
   }
+
   const rates = preset.resolutions
     .map((resolution) => pricePerSec({ preset, ctx: { ...ctx, resolution }, skus }))
     .filter((rate): rate is number => !isNil(rate))
@@ -57,9 +58,12 @@ export function ModelRow(props: ModelRowProps) {
   const from = fromRate(option, pricing?.skus)
   let listFrom: number | null = null
 
-  if (discount > 0) listFrom = fromRate(option, pricing?.listSkus)
+  if (discount > 0) {
+    listFrom = fromRate(option, pricing?.listSkus)
+  }
 
   const Icon = PRESET_ICONS[option.icon]
+
   const handleSelect = useCallback((): void => onSelect(option.id), [onSelect, option.id])
 
   return (

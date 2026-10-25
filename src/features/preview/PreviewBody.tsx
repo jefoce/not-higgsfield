@@ -41,7 +41,9 @@ export function PreviewBody(props: PreviewBodyProps) {
     )
   }
 
-  if (item.kind === 'audio') return <PreviewAudio item={item} src={src} />
+  if (item.kind === 'audio') {
+    return <PreviewAudio item={item} src={src} />
+  }
 
   return (
     // eslint-disable-next-line @next/next/no-img-element -- full original, not a thumb

@@ -16,6 +16,7 @@ interface PreviewActionButtonProps {
 /** Footer action bound to its key. */
 export function PreviewActionButton(props: PreviewActionButtonProps) {
   const { actionKey, label, variant, onRun } = props
+
   const handleClick = useCallback(() => onRun(actionKey), [actionKey, onRun])
 
   return (

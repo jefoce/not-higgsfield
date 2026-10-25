@@ -47,14 +47,18 @@ const cache = globalState('remoteStore', () => ({
 
 /** Mock wins only in mock provider mode, then complete R2 config, else null. */
 export function getRemoteStore(): RemoteStore | null {
-  if (!isNil(cache.value)) return cache.value
+  if (!isNil(cache.value)) {
+    return cache.value
+  }
 
   if ((process.env.REMOTE_MOCK?.trim() ?? '') !== '') {
-    if (isMockMode()) cache.value = createMockStore()
-    else
+    if (isMockMode()) {
+      cache.value = createMockStore()
+    } else {
       console.warn(
         '[not-higgsfield] REMOTE_MOCK ignored: real OpenRouter cannot fetch 127.0.0.1 links',
       )
+    }
   }
 
   if (isNil(cache.value) && R2_KEYS.every((key) => Boolean(getSecret(key)))) {

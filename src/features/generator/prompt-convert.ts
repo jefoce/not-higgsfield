@@ -36,7 +36,9 @@ function slotFromData(data?: Record<string, BeautifulMentionsItemData>): RefSlot
   const kind = MEDIA_KINDS.find((item) => item === String(data?.kind ?? ''))
   const n = Number(data?.n)
 
-  if (isNil(kind) || !Number.isInteger(n) || n <= 0) return null
+  if (isNil(kind) || !Number.isInteger(n) || n <= 0) {
+    return null
+  }
 
   return { kind, n }
 }
@@ -48,7 +50,9 @@ export function mentionSlot(
 ): RefSlot {
   const fromData = slotFromData(data)
 
-  if (!isNil(fromData)) return fromData
+  if (!isNil(fromData)) {
+    return fromData
+  }
 
   const match = LABEL.exec(value)
 
@@ -60,11 +64,17 @@ function serializeNode(node: LexicalNode): string {
     return slotToken(mentionSlot(node.getValue(), node.getData()))
   }
 
-  if ($isTextNode(node)) return node.getTextContent()
+  if ($isTextNode(node)) {
+    return node.getTextContent()
+  }
 
-  if ($isLineBreakNode(node)) return '\n'
+  if ($isLineBreakNode(node)) {
+    return '\n'
+  }
 
-  if ($isElementNode(node)) return node.getChildren().map(serializeNode).join('')
+  if ($isElementNode(node)) {
+    return node.getChildren().map(serializeNode).join('')
+  }
 
   return ''
 }
@@ -117,13 +127,18 @@ function $partsToNodes(parts: readonly PromptPart[]): LexicalNode[] {
           n: part.slot.n,
         }),
       )
+
       continue
     }
 
     for (const [index, line] of part.text.split('\n').entries()) {
-      if (index > 0) nodes.push($createLineBreakNode())
+      if (index > 0) {
+        nodes.push($createLineBreakNode())
+      }
 
-      if (line !== '') nodes.push($createTextNode(line))
+      if (line !== '') {
+        nodes.push($createTextNode(line))
+      }
     }
   }
 
@@ -146,19 +161,25 @@ export function buildEditor(prompt: string): void {
   root.clear()
   const paragraph = $createParagraphNode()
 
-  for (const node of $partsToNodes(parts)) paragraph.append(node)
+  for (const node of $partsToNodes(parts)) {
+    paragraph.append(node)
+  }
 
   root.append(paragraph)
 }
 
 /** Converts literal slot labels in text nodes to mention chips. */
 export function $convertLiteralMentions(counts: SlotCounts): void {
-  if (useGeneratorStore.getState().tab !== 'references') return
+  if (useGeneratorStore.getState().tab !== 'references') {
+    return
+  }
 
   for (const node of $getRoot().getAllTextNodes()) {
     const parts = parsePromptParts(node.getTextContent(), counts)
 
-    if (!parts.some((part) => part.type === 'slot')) continue
+    if (!parts.some((part) => part.type === 'slot')) {
+      continue
+    }
 
     let anchor: LexicalNode = node
 

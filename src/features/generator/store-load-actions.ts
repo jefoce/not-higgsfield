@@ -26,7 +26,9 @@ export function createLoadActions(set: SetState, get: GetState): LoadActions {
       const found = findPreset(input.presetId)
       const preset = found ?? getPreset(DEFAULT_PRESET_ID)
 
-      if (!found) toast(`Model no longer available, switched to ${preset.title}`)
+      if (!found) {
+        toast(`Model no longer available, switched to ${preset.title}`)
+      }
 
       const normalized = normalizeForPreset({ input, preset, uploads: cache }).input
       const duration = clampReferenceDuration({ input: normalized, uploads: cache, preset })
@@ -41,17 +43,21 @@ export function createLoadActions(set: SetState, get: GetState): LoadActions {
     normalizeLoaded: () => {
       const state = get()
       const preset = findPreset(state.presetId) ?? getPreset(DEFAULT_PRESET_ID)
+
       const { input } = normalizeForPreset({
         input: inputFromState(state),
         preset,
         uploads: state.uploadsById,
       })
+
       const duration = clampReferenceDuration({ input, uploads: state.uploadsById, preset })
       const { counts } = referenceSlots(input.references, (id) => state.uploadsById[id]?.kind)
       const references = canonicalizePrompt(state.prompts.references, counts)
       const next = omit({ ...input, duration, prompts: { ...state.prompts, references } }, 'prompt')
 
-      if (!isEqual(pick(state, Object.keys(next)), next)) set(next)
+      if (!isEqual(pick(state, Object.keys(next)), next)) {
+        set(next)
+      }
     },
   }
 }

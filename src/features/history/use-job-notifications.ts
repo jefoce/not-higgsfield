@@ -39,7 +39,9 @@ function scrollToRecord(id: string): void {
 function readLastSeen(): number | null {
   const value = readLocal(LAST_SEEN_KEY, LAST_SEEN_VALUE).value
 
-  if (isNil(value) || value === '') return null
+  if (isNil(value) || value === '') {
+    return null
+  }
 
   const at = Date.parse(value)
 
@@ -68,8 +70,9 @@ function summaryText(records: GenerationRecord[]): string {
     )
   }
 
-  if (counts.failed > 0)
+  if (counts.failed > 0) {
     parts.push(`${pluralVideos(counts.failed)} failed while the app was closed.`)
+  }
 
   return parts.join(' ')
 }
@@ -79,20 +82,27 @@ function showChanges(records: GenerationRecord[]): void {
   const store = useHistoryViewStore.getState()
 
   store.resetFilters()
+
   const buckets = new Set(
     records.map((record) => (record.status === 'completed' ? 'done' : 'failed')),
   )
 
-  if (buckets.size === 1) store.setFilters({ status: buckets.values().next().value })
+  if (buckets.size === 1) {
+    store.setFilters({ status: buckets.values().next().value })
+  }
 
   document.getElementById('history-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   const first = records[0]
 
-  if (records.length > 0) window.setTimeout(() => scrollToRecord(first.id), HISTORY_SCROLL_DELAY_MS)
+  if (records.length > 0) {
+    window.setTimeout(() => scrollToRecord(first.id), HISTORY_SCROLL_DELAY_MS)
+  }
 }
 
 function notifyHidden(title: string, body: string): void {
-  if (document.visibilityState !== 'hidden') return
+  if (document.visibilityState !== 'hidden') {
+    return
+  }
 
   void getPlatform()
     .then((platform) => platform.notify(title, body))
@@ -111,7 +121,9 @@ export function useJobNotifications(params: JobNotificationParams): void {
     const title = baseTitle.current
 
     return () => {
-      if (title !== '') document.title = title
+      if (title !== '') {
+        document.title = title
+      }
     }
   }, [])
 
@@ -121,21 +133,27 @@ export function useJobNotifications(params: JobNotificationParams): void {
   }, [activeCount])
 
   useEffect(() => {
-    if (summaryChecked.current || isLoading) return
+    if (summaryChecked.current || isLoading) {
+      return
+    }
 
     summaryChecked.current = true
     const lastSeen = readLastSeen()
 
     writeLocal(LAST_SEEN_KEY, new Date().toISOString())
 
-    if (isNil(lastSeen)) return
+    if (isNil(lastSeen)) {
+      return
+    }
 
     const changes = records.filter(
       (record) =>
         SUMMARY_STATUSES.includes(record.status) && Date.parse(record.updatedAt) > lastSeen,
     )
 
-    if (changes.length === 0) return
+    if (changes.length === 0) {
+      return
+    }
 
     toast(summaryText(changes), {
       duration: 10_000,
@@ -148,12 +166,16 @@ export function useJobNotifications(params: JobNotificationParams): void {
 
     previous.current = new Map(records.map((record) => [record.id, record.status]))
 
-    if (!before) return
+    if (!before) {
+      return
+    }
 
     for (const record of records) {
       const previousStatus = before.get(record.id)
 
-      if (isNil(previousStatus) || previousStatus === record.status) continue
+      if (isNil(previousStatus) || previousStatus === record.status) {
+        continue
+      }
 
       const body = truncate(plainPrompt(record), 80)
 
@@ -162,6 +184,7 @@ export function useJobNotifications(params: JobNotificationParams): void {
           description: body,
           action: { label: 'Show', onClick: () => scrollToRecord(record.id) },
         })
+
         notifyHidden('Video ready', body)
       }
 

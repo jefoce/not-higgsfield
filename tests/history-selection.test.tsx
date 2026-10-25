@@ -109,12 +109,14 @@ describe('history selection cards', () => {
     const records = ['a', 'b', 'c', 'd'].map((id) => record(id))
 
     setOrder(records.map((item) => item.id))
+
     act(() => {
       useSelectionStore.getState().toggle('b')
       useSelectionStore.getState().toggle('b')
     })
 
     render(<HistoryGrid records={records} onOpen={handleNoop} />)
+
     fireEvent.click(screen.getAllByRole('button', { name: 'Open video details' })[3], {
       shiftKey: true,
     })
@@ -156,6 +158,7 @@ describe('history selection bar', () => {
 
     setSelection(['b'])
     expect(stack()).toHaveLength(2)
+
     expect([...stack()].map((img) => img.getAttribute('src'))).toEqual([
       expect.stringContaining('b.preview'),
       expect.stringContaining('a.preview'),
@@ -165,6 +168,7 @@ describe('history selection bar', () => {
     expect(stack()).toHaveLength(3)
     setSelection(['d'])
     expect(stack()).toHaveLength(3)
+
     expect([...stack()].map((img) => img.getAttribute('src'))).toEqual([
       expect.stringContaining('d.preview'),
       expect.stringContaining('c.preview'),
@@ -201,6 +205,7 @@ describe('history selection bar', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Like selected videos' }))
 
     await waitFor(() => expect(apiPost).toHaveBeenCalledTimes(2))
+
     const sizes = apiPost.mock.calls
       .map((call) => (call[1] as { ids: string[] }).ids.length)
       .sort((a, b) => a - b)

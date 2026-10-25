@@ -36,7 +36,9 @@ export async function removeFile(file: string): Promise<void> {
   try {
     await fs.unlink(file)
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error
+    }
   }
 }
 

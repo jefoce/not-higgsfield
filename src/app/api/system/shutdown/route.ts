@@ -9,7 +9,9 @@ import { sessionRequired } from '@/server/session'
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
-  if (!sessionRequired()) return jsonError({ status: 404, error: 'Not found' })
+  if (!sessionRequired()) {
+    return jsonError({ status: 404, error: 'Not found' })
+  }
 
   try {
     assertLocalRequest(request)

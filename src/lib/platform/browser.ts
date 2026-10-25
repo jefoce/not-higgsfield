@@ -45,17 +45,25 @@ export const browserPlatform: Platform = {
   chooseFolder: (): Promise<FolderItem | null> => chooseFolderFromServer(),
 
   requestNotifications: async () => {
-    if (typeof Notification === 'undefined') return
+    if (typeof Notification === 'undefined') {
+      return
+    }
 
-    if (Notification.permission !== 'default') return
+    if (Notification.permission !== 'default') {
+      return
+    }
 
     await Notification.requestPermission().catch(() => {})
   },
 
   notify: async (title: string, body: string) => {
-    if (typeof Notification === 'undefined') return
+    if (typeof Notification === 'undefined') {
+      return
+    }
 
-    if (Notification.permission !== 'granted') return
+    if (Notification.permission !== 'granted') {
+      return
+    }
 
     new Notification(title, { body })
   },
@@ -74,7 +82,9 @@ export const browserPlatform: Platform = {
 
   saveVideos: async (records: GenerationRecord[]) => {
     for (const [index, record] of records.entries()) {
-      if (index > 0) await wait(DOWNLOAD_STAGGER_MS)
+      if (index > 0) {
+        await wait(DOWNLOAD_STAGGER_MS)
+      }
 
       clickDownload(downloadUrl(record))
     }

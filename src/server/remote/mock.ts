@@ -51,6 +51,7 @@ export function createMockStore(): RemoteStore {
           mode,
           onProgress: opts.onProgress,
         })
+
         const meta: MockMeta = { size, serverSha256: opts.sha256 }
 
         await fs.writeFile(metaPath(key), JSON.stringify(meta), 'utf8')
@@ -94,7 +95,9 @@ export function mockObjectPath(key: string): string | null {
 export function verifyMockSignature(params: VerifyMockSignatureParams): boolean {
   const { key, exp, sig } = params
 
-  if (!Number.isSafeInteger(exp) || exp * 1000 < Date.now()) return false
+  if (!Number.isSafeInteger(exp) || exp * 1000 < Date.now()) {
+    return false
+  }
 
   const expected = Buffer.from(sign(key, exp), 'utf8')
   const actual = Buffer.from(sig, 'utf8')
@@ -122,14 +125,20 @@ async function copyThrottled(params: CopyThrottledParams): Promise<{ size: numbe
 
   try {
     for await (const chunk of reader) {
-      if (!writer.write(chunk)) await once(writer, 'drain')
+      if (!writer.write(chunk)) {
+        await once(writer, 'drain')
+      }
 
       sent += chunk.length
       onProgress?.(sent, size)
 
-      if (mode === 'fail' && sent >= size / 2) throw new Error('Mock upload failed')
+      if (mode === 'fail' && sent >= size / 2) {
+        throw new Error('Mock upload failed')
+      }
 
-      if (bytesPerMs > 0) await delay(chunk.length / bytesPerMs)
+      if (bytesPerMs > 0) {
+        await delay(chunk.length / bytesPerMs)
+      }
     }
 
     writer.end()

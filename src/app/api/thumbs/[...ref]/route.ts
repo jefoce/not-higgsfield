@@ -19,11 +19,14 @@ export async function GET(request: Request, { params }: Params) {
     const media = await resolveMediaRef(ref)
     const stats = await fs.stat(media.absolutePath).catch(() => null)
 
-    if (!stats) return jsonError({ status: 404, error: 'File not found' })
+    if (!stats) {
+      return jsonError({ status: 404, error: 'File not found' })
+    }
 
     const parsedWidth = Number.parseInt(new URL(request.url).searchParams.get('w') ?? '', 10)
     const requested = Number.isNaN(parsedWidth) || parsedWidth === 0 ? THUMB_WIDTH : parsedWidth
     const width = Math.min(1280, Math.ceil(clamp(requested, 32, 1280) / 80) * 80)
+
     const thumb = await getThumbnail({
       ref: media.ref,
       absolutePath: media.absolutePath,

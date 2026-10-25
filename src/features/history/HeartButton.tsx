@@ -19,6 +19,7 @@ interface HeartButtonProps {
 /** Circular heart toggle: pink gradient when liked, neutral glass when not. */
 export function HeartButton(props: HeartButtonProps) {
   const { record, className } = props
+
   const handleFavorite = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()

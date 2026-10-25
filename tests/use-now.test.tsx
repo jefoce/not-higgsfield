@@ -8,6 +8,7 @@ let isHidden = false
 
 function setHidden(isValue: boolean): void {
   isHidden = isValue
+
   act(() => {
     document.dispatchEvent(new Event('visibilitychange'))
   })
@@ -76,9 +77,11 @@ describe('useNow', () => {
     const start = result.current
 
     setHidden(true)
+
     act(() => {
       vi.advanceTimersByTime(3000)
     })
+
     expect(result.current).toBe(start)
 
     setHidden(false)

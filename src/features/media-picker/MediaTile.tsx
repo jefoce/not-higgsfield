@@ -39,6 +39,7 @@ export function MediaTile(props: MediaTileProps) {
     onSelect,
     onPreview,
   } = props
+
   const [brokenSrc, setBrokenSrc] = useState<string | null>(null)
   const isBlocked = isMissing === true || isDisabled === true
   const isAudio = item.kind === 'audio'
@@ -46,7 +47,9 @@ export function MediaTile(props: MediaTileProps) {
   const thumbSrc = thumbUrl({ ref: mediaRef, w: undefined, version: thumbVersion })
   const isBroken = brokenSrc === thumbSrc
   const mediaSrc = mediaUrl(mediaRef, item.mime)
+
   const handleThumbError = useCallback(() => setBrokenSrc(thumbSrc), [thumbSrc])
+
   const handleSelect = onSelect
   const handlePreview = onPreview
   const handleDelete = onDelete

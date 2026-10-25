@@ -43,7 +43,9 @@ export async function keychainBackend(): Promise<SecretBackend | null> {
     remove: async (name: SecretName) => {
       const values = readAll(Entry)
 
-      if (isNil(values[name])) return
+      if (isNil(values[name])) {
+        return
+      }
 
       delete values[name]
       writeAll(Entry, values)
@@ -54,18 +56,24 @@ export async function keychainBackend(): Promise<SecretBackend | null> {
 function readAll(Entry: EntryCtor): Values {
   const raw = new Entry(SERVICE, ACCOUNT).getPassword()
 
-  if (isNil(raw)) return migrate(Entry)
+  if (isNil(raw)) {
+    return migrate(Entry)
+  }
 
   const parsed: unknown = JSON.parse(raw)
 
-  if (!isRecord(parsed)) throw new Error('Bad secrets item')
+  if (!isRecord(parsed)) {
+    throw new Error('Bad secrets item')
+  }
 
   const values: Values = {}
 
   for (const name of SECRET_NAMES) {
     const value = parsed[name]
 
-    if (isString(value) && value !== '') values[name] = value
+    if (isString(value) && value !== '') {
+      values[name] = value
+    }
   }
 
   return values
@@ -84,13 +92,17 @@ function migrate(Entry: EntryCtor): Values {
     const previous = new Entry(SERVICE, name)
     const value = previous.getPassword()
 
-    if (isNil(value) || value === '') continue
+    if (isNil(value) || value === '') {
+      continue
+    }
 
     values[name] = value
     old.push(previous)
   }
 
-  if (old.length === 0) return values
+  if (old.length === 0) {
+    return values
+  }
 
   writeAll(Entry, values)
 

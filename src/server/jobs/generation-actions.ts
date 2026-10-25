@@ -14,7 +14,9 @@ export function setFavorite(id: string, isFavorite: boolean): Promise<Generation
   return withLock(id, async () => {
     const record = await getGeneration(id)
 
-    if (!record) return null
+    if (!record) {
+      return null
+    }
 
     return saveGeneration({ ...record, favorite: isFavorite })
   })
@@ -25,11 +27,17 @@ export function deleteGeneration(id: string): Promise<DeleteResult> {
   return withLock(id, async () => {
     const record = await getGeneration(id)
 
-    if (!record) return 'not_found'
+    if (!record) {
+      return 'not_found'
+    }
 
-    if (ACTIVE_STATUSES.includes(record.status) && !canCancelInGrace(record)) return 'active'
+    if (ACTIVE_STATUSES.includes(record.status) && !canCancelInGrace(record)) {
+      return 'active'
+    }
 
-    if (canCancelInGrace(record)) cancelScheduledSubmit(id)
+    if (canCancelInGrace(record)) {
+      cancelScheduledSubmit(id)
+    }
 
     await deleteGenerationFiles(id)
 

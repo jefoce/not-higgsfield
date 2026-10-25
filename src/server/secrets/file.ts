@@ -30,7 +30,9 @@ export function fileBackend(): SecretBackend {
     remove: async (name: SecretName): Promise<void> => {
       const values = await readAll()
 
-      if (isNil(values[name])) return
+      if (isNil(values[name])) {
+        return
+      }
 
       delete values[name]
       await writeAll(values)
@@ -42,7 +44,9 @@ export function fileBackend(): SecretBackend {
 async function readAll(): Promise<Values> {
   const stats = await fs.stat(FILE).catch(() => null)
 
-  if (!stats) return {}
+  if (!stats) {
+    return {}
+  }
 
   if (process.platform !== 'win32' && (stats.mode & 0o077) !== 0) {
     console.warn('[not-higgsfield] secrets file is readable by others, ignoring it')
@@ -52,18 +56,24 @@ async function readAll(): Promise<Values> {
 
   const raw = await readJson<Record<string, unknown>>(FILE)
 
-  if (!raw) return {}
+  if (!raw) {
+    return {}
+  }
 
   const values: Values = {}
 
   for (const name of SECRET_NAMES) {
     const value = raw[name]
 
-    if (!isString(value)) continue
+    if (!isString(value)) {
+      continue
+    }
 
     const parsed = SECRET_SCHEMAS[name].safeParse(value)
 
-    if (parsed.success) values[name] = parsed.data
+    if (parsed.success) {
+      values[name] = parsed.data
+    }
   }
 
   return values

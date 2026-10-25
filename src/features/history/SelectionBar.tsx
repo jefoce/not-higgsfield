@@ -27,9 +27,13 @@ export function SelectionBar(props: SelectionBarProps) {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || event.defaultPrevented) return
+      if (event.key !== 'Escape' || event.defaultPrevented) {
+        return
+      }
 
-      if (document.querySelector('[role="dialog"],[role="menu"]')) return
+      if (document.querySelector('[role="dialog"],[role="menu"]')) {
+        return
+      }
 
       handleClear()
     }
@@ -41,13 +45,17 @@ export function SelectionBar(props: SelectionBarProps) {
 
   const byId = new Map(records.map((record) => [record.id, record]))
   const stack = [...ids].slice(-3).reverse()
+
   const isAllCompleted =
     selected.length > 0 && selected.every((record) => record.status === 'completed')
+
   const isAllLiked = selected.every((record) => record.favorite)
   const isBusy = !isNil(busy)
 
   const handleDownload = useCallback(async () => {
-    if (!isAllCompleted) return
+    if (!isAllCompleted) {
+      return
+    }
 
     setBusy('download')
 
@@ -73,7 +81,9 @@ export function SelectionBar(props: SelectionBarProps) {
   const handleDelete = useCallback(async () => {
     const isConfirmed = await confirmDelete(selected)
 
-    if (!isConfirmed) return
+    if (!isConfirmed) {
+      return
+    }
 
     setBusy('delete')
 

@@ -87,6 +87,7 @@ describe('FolderTab selection', () => {
       onPickFile: vi.fn<(rel: string) => void>(),
       selectedRels: ['clip.mp4'],
     })
+
     const tile = screen.getByRole('button', { name: 'Select clip.mp4' })
 
     fireEvent.click(tile)
@@ -107,7 +108,9 @@ describe('FolderTab selection', () => {
     const request = usePreviewStore.getState().request
     const item = request?.items[0]
 
-    if (isNil(request) || isNil(item)) throw new Error('preview request missing')
+    if (isNil(request) || isNil(item)) {
+      throw new Error('preview request missing')
+    }
 
     expect(item.id).toBe('folder:folder-1:clip.mp4')
     expect(item.previewRef).toBe('folders/folder-1/clip.mp4')
@@ -123,7 +126,9 @@ describe('FolderTab selection', () => {
     const request = usePreviewStore.getState().request
     const item = request?.items[0]
 
-    if (isNil(request) || isNil(item)) throw new Error('preview request missing')
+    if (isNil(request) || isNil(item)) {
+      throw new Error('preview request missing')
+    }
 
     act(() => request.actions?.select?.(item))
 

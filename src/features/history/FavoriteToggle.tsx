@@ -10,6 +10,7 @@ import { useHistoryViewStore } from './view-store'
 export function FavoriteToggle() {
   const filters = useHistoryViewStore((state) => state.filters)
   const setFilters = useHistoryViewStore((state) => state.setFilters)
+
   const handleToggle = useCallback(
     () => setFilters({ favorite: filters.favorite === true ? undefined : true }),
     [filters.favorite, setFilters],

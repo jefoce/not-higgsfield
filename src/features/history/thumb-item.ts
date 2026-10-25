@@ -23,13 +23,23 @@ const isFilled = (value: string | null | undefined): value is string =>
   !isNil(value) && value !== ''
 
 function sentNote(item: InputSnapshot[string] | undefined): string | undefined {
-  if (isNil(item)) return undefined
+  if (isNil(item)) {
+    return undefined
+  }
 
   const { sentWidth, sentHeight, sentBytes, format } = item
 
-  if (isNil(sentWidth) || sentWidth === 0) return undefined
-  if (isNil(sentHeight) || sentHeight === 0) return undefined
-  if (isNil(sentBytes)) return undefined
+  if (isNil(sentWidth) || sentWidth === 0) {
+    return undefined
+  }
+
+  if (isNil(sentHeight) || sentHeight === 0) {
+    return undefined
+  }
+
+  if (isNil(sentBytes)) {
+    return undefined
+  }
 
   const formatLabel = isNil(format) ? 'image' : format.toUpperCase()
 
@@ -66,7 +76,9 @@ export function thumbItems(record: GenerationRecord): ThumbItem[] {
       ['Start frame', frames.start],
       ['End frame', frames.end],
     ] as const) {
-      if (isFilled(id)) items.push(thumbItem({ snapshot, id, label }))
+      if (isFilled(id)) {
+        items.push(thumbItem({ snapshot, id, label }))
+      }
     }
   }
 
@@ -95,7 +107,9 @@ function handleAddAsReference(current: UploadItem): void {
 }
 
 function availableActions(current: UploadItem): ('useAsStart' | 'addAsReference')[] {
-  if (current.kind === 'image') return ['useAsStart', 'addAsReference']
+  if (current.kind === 'image') {
+    return ['useAsStart', 'addAsReference']
+  }
 
   return ['addAsReference']
 }

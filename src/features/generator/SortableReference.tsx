@@ -27,9 +27,11 @@ export function SortableReference(props: SortableReferenceProps) {
     onOpenPreview: handleOpenPreview,
     onRemove: handleRemove,
   } = props
+
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   })
+
   const isAudio = upload?.kind === 'audio'
 
   return (

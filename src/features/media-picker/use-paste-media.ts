@@ -36,15 +36,20 @@ const EDITABLE_SELECTOR = 'input, textarea, [contenteditable="true"], [contented
 
 function handlePastedFiles(params: PastedFilesParams): void {
   const { event, files, params: options } = params
+
   const { accepted, skipped } = acceptFiles({
     files,
     kinds: options.kinds(),
     extensions: options.extensions?.(),
   })
 
-  if (skipped > 0) toast(`Skipped ${skipped} unsupported file${skipped === 1 ? '' : 's'}`)
+  if (skipped > 0) {
+    toast(`Skipped ${skipped} unsupported file${skipped === 1 ? '' : 's'}`)
+  }
 
-  if (isEmpty(accepted)) return
+  if (isEmpty(accepted)) {
+    return
+  }
 
   event.preventDefault()
   options.onFiles(accepted)
@@ -57,9 +62,12 @@ function handlePastedPath(event: PasteLike, params: PasteMediaOptions): void {
     extensions: params.extensions?.(),
   })
 
-  if (isNil(path) || path === '') return
+  if (isNil(path) || path === '') {
+    return
+  }
 
   event.preventDefault()
+
   void linkAbsPath(path)
     .then((item) => params.onUploaded([item]))
     .catch((error) => toast.error(errorMessage(error)))
@@ -83,12 +91,16 @@ function readPasteTarget(event: PasteLike): PasteTarget {
 }
 
 function handlePaste(event: PasteLike, params: PasteMediaOptions): void {
-  if (!params.enabled) return
+  if (!params.enabled) {
+    return
+  }
 
   const { files, isEditing, isInPromptEditor } = readPasteTarget(event)
   const isPromptPaste = isInPromptEditor && files.length > 0
 
-  if (isEditing && !isPromptPaste) return
+  if (isEditing && !isPromptPaste) {
+    return
+  }
 
   if (files.length > 0) {
     handlePastedFiles({ event, files, params })
@@ -115,7 +127,9 @@ export function usePasteMedia(params: PasteMediaOptions): {
   }, [])
 
   useEffect(() => {
-    if (scope !== 'window' || !isEnabled) return
+    if (scope !== 'window' || !isEnabled) {
+      return
+    }
 
     const listener = (event: globalThis.ClipboardEvent) => handlePaste(event, current.current)
 
@@ -124,7 +138,9 @@ export function usePasteMedia(params: PasteMediaOptions): {
     return () => window.removeEventListener('paste', listener)
   }, [scope, isEnabled])
 
-  if (scope === 'element') return { onPaste }
+  if (scope === 'element') {
+    return { onPaste }
+  }
 
   return {}
 }

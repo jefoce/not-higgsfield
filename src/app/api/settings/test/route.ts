@@ -27,11 +27,15 @@ export async function POST(request: Request) {
     assertLocalRequest(request)
     const body = BodySchema.safeParse(await readJsonBody(request))
 
-    if (!body.success) return zodError(body.error)
+    if (!body.success) {
+      return zodError(body.error)
+    }
 
     await secretsReady()
 
-    if (body.data.target === 'openrouter') return Response.json(await testOpenRouter())
+    if (body.data.target === 'openrouter') {
+      return Response.json(await testOpenRouter())
+    }
 
     if ((process.env.REMOTE_MOCK?.trim() ?? '') !== '' && isMockMode()) {
       return Response.json({ ok: true, mock: true })
@@ -44,12 +48,15 @@ export async function POST(request: Request) {
 }
 
 async function testOpenRouter(): Promise<TestResult> {
-  if (isMockMode()) return { ok: true, mock: true }
+  if (isMockMode()) {
+    return { ok: true, mock: true }
+  }
 
   const key = getSecret('OPENROUTER_API_KEY')
 
-  if (isNil(key) || key === '')
+  if (isNil(key) || key === '') {
     return { ok: false, error: 'OpenRouter key is not set. Open Settings.' }
+  }
 
   try {
     const res = await fetch(`${BASE_URL}/api/v1/key`, {
@@ -58,12 +65,16 @@ async function testOpenRouter(): Promise<TestResult> {
       signal: AbortSignal.timeout(FETCH_TIMEOUTS.meta),
     })
 
-    if (!res.ok) return { ok: false, error: `OpenRouter ${res.status} ${res.statusText}` }
+    if (!res.ok) {
+      return { ok: false, error: `OpenRouter ${res.status} ${res.statusText}` }
+    }
 
     const parsed = KeySchema.safeParse(await res.json().catch(() => null))
     const label = parsed.success ? parsed.data.data.label : undefined
 
-    if (isNil(label) || label === '') return { ok: true }
+    if (isNil(label) || label === '') {
+      return { ok: true }
+    }
 
     return { ok: true, label }
   } catch (error) {

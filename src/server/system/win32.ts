@@ -18,6 +18,7 @@ export const win32: SystemAdapter = {
     const patterns = extensions(kinds)
       .map((ext) => `*.${ext}`)
       .join(';')
+
     const script = [
       'Add-Type -AssemblyName System.Windows.Forms',
       '$form = New-Object System.Windows.Forms.Form',
@@ -29,7 +30,9 @@ export const win32: SystemAdapter = {
       `$dialog.Filter = ${quote(`Media|${patterns}`)}`,
     ]
 
-    if (isMultiple) script.push('$dialog.Multiselect = $true')
+    if (isMultiple) {
+      script.push('$dialog.Multiselect = $true')
+    }
 
     script.push("if ($dialog.ShowDialog($form) -eq 'OK') { $dialog.FileNames }")
     const { stdout } = await dialog(script)
@@ -48,6 +51,7 @@ export const win32: SystemAdapter = {
       `$dialog.Description = ${quote(prompt)}`,
       "if ($dialog.ShowDialog() -eq 'OK') { $dialog.SelectedPath }",
     ]
+
     const { stdout } = await dialog(script)
 
     const picked = stdout.trim()

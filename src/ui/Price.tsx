@@ -48,6 +48,7 @@ export function Price(props: PriceProps) {
     tone = 'default',
     showDiscountLabel: shouldShowDiscountLabel = false,
   } = props
+
   const classes = TONE_CLASSES[tone]
   const isDiscounted = discount > 0
 

@@ -21,6 +21,7 @@ interface SegmentedTabProps {
 /** One tab button in a segmented control. */
 export function SegmentedTab(props: SegmentedTabProps) {
   const { option, isActive, sizeClass, onValueChange } = props
+
   const handleSelect = useCallback(() => onValueChange(option.value), [onValueChange, option.value])
 
   return (

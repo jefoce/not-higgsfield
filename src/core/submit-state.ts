@@ -14,7 +14,9 @@ import type { GenerationInput, GenerationRecord, JobStatus, UploadItem } from '.
 export function graceDelayMs(notBefore: string | undefined, now = Date.now()): number {
   const at = isNil(notBefore) || notBefore === '' ? Number.NaN : Date.parse(notBefore)
 
-  if (!Number.isFinite(at)) return 0
+  if (!Number.isFinite(at)) {
+    return 0
+  }
 
   return Math.max(0, at - now)
 }
@@ -24,7 +26,9 @@ export function isStaleGrace(
   record: Pick<GenerationRecord, 'status' | 'submit'>,
   now = Date.now(),
 ): boolean {
-  if (record.status !== 'submitting' || record.submit?.stage !== 'grace') return false
+  if (record.status !== 'submitting' || record.submit?.stage !== 'grace') {
+    return false
+  }
 
   const notBefore = record.submit.notBefore
   const at = isNil(notBefore) || notBefore === '' ? Number.NaN : Date.parse(notBefore)
@@ -75,7 +79,9 @@ export function withTransports(
     Object.entries(snapshot).map(([id, item]) => {
       const transport = transports[id]
 
-      if (isNil(transport)) return [id, item] as const
+      if (isNil(transport)) {
+        return [id, item] as const
+      }
 
       return [id, { ...item, transport }] as const
     }),

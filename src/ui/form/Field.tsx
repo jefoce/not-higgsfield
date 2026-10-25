@@ -30,10 +30,13 @@ export function Field(props: FieldProps) {
   const hintId = Boolean(hint) ? `${controlId}-hint` : undefined
   const hasError = !isNil(error) && error !== ''
   const errorId = hasError ? `${controlId}-error` : undefined
+
   const describedByText = [children.props['aria-describedby'], hintId, errorId]
     .filter((value): value is string => !isNil(value) && value !== '')
     .join(' ')
+
   const describedBy = describedByText === '' ? undefined : describedByText
+
   const control = cloneElement(children, {
     id: controlId,
     'aria-describedby': describedBy,

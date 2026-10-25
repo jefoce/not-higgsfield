@@ -20,8 +20,9 @@ export { serve as GET, serve as HEAD }
 
 /** Serves an object from the mock remote store, signed and short lived. */
 async function handle(request: Request, keyParts: string[]): Promise<Response> {
-  if ((process.env.REMOTE_MOCK?.trim() ?? '') === '')
+  if ((process.env.REMOTE_MOCK?.trim() ?? '') === '') {
     return new Response('Not found', { status: 404 })
+  }
 
   try {
     assertLocalRequest(request, { session: false })
@@ -36,7 +37,9 @@ async function handle(request: Request, keyParts: string[]): Promise<Response> {
 
     const file = mockObjectPath(key)
 
-    if (isNil(file) || file === '') return jsonError({ status: 404, error: 'Object not found' })
+    if (isNil(file) || file === '') {
+      return jsonError({ status: 404, error: 'Object not found' })
+    }
 
     const response = await streamFile({
       absPath: file,

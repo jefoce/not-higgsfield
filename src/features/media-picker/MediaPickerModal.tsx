@@ -8,7 +8,9 @@ import { PickerBody } from './PickerBody'
 import { closeMediaPicker, useMediaPickerStore } from './store'
 
 function handleOpenChange(isOpen: boolean): void {
-  if (!isOpen) closeMediaPicker()
+  if (!isOpen) {
+    closeMediaPicker()
+  }
 }
 
 /** Dialog shell, the body remounts per request so its state resets. */

@@ -20,7 +20,9 @@ export function PreviewAudioWave(props: PreviewAudioWaveProps) {
 
   const handleSeek = useCallback(
     (event: MouseEvent<HTMLDivElement>) => {
-      if (total === 0) return
+      if (total === 0) {
+        return
+      }
 
       const rect = event.currentTarget.getBoundingClientRect()
 
@@ -28,6 +30,7 @@ export function PreviewAudioWave(props: PreviewAudioWaveProps) {
     },
     [total],
   )
+
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
       if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {

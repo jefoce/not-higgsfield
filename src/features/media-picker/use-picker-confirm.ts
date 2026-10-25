@@ -30,12 +30,15 @@ export function usePickerConfirm(params: UsePickerConfirmParams) {
       return
     }
 
-    if (isEmpty(selectedFolderRels)) return
+    if (isEmpty(selectedFolderRels)) {
+      return
+    }
 
     setIsAddingFolderFiles(true)
 
     try {
       const rels = selectedFolderRels.slice(0, request.max)
+
       const uploads = await Promise.all(
         rels.map((rel) => linkFolderFile({ folderId: activeFolder.id, relPath: rel })),
       )

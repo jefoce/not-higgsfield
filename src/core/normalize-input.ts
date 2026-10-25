@@ -8,7 +8,9 @@ import type { GenerationInput, MediaKind, UploadItem } from './types'
 
 /** Drop media belonging to the inactive tab. Returns a new object. */
 export function inputForSubmit(input: GenerationInput): GenerationInput {
-  if (input.tab !== 'frames') return { ...input, frames: { start: null, end: null } }
+  if (input.tab !== 'frames') {
+    return { ...input, frames: { start: null, end: null } }
+  }
 
   const hasStart = !isNil(input.frames.start) && input.frames.start !== ''
   const end = hasStart ? input.frames.end : null
@@ -38,7 +40,9 @@ interface NormalizeAspectParams {
 function normalizeAspect(params: NormalizeAspectParams): GenerationInput['aspectRatio'] {
   const { aspect, preset, resolution } = params
 
-  if (aspect === 'auto') return preset.autoAspectWithFrames ? 'auto' : preset.defaultAspectRatio
+  if (aspect === 'auto') {
+    return preset.autoAspectWithFrames ? 'auto' : preset.defaultAspectRatio
+  }
 
   return aspectAllowed({ preset, resolution, aspect }) ? aspect : preset.defaultAspectRatio
 }
@@ -76,7 +80,9 @@ function trimReferences(params: TrimReferencesParams): { references: string[]; n
   const references = ids.filter((id) => {
     const kind = uploads[id]?.kind
 
-    if (isNil(kind)) return true // unknown until uploads load, decided later
+    if (isNil(kind)) {
+      return true
+    } // unknown until uploads load, decided later
 
     if (counts[kind] < preset.references[kind]) {
       counts[kind] += 1
@@ -126,12 +132,16 @@ export function normalizeForPreset(params: NormalizeForPresetParams): {
 
   let activeReferences: string[] = []
 
-  if (tab === 'references') activeReferences = references
+  if (tab === 'references') {
+    activeReferences = references
+  }
 
   const limit = durationLimitFor({ references: activeReferences, uploads, preset })
   const duration = clampDuration({ value: input.duration, preset, limit })
 
-  if (duration !== input.duration) notes.push(`Duration set to ${duration}s`)
+  if (duration !== input.duration) {
+    notes.push(`Duration set to ${duration}s`)
+  }
 
   let resolution = input.resolution
 

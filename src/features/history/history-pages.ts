@@ -18,7 +18,9 @@ export function patchPage(params: PatchPageParams): GenerationListResult {
   const { page, byId, activeCount } = params
   const hasMatch = page.items.some((item) => byId.has(item.id))
 
-  if (!hasMatch && page.activeCount === activeCount) return page
+  if (!hasMatch && page.activeCount === activeCount) {
+    return page
+  }
 
   return {
     ...page,

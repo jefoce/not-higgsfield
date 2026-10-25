@@ -51,7 +51,9 @@ export function isMockMode(): boolean {
 export async function submitVideo(
   body: unknown,
 ): Promise<{ id: string; polling_url?: string; status: string }> {
-  if (isMockMode()) return mockSubmit(body)
+  if (isMockMode()) {
+    return mockSubmit(body)
+  }
 
   const res = await request({
     url: `${BASE_URL}/api/v1/videos`,
@@ -63,12 +65,15 @@ export async function submitVideo(
     timeoutMs: FETCH_TIMEOUTS.submit,
   })
 
-  if (!res.ok) throw await errorFromResponse(res)
+  if (!res.ok) {
+    throw await errorFromResponse(res)
+  }
 
   const parsed = SubmitSchema.safeParse(await res.json().catch(() => null))
 
-  if (!parsed.success)
+  if (!parsed.success) {
     throw new OpenRouterError({ message: 'Invalid submit response', status: res.status })
+  }
 
   return parsed.data
 }
@@ -78,7 +83,9 @@ export async function getVideoJob(
   id: string,
   opts?: { submittedAt?: string },
 ): Promise<VideoJobResponse> {
-  if (isMockMode()) return mockJob(id, opts?.submittedAt)
+  if (isMockMode()) {
+    return mockJob(id, opts?.submittedAt)
+  }
 
   const res = await request({
     url: `${BASE_URL}/api/v1/videos/${encodeURIComponent(id)}`,
@@ -89,12 +96,15 @@ export async function getVideoJob(
     timeoutMs: FETCH_TIMEOUTS.poll,
   })
 
-  if (!res.ok) throw await errorFromResponse(res)
+  if (!res.ok) {
+    throw await errorFromResponse(res)
+  }
 
   const parsed = JobSchema.safeParse(await res.json().catch(() => null))
 
-  if (!parsed.success)
+  if (!parsed.success) {
     throw new OpenRouterError({ message: 'Invalid job response', status: res.status })
+  }
 
   return parsed.data
 }
@@ -109,7 +119,9 @@ interface FetchVideoContentParams {
 export async function fetchVideoContent(params: FetchVideoContentParams): Promise<Response> {
   const { id, index = 0, fallback } = params
 
-  if (isMockMode()) return mockContent(id, fallback)
+  if (isMockMode()) {
+    return mockContent(id, fallback)
+  }
 
   const res = await request({
     url: `${BASE_URL}/api/v1/videos/${encodeURIComponent(id)}/content?index=${index}`,
@@ -117,7 +129,9 @@ export async function fetchVideoContent(params: FetchVideoContentParams): Promis
     timeoutMs: FETCH_TIMEOUTS.content,
   })
 
-  if (!res.ok) throw await errorFromResponse(res)
+  if (!res.ok) {
+    throw await errorFromResponse(res)
+  }
 
   return res
 }
@@ -135,7 +149,9 @@ async function request(params: RequestParams): Promise<Response> {
   try {
     return await fetch(url, { ...init, signal: AbortSignal.timeout(timeoutMs) })
   } catch (error) {
-    if (error instanceof OpenRouterError) throw error
+    if (error instanceof OpenRouterError) {
+      throw error
+    }
 
     if (error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')) {
       throw new OpenRouterError({ message: 'Request timed out', status: 0 })
@@ -148,12 +164,13 @@ async function request(params: RequestParams): Promise<Response> {
 function headers(isJson: boolean): Record<string, string> {
   const key = getSecret('OPENROUTER_API_KEY')
 
-  if (isNil(key) || key === '')
+  if (isNil(key) || key === '') {
     throw new OpenRouterError({
       message: 'OpenRouter key is not set. Open Settings.',
       status: 401,
       code: 'no_key',
     })
+  }
 
   const result: Record<string, string> = {
     Authorization: `Bearer ${key}`,
@@ -161,7 +178,9 @@ function headers(isJson: boolean): Record<string, string> {
     'X-Title': 'Not Higgsfield',
   }
 
-  if (isJson) result['Content-Type'] = 'application/json'
+  if (isJson) {
+    result['Content-Type'] = 'application/json'
+  }
 
   return result
 }
@@ -192,7 +211,9 @@ function errorCode(error: unknown): unknown {
 function providerDetail(error: unknown): string {
   const meta = isRecord(error) && isRecord(error.metadata) ? error.metadata : null
 
-  if (isNil(meta)) return ''
+  if (isNil(meta)) {
+    return ''
+  }
 
   const rawText = isString(meta.raw) ? meta.raw : null
   const raw = rawText?.slice(0, PROVIDER_RAW_MAX_CHARS) ?? null
@@ -215,7 +236,9 @@ function normalizeBase(input: string, status: number): { message: string; code?:
     message = stripStatusPrefix(message, status)
     const error = innerError(message)
 
-    if (!error) break
+    if (!error) {
+      break
+    }
 
     code = codeValue(error.code) ?? code
     message = isString(error.message) ? error.message : ''
@@ -225,12 +248,16 @@ function normalizeBase(input: string, status: number): { message: string; code?:
 }
 
 function innerError(message: string): Record<string, unknown> | null {
-  if (!message.startsWith('{')) return null
+  if (!message.startsWith('{')) {
+    return null
+  }
 
   try {
     const parsed: unknown = JSON.parse(message)
 
-    if (!isRecord(parsed)) return null
+    if (!isRecord(parsed)) {
+      return null
+    }
 
     return isRecord(parsed.error) ? parsed.error : parsed
   } catch {

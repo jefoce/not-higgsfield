@@ -20,6 +20,7 @@ export const ReferencePickerMenuItem = forwardRef<HTMLLIElement, BeautifulMentio
       onMouseEnter: handleMouseEnter,
       tabIndex,
     } = props
+
     const thumb = item.data?.thumb
     const kind = item.data?.kind
     const thumbSrc = isString(thumb) ? thumb : null

@@ -23,6 +23,7 @@ interface SubmitState {
   runner: SubmitRunner | null
   closed: boolean
 }
+
 const state = globalState<SubmitState>('submitQueue', () => ({
   pending: new Set(),
   active: new Set(),
@@ -52,15 +53,22 @@ export function activeSubmitCount(): number {
 export function sendingCount(): number {
   let count = 0
 
-  for (const stage of state.stages.values()) if (stage === 'sending') count += 1
+  for (const stage of state.stages.values()) {
+    if (stage === 'sending') {
+      count += 1
+    }
+  }
 
   return count
 }
 
 /** run-submit marks each phase so shutdown can tell uploads from sends. */
 export function setSubmitStage(id: string, stage: SubmitStage | null): void {
-  if (isNil(stage)) state.stages.delete(id)
-  else state.stages.set(id, stage)
+  if (isNil(stage)) {
+    state.stages.delete(id)
+  } else {
+    state.stages.set(id, stage)
+  }
 }
 
 /** True after shutdown stopped the queue. No new submit may start. */
@@ -70,11 +78,15 @@ export function isSubmitStopped(): boolean {
 
 /** Schedules an upload and submit after the grace window. */
 export async function startSubmit(id: string): Promise<void> {
-  if (state.closed || isSubmitOwned(id)) return
+  if (state.closed || isSubmitOwned(id)) {
+    return
+  }
 
   const record = await getGeneration(id)
 
-  if (record?.status !== 'submitting' || record.submit?.stage !== 'grace') return
+  if (record?.status !== 'submitting' || record.submit?.stage !== 'grace') {
+    return
+  }
 
   schedule(id, graceDelayMs(record.submit.notBefore))
 }
@@ -82,8 +94,9 @@ export async function startSubmit(id: string): Promise<void> {
 /** Reschedules the remaining grace windows after a process restart. */
 export async function resumeGraceSubmits(): Promise<void> {
   for (const record of await listGenerations()) {
-    if (record.status === 'submitting' && record.submit?.stage === 'grace')
+    if (record.status === 'submitting' && record.submit?.stage === 'grace') {
       await startSubmit(record.id)
+    }
   }
 }
 
@@ -103,13 +116,17 @@ export function cancelScheduledSubmit(id: string): void {
 export function stopSubmits(): void {
   state.closed = true
 
-  for (const timer of state.timers.values()) clearTimeout(timer)
+  for (const timer of state.timers.values()) {
+    clearTimeout(timer)
+  }
 
   state.timers.clear()
   state.pending.clear()
 
   for (const [id, controller] of state.controllers) {
-    if (state.stages.get(id) !== 'sending') controller.abort()
+    if (state.stages.get(id) !== 'sending') {
+      controller.abort()
+    }
   }
 }
 
@@ -125,7 +142,9 @@ export async function waitForSendingDone(timeoutMs: number): Promise<boolean> {
 }
 
 function schedule(id: string, delayMs: number): void {
-  if (state.closed || isSubmitOwned(id)) return
+  if (state.closed || isSubmitOwned(id)) {
+    return
+  }
 
   const timer = setTimeout(() => {
     state.timers.delete(id)
@@ -140,7 +159,9 @@ function drain(): void {
   while (!state.closed && state.active.size < MAX_CONCURRENT && state.pending.size > 0) {
     const id = state.pending.values().next().value
 
-    if (isNil(id) || id === '') return
+    if (isNil(id) || id === '') {
+      return
+    }
 
     state.pending.delete(id)
     state.active.add(id)

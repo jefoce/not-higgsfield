@@ -7,11 +7,15 @@ export function GET(request: Request) {
   try {
     assertLocalRequest(request, { session: false })
 
-    if (!sessionRequired()) return Response.redirect(new URL('/', request.url), 303)
+    if (!sessionRequired()) {
+      return Response.redirect(new URL('/', request.url), 303)
+    }
 
     const token = new URL(request.url).searchParams.get('t')
 
-    if (!tokenMatches(token)) return jsonError({ status: 401, error: 'Bad session token' })
+    if (!tokenMatches(token)) {
+      return jsonError({ status: 401, error: 'Bad session token' })
+    }
 
     return new Response(null, {
       status: 303,

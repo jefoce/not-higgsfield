@@ -4,6 +4,7 @@ import type { GenerationRecord } from './types'
 export function promptSlug(record: Pick<GenerationRecord, 'input' | 'preset'>): string {
   const prompt = record.input.prompt.trim()
   const base = prompt === '' ? record.preset.slug : prompt
+
   const slug = base
     .toLowerCase()
     .replaceAll(/[^a-z0-9]+/g, '-')

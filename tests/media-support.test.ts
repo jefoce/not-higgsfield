@@ -12,6 +12,7 @@ function stubDocument(supported: Record<string, string>): void {
   vi.stubGlobal('document', {
     createElement: () => ({ canPlayType: (mime: string) => supported[mime] ?? '' }),
   })
+
   __resetCanPlayCache()
 }
 
