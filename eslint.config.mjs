@@ -78,6 +78,23 @@ const OBJECT_FUNCTION_SELECTOR = {
   message: 'Name the function (handle<Action>) and pass it by reference.',
 }
 
+// One level per object type. Bigger shapes are built from named parts.
+const TYPE_SELECTORS = [
+  {
+    selector: 'TSTypeLiteral',
+    message: 'Name this object type: declare an interface and reference it.',
+  },
+  {
+    selector: "TSTypeReference[typeName.name='Record'] TSTypeReference[typeName.name='Record']",
+    message: 'Name the inner map type: type SizeByAspect = Partial<Record<...>>.',
+  },
+  {
+    selector:
+      "CallExpression[callee.object.name='z'] CallExpression[callee.object.name='z'][callee.property.name='object']",
+    message: 'Name the inner schema (FooSchema) and reference it.',
+  },
+]
+
 const localPlugin = { rules: { 'padding-around-functions': paddingAroundFunctions } }
 
 export default defineConfig([
@@ -324,6 +341,7 @@ export default defineConfig([
         MODULE_SELECTORS,
         PROPS_SELECTOR,
         SECRET_SELECTORS,
+        TYPE_SELECTORS,
       ),
     },
   },
@@ -331,7 +349,12 @@ export default defineConfig([
     // Preset literal checks would flag the data files themselves.
     files: ['src/core/presets/**'],
     rules: {
-      'no-restricted-syntax': restrict(SHARED_SELECTORS, MODULE_SELECTORS, PROPS_SELECTOR),
+      'no-restricted-syntax': restrict(
+        SHARED_SELECTORS,
+        MODULE_SELECTORS,
+        PROPS_SELECTOR,
+        TYPE_SELECTORS,
+      ),
     },
   },
   {
@@ -343,6 +366,7 @@ export default defineConfig([
         PROPS_SELECTOR,
         SECRET_SELECTORS,
         SERVER_SELECTORS,
+        TYPE_SELECTORS,
       ),
     },
   },
@@ -355,6 +379,7 @@ export default defineConfig([
         MODULE_SELECTORS,
         PROPS_SELECTOR,
         SERVER_SELECTORS,
+        TYPE_SELECTORS,
       ),
     },
   },
@@ -362,7 +387,12 @@ export default defineConfig([
     // The keychain lazily loads its native module, the one allowed dynamic import.
     files: ['src/server/secrets/keychain.ts'],
     rules: {
-      'no-restricted-syntax': restrict(SHARED_SELECTORS, MODULE_SELECTORS, PROPS_SELECTOR),
+      'no-restricted-syntax': restrict(
+        SHARED_SELECTORS,
+        MODULE_SELECTORS,
+        PROPS_SELECTOR,
+        TYPE_SELECTORS,
+      ),
     },
   },
   {
@@ -370,7 +400,12 @@ export default defineConfig([
     // SECRET_SELECTORS stays: the old block dropped it by accident.
     files: ['src/app/api/**/route.ts'],
     rules: {
-      'no-restricted-syntax': restrict(SHARED_SELECTORS, MODULE_SELECTORS, SECRET_SELECTORS),
+      'no-restricted-syntax': restrict(
+        SHARED_SELECTORS,
+        MODULE_SELECTORS,
+        SECRET_SELECTORS,
+        TYPE_SELECTORS,
+      ),
     },
   },
   {
@@ -383,6 +418,7 @@ export default defineConfig([
         PROPS_SELECTOR,
         SECRET_SELECTORS,
         OBJECT_FUNCTION_SELECTOR,
+        TYPE_SELECTORS,
       ),
     },
   },
