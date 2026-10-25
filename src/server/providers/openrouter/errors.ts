@@ -23,8 +23,16 @@ interface ErrorFields {
   code: string | null
 }
 
+const STORED_MESSAGES: Partial<Record<ProviderErrorKind, string>> = {
+  auth: 'OpenRouter auth failed',
+  no_key: 'OpenRouter auth failed',
+  not_found: 'Job not found on OpenRouter',
+}
+
 function providerError(params: ErrorFields): ProviderError {
-  return new ProviderError({ providerId: 'openrouter', ...params })
+  const storedMessage = STORED_MESSAGES[params.kind] ?? params.message
+
+  return new ProviderError({ providerId: 'openrouter', storedMessage, ...params })
 }
 
 function kindFor(error: OpenRouterError): ProviderErrorKind {

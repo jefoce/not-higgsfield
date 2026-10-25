@@ -2,6 +2,7 @@ import 'server-only'
 
 import { isNil } from 'lodash-es'
 
+import { INTERRUPT_SENDING_TEXT } from '@/core/provider-errors/app'
 import { isStaleGrace } from '@/core/submit-state'
 import type { GenerationRecord } from '@/core/types'
 
@@ -13,7 +14,7 @@ export const GRACE_EXPIRED_TEXT = 'Not started: the app was closed before it was
 
 const INTERRUPT_TEXT = {
   uploading: 'Interrupted while uploading inputs',
-  sending: 'Interrupted while sending. Check OpenRouter activity before rerun, the job may exist.',
+  sending: INTERRUPT_SENDING_TEXT,
 } as const
 
 /** Cancels stale grace records, resumes fresh ones, fails orphaned submits. */

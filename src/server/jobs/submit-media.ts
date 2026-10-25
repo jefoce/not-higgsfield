@@ -191,7 +191,7 @@ export async function recordSent(id: string, plan: ReferencePlan): Promise<void>
 
 export async function send(params: SendParams): Promise<SubmittedJob> {
   const { record, preset, uploads, transports, built } = params
-  const provider = getVideoProvider('openrouter')
+  const provider = getVideoProvider()
 
   try {
     return await provider.submit({ input: record.input, preset, media: built.media })

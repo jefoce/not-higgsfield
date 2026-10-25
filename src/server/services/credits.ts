@@ -14,7 +14,7 @@ interface GetCreditsParams {
 /** Provider account credits combined with what this app spent locally. */
 export async function getCredits(params: GetCreditsParams = {}): Promise<CreditsInfo> {
   const isFresh = params.fresh
-  const account = await getVideoProvider('openrouter').getAccount({ fresh: isFresh })
+  const account = await getVideoProvider().getAccount({ fresh: isFresh })
   const localSpent = await spentLocally()
 
   return { ...account, error: account.error ?? undefined, localSpent }

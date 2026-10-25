@@ -1,5 +1,10 @@
 import type { Rule } from './types'
 
+export const INTERRUPT_SENDING_TEXT =
+  'Interrupted while sending. Check OpenRouter activity before rerun, the job may exist.'
+
+export const COPY_EXPIRED_TEXT = 'OpenRouter copy expired before download'
+
 export const APP_RULES: readonly Rule[] = [
   {
     match: 'Interrupted while sending',
@@ -20,7 +25,7 @@ export const APP_RULES: readonly Rule[] = [
     kind: 'app',
   },
   {
-    match: 'OpenRouter copy expired before download',
+    match: COPY_EXPIRED_TEXT,
     title: 'The finished video was not saved.',
     hint: 'OpenRouter no longer had the file. Check OpenRouter activity for the charge.',
     kind: 'app',

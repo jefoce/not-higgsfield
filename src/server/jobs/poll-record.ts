@@ -5,13 +5,15 @@ import { isNil } from 'lodash-es'
 import { MAX_JOB_AGE_MIN } from '@/core/constants'
 import type { GenerationRecord, JobStatus } from '@/core/types'
 
-import { ProviderError } from '../providers/provider-error'
+import { ProviderError, type ProviderErrorKind } from '../providers/provider-error'
 import { getVideoProvider } from '../providers/registry'
 import type { JobSnapshot } from '../providers/types'
 import { saveGeneration } from '../repos/generations'
 import { queueDownload } from './download-queue'
 
 const FINAL: JobStatus[] = ['completed', 'failed', 'cancelled', 'expired']
+
+const RETRY_KINDS: readonly ProviderErrorKind[] = ['timeout', 'rate_limit', 'server']
 
 /** Fetches the latest job, updates the record and hands completed work to the download queue. */
 export async function processRecord(record: GenerationRecord): Promise<void> {
@@ -57,7 +59,7 @@ async function pollJob(params: PollJobParams): Promise<JobSnapshot | null> {
   const { record, current } = params
 
   try {
-    return await getVideoProvider('openrouter').getJob({
+    return await getVideoProvider().getJob({
       jobId: current.id,
       submittedAt: current.submittedAt,
     })
@@ -176,14 +178,14 @@ async function handleJobError(record: GenerationRecord, error: unknown): Promise
     return false
   }
 
-  if (error.status === 404) {
-    await saveGeneration({ ...record, status: 'failed', error: 'Job not found on OpenRouter' })
+  if (error.kind === 'not_found') {
+    await saveGeneration({ ...record, status: 'failed', error: error.storedMessage })
 
     return true
   }
 
-  if (error.status === 401 || error.status === 403) {
-    const text = `OpenRouter auth failed: ${error.message}`
+  if (error.kind === 'auth' || error.kind === 'no_key') {
+    const text = `${error.storedMessage}: ${error.message}`
 
     if (record.error !== text) {
       await saveGeneration({ ...record, error: text })
@@ -192,7 +194,7 @@ async function handleJobError(record: GenerationRecord, error: unknown): Promise
     return true
   }
 
-  return error.status === 0 || error.status === 429 || error.status >= 500
+  return RETRY_KINDS.includes(error.kind)
 }
 
 function isAgedOut(record: GenerationRecord, status: JobStatus): boolean {

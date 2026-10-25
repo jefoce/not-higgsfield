@@ -7,6 +7,7 @@ import { ProviderError, type ProviderErrorKind } from '@/server/providers/provid
 interface MappingCase {
   kind: ProviderErrorKind
   message: string
+  storedMessage?: string
   status: number
   code?: string
 }
@@ -15,12 +16,23 @@ const MAPPING_CASES: readonly MappingCase[] = [
   {
     kind: 'no_key',
     message: 'OpenRouter key is not set. Open Settings.',
+    storedMessage: 'OpenRouter auth failed',
     status: 401,
     code: 'no_key',
   },
-  { kind: 'auth', message: 'Invalid API key', status: 401 },
+  {
+    kind: 'auth',
+    message: 'Invalid API key',
+    storedMessage: 'OpenRouter auth failed',
+    status: 401,
+  },
   { kind: 'credits', message: 'Insufficient credits', status: 402 },
-  { kind: 'not_found', message: 'Video not found', status: 404 },
+  {
+    kind: 'not_found',
+    message: 'Video not found',
+    storedMessage: 'Job not found on OpenRouter',
+    status: 404,
+  },
   { kind: 'rate_limit', message: 'Too many requests', status: 429 },
   { kind: 'timeout', message: 'Request timed out', status: 408 },
   { kind: 'server', message: 'Bad gateway', status: 502 },
@@ -32,7 +44,7 @@ const MAPPING_CASES: readonly MappingCase[] = [
 
 describe('classifyOpenRouterError', () => {
   it.each(MAPPING_CASES)('classifies $kind', (testCase) => {
-    const { kind, message, status, code } = testCase
+    const { kind, message, storedMessage, status, code } = testCase
 
     const error = classifyOpenRouterError(new OpenRouterError({ message, status, code }))
 
@@ -40,6 +52,7 @@ describe('classifyOpenRouterError', () => {
     expect(error.providerId).toBe('openrouter')
     expect(error.kind).toBe(kind)
     expect(error.message).toBe(message)
+    expect(error.storedMessage).toBe(storedMessage ?? message)
     expect(error.status).toBe(status)
     expect(error.code).toBe(code ?? null)
   })
@@ -50,6 +63,7 @@ describe('classifyOpenRouterError', () => {
     expect(error.kind).toBe('unknown')
     expect(error.status).toBe(0)
     expect(error.message).toBe('boom')
+    expect(error.storedMessage).toBe('boom')
     expect(error.code).toBeNull()
   })
 })

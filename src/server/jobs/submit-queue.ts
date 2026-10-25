@@ -52,7 +52,7 @@ export function isSubmitOwned(id: string): boolean {
   return state.timers.has(id) || state.pending.has(id) || state.active.has(id)
 }
 
-/** Runs that already handed the request to OpenRouter but await its reply. */
+/** Runs that already handed the request to the provider but await its reply. */
 export function sendingCount(): number {
   let count = 0
 

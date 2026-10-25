@@ -10,6 +10,7 @@ import type { ReadableStream } from 'node:stream/web'
 import { isNil } from 'lodash-es'
 
 import { FETCH_TIMEOUTS, MAX_DOWNLOAD_RETRIES } from '@/core/constants'
+import { COPY_EXPIRED_TEXT } from '@/core/provider-errors/app'
 import type { GenerationRecord } from '@/core/types'
 
 import { exists, isDiskFull } from '../fs/stat'
@@ -128,7 +129,7 @@ async function finalize(record: GenerationRecord, job: JobSnapshot): Promise<voi
       ...record,
       download: undefined,
       status: 'expired',
-      error: 'OpenRouter copy expired before download',
+      error: COPY_EXPIRED_TEXT,
     })
 
     return
@@ -281,7 +282,7 @@ async function openContent(params: DownloadParams): Promise<Response> {
   const submittedAt = record.job?.submittedAt ?? ''
 
   try {
-    return await getVideoProvider('openrouter').fetchContent({
+    return await getVideoProvider().fetchContent({
       job: { jobId: record.id, submittedAt },
       index: 0,
       fallback: record.input,

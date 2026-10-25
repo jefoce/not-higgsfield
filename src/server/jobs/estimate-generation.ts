@@ -13,7 +13,7 @@ import type { GenerationEstimate, GenerationInput } from '@/core/types'
 import { type PriceInput, validateInput } from '@/core/validation'
 
 import { ValidationError } from '../errors'
-import { getPricing } from '../providers/openrouter/pricing'
+import { getVideoProvider } from '../providers/registry'
 import { getActiveCount } from '../repos/generations'
 import { getObjectStore } from '../storage/registry'
 import { loadUploads } from './run-submit'
@@ -60,7 +60,7 @@ export async function loadPriceDraft(raw: PriceInput): Promise<GenerationDraft> 
 /** Discounted and list totals for a validated draft. */
 export async function estimateGeneration(draft: GenerationDraft): Promise<GenerationEstimate> {
   const { preset, input, uploads } = draft
-  const pricing = await getPricing(preset)
+  const pricing = await getVideoProvider().getPricing(preset)
 
   const hasVideoInput =
     input.tab === 'references' && input.references.some((id) => uploads[id]?.kind === 'video')

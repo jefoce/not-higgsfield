@@ -127,7 +127,7 @@ function providerDetail(error: unknown): string {
 }
 
 /** Removes repeated `HTTP <status>:` and `<status>:` prefixes. */
-export function stripStatusPrefix(message: string, status: number): string {
+function stripStatusPrefix(message: string, status: number): string {
   return message.replace(new RegExp(`^(?:(?:HTTP\\s+)?${status}:\\s*)+`, 'i'), '').trim()
 }
 

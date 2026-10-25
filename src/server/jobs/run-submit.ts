@@ -9,8 +9,6 @@ import { graceDelayMs, inputIds, transportsFor, withTransports } from '@/core/su
 import type { ResolvedTransport } from '@/core/transport'
 import type { GenerationRecord } from '@/core/types'
 
-import { OpenRouterError } from '../providers/openrouter/error'
-import { stripStatusPrefix } from '../providers/openrouter/http'
 import { ProviderError } from '../providers/provider-error'
 import type { SubmittedJob } from '../providers/types'
 import { getGeneration, saveGeneration } from '../repos/generations'
@@ -195,17 +193,12 @@ export function submitError(error: unknown): string {
     return formatError(error)
   }
 
-  if (error instanceof OpenRouterError) {
-    return formatError(error)
-  }
-
   return error instanceof Error ? error.message : 'Submit failed'
 }
 
-function formatError(error: { message: string; status: number; code?: string | null }): string {
-  const stripped = stripStatusPrefix(error.message, error.status)
-  const message = stripped === '' ? `HTTP ${error.status}` : stripped
-  const code = error.code
+function formatError(error: ProviderError): string {
+  const { code } = error
+  const message = error.message === '' ? `HTTP ${error.status}` : error.message
   const isCodeUseful = !isNil(code) && code !== '' && code !== String(error.status)
 
   return isCodeUseful ? `${code}: ${message}` : message

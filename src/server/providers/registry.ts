@@ -1,11 +1,13 @@
 import 'server-only'
 
-import type { VideoProviderId } from '@/core/providers/types'
+import { VIDEO_PROVIDER_IDS, type VideoProviderId } from '@/core/providers/types'
 
 import { createMockProvider } from './mock/provider'
 import { isMockMode } from './openrouter/mock-mode'
 import { createOpenRouterProvider } from './openrouter/provider'
 import type { VideoProvider } from './types'
+
+const DEFAULT_PROVIDER_ID: VideoProviderId = VIDEO_PROVIDER_IDS[0]
 
 const providers = new Map<VideoProviderId, VideoProvider>()
 
@@ -19,7 +21,7 @@ function isMockProvider(id: VideoProviderId): boolean {
 }
 
 /** One configured adapter per provider id. */
-export function getVideoProvider(id: VideoProviderId): VideoProvider {
+export function getVideoProvider(id: VideoProviderId = DEFAULT_PROVIDER_ID): VideoProvider {
   const existing = providers.get(id)
 
   if (existing) {

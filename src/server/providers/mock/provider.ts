@@ -19,8 +19,8 @@ import { globalState } from '../../global-state'
 import { MOCK_REMOTE_PREFIX } from '../../local-url'
 import { makeTestVideo } from '../../media/ffmpeg'
 import { buildRequestBody } from '../openrouter/body'
-import { OpenRouterError } from '../openrouter/error'
 import type { VideoJobResponse } from '../openrouter/http'
+import { ProviderError } from '../provider-error'
 import type {
   ContentFallback,
   ContentRequest,
@@ -163,7 +163,16 @@ async function assertMockFetch(link: string): Promise<void> {
     .catch(() => 0)
 
   if (status !== 200) {
-    throw new OpenRouterError({ message: `Mock provider could not fetch ${link}`, status: 400 })
+    const message = `Mock provider could not fetch ${link}`
+
+    throw new ProviderError({
+      providerId: 'openrouter',
+      kind: 'url_input',
+      message,
+      storedMessage: message,
+      status: 400,
+      code: null,
+    })
   }
 }
 
