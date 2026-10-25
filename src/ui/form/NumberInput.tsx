@@ -1,7 +1,7 @@
 'use client'
 
 import { type ChangeEvent, type FocusEvent, forwardRef, useEffect, useState } from 'react'
-import { clamp, isNil, round } from 'lodash-es'
+import { clamp, isNil, omit, round } from 'lodash-es'
 
 import { Input, type InputProps } from './Input'
 
@@ -37,7 +37,8 @@ const parse = (text: string): number | null => {
 /** Number input that reports null when empty and rounds/clamps on blur. */
 export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
   function NumberInput(props, ref) {
-    const { value, min, max, ...rest } = props
+    // Callback read as props.onValueChange per lint rule. omit keeps it off the DOM input.
+    const { value, min, max, ...rest } = omit(props, 'onValueChange')
     const [draft, setDraft] = useState(format(value))
 
     useEffect(() => {

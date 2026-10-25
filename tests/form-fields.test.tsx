@@ -8,7 +8,10 @@ import { Input } from '@/ui/form/Input'
 import { NumberInput } from '@/ui/form/NumberInput'
 import { PasswordInput } from '@/ui/form/PasswordInput'
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  vi.restoreAllMocks()
+})
 
 const handleNoop = () => {}
 
@@ -55,6 +58,22 @@ function NumberHarness({ onValueChange }: { onValueChange: (value: number | null
 }
 
 describe('NumberInput', () => {
+  it('keeps onValueChange off the native input', () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const handleChanges = vi.fn()
+
+    render(<NumberHarness onValueChange={handleChanges} />)
+    fireEvent.change(screen.getByLabelText('Count'), { target: { value: '3' } })
+
+    expect(handleChanges).toHaveBeenLastCalledWith(3)
+
+    const messages = consoleError.mock.calls.map((args) => args.map(String).join(' '))
+
+    expect(messages.some((message) => message.includes('Unknown event handler property'))).toBe(
+      false,
+    )
+  })
+
   it('reports null when empty, then rounds and clamps on blur', () => {
     const handleChanges = vi.fn()
 
