@@ -72,8 +72,17 @@ describe('updater manifest', () => {
     )
   })
 
+  it('falls back to the base version for a prerelease', () => {
+    expect(extractNotes(CHANGELOG, '9.9.9-rc.1')).toBe(NOTES)
+  })
+
+  it('falls back to the base version for a build suffix', () => {
+    expect(extractNotes(CHANGELOG, '9.9.9+build.4')).toBe(NOTES)
+  })
+
   it('falls back when the version section is absent', () => {
     expect(extractNotes(CHANGELOG, '0.0.1')).toBe('See CHANGELOG.md')
+    expect(extractNotes(CHANGELOG, '0.0.1-rc.1')).toBe('See CHANGELOG.md')
   })
 
   it('uses explicit notes over the changelog', () => {

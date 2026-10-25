@@ -30,16 +30,16 @@ export const ManifestSchema = z.object({
 })
 
 /**
- * Returns the `## <version>` section body from a changelog, or the fallback.
+ * Returns the `## <version>` section body from a changelog, or null.
  */
-export function extractNotes(changelog, version) {
+function findNotes(changelog, version) {
   const lines = changelog.split(/\r?\n/)
   const start = lines.findIndex((line) => {
     return line === `## ${version}` || line.startsWith(`## ${version} `)
   })
 
   if (start === -1) {
-    return FALLBACK_NOTES
+    return null
   }
 
   const after = lines.slice(start + 1)
@@ -49,10 +49,19 @@ export function extractNotes(changelog, version) {
   const body = (end === -1 ? after : after.slice(0, end)).join('\n').trim()
 
   if (body === '') {
-    return FALLBACK_NOTES
+    return null
   }
 
   return body
+}
+
+/**
+ * Returns the notes of a version, then of its base version (`0.2.0-rc.1` -> `0.2.0`).
+ */
+export function extractNotes(changelog, version) {
+  const base = version.split(/[-+]/)[0]
+
+  return findNotes(changelog, version) ?? findNotes(changelog, base) ?? FALLBACK_NOTES
 }
 
 /**
