@@ -187,9 +187,8 @@ export default defineConfig([
       '@typescript-eslint/max-params': ['error', { max: 2 }],
       '@typescript-eslint/no-deprecated': 'error',
       '@typescript-eslint/no-non-null-assertion': 'error',
-      // Warning for one release: 406 sites at introduction.
       '@typescript-eslint/strict-boolean-expressions': [
-        'warn',
+        'error',
         { allowString: false, allowNumber: false, allowNullableObject: true },
       ],
       '@typescript-eslint/naming-convention': [
