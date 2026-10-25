@@ -15,7 +15,7 @@ pnpm typecheck && pnpm lint && pnpm deps && pnpm format:check && pnpm knip && pn
 ## Git
 
 - Work on the branch named after the next version, without `v` (`0.1.1`). Create it locally if it does not exist. Never commit to `releases`.
-- The first commit on a new branch bumps the version in `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml` and `Cargo.lock`, and opens `## X.Y.Z - unreleased` in `CHANGELOG.md`.
+- The first commit on a new branch bumps the version in `package.json`, `src-tauri/Cargo.toml` and `Cargo.lock`, and opens `## X.Y.Z - unreleased` in `CHANGELOG.md`. Replace `unreleased` with the date in the last commit before the PR.
 - Commit message: `TYPE: X.Y.Z Message`, where X.Y.Z is the version of the current branch. Optional description after a blank line. No task ids or review ids.
 - Message completes "If applied, this commit will ...", imperative mood, no trailing period.
 - Types: CRITICAL (critical fix), FIX (bug fix), HACKFIX (workaround until a proper fix), FEAT (user-facing feature added or removed), CODE (internal feature invisible to users), PERF (performance), SECURITY (security improvement), DOCS (documentation), STYLE (formatting only), REFACTOR (no behavior change), TEST (tests), CHORE (tiny fixes, config, deps), TEXT (user-facing text only).
@@ -84,7 +84,7 @@ Traps, do not use these:
 
 Still fine: `?.`, `??`, and `Boolean(x)` on the left of `&&` in JSX.
 
-`isPlainObject` does not narrow the type. Where narrowing is needed (`isRecord` in `server/openrouter/client.ts`), keep one typed guard in `src/core/guards.ts` and import it. No local copies.
+`isPlainObject` does not narrow the type. Where narrowing is needed, use one typed guard in `src/core/guards.ts` (`isRecord`) and import it. No local copies.
 
 ### Parameters
 
@@ -140,9 +140,15 @@ Search here before writing a helper. One of these covers the case. Extract a new
 - `toastError`, `copyText` (`src/lib/notify.ts`).
 - `messageOf` (`src/core/errors.ts`): message of a caught value.
 - `isNonEmptyString` (`src/core/guards.ts`): non-empty string guard.
+- `isOneOf` (`src/core/guards.ts`): guard for a value in a `const` list.
 - `withQuery` (`src/lib/api/query.ts`): URL with query params, nil and empty values skipped.
 - `joinWords` (`src/core/text.ts`): "a, b, and c" or "a, b, or c".
+- `formatAgo` (`src/lib/format.ts`): short relative age from an ISO string and a clock.
+- `useNow` (`src/lib/use-now.ts`): shared 1 s clock, paused while the page is hidden.
+- `isOwnEvent` (`src/lib/events.ts`): true when an event started inside the element, not in a portal.
 - `createTtlCache` (`src/server/sync/ttl-cache.ts`): `globalState` TTL cache.
+- `createLimiter` (`src/server/sync/limiter.ts`): at most `max` tasks at once per key.
+- `settings::update` (`src-tauri/src/settings.rs`): the only writer for `desktop.json`, under one lock.
 - `Dict`, `HasId` (`src/core/utility-types.ts`), `UploadsById` (`src/core/media-types.ts`).
 
 ## React
@@ -286,11 +292,12 @@ const deletion = useAsyncAction(async () => {
 - Routes: `src/app/api`
 - Jobs: `src/server/jobs` (`submit-queue`, `run-submit`, `submit-media`, `submit-record`, `poller`, `download-queue`, `generation-actions`)
 - Repos: `src/server/repos`
-- Media: `src/server/media` (`ffmpeg`, `to-data-url`, `thumbs`, `compat`)
+- Media: `src/server/media` (`ffmpeg`, `image-data-url`, `image-encode`, `to-data-url`, `preview`, `thumbs`, `compat`), `src/server/services` (`remote-cap`)
 - Presets: `src/core/presets` (one file per model, `index.ts` holds the list)
 - History: `src/features/history` (`record-view` helpers, `record-actions`, `selection-store`, `view-store`)
 - Validation: `src/core/validation.ts`
-- Provider errors: `src/core/provider-errors.ts`
+- Provider errors: `src/core/provider-errors/`
+- Sync: `src/server/sync` (`lock`, `limiter`, `ttl-cache`)
 - Secrets: `src/server/secrets`
 - Platform bridge: `src/lib/platform`
 - Shared UI: `src/ui`, `src/ui/form`
