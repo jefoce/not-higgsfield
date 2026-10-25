@@ -16,6 +16,12 @@ export interface ProviderModel {
   hasSeed: boolean | null
 }
 
+/** A provider model list and whether the fetch succeeded. */
+export interface ProviderModelList {
+  models: readonly ProviderModel[]
+  isFresh: boolean
+}
+
 export interface ResolvedMedia {
   id: string
   kind: MediaKind
@@ -91,6 +97,6 @@ export interface VideoProvider {
   fetchContent(request: ContentRequest): Promise<Response>
   getAccount(params?: AccountLookupParams): Promise<ProviderAccount>
   getPricing(preset: ModelPreset, isForce?: boolean): Promise<PricingInfo>
-  listModels(): Promise<readonly ProviderModel[]>
+  listModels(): Promise<ProviderModelList>
   testConnection(): Promise<TestResult>
 }

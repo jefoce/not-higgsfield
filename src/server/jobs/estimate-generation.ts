@@ -2,13 +2,14 @@ import 'server-only'
 
 import { isNil } from 'lodash-es'
 
+import type { CatalogEntry } from '@/core/catalog'
 import { referenceVideoSeconds } from '@/core/duration-limits'
 import { inputForSubmit } from '@/core/normalize-input'
 import { getPreset } from '@/core/presets'
+import { activeBinding } from '@/core/presets/bindings'
 import type { ModelPreset } from '@/core/presets/types'
 import { estimatePrice, type PriceContext } from '@/core/pricing'
 import { canonicalizePrompt, referenceSlots } from '@/core/prompt-tokens'
-import { VIDEO_PROVIDER_IDS } from '@/core/providers/types'
 import type { GenerationInput } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import type { GenerationEstimate } from '@/core/types'
@@ -30,8 +31,7 @@ export interface GenerationDraft {
 /** Validates one draft and loads only its referenced uploads. */
 export async function loadDraft(raw: GenerationInput): Promise<GenerationDraft> {
   const preset = getPreset(raw.presetId)
-
-  await assertCatalogUsable(preset.id)
+  const entry = await loadCatalogEntry(preset.id)
   const base = inputForSubmit(raw)
   const uploads = await loadUploads(base)
   const input = withCanonicalPrompt(base, uploads)
@@ -43,6 +43,8 @@ export async function loadDraft(raw: GenerationInput): Promise<GenerationDraft> 
     ctx: {
       activeCount: await getActiveCount(),
       remoteConfigured: !isNil(getObjectStore()),
+      modelStatus: entry?.status ?? 'unverified',
+      modelReason: entry?.reason ?? null,
     },
   })
 
@@ -57,7 +59,7 @@ export async function loadDraft(raw: GenerationInput): Promise<GenerationDraft> 
 export async function loadPriceDraft(raw: PriceInput): Promise<GenerationDraft> {
   const preset = getPreset(raw.presetId)
 
-  await assertCatalogUsable(preset.id)
+  await loadCatalogEntry(preset.id)
   const input = inputForSubmit({ ...raw, prompt: '', seed: null })
   const uploads = await loadUploads(input)
 
@@ -65,23 +67,26 @@ export async function loadPriceDraft(raw: PriceInput): Promise<GenerationDraft> 
 }
 
 /** Missing and unconfigured models fail loudly. Unverified ones proceed. */
-async function assertCatalogUsable(presetId: string): Promise<void> {
+async function loadCatalogEntry(presetId: string): Promise<CatalogEntry | undefined> {
   const { entries } = await getModelCatalog()
   const entry = entries.find((item) => item.presetId === presetId)
 
   if (isNil(entry)) {
-    return
+    return undefined
   }
 
   if (entry.status === 'missing' || entry.status === 'no_provider') {
     throw new ValidationError([entry.reason ?? 'Model unavailable'])
   }
+
+  return entry
 }
 
 /** Discounted and list totals for a validated draft. */
 export async function estimateGeneration(draft: GenerationDraft): Promise<GenerationEstimate> {
   const { preset, input, uploads } = draft
-  const pricing = await getVideoProvider(VIDEO_PROVIDER_IDS[0]).getPricing(preset)
+  const binding = activeBinding(preset, (item) => getVideoProvider(item.provider).isConfigured())
+  const pricing = await getVideoProvider(binding.provider).getPricing(preset)
 
   const hasVideoInput =
     input.tab === 'references' && input.references.some((id) => uploads[id]?.kind === 'video')

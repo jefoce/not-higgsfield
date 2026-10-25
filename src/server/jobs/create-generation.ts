@@ -4,12 +4,12 @@ import { randomInt, randomUUID } from 'node:crypto'
 
 import { MAX_REQUEST_MB, REQUEST_RESERVE_MB, SEED_MAX, SUBMIT_GRACE_MS } from '@/core/constants'
 import type { ReferencePlan } from '@/core/media-types'
-import { primaryBinding } from '@/core/pricing'
-import { VIDEO_PROVIDER_IDS } from '@/core/providers/types'
+import { activeBinding } from '@/core/presets/bindings'
 import type { GenerationInput, GenerationRecord } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
 
 import { encodeImages } from '../media/image-data-url'
+import { getVideoProvider } from '../providers/registry'
 import { saveGeneration } from '../repos/generations'
 import { estimateGeneration, loadDraft } from './estimate-generation'
 import { startSubmit } from './submit-queue'
@@ -26,6 +26,7 @@ export async function createGeneration(raw: GenerationInput): Promise<Generation
 
   const estimate = await estimateGeneration({ preset, input, uploads })
   const now = new Date().toISOString()
+  const binding = activeBinding(preset, (item) => getVideoProvider(item.provider).isConfigured())
 
   const record: GenerationRecord = {
     schemaVersion: 1,
@@ -33,9 +34,9 @@ export async function createGeneration(raw: GenerationInput): Promise<Generation
     createdAt: now,
     updatedAt: now,
     status: 'submitting',
-    provider: VIDEO_PROVIDER_IDS[0],
+    provider: binding.provider,
     input: { ...input, frames: { ...input.frames }, references: [...input.references] },
-    preset: { id: preset.id, title: preset.title, slug: primaryBinding(preset).modelId },
+    preset: { id: preset.id, title: preset.title, slug: binding.modelId },
     inputsSnapshot: snapshot(uploads, encoded.plan),
     submit: {
       stage: 'grace',

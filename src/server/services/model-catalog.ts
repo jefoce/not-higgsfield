@@ -4,8 +4,8 @@ import { isEmpty, isNil } from 'lodash-es'
 
 import type { CatalogEntry, ModelCatalog } from '@/core/catalog'
 import { MODEL_PRESETS } from '@/core/presets'
-import type { ModelPreset } from '@/core/presets/types'
-import { primaryBinding } from '@/core/pricing'
+import { activeBinding } from '@/core/presets/bindings'
+import type { ModelPreset, ProviderBinding } from '@/core/presets/types'
 import { videoProviderDescriptor } from '@/core/providers/registry'
 
 import { globalState } from '../global-state'
@@ -14,12 +14,16 @@ import type { ProviderModel } from '../providers/types'
 import { secretsReady } from '../secrets'
 
 interface DriftState {
-  hasLogged: boolean
+  logged: Set<string>
 }
 
 const driftState = globalState<DriftState>('modelCatalogDrift', () => ({
-  hasLogged: false,
+  logged: new Set<string>(),
 }))
+
+function isBindingConfigured(binding: ProviderBinding): boolean {
+  return getVideoProvider(binding.provider).isConfigured()
+}
 
 /** One entry per preset, with availability from the provider model list. */
 export async function getModelCatalog(): Promise<ModelCatalog> {
@@ -31,15 +35,13 @@ export async function getModelCatalog(): Promise<ModelCatalog> {
 }
 
 async function buildEntry(preset: ModelPreset): Promise<CatalogEntry> {
-  const binding = primaryBinding(preset)
+  const binding = activeBinding(preset, isBindingConfigured)
   const provider = getVideoProvider(binding.provider)
   const pricing = await provider.getPricing(preset)
   const label = videoProviderDescriptor(binding.provider).label
   const base = { modelId: binding.modelId, presetId: preset.id, pricing }
 
-  const isConfigured = preset.bindings.some((item) =>
-    getVideoProvider(item.provider).isConfigured(),
-  )
+  const isConfigured = preset.bindings.some(isBindingConfigured)
 
   if (!isConfigured) {
     return {
@@ -50,9 +52,9 @@ async function buildEntry(preset: ModelPreset): Promise<CatalogEntry> {
     }
   }
 
-  const models = await provider.listModels()
+  const { models, isFresh } = await provider.listModels()
 
-  if (isEmpty(models)) {
+  if (!isFresh || isEmpty(models)) {
     return { ...base, provider: binding.provider, status: 'unverified', reason: null }
   }
 
@@ -72,9 +74,9 @@ async function buildEntry(preset: ModelPreset): Promise<CatalogEntry> {
   return { ...base, provider: binding.provider, status: 'available', reason: null }
 }
 
-/** Development-only drift report. Logs once per process, never blocks. */
+/** Development-only drift report. Logs once per preset, never blocks. */
 function logDrift(preset: ModelPreset, model: ProviderModel): void {
-  if (process.env.NODE_ENV !== 'development' || driftState.hasLogged) {
+  if (process.env.NODE_ENV !== 'development' || driftState.logged.has(preset.id)) {
     return
   }
 
@@ -84,7 +86,7 @@ function logDrift(preset: ModelPreset, model: ProviderModel): void {
     return
   }
 
-  driftState.hasLogged = true
+  driftState.logged.add(preset.id)
   console.warn(`[model-catalog] ${preset.id} drift`, drifts)
 }
 

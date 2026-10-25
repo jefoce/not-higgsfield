@@ -12,7 +12,7 @@ describe('validateInput remote storage', () => {
       input: input({ presetId: 'seedance-2.0', references: ['v'] }),
       uploads: uploadsOf(upload('v', 'video', { durationSec: 5 })),
       preset: getPreset('seedance-2.0'),
-      ctx: { remoteConfigured: false },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: false },
     })
 
     expect(result.errors).toContain(
@@ -25,7 +25,7 @@ describe('validateInput remote storage', () => {
       input: input({ presetId: 'seedance-2.0', references: ['v'] }),
       uploads: uploadsOf(upload('v', 'video', { durationSec: 5 })),
       preset: getPreset('seedance-2.0'),
-      ctx: { remoteConfigured: true },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: true },
     })
 
     expect(result.ok).toBe(true)
@@ -36,7 +36,7 @@ describe('validateInput remote storage', () => {
       input: input({ references: ['v'] }),
       uploads: uploadsOf(upload('v', 'video', { durationSec: 5 })),
       preset,
-      ctx: { remoteConfigured: false },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: false },
     })
 
     expect(result.errors).toContain(
@@ -61,7 +61,7 @@ describe('validateInput remote storage', () => {
       input: input({ references: ['a'] }),
       uploads: uploadsOf(upload('a', 'audio', { durationSec: 5 })),
       preset,
-      ctx: { remoteConfigured: false },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: false },
     })
 
     expect(result.errors).toContain(
@@ -72,7 +72,12 @@ describe('validateInput remote storage', () => {
 
 describe('validateInput submit and inline limits', () => {
   it('rejects a submit while four jobs are active', () => {
-    const result = validateInput({ input: input(), uploads: {}, preset, ctx: { activeCount: 4 } })
+    const result = validateInput({
+      input: input(),
+      uploads: {},
+      preset,
+      ctx: { modelStatus: 'unverified', modelReason: null, activeCount: 4 },
+    })
 
     expect(result.errors).toContain('4 videos already generating. Wait for one to finish.')
   })
@@ -102,7 +107,7 @@ describe('validateInput submit and inline limits', () => {
       input: input({ presetId: 'seedance-2.0', references: ['v'] }),
       uploads: uploadsOf(upload('v', 'video', { sizeBytes: 60 * MB, durationSec: 5 })),
       preset: getPreset('seedance-2.0'),
-      ctx: { remoteConfigured: true },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: true },
     })
 
     expect(result.ok).toBe(true)
@@ -145,7 +150,7 @@ describe('validateInput media limits', () => {
         upload('v', 'video', { width: 4800, height: 2160, originalName: 'drone.mov' }),
       ),
       preset,
-      ctx: { remoteConfigured: true },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: true },
     })
 
     expect(result.errors).toContain('Video too large: 4800 px, max 4096 px (drone.mov)')
@@ -168,7 +173,7 @@ describe('validateInput media limits', () => {
       input: input({ references: ['v'] }),
       uploads: uploadsOf(upload('v', 'video', { sizeBytes: 140 * MB, originalName: 'drone.mov' })),
       preset,
-      ctx: { remoteConfigured: true },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: true },
     })
 
     expect(result.errors).toContain('Video file too large: 140 MB, max 100 MB (drone.mov)')
@@ -179,7 +184,7 @@ describe('validateInput media limits', () => {
       input: input({ references: ['v'] }),
       uploads: uploadsOf(upload('v', 'video', { ext: '.webm', originalName: 'clip.webm' })),
       preset,
-      ctx: { remoteConfigured: true },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: true },
     })
 
     expect(result.errors).toContain('Wan 3.0 takes video references as mp4 or mov (clip.webm)')
@@ -190,7 +195,7 @@ describe('validateInput media limits', () => {
       input: input({ references: ['a'] }),
       uploads: uploadsOf(upload('a', 'audio', { ext: '.m4a', originalName: 'track.m4a' })),
       preset,
-      ctx: { remoteConfigured: true },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: true },
     })
 
     expect(result.errors).toContain('Wan 3.0 takes audio references as wav or mp3 (track.m4a)')

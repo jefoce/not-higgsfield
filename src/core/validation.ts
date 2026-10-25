@@ -72,6 +72,8 @@ export function buildInputSchema(preset: ModelPreset): ReturnType<typeof createI
   return createInputSchema(preset)
 }
 
+const DEFAULT_CONTEXT: ValidationContext = { modelStatus: 'unverified', modelReason: null }
+
 interface ValidateInputParams {
   input: GenerationInput
   uploads: Record<string, UploadItem>
@@ -80,7 +82,7 @@ interface ValidateInputParams {
 }
 
 export function validateInput(params: ValidateInputParams): ValidationResult {
-  const { input, uploads, preset, ctx = {} } = params
+  const { input, uploads, preset, ctx = DEFAULT_CONTEXT } = params
   const status = validateModelStatus(ctx)
   const parsed = buildInputSchema(preset).safeParse(input)
 

@@ -215,7 +215,7 @@ describe('validateInput model status', () => {
       input: input(),
       uploads: {},
       preset,
-      ctx: { modelStatus: 'unverified' },
+      ctx: { modelStatus: 'unverified', modelReason: null },
     })
 
     expect(result).toEqual({ ok: true, errors: [], warnings: [] })

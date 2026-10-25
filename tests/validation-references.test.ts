@@ -21,7 +21,7 @@ describe('validateInput reference counts', () => {
       }),
       uploads,
       preset,
-      ctx: { remoteConfigured: true },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: true },
     })
 
     expect(result.ok).toBe(true)
@@ -84,7 +84,7 @@ describe('validateInput reference counts', () => {
       input: input({ references: ['vid'] }),
       uploads: uploadsOf(upload('vid', 'video', { durationSec: 5 })),
       preset,
-      ctx: { remoteConfigured: false },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: false },
     })
 
     expect(result.errors).toContain(
@@ -139,7 +139,7 @@ describe('validateInput reference durations', () => {
       input: input({ duration: 30, references: ['v'] }),
       uploads: uploadsOf(upload('v', 'video', { durationSec: 6.8 })),
       preset,
-      ctx: { remoteConfigured: true },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: true },
     })
 
     expect(result.errors).toContain('Max 23s: reference videos are 6.8s in total, limit 30s')
@@ -153,7 +153,7 @@ describe('validateInput reference durations', () => {
         upload('v2', 'video', { durationSec: 7 }),
       ),
       preset,
-      ctx: { remoteConfigured: true },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: true },
     })
 
     expect(result.errors).toContain('Max 16s: reference videos are 14s in total, limit 30s')
@@ -164,7 +164,7 @@ describe('validateInput reference durations', () => {
       input: input({ references: ['v'] }),
       uploads: uploadsOf(upload('v', 'video', { durationSec: 15.02 })),
       preset,
-      ctx: { remoteConfigured: true },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: true },
     })
 
     expect(result.ok).toBe(false)
@@ -177,7 +177,7 @@ describe('validateInput reference durations', () => {
       input: input({ references: ['v'] }),
       uploads: uploadsOf(upload('v', 'video', { durationSec: 15.2 })),
       preset,
-      ctx: { remoteConfigured: true },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: true },
     })
 
     expect(result.errors).toEqual([
@@ -191,7 +191,7 @@ describe('validateInput reference durations', () => {
       input: input({ presetId: 'seedance-2.0', duration: 15, references: ['v'] }),
       uploads: uploadsOf(upload('v', 'video', { durationSec: 10 })),
       preset: getPreset('seedance-2.0'),
-      ctx: { remoteConfigured: true },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: true },
     })
 
     expect(result.ok).toBe(true)

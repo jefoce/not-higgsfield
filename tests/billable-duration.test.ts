@@ -102,7 +102,7 @@ describe('duration normalization', () => {
       input: draft('wan-3.0', 23, ['v1']),
       uploads,
       preset: wan,
-      ctx: { remoteConfigured: true },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: true },
     })
 
     expect(valid.ok).toBe(true)
@@ -120,7 +120,7 @@ describe('duration normalization', () => {
       input: draft('wan-3.0', 24, ['v1']),
       uploads,
       preset: wan,
-      ctx: { remoteConfigured: true },
+      ctx: { modelStatus: 'unverified', modelReason: null, remoteConfigured: true },
     })
 
     expect(rejected.ok).toBe(false)

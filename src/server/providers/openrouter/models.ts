@@ -6,7 +6,7 @@ import { FETCH_TIMEOUTS, PRICING_FALLBACK_TTL_MS } from '@/core/constants'
 
 import { globalState } from '../../global-state'
 import { onSecretsChange } from '../../secrets'
-import type { ProviderModel } from '../types'
+import type { ProviderModel, ProviderModelList } from '../types'
 import { BASE_URL } from './http'
 
 const MODELS_URL = `${BASE_URL}/api/v1/videos/models`
@@ -35,12 +35,12 @@ interface CacheEntry {
 const cache = globalState('providerModels', () => ({ entry: undefined as CacheEntry | undefined }))
 
 /** Live model capabilities. A good result caches for an hour, a failure for five minutes. */
-export async function listModels(): Promise<readonly ProviderModel[]> {
+export async function listModels(): Promise<ProviderModelList> {
   const cached = cache.entry
   const ttl = cached?.isFallback === true ? PRICING_FALLBACK_TTL_MS : LIVE_TTL_MS
 
   if (cached && Date.now() - cached.at < ttl) {
-    return cached.models
+    return { models: cached.models, isFresh: !cached.isFallback }
   }
 
   try {
@@ -48,13 +48,13 @@ export async function listModels(): Promise<readonly ProviderModel[]> {
 
     cache.entry = { models, at: Date.now(), isFallback: false }
 
-    return models
+    return { models, isFresh: true }
   } catch {
     const models = cached?.models ?? []
 
     cache.entry = { models, at: Date.now(), isFallback: true }
 
-    return models
+    return { models, isFresh: false }
   }
 }
 

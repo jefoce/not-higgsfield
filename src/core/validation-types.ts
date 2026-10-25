@@ -32,8 +32,8 @@ export interface RuleResult {
 export interface ValidationContext {
   activeCount?: number
   remoteConfigured?: boolean
-  modelStatus?: ModelStatus
-  modelReason?: string | null
+  modelStatus: ModelStatus
+  modelReason: string | null
 }
 
 export interface ValidateFramesParams {

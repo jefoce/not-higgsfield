@@ -3,10 +3,12 @@ import 'server-only'
 import { isNil } from 'lodash-es'
 
 import type { MediaKind } from '@/core/media-types'
-import type { ModelPreset } from '@/core/presets/types'
-import { primaryBinding } from '@/core/pricing'
+import { activeBinding } from '@/core/presets/bindings'
+import type { ModelPreset, ProviderBinding } from '@/core/presets/types'
 import { renderPromptForApi } from '@/core/prompt-tokens'
 import type { GenerationInput } from '@/core/schemas/generation-record'
+
+import { getSecret, isNonEmptyString } from '../../secrets'
 
 interface MediaPayload {
   id: string
@@ -168,11 +170,16 @@ const mediaFields = (params: BuildRequestBodyParams): Partial<OpenRouterVideoBod
   return { input_references: references }
 }
 
+function isBindingConfigured(binding: ProviderBinding): boolean {
+  return binding.provider === 'openrouter' && isNonEmptyString(getSecret('OPENROUTER_API_KEY'))
+}
+
 export function buildRequestBody(params: BuildRequestBodyParams): OpenRouterVideoBody {
   const { input, preset } = params
+  const binding = activeBinding(preset, isBindingConfigured)
 
   return {
-    model: primaryBinding(preset).modelId,
+    model: binding.modelId,
     duration: input.duration,
     resolution: input.resolution,
     ...audioFields(params),

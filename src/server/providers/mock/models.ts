@@ -4,11 +4,11 @@ import { MODEL_PRESETS } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
 import { primaryBinding } from '@/core/pricing'
 
-import type { ProviderModel } from '../types'
+import type { ProviderModel, ProviderModelList } from '../types'
 
 /** Static capabilities for the four presets, no provider call. */
-export async function listModels(): Promise<readonly ProviderModel[]> {
-  return MODEL_PRESETS.map(staticModel)
+export async function listModels(): Promise<ProviderModelList> {
+  return { models: MODEL_PRESETS.map(staticModel), isFresh: true }
 }
 
 function staticModel(preset: ModelPreset): ProviderModel {
