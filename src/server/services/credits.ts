@@ -4,7 +4,7 @@ import { sumBy } from 'lodash-es'
 
 import type { CreditsInfo } from '@/core/types'
 
-import { getAccountCredits } from '../openrouter/credits'
+import { getVideoProvider } from '../providers/registry'
 import { listGenerations } from '../repos/generations'
 
 interface GetCreditsParams {
@@ -14,10 +14,10 @@ interface GetCreditsParams {
 /** Provider account credits combined with what this app spent locally. */
 export async function getCredits(params: GetCreditsParams = {}): Promise<CreditsInfo> {
   const isFresh = params.fresh
-  const account = await getAccountCredits({ fresh: isFresh })
+  const account = await getVideoProvider('openrouter').getAccount({ fresh: isFresh })
   const localSpent = await spentLocally()
 
-  return { ...account, localSpent }
+  return { ...account, error: account.error ?? undefined, localSpent }
 }
 
 async function spentLocally(): Promise<number> {

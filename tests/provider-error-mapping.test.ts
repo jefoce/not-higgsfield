@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { OpenRouterError } from '@/server/openrouter/error'
+import { OpenRouterError } from '@/server/providers/openrouter/error'
 import { classifyOpenRouterError } from '@/server/providers/openrouter/errors'
 import { ProviderError, type ProviderErrorKind } from '@/server/providers/provider-error'
 

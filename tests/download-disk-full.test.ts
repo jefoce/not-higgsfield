@@ -14,9 +14,19 @@ process.env.STORAGE_ROOT = root
 
 const fetchVideoContent = vi.hoisted(() => vi.fn())
 
-vi.mock('@/server/openrouter/client', () => ({ fetchVideoContent }))
+vi.mock('@/server/providers/registry', () => ({
+  getVideoProvider: () => ({ fetchContent: fetchVideoContent }),
+}))
 
-const JOB = { id: 'job-1', status: 'completed', expires_at: 4_102_444_800 }
+const JOB = {
+  status: 'completed' as const,
+  generationId: null,
+  expiresAt: 4_102_444_800_000,
+  urls: null,
+  usage: null,
+  error: null,
+}
+
 const ID = '22222222-2222-4222-8222-222222222222'
 
 let queueDownload: typeof QueueDownload

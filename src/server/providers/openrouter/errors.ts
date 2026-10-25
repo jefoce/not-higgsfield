@@ -1,8 +1,8 @@
 import 'server-only'
 
-import { OpenRouterError } from '../../openrouter/error'
 import type { ProviderErrorKind } from '../provider-error'
 import { ProviderError } from '../provider-error'
+import { OpenRouterError } from './error'
 
 const MODERATION_PATTERN = /moderation|flagged|sensitive|policy/i
 const URL_PATTERN = /url|download|fetch|image_url|video_url|audio_url/i

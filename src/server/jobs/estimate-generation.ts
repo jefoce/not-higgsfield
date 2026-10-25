@@ -13,7 +13,7 @@ import type { GenerationEstimate, GenerationInput } from '@/core/types'
 import { type PriceInput, validateInput } from '@/core/validation'
 
 import { ValidationError } from '../errors'
-import { getPricing } from '../openrouter/pricing'
+import { getPricing } from '../providers/openrouter/pricing'
 import { getRemoteStore } from '../remote/remote-store'
 import { getActiveCount } from '../repos/generations'
 import { loadUploads } from './run-submit'

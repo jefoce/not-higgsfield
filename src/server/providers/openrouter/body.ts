@@ -1,9 +1,11 @@
+import 'server-only'
+
 import { isNil } from 'lodash-es'
 
-import type { MediaKind } from './media-types'
-import type { ModelPreset } from './presets/types'
-import { renderPromptForApi } from './prompt-tokens'
-import type { GenerationInput } from './types'
+import type { MediaKind } from '@/core/media-types'
+import type { ModelPreset } from '@/core/presets/types'
+import { renderPromptForApi } from '@/core/prompt-tokens'
+import type { GenerationInput } from '@/core/types'
 
 interface MediaPayload {
   id: string
@@ -22,7 +24,7 @@ type OpenRouterReferencePart =
   | { type: 'video_url'; video_url: { url: string } }
   | { type: 'audio_url'; audio_url: { url: string } }
 
-export interface OpenRouterVideoBody {
+interface OpenRouterVideoBody {
   model: string
   duration: number
   resolution: string
@@ -55,13 +57,13 @@ const referencePart = (media: MediaPayload): OpenRouterReferencePart => {
   return { type: 'audio_url', audio_url: { url: media.url } }
 }
 
-export interface BuildOpenRouterBodyParams {
+interface BuildRequestBodyParams {
   input: GenerationInput
   preset: ModelPreset
   media: Record<string, MediaPayload>
 }
 
-const audioFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVideoBody> => {
+const audioFields = (params: BuildRequestBodyParams): Partial<OpenRouterVideoBody> => {
   const { input, preset } = params
 
   if (!preset.audio.supported) {
@@ -71,7 +73,7 @@ const audioFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVideo
   return { generate_audio: input.audio }
 }
 
-const promptFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVideoBody> => {
+const promptFields = (params: BuildRequestBodyParams): Partial<OpenRouterVideoBody> => {
   const { input, preset } = params
   const prompt = input.prompt.trim()
 
@@ -82,7 +84,7 @@ const promptFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVide
   return { prompt: renderPromptForApi(prompt, preset) }
 }
 
-const seedFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVideoBody> => {
+const seedFields = (params: BuildRequestBodyParams): Partial<OpenRouterVideoBody> => {
   const { input, preset } = params
 
   if (isNil(input.seed) || !preset.seed) {
@@ -92,7 +94,7 @@ const seedFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVideoB
   return { seed: input.seed }
 }
 
-const aspectFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVideoBody> => {
+const aspectFields = (params: BuildRequestBodyParams): Partial<OpenRouterVideoBody> => {
   const { input } = params
 
   if (input.aspectRatio === 'auto') {
@@ -102,7 +104,7 @@ const aspectFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVide
   return { aspect_ratio: input.aspectRatio }
 }
 
-const frameParts = (params: BuildOpenRouterBodyParams): OpenRouterFramePart[] => {
+const frameParts = (params: BuildRequestBodyParams): OpenRouterFramePart[] => {
   const { input, preset, media } = params
   const frames: OpenRouterFramePart[] = []
 
@@ -123,7 +125,7 @@ const frameParts = (params: BuildOpenRouterBodyParams): OpenRouterFramePart[] =>
   return frames
 }
 
-const mediaFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVideoBody> => {
+const mediaFields = (params: BuildRequestBodyParams): Partial<OpenRouterVideoBody> => {
   const { input, media } = params
 
   if (input.tab === 'frames') {
@@ -143,7 +145,7 @@ const mediaFields = (params: BuildOpenRouterBodyParams): Partial<OpenRouterVideo
   return { input_references: input.references.map((id) => referencePart(media[id])) }
 }
 
-export function buildOpenRouterBody(params: BuildOpenRouterBodyParams): OpenRouterVideoBody {
+export function buildRequestBody(params: BuildRequestBodyParams): OpenRouterVideoBody {
   const { input, preset } = params
 
   return {

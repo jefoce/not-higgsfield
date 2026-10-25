@@ -1,6 +1,7 @@
 import 'server-only'
 
-import { OpenRouterError } from '../openrouter/error'
+import { OpenRouterError } from '../providers/openrouter/error'
+import { ProviderError } from '../providers/provider-error'
 
 const PROVIDER_URL_ERROR = /url|download|fetch|image_url|video_url|audio_url/i
 
@@ -16,6 +17,10 @@ export function shouldRetryAsBase64(params: ShouldRetryAsBase64Params): boolean 
 
   if (!hasUrlInputs || !canFitBase64) {
     return false
+  }
+
+  if (error instanceof ProviderError) {
+    return error.kind === 'url_input'
   }
 
   if (!(error instanceof OpenRouterError)) {

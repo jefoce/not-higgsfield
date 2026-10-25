@@ -3,12 +3,11 @@ import 'server-only'
 import { isNil } from 'lodash-es'
 
 import { MAX_JOB_AGE_MIN } from '@/core/constants'
-import { asJobStatus } from '@/core/submit-state'
 import type { GenerationRecord, JobStatus } from '@/core/types'
 
-import type { VideoJobResponse } from '../openrouter/client'
-import { getVideoJob, isMockMode } from '../openrouter/client'
-import { OpenRouterError } from '../openrouter/error'
+import { ProviderError } from '../providers/provider-error'
+import { getVideoProvider, isMockMode } from '../providers/registry'
+import type { JobSnapshot } from '../providers/types'
 import { saveGeneration } from '../repos/generations'
 import { queueDownload } from './download-queue'
 
@@ -28,7 +27,7 @@ export async function processRecord(record: GenerationRecord): Promise<void> {
     return
   }
 
-  const status = asJobStatus(job.status) ?? record.status
+  const status = job.status
 
   if (isAgedOut(record, status)) {
     await saveGeneration({ ...record, status: 'expired', error: 'Job expired' })
@@ -54,11 +53,14 @@ interface PollJobParams {
 }
 
 /** Returns null when the tick handled the provider error. */
-async function pollJob(params: PollJobParams): Promise<VideoJobResponse | null> {
+async function pollJob(params: PollJobParams): Promise<JobSnapshot | null> {
   const { record, current } = params
 
   try {
-    return await getVideoJob(current.id, { submittedAt: current.submittedAt })
+    return await getVideoProvider('openrouter').getJob({
+      jobId: current.id,
+      submittedAt: current.submittedAt,
+    })
   } catch (error) {
     if (await handleJobError(record, error)) {
       return null
@@ -71,7 +73,7 @@ async function pollJob(params: PollJobParams): Promise<VideoJobResponse | null> 
 interface PrepareNextParams {
   record: GenerationRecord
   current: NonNullable<GenerationRecord['job']>
-  job: VideoJobResponse
+  job: JobSnapshot
   status: JobStatus
   now: string
 }
@@ -86,8 +88,8 @@ function prepareNext(params: PrepareNextParams): PreparedRecord {
 
   const jobFields = {
     ...current,
-    generationId: job.generation_id ?? current.generationId,
-    expiresAt: job.expires_at ?? current.expiresAt,
+    generationId: job.generationId ?? current.generationId,
+    expiresAt: job.expiresAt ?? current.expiresAt,
   }
 
   if (status === 'in_progress' && (isNil(current.startedAt) || current.startedAt === '')) {
@@ -109,12 +111,12 @@ function prepareNext(params: PrepareNextParams): PreparedRecord {
 
 interface ApplyUsageCostParams {
   record: GenerationRecord
-  job: VideoJobResponse
+  job: JobSnapshot
 }
 
 function applyUsageCost(params: ApplyUsageCostParams): GenerationRecord {
   const { record, job } = params
-  const usageCost = job.usage?.cost
+  const usageCost = job.usage?.costUsd
 
   if (isNil(usageCost)) {
     return record
@@ -127,7 +129,7 @@ function applyUsageCost(params: ApplyUsageCostParams): GenerationRecord {
     cost: {
       ...record.cost,
       actualUsd: actual,
-      isByok: job.usage?.is_byok ?? null,
+      isByok: job.usage?.isByok ?? null,
       billed: actual > 0,
     },
   }
@@ -137,7 +139,7 @@ interface FinishFinalParams {
   record: GenerationRecord
   status: JobStatus
   jobFields: NonNullable<GenerationRecord['job']>
-  job: VideoJobResponse
+  job: JobSnapshot
   now: string
 }
 
@@ -160,8 +162,8 @@ async function finishFinal(params: FinishFinalParams): Promise<void> {
   await saveGeneration({ ...finalizeCost(next, job), error: job.error ?? fallback })
 }
 
-function finalizeCost(record: GenerationRecord, job: VideoJobResponse): GenerationRecord {
-  if (!isNil(job.usage?.cost)) {
+function finalizeCost(record: GenerationRecord, job: JobSnapshot): GenerationRecord {
+  if (!isNil(job.usage?.costUsd)) {
     return record
   }
 
@@ -170,7 +172,7 @@ function finalizeCost(record: GenerationRecord, job: VideoJobResponse): Generati
 
 /** Returns true when the error was handled and this tick should stop. */
 async function handleJobError(record: GenerationRecord, error: unknown): Promise<boolean> {
-  if (!(error instanceof OpenRouterError)) {
+  if (!(error instanceof ProviderError)) {
     return false
   }
 

@@ -1,6 +1,6 @@
 import { DEFAULT_PRESET_ID, findPreset } from '@/core/presets'
 import { errorResponse, jsonError } from '@/server/http'
-import { getPricing } from '@/server/openrouter/pricing'
+import { getVideoProvider } from '@/server/providers/registry'
 import { assertLocalRequest } from '@/server/request-guard'
 
 export async function GET(request: Request) {
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
       return jsonError({ status: 400, error: 'Unknown model' })
     }
 
-    return Response.json(await getPricing(preset))
+    return Response.json(await getVideoProvider('openrouter').getPricing(preset))
   } catch (error) {
     return errorResponse(error)
   }

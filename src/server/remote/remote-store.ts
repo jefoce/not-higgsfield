@@ -3,7 +3,7 @@ import 'server-only'
 import { isNil } from 'lodash-es'
 
 import { globalState } from '../global-state'
-import { isMockMode } from '../openrouter/client'
+import { isMockMode } from '../providers/registry'
 import { getSecret, onSecretsChange } from '../secrets'
 import { createMockStore } from './mock'
 import { createR2Store } from './r2'

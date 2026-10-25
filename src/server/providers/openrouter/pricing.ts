@@ -7,8 +7,8 @@ import { FETCH_TIMEOUTS, PRICING_FALLBACK_TTL_MS } from '@/core/constants'
 import type { ModelPreset } from '@/core/presets/types'
 import type { PricingInfo } from '@/core/types'
 
-import { globalState } from '../global-state'
-import { isMockMode } from './client'
+import { globalState } from '../../global-state'
+import { isMockMode } from './mock-mode'
 
 const API_URL = 'https://openrouter.ai/api/v1'
 const MODELS_URL = `${API_URL}/videos/models`

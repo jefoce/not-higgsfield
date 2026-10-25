@@ -5,18 +5,14 @@ import { isNil } from 'lodash-es'
 import { MAX_REQUEST_MB } from '@/core/constants'
 import type { UploadItem } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
-import {
-  asJobStatus,
-  graceDelayMs,
-  inputIds,
-  transportsFor,
-  withTransports,
-} from '@/core/submit-state'
+import { graceDelayMs, inputIds, transportsFor, withTransports } from '@/core/submit-state'
 import type { ResolvedTransport } from '@/core/transport'
 import type { GenerationRecord } from '@/core/types'
 
-import { stripStatusPrefix } from '../openrouter/client'
-import { OpenRouterError } from '../openrouter/error'
+import { OpenRouterError } from '../providers/openrouter/error'
+import { stripStatusPrefix } from '../providers/openrouter/http'
+import { ProviderError } from '../providers/provider-error'
+import type { SubmittedJob } from '../providers/types'
 import { getRemoteStore } from '../remote/remote-store'
 import { getGeneration, saveGeneration } from '../repos/generations'
 import { getUpload } from '../repos/uploads'
@@ -157,10 +153,7 @@ async function uploadAndSend(params: Prepared, signal?: AbortSignal): Promise<vo
   }
 }
 
-async function complete(
-  id: string,
-  response: { id: string; status: string },
-): Promise<GenerationRecord | null> {
+async function complete(id: string, response: SubmittedJob): Promise<GenerationRecord | null> {
   return updateSubmit(id, (record) => {
     if (record.status !== 'submitting') {
       return null
@@ -168,8 +161,8 @@ async function complete(
 
     return {
       ...record,
-      status: asJobStatus(response.status) ?? 'pending',
-      job: { id: response.id, submittedAt: new Date().toISOString() },
+      status: response.status,
+      job: { id: response.jobId, submittedAt: new Date().toISOString() },
       submit: undefined,
     }
   })
@@ -198,10 +191,18 @@ export async function loadUploads(
 
 /** Formats a stored failure without repeating the HTTP status. */
 export function submitError(error: unknown): string {
-  if (!(error instanceof OpenRouterError)) {
-    return error instanceof Error ? error.message : 'Submit failed'
+  if (error instanceof ProviderError) {
+    return formatError(error)
   }
 
+  if (error instanceof OpenRouterError) {
+    return formatError(error)
+  }
+
+  return error instanceof Error ? error.message : 'Submit failed'
+}
+
+function formatError(error: { message: string; status: number; code?: string | null }): string {
   const stripped = stripStatusPrefix(error.message, error.status)
   const message = stripped === '' ? `HTTP ${error.status}` : stripped
   const code = error.code

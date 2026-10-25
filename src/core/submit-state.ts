@@ -2,11 +2,6 @@ import { isNil } from 'lodash-es'
 
 import { GRACE_STALE_MS } from './constants'
 import type { UploadItem } from './media-types'
-import {
-  buildOpenRouterBody,
-  type BuildOpenRouterBodyParams,
-  type OpenRouterVideoBody,
-} from './openrouter-body'
 import type { ModelPreset } from './presets/types'
 import { type ResolvedTransport, resolveTransport } from './transport'
 import type { GenerationInput, GenerationRecord, JobStatus } from './types'
@@ -93,10 +88,6 @@ export function base64Only(
   transports: Record<string, ResolvedTransport>,
 ): Record<string, ResolvedTransport> {
   return Object.fromEntries(Object.keys(transports).map((id) => [id, 'base64'] as const))
-}
-
-export function bodyFor(params: BuildOpenRouterBodyParams): OpenRouterVideoBody {
-  return buildOpenRouterBody(params)
 }
 
 const JOB_STATUSES: JobStatus[] = [

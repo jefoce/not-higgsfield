@@ -7,7 +7,8 @@ import { MEDIA_KINDS } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 
 import { HttpError, ValidationError } from './errors'
-import { OpenRouterError } from './openrouter/error'
+import { OpenRouterError } from './providers/openrouter/error'
+import { ProviderError } from './providers/provider-error'
 
 interface JsonErrorParams {
   status: number
@@ -36,7 +37,7 @@ export function errorResponse(error: unknown): Response {
     return jsonError({ status: 400, error: error.message, details: error.errors })
   }
 
-  if (error instanceof OpenRouterError) {
+  if (error instanceof OpenRouterError || error instanceof ProviderError) {
     return jsonError({
       status: error.status === 0 || Number.isNaN(error.status) ? 502 : error.status,
       error: error.message,

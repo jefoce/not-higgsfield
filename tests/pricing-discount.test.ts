@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { getPreset } from '@/core/presets'
-import { getPricing } from '@/server/openrouter/pricing'
+import { getPricing } from '@/server/providers/openrouter/pricing'
 
 const WAN_SKUS = {
   duration_seconds_480p: '0.05',

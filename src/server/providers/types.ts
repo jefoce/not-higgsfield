@@ -3,7 +3,7 @@ import 'server-only'
 import type { MediaKind } from '@/core/media-types'
 import type { ModelPreset } from '@/core/presets/types'
 import type { VideoProviderId } from '@/core/providers/types'
-import type { GenerationInput, JobStatus, TestResult } from '@/core/types'
+import type { GenerationInput, JobStatus, PricingInfo, TestResult } from '@/core/types'
 
 export interface ProviderModel {
   modelId: string
@@ -46,6 +46,7 @@ export interface JobSnapshot {
   status: JobStatus
   generationId: string | null
   expiresAt: number | null
+  urls: readonly string[] | null
   usage: JobUsage | null
   error: string | null
 }
@@ -72,7 +73,12 @@ export interface ProviderAccount {
   usageDaily: number | null
   usageMonthly: number | null
   source: AccountSource
+  fetchedAt: string
   error: string | null
+}
+
+export interface AccountLookupParams {
+  fresh?: boolean
 }
 
 export interface VideoProvider {
@@ -81,6 +87,8 @@ export interface VideoProvider {
   submit(params: SubmitJobParams): Promise<SubmittedJob>
   getJob(job: JobRef): Promise<JobSnapshot>
   fetchContent(request: ContentRequest): Promise<Response>
-  getAccount(): Promise<ProviderAccount>
+  getAccount(params?: AccountLookupParams): Promise<ProviderAccount>
+  getPricing(preset: ModelPreset, isForce?: boolean): Promise<PricingInfo>
+  listModels(): Promise<readonly ProviderModel[]>
   testConnection(): Promise<TestResult>
 }

@@ -3,12 +3,12 @@ import 'server-only'
 import { z } from 'zod'
 
 import { FETCH_TIMEOUTS } from '@/core/constants'
-import type { CreditsInfo } from '@/core/types'
 
-import { messageOf } from '../errors'
-import { globalState } from '../global-state'
-import { getSecret, isNonEmptyString, onSecretsChange, secretsReady } from '../secrets'
-import { isMockMode } from './client'
+import { messageOf } from '../../errors'
+import { globalState } from '../../global-state'
+import { getSecret, isNonEmptyString, onSecretsChange, secretsReady } from '../../secrets'
+import type { ProviderAccount } from '../types'
+import { isMockMode } from './mock-mode'
 
 const BASE_URL = 'https://openrouter.ai'
 const CACHE_MS = 30_000
@@ -37,17 +37,15 @@ const CreditsSchema = z
   })
   .loose()
 
-type AccountCredits = Omit<CreditsInfo, 'localSpent'>
-
 interface CacheEntry {
-  info: AccountCredits
+  info: ProviderAccount
   at: number
 }
 
 const cache = globalState('credits', () => ({ entry: undefined as CacheEntry | undefined }))
 
 /** Key and management credits, cached for 30 seconds. Never throws. */
-export async function getAccountCredits(opts?: { fresh?: boolean }): Promise<AccountCredits> {
+export async function getProviderAccount(opts?: { fresh?: boolean }): Promise<ProviderAccount> {
   const cached = cache.entry
 
   if (opts?.fresh !== true && cached && Date.now() - cached.at < CACHE_MS) {
@@ -65,7 +63,7 @@ export async function getAccountCredits(opts?: { fresh?: boolean }): Promise<Acc
   }
 }
 
-async function loadCredits(): Promise<AccountCredits> {
+async function loadCredits(): Promise<ProviderAccount> {
   await secretsReady()
   const fetchedAt = new Date().toISOString()
 
@@ -78,6 +76,7 @@ async function loadCredits(): Promise<AccountCredits> {
       usageMonthly: null,
       source: 'mock',
       fetchedAt,
+      error: null,
     }
   }
 
@@ -89,7 +88,7 @@ async function loadCredits(): Promise<AccountCredits> {
 
   const keyInfo = await fetchKey(key)
 
-  const info: AccountCredits = {
+  const info: ProviderAccount = {
     balance: null,
     keyLimitRemaining: keyInfo.limit_remaining ?? null,
     keyLimit: keyInfo.limit ?? null,
@@ -97,6 +96,7 @@ async function loadCredits(): Promise<AccountCredits> {
     usageMonthly: keyInfo.usage_monthly ?? null,
     source: 'key',
     fetchedAt,
+    error: null,
   }
 
   const managementKey = getSecret('OPENROUTER_MANAGEMENT_KEY')
@@ -152,7 +152,7 @@ async function getJson(url: string, key: string): Promise<unknown> {
   return res.json()
 }
 
-function withError(last: AccountCredits | null, message: string): AccountCredits {
+function withError(last: ProviderAccount | null, message: string): ProviderAccount {
   if (last) {
     return { ...last, error: message }
   }

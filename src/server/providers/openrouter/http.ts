@@ -3,16 +3,15 @@ import 'server-only'
 import { isNil, isString } from 'lodash-es'
 import { z } from 'zod'
 
-import { FETCH_TIMEOUTS, PROVIDER_RAW_MAX_CHARS } from '@/core/constants'
+import { PROVIDER_RAW_MAX_CHARS } from '@/core/constants'
 import { isRecord } from '@/core/guards'
 
-import { getSecret } from '../secrets'
+import { getSecret } from '../../secrets'
 import { OpenRouterError } from './error'
-import { mockContent, type MockContentFallback, mockJob, mockSubmit } from './mock-provider'
 
-const BASE_URL = 'https://openrouter.ai'
+export const BASE_URL = 'https://openrouter.ai'
 
-const SubmitSchema = z
+export const SubmitSchema = z
   .object({
     id: z.string(),
     polling_url: z.string().optional(),
@@ -20,7 +19,7 @@ const SubmitSchema = z
   })
   .loose()
 
-const JobSchema = z
+export const JobSchema = z
   .object({
     id: z.string(),
     status: z.string(),
@@ -41,99 +40,6 @@ const JobSchema = z
 
 export type VideoJobResponse = z.infer<typeof JobSchema>
 
-export function isMockMode(): boolean {
-  return process.env.OPENROUTER_MOCK === '1'
-}
-
-/** Submits a video generation request. */
-export async function submitVideo(
-  body: unknown,
-): Promise<{ id: string; polling_url?: string; status: string }> {
-  if (isMockMode()) {
-    return mockSubmit(body)
-  }
-
-  const res = await request({
-    url: `${BASE_URL}/api/v1/videos`,
-    init: {
-      method: 'POST',
-      headers: headers(true),
-      body: JSON.stringify(body),
-    },
-    timeoutMs: FETCH_TIMEOUTS.submit,
-  })
-
-  if (!res.ok) {
-    throw await errorFromResponse(res)
-  }
-
-  const parsed = SubmitSchema.safeParse(await res.json().catch(() => null))
-
-  if (!parsed.success) {
-    throw new OpenRouterError({ message: 'Invalid submit response', status: res.status })
-  }
-
-  return parsed.data
-}
-
-/** Reads one job. `submittedAt` is the mock clock fallback after a restart. */
-export async function getVideoJob(
-  id: string,
-  opts?: { submittedAt?: string },
-): Promise<VideoJobResponse> {
-  if (isMockMode()) {
-    return mockJob(id, opts?.submittedAt)
-  }
-
-  const res = await request({
-    url: `${BASE_URL}/api/v1/videos/${encodeURIComponent(id)}`,
-    init: {
-      headers: headers(false),
-      cache: 'no-store',
-    },
-    timeoutMs: FETCH_TIMEOUTS.poll,
-  })
-
-  if (!res.ok) {
-    throw await errorFromResponse(res)
-  }
-
-  const parsed = JobSchema.safeParse(await res.json().catch(() => null))
-
-  if (!parsed.success) {
-    throw new OpenRouterError({ message: 'Invalid job response', status: res.status })
-  }
-
-  return parsed.data
-}
-
-/** Returns the raw content response. The caller streams and closes it. */
-interface FetchVideoContentParams {
-  id: string
-  index?: number
-  fallback?: MockContentFallback
-}
-
-export async function fetchVideoContent(params: FetchVideoContentParams): Promise<Response> {
-  const { id, index = 0, fallback } = params
-
-  if (isMockMode()) {
-    return mockContent(id, fallback)
-  }
-
-  const res = await request({
-    url: `${BASE_URL}/api/v1/videos/${encodeURIComponent(id)}/content?index=${index}`,
-    init: { headers: headers(false), cache: 'no-store' },
-    timeoutMs: FETCH_TIMEOUTS.content,
-  })
-
-  if (!res.ok) {
-    throw await errorFromResponse(res)
-  }
-
-  return res
-}
-
 interface RequestParams {
   url: string
   init: RequestInit
@@ -141,7 +47,7 @@ interface RequestParams {
 }
 
 /** Runs an outbound call. Aborts become retryable status 0 errors. */
-async function request(params: RequestParams): Promise<Response> {
+export async function request(params: RequestParams): Promise<Response> {
   const { url, init, timeoutMs } = params
 
   try {
@@ -159,7 +65,7 @@ async function request(params: RequestParams): Promise<Response> {
   }
 }
 
-function headers(isJson: boolean): Record<string, string> {
+export function headers(isJson: boolean): Record<string, string> {
   const key = getSecret('OPENROUTER_API_KEY')
 
   if (isNil(key) || key === '') {

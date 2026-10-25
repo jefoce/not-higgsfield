@@ -5,14 +5,14 @@ import { chunk, isNil, sumBy } from 'lodash-es'
 import { MAX_REQUEST_MB, REQUEST_RESERVE_MB } from '@/core/constants'
 import type { ReferencePlan, UploadItem } from '@/core/media-types'
 import type { ModelPreset } from '@/core/presets/types'
-import { base64Only, bodyFor } from '@/core/submit-state'
+import { base64Only } from '@/core/submit-state'
 import type { ResolvedTransport } from '@/core/transport'
 import type { GenerationRecord } from '@/core/types'
 
 import { encodeImages } from '../media/image-data-url'
 import { toDataUrl } from '../media/to-data-url'
-import { submitVideo } from '../openrouter/client'
-import type { ResolvedMedia } from '../providers/types'
+import { getVideoProvider } from '../providers/registry'
+import type { ResolvedMedia, SubmittedJob } from '../providers/types'
 import { ensureRemote, presignFor } from '../services/remote-inputs'
 import { throwIfStopped, updateSubmit } from './submit-record'
 import { shouldRetryAsBase64 } from './submit-retry'
@@ -23,11 +23,6 @@ const IMAGE_BUDGET = LIMIT_BYTES - REQUEST_RESERVE_MB * 1024 * 1024
 type Uploads = Record<string, UploadItem>
 
 type Transports = Record<string, ResolvedTransport>
-
-interface SubmitResponse {
-  id: string
-  status: string
-}
 
 /** Media built for one submit request. */
 export interface BuiltMedia {
@@ -194,11 +189,12 @@ export async function recordSent(id: string, plan: ReferencePlan): Promise<void>
   }))
 }
 
-export async function send(params: SendParams): Promise<SubmitResponse> {
+export async function send(params: SendParams): Promise<SubmittedJob> {
   const { record, preset, uploads, transports, built } = params
+  const provider = getVideoProvider('openrouter')
 
   try {
-    return await submitVideo(bodyFor({ input: record.input, preset, media: built.media }))
+    return await provider.submit({ input: record.input, preset, media: built.media })
   } catch (error) {
     const hasUrlInputs = Object.values(transports).includes('url')
 
@@ -219,7 +215,7 @@ export async function send(params: SendParams): Promise<SubmitResponse> {
     await markBase64(record.id)
     console.warn(`[not-higgsfield] retrying submit as base64 for ${record.id}`)
 
-    return submitVideo(bodyFor({ input: record.input, preset, media: retry.media }))
+    return provider.submit({ input: record.input, preset, media: retry.media })
   }
 }
 

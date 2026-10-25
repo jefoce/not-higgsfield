@@ -16,8 +16,9 @@ import { exists, isDiskFull } from '../fs/stat'
 import { globalState } from '../global-state'
 import { probeMedia } from '../media/ffmpeg'
 import { makePreview } from '../media/preview'
-import { fetchVideoContent, type VideoJobResponse } from '../openrouter/client'
 import { downloadPaths } from '../paths'
+import { getVideoProvider } from '../providers/registry'
+import type { JobSnapshot } from '../providers/types'
 import { getGeneration, saveGeneration } from '../repos/generations'
 import { withLock } from '../sync/lock'
 
@@ -25,7 +26,7 @@ const MAX_DOWNLOADS = 2
 
 interface DownloadTask {
   record: GenerationRecord
-  job: VideoJobResponse
+  job: JobSnapshot
 }
 
 interface DownloadQueue {
@@ -37,9 +38,8 @@ interface DownloadQueue {
 }
 
 interface DownloadParams {
-  id: string
-  job: VideoJobResponse
-  input: GenerationRecord['input']
+  record: GenerationRecord
+  job: JobSnapshot
 }
 
 const DISK_FULL = 'Disk is full. Free some space, the download retries every minute.'
@@ -69,10 +69,7 @@ export function stopDownloads(): void {
 }
 
 /** Marks the record Downloading, then adds it to the bounded queue. */
-export async function queueDownload(
-  record: GenerationRecord,
-  job: VideoJobResponse,
-): Promise<void> {
+export async function queueDownload(record: GenerationRecord, job: JobSnapshot): Promise<void> {
   const fullAt = downloads.diskFullAt.get(record.id)
 
   if (downloads.stopped || isDownloadQueued(record.id)) {
@@ -123,7 +120,7 @@ function drainDownloads(): void {
   }
 }
 
-async function finalize(record: GenerationRecord, job: VideoJobResponse): Promise<void> {
+async function finalize(record: GenerationRecord, job: JobSnapshot): Promise<void> {
   const paths = downloadPaths(record.id)
 
   if (await isExpiredBeforeDownload({ job, video: paths.video })) {
@@ -138,7 +135,7 @@ async function finalize(record: GenerationRecord, job: VideoJobResponse): Promis
   }
 
   try {
-    await download({ id: record.id, job, input: record.input })
+    await download({ record, job })
   } catch (error) {
     await handleDownloadFailure(record, error)
 
@@ -149,14 +146,14 @@ async function finalize(record: GenerationRecord, job: VideoJobResponse): Promis
 }
 
 interface ExpiryParams {
-  job: VideoJobResponse
+  job: JobSnapshot
   video: string
 }
 
 async function isExpiredBeforeDownload(params: ExpiryParams): Promise<boolean> {
   const { job, video } = params
 
-  if (isNil(job.expires_at) || Date.now() <= job.expires_at * 1000) {
+  if (isNil(job.expiresAt) || Date.now() <= job.expiresAt) {
     return false
   }
 
@@ -254,9 +251,9 @@ async function saveRetry(record: GenerationRecord, error: unknown): Promise<void
 }
 
 async function download(params: DownloadParams): Promise<void> {
-  const { id, job, input } = params
-  const paths = downloadPaths(id)
-  const response = await openContent({ id, job, input })
+  const { record } = params
+  const paths = downloadPaths(record.id)
+  const response = await openContent(params)
 
   if (!response.body) {
     throw new Error('Empty video response')
@@ -280,10 +277,15 @@ async function download(params: DownloadParams): Promise<void> {
 }
 
 async function openContent(params: DownloadParams): Promise<Response> {
-  const { id, job, input } = params
+  const { record, job } = params
+  const submittedAt = record.job?.submittedAt ?? ''
 
   try {
-    return await fetchVideoContent({ id, index: 0, fallback: input })
+    return await getVideoProvider('openrouter').fetchContent({
+      job: { jobId: record.id, submittedAt },
+      index: 0,
+      fallback: record.input,
+    })
   } catch (error) {
     const url = job.urls?.[0]
 

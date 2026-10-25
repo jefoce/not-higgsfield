@@ -12,11 +12,11 @@ import { isRecord } from '@/core/guards'
 import { outputSize } from '@/core/output-size'
 import { MODEL_PRESETS } from '@/core/presets'
 
-import { globalState } from '../global-state'
-import { MOCK_REMOTE_PREFIX } from '../local-url'
-import { makeTestVideo } from '../media/ffmpeg'
-import type { VideoJobResponse } from './client'
+import { globalState } from '../../global-state'
+import { MOCK_REMOTE_PREFIX } from '../../local-url'
+import { makeTestVideo } from '../../media/ffmpeg'
 import { OpenRouterError } from './error'
+import type { VideoJobResponse } from './http'
 
 export interface MockContentFallback {
   presetId: string
