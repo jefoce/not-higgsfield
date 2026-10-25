@@ -1,7 +1,6 @@
 'use client'
 
-import { isNil } from 'lodash-es'
-
+import { isNonEmptyString } from '@/core/guards'
 import { getPreset } from '@/core/presets'
 
 import { useGeneratorStore } from '../store/store'
@@ -23,7 +22,7 @@ export function FrameSlots() {
         {preset.frames.end && (
           <FrameSlot
             slot="end"
-            disabled={isNil(startId) || startId === ''}
+            disabled={!isNonEmptyString(startId)}
             disabledReason="Add start frame first"
           />
         )}

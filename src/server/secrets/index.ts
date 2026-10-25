@@ -2,6 +2,7 @@ import 'server-only'
 
 import { isNil } from 'lodash-es'
 
+import { isNonEmptyString } from '@/core/guards'
 import { R2_NAMES, SECRET_NAMES, type SecretName } from '@/core/secret-names'
 import type { SecretKeyStatus, SecretSource, SecretStatus } from '@/core/types'
 
@@ -101,11 +102,6 @@ export function getSecret(name: SecretName): string | null {
   return state.values.get(name)?.value ?? null
 }
 
-/** True for a string that is not empty. */
-export function isNonEmptyString(value: string | null | undefined): value is string {
-  return !isNil(value) && value !== ''
-}
-
 /** Applies changes at once (null removes). Env keys are read-only. */
 export async function setSecrets(
   changes: Partial<Record<SecretName, string | null>>,
@@ -116,7 +112,7 @@ export async function setSecrets(
 async function applySecrets(changes: Partial<Record<SecretName, string | null>>): Promise<void> {
   await secretsReady()
 
-  if (!isNil(state.loadError) && state.loadError !== '') {
+  if (isNonEmptyString(state.loadError)) {
     throw new HttpError(409, 'Keychain not loaded')
   }
 

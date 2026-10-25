@@ -1,6 +1,6 @@
-import { isNil } from 'lodash-es'
 import { Music } from 'lucide-react'
 
+import { isNonEmptyString } from '@/core/guards'
 import { idForSlot, type RefSlot, slotLabel } from '@/core/prompt-tokens'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 
@@ -17,7 +17,7 @@ export function PromptSlot(props: PromptSlotProps) {
   const label = slotLabel(slot)
   const id = idForSlot(recordSlots(record).slots, slot)
 
-  if (isNil(id) || id === '') {
+  if (!isNonEmptyString(id)) {
     return <span className="mx-0.5 rounded-sm bg-danger/10 px-1 text-xs text-danger">@{label}</span>
   }
 

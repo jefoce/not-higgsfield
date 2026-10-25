@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { SEED_MAX } from '@/core/constants'
 import { maxDurationFor } from '@/core/duration-limits'
+import { isNonEmptyString } from '@/core/guards'
 import type { MediaKind, MediaKindCounts } from '@/core/media-types'
 import { minDuration } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
@@ -28,7 +29,7 @@ export function uploadForSlot(state: ReferenceState, slot: RefSlot): UploadItem 
   const { slots } = referenceSlots(state.references, (id) => state.uploadsById[id]?.kind)
   const id = idForSlot(slots, slot)
 
-  if (isNil(id) || id === '') {
+  if (!isNonEmptyString(id)) {
     return undefined
   }
 

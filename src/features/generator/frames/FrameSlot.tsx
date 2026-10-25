@@ -3,6 +3,7 @@
 import { type MouseEvent } from 'react'
 import { isNil } from 'lodash-es'
 
+import { isNonEmptyString } from '@/core/guards'
 import { getPreset } from '@/core/presets'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { extensionsFromLimits, openMediaPicker } from '@/features/media-picker/picker/store'
@@ -73,7 +74,7 @@ export function FrameSlot(props: FrameSlotProps) {
   const frameId = useGeneratorStore((state) => state.frames[slot])
 
   const upload = useGeneratorStore((state) => {
-    if (isNil(frameId) || frameId === '') {
+    if (!isNonEmptyString(frameId)) {
       return
     }
 

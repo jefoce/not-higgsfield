@@ -2,13 +2,14 @@ import 'server-only'
 
 import { isNil } from 'lodash-es'
 
+import { isNonEmptyString } from '@/core/guards'
 import type { MediaKind } from '@/core/media-types'
 import { activeBinding } from '@/core/presets/bindings'
 import type { ModelPreset, ProviderBinding } from '@/core/presets/types'
 import { renderPromptForApi } from '@/core/prompt-tokens'
 import type { GenerationInput } from '@/core/schemas/generation-record'
 
-import { getSecret, isNonEmptyString } from '../../secrets'
+import { getSecret } from '../../secrets'
 
 interface MediaPayload {
   id: string

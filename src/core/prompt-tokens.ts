@@ -1,5 +1,6 @@
 import { isNil } from 'lodash-es'
 
+import { isNonEmptyString } from './guards'
 import { KIND_TITLE } from './media-kinds'
 import type { MediaKind, MediaKindCounts } from './media-types'
 import type { ModelPreset } from './presets/types'
@@ -115,7 +116,7 @@ function readLooseMatch(match: RegExpExecArray): LooseMatch | null {
   const word = atKind ?? bracketKind ?? bareKind
   const rawNumber = atNum ?? bracketNum ?? bareNum
 
-  if (isNil(word) || word === '' || isNil(rawNumber)) {
+  if (!isNonEmptyString(word) || isNil(rawNumber)) {
     return null
   }
 

@@ -3,6 +3,8 @@
 import { isNil } from 'lodash-es'
 import { create } from 'zustand'
 
+import { isNonEmptyString } from '@/core/guards'
+
 interface SelectionState {
   // Selection order, also the order Shift ranges walk.
   ids: Set<string>
@@ -95,8 +97,7 @@ export const useSelectionStore = create<SelectionState>()((set, get) => ({
     set((state) => {
       const ids = new Set([...state.ids].filter((id) => existing.has(id)))
 
-      const isAnchorId =
-        !isNil(state.anchorId) && state.anchorId !== '' && existing.has(state.anchorId)
+      const isAnchorId = isNonEmptyString(state.anchorId) && existing.has(state.anchorId)
 
       const anchorId = isAnchorId ? state.anchorId : null
 

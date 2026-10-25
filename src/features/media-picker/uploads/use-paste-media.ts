@@ -1,10 +1,11 @@
 'use client'
 
 import { useCallback, useEffect, useRef } from 'react'
-import { isEmpty, isNil } from 'lodash-es'
+import { isEmpty } from 'lodash-es'
 import type { ClipboardEvent } from 'react'
 import { toast } from 'sonner'
 
+import { isNonEmptyString } from '@/core/guards'
 import { acceptFiles, type KindExtensions, pastedPath } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 import type { UploadItem } from '@/core/schemas/upload-item'
@@ -64,7 +65,7 @@ function handlePastedPath(event: PasteLike, params: PasteMediaOptions): void {
     extensions: params.extensions?.(),
   })
 
-  if (isNil(path) || path === '') {
+  if (!isNonEmptyString(path)) {
     return
   }
 

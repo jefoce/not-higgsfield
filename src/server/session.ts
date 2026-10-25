@@ -4,6 +4,8 @@ import { timingSafeEqual } from 'node:crypto'
 
 import { isNil } from 'lodash-es'
 
+import { isNonEmptyString } from '@/core/guards'
+
 const configuredToken = process.env.APP_TOKEN?.trim() ?? ''
 const TOKEN = configuredToken === '' ? null : configuredToken
 
@@ -15,7 +17,7 @@ export function sessionRequired(): boolean {
 }
 
 export function tokenMatches(value: string | null | undefined): boolean {
-  if (isNil(TOKEN) || TOKEN === '' || isNil(value) || value === '') {
+  if (!isNonEmptyString(TOKEN) || !isNonEmptyString(value)) {
     return false
   }
 
@@ -27,7 +29,7 @@ export function tokenMatches(value: string | null | undefined): boolean {
 
 /** Reads the session cookie. Missing or wrong values fail closed. */
 export function hasSession(request: Request): boolean {
-  if (isNil(TOKEN) || TOKEN === '') {
+  if (!isNonEmptyString(TOKEN)) {
     return true
   }
 

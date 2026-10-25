@@ -4,7 +4,7 @@ import { isNil, isString } from 'lodash-es'
 import { z } from 'zod'
 
 import { PROVIDER_RAW_MAX_CHARS } from '@/core/constants'
-import { isRecord } from '@/core/guards'
+import { isNonEmptyString, isRecord } from '@/core/guards'
 
 import { getSecret } from '../../secrets'
 import { OpenRouterError } from './error'
@@ -71,7 +71,7 @@ export async function request(params: RequestParams): Promise<Response> {
 export function headers(isJson: boolean): Record<string, string> {
   const key = getSecret('OPENROUTER_API_KEY')
 
-  if (isNil(key) || key === '') {
+  if (!isNonEmptyString(key)) {
     throw new OpenRouterError({
       message: 'OpenRouter key is not set. Open Settings.',
       status: 401,

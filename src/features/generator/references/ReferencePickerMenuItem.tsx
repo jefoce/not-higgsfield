@@ -2,14 +2,15 @@
 
 import { forwardRef } from 'react'
 import type { BeautifulMentionsMenuItemProps } from 'lexical-beautiful-mentions'
-import { isNil, isString } from 'lodash-es'
+import { isString } from 'lodash-es'
 
+import { isNonEmptyString } from '@/core/guards'
 import { cn } from '@/lib/cn'
 
 import { ReferenceIcon } from './ReferenceIcon'
 
 function hasThumbSrc(thumbSrc: string | null): boolean {
-  return !isNil(thumbSrc) && thumbSrc !== ''
+  return isNonEmptyString(thumbSrc)
 }
 
 function dataSelectedValue(isSelected: boolean | undefined): true | undefined {

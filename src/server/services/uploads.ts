@@ -7,6 +7,7 @@ import path from 'node:path'
 
 import { isNil, isString } from 'lodash-es'
 
+import { isNonEmptyString } from '@/core/guards'
 import { extWithDot, mimeFromExt } from '@/core/media-kinds'
 import type { LinkMode, UploadItem } from '@/core/schemas/upload-item'
 
@@ -70,7 +71,7 @@ export async function createLinkUpload(params: LinkUploadParams): Promise<Upload
   const kind = assertSupported(ext)
   const mime = mimeFromExt(ext)
 
-  if (isNil(mime) || mime === '') {
+  if (!isNonEmptyString(mime)) {
     throw new UploadError(400, `Unsupported file type: ${ext}`)
   }
 
@@ -156,7 +157,7 @@ export async function removeUpload(id: string): Promise<void> {
 async function resolveRequested(params: LinkUploadParams): Promise<string> {
   const { absPath, folderId, relPath } = params
 
-  if (!isNil(folderId) && folderId !== '' && isString(relPath)) {
+  if (isNonEmptyString(folderId) && isString(relPath)) {
     const folder = await getFolder(folderId)
 
     if (!folder) {
@@ -206,7 +207,7 @@ async function findLink(target: string): Promise<UploadItem | null> {
   const records = await listUploadRecords()
 
   for (const record of records) {
-    if (record.source !== 'link' || isNil(record.target) || record.target === '') {
+    if (record.source !== 'link' || !isNonEmptyString(record.target)) {
       continue
     }
 

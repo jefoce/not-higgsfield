@@ -1,6 +1,7 @@
 import { isNil } from 'lodash-es'
 
 import { LOW_RES_MIN_PX, MAX_ACTIVE_JOBS, MAX_INLINE_MEDIA_MB } from './constants'
+import { isNonEmptyString } from './guards'
 import { aspectAllowed } from './output-size'
 import type { ModelPreset } from './presets/types'
 import { primaryBinding } from './pricing'
@@ -97,8 +98,8 @@ interface CheckFrameOrderParams extends ValidateFramesParams {
 const checkFrameOrder = (params: CheckFrameOrderParams): void => {
   const { input, preset, errors } = params
 
-  const hasEnd = !isNil(input.frames.end) && input.frames.end !== ''
-  const hasStart = !isNil(input.frames.start) && input.frames.start !== ''
+  const hasEnd = isNonEmptyString(input.frames.end)
+  const hasStart = isNonEmptyString(input.frames.start)
 
   if (hasEnd && !hasStart) {
     errors.push('Add a start frame first')
@@ -129,12 +130,7 @@ export function validateFrames(params: ValidateFramesParams): RuleResult {
   checkFrameOrder({ input, uploads, preset, errors })
   checkFrameKind({ id: input.frames.start, role: 'Start frame', uploads, errors })
 
-  if (
-    !isNil(input.frames.start) &&
-    input.frames.start !== '' &&
-    !isNil(input.frames.end) &&
-    input.frames.end !== ''
-  ) {
+  if (isNonEmptyString(input.frames.start) && isNonEmptyString(input.frames.end)) {
     checkFrameKind({ id: input.frames.end, role: 'End frame', uploads, errors })
   }
 
@@ -206,13 +202,13 @@ function attachedMedia(input: GenerationInput, uploads: Record<string, UploadIte
   const endId = input.frames.end
   let start: UploadItem | undefined
 
-  if (!isNil(startId) && startId !== '') {
+  if (isNonEmptyString(startId)) {
     start = uploads[startId]
   }
 
   let end: UploadItem | undefined
 
-  if (!isNil(startId) && startId !== '' && !isNil(endId) && endId !== '') {
+  if (isNonEmptyString(startId) && isNonEmptyString(endId)) {
     end = uploads[endId]
   }
 
@@ -222,7 +218,7 @@ function attachedMedia(input: GenerationInput, uploads: Record<string, UploadIte
 function checkUpload(params: CheckUploadParams): UploadItem | null {
   const { id, role, uploads, errors } = params
 
-  if (isNil(id) || id === '') {
+  if (!isNonEmptyString(id)) {
     return null
   }
 

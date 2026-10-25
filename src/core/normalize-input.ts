@@ -1,6 +1,7 @@
 import { clamp, isNil } from 'lodash-es'
 
 import { durationLimitFor } from './duration-limits'
+import { isNonEmptyString } from './guards'
 import { MEDIA_KINDS } from './media-kinds'
 import type { MediaKindCounts } from './media-types'
 import { aspectAllowed } from './output-size'
@@ -16,7 +17,7 @@ export function inputForSubmit(input: GenerationInput): GenerationInput {
     return { ...input, frames: { start: null, end: null } }
   }
 
-  const hasStart = !isNil(input.frames.start) && input.frames.start !== ''
+  const hasStart = isNonEmptyString(input.frames.start)
   const end = hasStart ? input.frames.end : null
 
   return { ...input, references: [], frames: { start: input.frames.start, end } }
@@ -60,11 +61,11 @@ function normalizeAspect(params: NormalizeAspectParams): AspectChoice {
 }
 
 function normalizeFrames(frames: FrameSlots, preset: ModelPreset): FrameSlots {
-  if (!preset.frames.start || isNil(frames.start) || frames.start === '') {
+  if (!preset.frames.start || !isNonEmptyString(frames.start)) {
     return { start: null, end: null }
   }
 
-  if (!preset.frames.end || isNil(frames.end) || frames.end === '') {
+  if (!preset.frames.end || !isNonEmptyString(frames.end)) {
     return { start: frames.start, end: null }
   }
 

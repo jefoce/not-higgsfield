@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useMemo } from 'react'
-import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
+import { isNonEmptyString } from '@/core/guards'
 import type { KindExtensions } from '@/core/media-kinds'
 import { MEDIA_KINDS } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
@@ -29,8 +29,8 @@ function route(items: UploadItem[]): void {
   const preset = getPreset(state.presetId)
   let slot: 'start' | 'end' = 'start'
 
-  const hasStart = !isNil(state.frames.start) && state.frames.start !== ''
-  const hasEnd = !isNil(state.frames.end) && state.frames.end !== ''
+  const hasStart = isNonEmptyString(state.frames.start)
+  const hasEnd = isNonEmptyString(state.frames.end)
 
   if (hasStart && preset.frames.end && !hasEnd) {
     slot = 'end'

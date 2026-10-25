@@ -2,6 +2,7 @@
 
 import { isNil } from 'lodash-es'
 
+import { isNonEmptyString } from '@/core/guards'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { mediaUrl, thumbUrl } from '@/lib/api/media-urls'
 import { cn } from '@/lib/cn'
@@ -100,7 +101,7 @@ function thumbTitle(params: ThumbTitleParams): string {
     return 'File deleted'
   }
 
-  if (!isNil(label) && label !== '') {
+  if (isNonEmptyString(label)) {
     return `${label} \u00b7 ${name}`
   }
 
@@ -146,7 +147,7 @@ function thumbMedia(params: ThumbMediaParams): ThumbMedia {
 }
 
 function thumbContent(title: string, note?: string): string {
-  if (isNil(note) || note === '') {
+  if (!isNonEmptyString(note)) {
     return title
   }
 

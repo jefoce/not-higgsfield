@@ -1,5 +1,4 @@
-import { isNil } from 'lodash-es'
-
+import { isNonEmptyString } from '@/core/guards'
 import { streamFile } from '@/server/fs/range-response'
 import { errorResponse, jsonError, type KeyRouteContext } from '@/server/http'
 import { assertLocalRequest } from '@/server/request-guard'
@@ -34,7 +33,7 @@ async function handle(request: Request, keyParts: string[]): Promise<Response> {
 
     const file = mockObjectPath(key)
 
-    if (isNil(file) || file === '') {
+    if (!isNonEmptyString(file)) {
       return jsonError({ status: 404, error: 'Object not found' })
     }
 

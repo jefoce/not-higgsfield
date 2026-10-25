@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { HISTORY_SCROLL_DELAY_MS } from '@/core/constants'
+import { isNonEmptyString } from '@/core/guards'
 import type { GenerationRecord, JobStatus } from '@/core/schemas/generation-record'
 import { truncate } from '@/lib/format'
 import { readLocal, writeLocal } from '@/lib/local-store'
@@ -39,7 +40,7 @@ function scrollToRecord(id: string): void {
 function readLastSeen(): number | null {
   const value = readLocal(LAST_SEEN_KEY, LAST_SEEN_VALUE).value
 
-  if (isNil(value) || value === '') {
+  if (!isNonEmptyString(value)) {
     return null
   }
 

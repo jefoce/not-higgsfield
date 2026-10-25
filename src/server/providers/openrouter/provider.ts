@@ -5,11 +5,12 @@ import { z } from 'zod'
 
 import { FETCH_TIMEOUTS } from '@/core/constants'
 import { messageOf } from '@/core/errors'
+import { isNonEmptyString } from '@/core/guards'
 import type { ModelPreset } from '@/core/presets/types'
 import { asJobStatus } from '@/core/submit-state'
 import type { PricingInfo, TestResult } from '@/core/types'
 
-import { getSecret, isNonEmptyString } from '../../secrets'
+import { getSecret } from '../../secrets'
 import type {
   AccountLookupParams,
   ContentRequest,
@@ -172,7 +173,7 @@ function getPricing(preset: ModelPreset, isForce?: boolean): Promise<PricingInfo
 async function testConnection(): Promise<TestResult> {
   const key = getSecret('OPENROUTER_API_KEY')
 
-  if (isNil(key) || key === '') {
+  if (!isNonEmptyString(key)) {
     return { ok: false, error: 'OpenRouter key is not set. Open Settings.' }
   }
 
@@ -190,7 +191,7 @@ async function testConnection(): Promise<TestResult> {
     const parsed = KeySchema.safeParse(await res.json().catch(() => null))
     const label = parsed.success ? parsed.data.data.label : undefined
 
-    if (isNil(label) || label === '') {
+    if (!isNonEmptyString(label)) {
       return { ok: true }
     }
 

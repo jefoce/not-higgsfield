@@ -1,10 +1,10 @@
 'use client'
 
 import { useCallback, useEffect, useMemo } from 'react'
-import { isNil } from 'lodash-es'
 import useSWRInfinite from 'swr/infinite'
 
 import { HISTORY_PAGE_SIZE } from '@/core/constants'
+import { isNonEmptyString } from '@/core/guards'
 import { countActive } from '@/core/history-filters'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import type { GenerationListResult } from '@/core/types'
@@ -19,7 +19,7 @@ function historyKey(filters: ViewFilters): string {
   const params = new URLSearchParams({ limit: String(HISTORY_PAGE_SIZE) })
   const query = filters.q?.trim()
 
-  if (!isNil(query) && query !== '') {
+  if (isNonEmptyString(query)) {
     params.set('q', query)
   }
 
@@ -30,7 +30,7 @@ function historyKey(filters: ViewFilters): string {
   for (const [key, fallback] of FILTER_PARAMS) {
     const value = filters[key]
 
-    if (!isNil(value) && value !== '' && value !== fallback) {
+    if (isNonEmptyString(value) && value !== fallback) {
       params.set(key, value)
     }
   }
@@ -80,7 +80,7 @@ export function useHistory(): HistoryResult {
   useHistoryPoll({ activeCount, records, mutate })
 
   const loadMore = useCallback(() => {
-    if (isNil(nextCursor) || nextCursor === '' || isValidating) {
+    if (!isNonEmptyString(nextCursor) || isValidating) {
       return
     }
 

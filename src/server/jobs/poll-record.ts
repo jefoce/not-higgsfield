@@ -3,6 +3,7 @@ import 'server-only'
 import { isNil } from 'lodash-es'
 
 import { MAX_JOB_AGE_MIN } from '@/core/constants'
+import { isNonEmptyString } from '@/core/guards'
 import { recordProvider } from '@/core/providers/registry'
 import type { GenerationRecord, JobStatus, RecordJob } from '@/core/schemas/generation-record'
 
@@ -20,7 +21,7 @@ const RETRY_KINDS: readonly ProviderErrorKind[] = ['timeout', 'rate_limit', 'ser
 export async function processRecord(record: GenerationRecord): Promise<void> {
   const current = record.job
 
-  if (isNil(current) || current.id === '') {
+  if (isNil(current) || !isNonEmptyString(current.id)) {
     return
   }
 
@@ -95,7 +96,7 @@ function prepareNext(params: PrepareNextParams): PreparedRecord {
     expiresAt: job.expiresAt ?? current.expiresAt,
   }
 
-  if (status === 'in_progress' && (isNil(current.startedAt) || current.startedAt === '')) {
+  if (status === 'in_progress' && !isNonEmptyString(current.startedAt)) {
     jobFields.startedAt = now
   }
 

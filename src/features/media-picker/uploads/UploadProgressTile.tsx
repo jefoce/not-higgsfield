@@ -3,6 +3,7 @@
 import { isNil } from 'lodash-es'
 import { X } from 'lucide-react'
 
+import { isNonEmptyString } from '@/core/guards'
 import { cn } from '@/lib/cn'
 
 import { ProgressRing } from './ProgressRing'
@@ -23,7 +24,7 @@ export interface UploadProgressTileProps {
 /** Dashed placeholder for a file being copied into app storage. */
 export function UploadProgressTile(props: UploadProgressTileProps) {
   const { item } = props
-  const hasError = !isNil(item.error) && item.error !== ''
+  const hasError = isNonEmptyString(item.error)
 
   return (
     <div

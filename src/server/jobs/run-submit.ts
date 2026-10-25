@@ -3,6 +3,7 @@ import 'server-only'
 import { isNil } from 'lodash-es'
 
 import { MAX_REQUEST_MB } from '@/core/constants'
+import { isNonEmptyString } from '@/core/guards'
 import { getPreset } from '@/core/presets'
 import type { GenerationInput, GenerationRecord } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
@@ -168,7 +169,7 @@ async function complete(id: string, response: SubmittedJob): Promise<GenerationR
 
 async function fail(id: string, error: unknown): Promise<void> {
   await updateSubmit(id, (record) => {
-    if (record.status !== 'submitting' || (!isNil(record.job) && record.job.id !== '')) {
+    if (record.status !== 'submitting' || isNonEmptyString(record.job?.id)) {
       return null
     }
 
@@ -201,7 +202,7 @@ export function submitError(error: unknown): string {
 function formatError(error: ProviderError): string {
   const { code } = error
   const message = error.message === '' ? `HTTP ${error.status}` : error.message
-  const isCodeUseful = !isNil(code) && code !== '' && code !== String(error.status)
+  const isCodeUseful = isNonEmptyString(code) && code !== String(error.status)
 
   if (isCodeUseful) {
     return `${code}: ${message}`

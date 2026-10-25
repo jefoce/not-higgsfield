@@ -1,6 +1,7 @@
 import { isNil } from 'lodash-es'
 
 import { GRACE_STALE_MS } from './constants'
+import { isNonEmptyString } from './guards'
 import type { ModelPreset } from './presets/types'
 import { primaryBinding } from './pricing'
 import type {
@@ -13,7 +14,7 @@ import type { UploadItem } from './schemas/upload-item'
 import { type ResolvedTransport, resolveTransport } from './transport'
 
 function parseNotBefore(notBefore: string | undefined): number {
-  if (isNil(notBefore) || notBefore === '') {
+  if (!isNonEmptyString(notBefore)) {
     return Number.NaN
   }
 
@@ -51,7 +52,7 @@ export function canCancelInGrace(
 ): boolean {
   return (
     record.status === 'submitting' &&
-    (isNil(record.job?.id) || record.job?.id === '') &&
+    !isNonEmptyString(record.job?.id) &&
     record.submit?.stage === 'grace'
   )
 }

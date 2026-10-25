@@ -1,8 +1,7 @@
 import 'server-only'
 
-import { isNil } from 'lodash-es'
-
 import { POLL_INTERVAL_MS, POLL_PARALLEL } from '@/core/constants'
+import { isNonEmptyString } from '@/core/guards'
 import { ACTIVE_STATUSES } from '@/core/types'
 
 import { globalState } from '../global-state'
@@ -163,7 +162,7 @@ async function processById(id: string): Promise<void> {
     return
   }
 
-  if (isNil(record.job) || record.job.id === '') {
+  if (!isNonEmptyString(record.job?.id)) {
     if (needsInterruptFail(record)) {
       await saveGeneration({
         ...record,

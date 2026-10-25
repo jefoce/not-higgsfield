@@ -8,7 +8,7 @@ import path from 'node:path'
 import { isNil, isString } from 'lodash-es'
 
 import { FETCH_TIMEOUTS, MOCK_GENERATE_MS, MOCK_QUEUE_MS } from '@/core/constants'
-import { isRecord } from '@/core/guards'
+import { isNonEmptyString, isRecord } from '@/core/guards'
 import type { ModelPreset } from '@/core/presets/types'
 import { primaryBinding } from '@/core/pricing'
 import { asJobStatus } from '@/core/submit-state'
@@ -238,7 +238,7 @@ function mockStarted(id: string, submittedAt?: string): number {
     return stored
   }
 
-  const isParsed = isNil(submittedAt) || submittedAt === ''
+  const isParsed = !isNonEmptyString(submittedAt)
   let parsed = Number.NaN
 
   if (!isParsed) {

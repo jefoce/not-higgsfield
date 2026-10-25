@@ -1,6 +1,7 @@
 import { clamp, filter, isEmpty, isNil, orderBy } from 'lodash-es'
 
 import { HISTORY_MAX_PAGE_SIZE, HISTORY_PAGE_SIZE } from './constants'
+import { isNonEmptyString } from './guards'
 import type { GenerationInput, GenerationRecord, JobStatus } from './schemas/generation-record'
 import { ACTIVE_STATUSES, type HistoryFilters, type HistoryMode, type StatusFilter } from './types'
 
@@ -36,7 +37,7 @@ const activeMode = (filters: HistoryFilters): HistoryMode | null => {
 const matchesQuery = (record: GenerationRecord, filters: HistoryFilters): boolean => {
   const q = filters.q?.trim().toLowerCase()
 
-  if (isNil(q) || q === '') {
+  if (!isNonEmptyString(q)) {
     return true
   }
 
@@ -44,7 +45,7 @@ const matchesQuery = (record: GenerationRecord, filters: HistoryFilters): boolea
 }
 
 const matchesModel = (record: GenerationRecord, filters: HistoryFilters): boolean =>
-  isNil(filters.model) || filters.model === '' || record.input.presetId === filters.model
+  !isNonEmptyString(filters.model) || record.input.presetId === filters.model
 
 const matchesFavorite = (record: GenerationRecord, filters: HistoryFilters): boolean =>
   isNil(filters.favorite) || record.favorite === filters.favorite
@@ -143,7 +144,7 @@ interface Cursor {
 }
 
 function parseCursor(cursor: string | null | undefined): Cursor | null {
-  if (isNil(cursor) || cursor === '') {
+  if (!isNonEmptyString(cursor)) {
     return null
   }
 

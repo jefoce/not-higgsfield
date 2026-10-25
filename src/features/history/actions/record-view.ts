@@ -1,6 +1,7 @@
 import { isNil } from 'lodash-es'
 
 import { POSTER_WIDTHS, PREVIEW_WIDTH } from '@/core/constants'
+import { isNonEmptyString } from '@/core/guards'
 import type { MediaKindCounts } from '@/core/media-types'
 import { findPreset } from '@/core/presets'
 import { canonicalizePrompt, referenceSlots, type RefSlot } from '@/core/prompt-tokens'
@@ -19,7 +20,7 @@ export function isSelectable(record: GenerationRecord): boolean {
 
 /** Friendly error for a record, or null when there is no raw text. */
 export function recordError(record: GenerationRecord): FriendlyError | null {
-  if (isNil(record.error) || record.error === '') {
+  if (!isNonEmptyString(record.error)) {
     return null
   }
 
@@ -76,7 +77,7 @@ function posterWidth(widthPx: number): number {
 export function posterSrc(record: GenerationRecord, widthPx = PREVIEW_WIDTH): string | undefined {
   const preview = record.output?.preview
 
-  if (isNil(preview) || preview === '') {
+  if (!isNonEmptyString(preview)) {
     return undefined
   }
 

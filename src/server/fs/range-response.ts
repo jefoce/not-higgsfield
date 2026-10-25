@@ -7,6 +7,7 @@ import { Readable } from 'node:stream'
 
 import { isNil } from 'lodash-es'
 
+import { isNonEmptyString } from '@/core/guards'
 import { mimeFromExt } from '@/core/media-kinds'
 
 interface Range {
@@ -78,11 +79,11 @@ function buildHeaders(params: BuildHeadersParams): Headers {
     'Content-Type': mimeFromExt(path.extname(absPath)) ?? 'application/octet-stream',
   })
 
-  if (!isNil(opts.cacheControl) && opts.cacheControl !== '') {
+  if (isNonEmptyString(opts.cacheControl)) {
     headers.set('Cache-Control', opts.cacheControl)
   }
 
-  if (!isNil(opts.downloadName) && opts.downloadName !== '') {
+  if (isNonEmptyString(opts.downloadName)) {
     headers.set('Content-Disposition', `attachment; filename="${sanitizeName(opts.downloadName)}"`)
   }
 
@@ -104,7 +105,7 @@ interface RangeResponseParams {
 function rangeResponse(params: RangeResponseParams): Response {
   const { absPath, request, headers, rangeHeader, range, size } = params
 
-  if (!isNil(rangeHeader) && rangeHeader !== '' && isNil(range)) {
+  if (isNonEmptyString(rangeHeader) && isNil(range)) {
     headers.set('Content-Range', `bytes */${size}`)
     headers.set('Content-Length', '0')
 
@@ -192,7 +193,7 @@ function parseBounds(params: ParseBoundsParams): Range | null {
 
 /** Weak comparison against a comma-separated If-None-Match list. */
 function isNotModified(header: string | null, etag: string): boolean {
-  if (isNil(header) || header === '') {
+  if (!isNonEmptyString(header)) {
     return false
   }
 

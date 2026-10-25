@@ -1,4 +1,6 @@
-import { isNil, isUndefined } from 'lodash-es'
+import { isUndefined } from 'lodash-es'
+
+import { isNonEmptyString } from '@/core/guards'
 
 interface ApiErrorParams {
   status: number
@@ -67,7 +69,7 @@ export async function apiRequest<T>(url: string, init?: RequestInit): Promise<T>
   const body = init?.body
   const isForm = body instanceof FormData
 
-  if (!isNil(body) && body !== '' && !isForm && !headers.has('Content-Type')) {
+  if (isNonEmptyString(body) && !isForm && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
   }
 

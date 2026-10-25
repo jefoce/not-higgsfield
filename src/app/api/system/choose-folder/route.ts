@@ -1,6 +1,6 @@
-import { isNil } from 'lodash-es'
 import { z } from 'zod'
 
+import { isNonEmptyString } from '@/core/guards'
 import { errorResponse, zodError } from '@/server/http'
 import { addFolder } from '@/server/repos/folders'
 import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
     const path = await getSystem().chooseFolder({ prompt: PROMPT })
 
-    if (isNil(path) || path === '') {
+    if (!isNonEmptyString(path)) {
       return Response.json(null, { status: 201 })
     }
 

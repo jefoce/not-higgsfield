@@ -3,6 +3,7 @@ import 'server-only'
 import { isNil } from 'lodash-es'
 
 import { SUBMIT_YIELD_MS } from '@/core/constants'
+import { isNonEmptyString } from '@/core/guards'
 import { graceDelayMs } from '@/core/submit-state'
 
 import { globalState } from '../global-state'
@@ -162,7 +163,7 @@ function drain(): void {
   while (!state.closed && state.active.size < MAX_CONCURRENT && state.pending.size > 0) {
     const id = state.pending.values().next().value
 
-    if (isNil(id) || id === '') {
+    if (!isNonEmptyString(id)) {
       return
     }
 

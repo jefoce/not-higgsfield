@@ -1,9 +1,9 @@
 'use client'
 
 import { forwardRef } from 'react'
-import { isNil } from 'lodash-es'
 import { Eye, EyeOff } from 'lucide-react'
 
+import { isNonEmptyString } from '@/core/guards'
 import { cn } from '@/lib/cn'
 import { useBoolean } from '@/lib/use-boolean'
 
@@ -14,7 +14,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
   function PasswordInput(props, ref) {
     const { className, disabled: isDisabled, value, ...rest } = props
     const reveal = useBoolean()
-    const isValueEmpty = isNil(value) || value === ''
+    const isValueEmpty = !isNonEmptyString(value)
 
     const handleToggleReveal = () => reveal.toggle()
 

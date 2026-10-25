@@ -5,6 +5,7 @@ import fs from 'node:fs/promises'
 
 import { filter, isNil, orderBy } from 'lodash-es'
 
+import { isNonEmptyString } from '@/core/guards'
 import { extWithDot, kindFromExt, mimeFromExt } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 import type { UploadItem } from '@/core/schemas/upload-item'
@@ -43,7 +44,7 @@ export async function saveFileUpload(params: SaveFileUploadParams): Promise<Uplo
     throw new UploadError(400, `Unsupported file type: ${ext}`)
   }
 
-  if (isNil(mime) || mime === '') {
+  if (!isNonEmptyString(mime)) {
     throw new UploadError(400, `Unsupported file type: ${ext}`)
   }
 
@@ -129,7 +130,7 @@ async function withMissing(item: UploadItem): Promise<UploadItem> {
 
   let check = uploadPaths(item.id, item.ext).media
 
-  if (item.source === 'link' && !isNil(item.target) && item.target !== '' && mode === 'symlink') {
+  if (item.source === 'link' && isNonEmptyString(item.target) && mode === 'symlink') {
     check = item.target
   }
 

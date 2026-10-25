@@ -4,9 +4,8 @@ import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 
-import { isNil } from 'lodash-es'
-
 import { UPLOAD_CLEANUP_MS } from '@/core/constants'
+import { isNonEmptyString } from '@/core/guards'
 
 const envRoot = process.env.STORAGE_ROOT?.trim()
 const defaultRoot = path.join(os.homedir(), '.not-higgsfield')
@@ -15,7 +14,7 @@ const defaultRoot = path.join(os.homedir(), '.not-higgsfield')
 export const STORAGE_ROOT = storageRoot()
 
 function storageRoot(): string {
-  if (isNil(envRoot) || envRoot === '') {
+  if (!isNonEmptyString(envRoot)) {
     return defaultRoot
   }
 

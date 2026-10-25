@@ -20,6 +20,7 @@ import {
 import { $isBeautifulMentionNode, useBeautifulMentions } from 'lexical-beautiful-mentions'
 import { isNil } from 'lodash-es'
 
+import { isNonEmptyString } from '@/core/guards'
 import { referenceSlots, type RefSlot, slotLabel } from '@/core/prompt-tokens'
 
 import { useGeneratorStore } from '../store/store'
@@ -76,7 +77,7 @@ function focusSlotInEditor(params: FocusSlotParams): void {
   let key: string | null = null
 
   const handleUpdate = (): void => {
-    if (isNil(key) || key === '') {
+    if (!isNonEmptyString(key)) {
       return
     }
 

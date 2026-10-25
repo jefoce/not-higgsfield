@@ -10,6 +10,7 @@ import type { ReadableStream } from 'node:stream/web'
 import { isNil } from 'lodash-es'
 
 import { FETCH_TIMEOUTS, MAX_DOWNLOAD_RETRIES } from '@/core/constants'
+import { isNonEmptyString } from '@/core/guards'
 import { COPY_EXPIRED_TEXT } from '@/core/provider-errors/app'
 import { recordProvider } from '@/core/providers/registry'
 import type { GenerationRecord, RecordOutput } from '@/core/schemas/generation-record'
@@ -293,7 +294,7 @@ async function openContent(params: DownloadParams): Promise<Response> {
   } catch (error) {
     const url = job.urls?.[0]
 
-    if (isNil(url) || url === '') {
+    if (!isNonEmptyString(url)) {
       throw error
     }
 

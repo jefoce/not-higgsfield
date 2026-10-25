@@ -6,6 +6,7 @@ import type { StateCreator } from 'zustand'
 
 import { SEED_MAX } from '@/core/constants'
 import { maxDurationFor } from '@/core/duration-limits'
+import { isNonEmptyString } from '@/core/guards'
 import { clampDuration, normalizeForPreset } from '@/core/normalize-input'
 import { findPreset, getPreset } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
@@ -50,8 +51,7 @@ function nextTabState(params: NextTabStateParams): Partial<GeneratorState> {
   const { state, preset, tab } = params
 
   const isInvalid =
-    state.aspectRatio === 'auto' &&
-    (tab !== 'frames' || isNil(state.frames.start) || state.frames.start === '')
+    state.aspectRatio === 'auto' && (tab !== 'frames' || !isNonEmptyString(state.frames.start))
 
   const aspectRatio = isInvalid ? preset.defaultAspectRatio : state.aspectRatio
 

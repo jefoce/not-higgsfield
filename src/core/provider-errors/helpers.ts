@@ -1,4 +1,4 @@
-import { isNil } from 'lodash-es'
+import { isNonEmptyString } from '../guards'
 
 const SEEDANCE_SUBJECT = {
   Image: 'image',
@@ -33,7 +33,7 @@ function parameterName(raw: string): string | null {
 export function settingTitle(provider: string, raw: string): string {
   const name = parameterName(raw)
 
-  if (isNil(name) || name === '') {
+  if (!isNonEmptyString(name)) {
     return `${provider} rejected a setting.`
   }
 

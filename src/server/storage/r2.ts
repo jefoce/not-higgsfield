@@ -2,10 +2,11 @@ import 'server-only'
 
 import { isNil } from 'lodash-es'
 
+import { isNonEmptyString } from '@/core/guards'
 import type { SecretName } from '@/core/secret-names'
 import type { TestResult } from '@/core/types'
 
-import { getSecret, isNonEmptyString } from '../secrets'
+import { getSecret } from '../secrets'
 import { createS3Store, type S3StoreConfig } from './s3-store'
 
 const MISSING_ORDER: readonly SecretName[] = [

@@ -3,7 +3,7 @@ import 'server-only'
 import type { Entry } from '@napi-rs/keyring'
 import { isNil, isString } from 'lodash-es'
 
-import { isRecord } from '@/core/guards'
+import { isNonEmptyString, isRecord } from '@/core/guards'
 import { SECRET_NAMES, type SecretName } from '@/core/secret-names'
 
 import type { SecretBackend } from './types'
@@ -90,7 +90,7 @@ function migrate(Entry: EntryCtor): Values {
     const previous = new Entry(SERVICE, name)
     const value = previous.getPassword()
 
-    if (isNil(value) || value === '') {
+    if (!isNonEmptyString(value)) {
       continue
     }
 

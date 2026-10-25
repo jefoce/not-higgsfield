@@ -4,7 +4,7 @@ import readline from 'node:readline'
 
 import { isBoolean, isNil, isString, isUndefined } from 'lodash-es'
 
-import { isRecord } from '@/core/guards'
+import { isNonEmptyString, isRecord } from '@/core/guards'
 import { SECRET_NAMES, type SecretName } from '@/core/secret-names'
 
 import type { SecretBackend } from './types'
@@ -164,7 +164,7 @@ function hasReplyShape(reply: Partial<Reply>): boolean {
 }
 
 function parseAll(raw: string | null | undefined): Partial<Record<SecretName, string>> {
-  if (isNil(raw) || raw === '') {
+  if (!isNonEmptyString(raw)) {
     return {}
   }
 

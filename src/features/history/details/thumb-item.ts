@@ -1,6 +1,7 @@
 import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
+import { isNonEmptyString } from '@/core/guards'
 import { referenceSlots, slotLabel } from '@/core/prompt-tokens'
 import type {
   GenerationRecord,
@@ -22,8 +23,7 @@ export interface ThumbItem {
   sent?: string
 }
 
-const isFilled = (value: string | null | undefined): value is string =>
-  !isNil(value) && value !== ''
+const isFilled = (value: string | null | undefined): value is string => isNonEmptyString(value)
 
 function sentNote(item: SnapshotItem | undefined): string | undefined {
   if (isNil(item)) {

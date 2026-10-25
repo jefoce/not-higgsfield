@@ -1,7 +1,6 @@
 import 'server-only'
 
-import { isNil } from 'lodash-es'
-
+import { isNonEmptyString } from '@/core/guards'
 import { INTERRUPT_SENDING_TEXT } from '@/core/provider-errors/app'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { isStaleGrace } from '@/core/submit-state'
@@ -74,7 +73,7 @@ export function needsInterruptFail(record: GenerationRecord): boolean {
 
   return (
     record.status === 'submitting' &&
-    (isNil(record.job) || record.job.id === '') &&
+    !isNonEmptyString(record.job?.id) &&
     (stage === 'uploading' || stage === 'sending') &&
     !isSubmitOwned(record.id)
   )

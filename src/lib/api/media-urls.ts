@@ -1,6 +1,7 @@
 import { isEmpty, isNil } from 'lodash-es'
 
 import { THUMB_WIDTH } from '@/core/constants'
+import { isNonEmptyString } from '@/core/guards'
 import { canPlay } from '@/lib/media-support'
 
 const encodeRef = (ref: string): string => ref.split('/').map(encodeURIComponent).join('/')
@@ -19,7 +20,7 @@ export function mediaUrl(ref: string, mime?: string): string {
 
   const plainUrl = isPlainUrl ? base : `${base}?${query}`
 
-  if (isNil(mime) || mime === '' || canPlay(mime)) {
+  if (!isNonEmptyString(mime) || canPlay(mime)) {
     return plainUrl
   }
 

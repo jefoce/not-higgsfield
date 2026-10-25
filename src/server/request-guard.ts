@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { isNil } from 'lodash-es'
+import { isNonEmptyString } from '@/core/guards'
 
 import { HttpError, RequestBodyError } from './errors'
 import { hasSession } from './session'
@@ -36,11 +36,11 @@ function assertSameOrigin(request: Request): void {
   const site = request.headers.get('sec-fetch-site')
   const origin = request.headers.get('origin')
 
-  if (!isNil(site) && site !== '' && site !== 'same-origin' && site !== 'none') {
+  if (isNonEmptyString(site) && site !== 'same-origin' && site !== 'none') {
     throw new HttpError(403, 'Cross-site request')
   }
 
-  if (!isNil(origin) && origin !== '' && !LOCAL_HOSTS.has(new URL(origin).hostname)) {
+  if (isNonEmptyString(origin) && !LOCAL_HOSTS.has(new URL(origin).hostname)) {
     throw new HttpError(403, 'Bad origin')
   }
 }

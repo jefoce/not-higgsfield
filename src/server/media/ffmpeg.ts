@@ -10,6 +10,7 @@ import { isEmpty, isNil } from 'lodash-es'
 
 import { FFMPEG_TIMEOUTS, PREVIEW_WIDTH } from '@/core/constants'
 import type { PixelSize } from '@/core/geometry'
+import { isNonEmptyString } from '@/core/guards'
 
 const MAX_BUFFER = 16 * 1024 * 1024
 
@@ -201,7 +202,7 @@ export async function probeMedia(filePath: string): Promise<MediaProbe> {
   const videoLine = lines.find((line) => line.includes('Video:'))
   let candidates = lines
 
-  if (!isNil(videoLine) && videoLine !== '') {
+  if (isNonEmptyString(videoLine)) {
     candidates = [videoLine, ...lines]
   }
 

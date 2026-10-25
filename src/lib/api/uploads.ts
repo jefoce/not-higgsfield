@@ -1,5 +1,6 @@
 import { isEmpty, isNil } from 'lodash-es'
 
+import { isNonEmptyString } from '@/core/guards'
 import type { MediaKind } from '@/core/media-types'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { apiDelete, apiPost, fetcher } from '@/lib/fetcher'
@@ -14,7 +15,7 @@ export function withQuery(base: string, params: Record<string, string | undefine
   const query = new URLSearchParams()
 
   for (const [key, value] of Object.entries(params)) {
-    if (!isNil(value) && value !== '') {
+    if (isNonEmptyString(value)) {
       query.set(key, value)
     }
   }

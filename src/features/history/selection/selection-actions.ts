@@ -1,6 +1,7 @@
 import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
+import { isNonEmptyString } from '@/core/guards'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { toastError } from '@/lib/notify'
 import { platform } from '@/lib/platform'
@@ -37,7 +38,7 @@ export async function downloadSelected(selected: GenerationRecord[]): Promise<vo
       return
     }
 
-    if (!isNil(result.folder) && result.folder !== '') {
+    if (isNonEmptyString(result.folder)) {
       toast.success(`${pluralVideos(result.saved)} saved to ${result.folder}`)
 
       return

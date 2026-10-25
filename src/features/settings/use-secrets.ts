@@ -5,6 +5,7 @@ import { isNil } from 'lodash-es'
 import useSWR from 'swr'
 import { z } from 'zod'
 
+import { isNonEmptyString } from '@/core/guards'
 import { STORAGE_PROVIDER_IDS } from '@/core/providers/types'
 import type { SecretBackend, SecretStatus, TestResult } from '@/core/types'
 import { fetchSecrets } from '@/lib/api/settings'
@@ -69,7 +70,7 @@ export function testLine(target: SettingsSection, result: TestResult): TestMessa
     return { tone: 'ok', text }
   }
 
-  if (!isNil(result.label) && result.label !== '') {
+  if (isNonEmptyString(result.label)) {
     return { tone: 'ok', text: `Key works (label: "${result.label}")` }
   }
 

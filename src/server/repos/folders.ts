@@ -7,6 +7,7 @@ import path from 'node:path'
 
 import { isNil, orderBy } from 'lodash-es'
 
+import { isNonEmptyString } from '@/core/guards'
 import { kindFromName } from '@/core/media-kinds'
 import type { FolderDir, FolderFile, FolderListing, MediaKind } from '@/core/media-types'
 import { type FolderItem, FoldersFileSchema } from '@/core/schemas/folder-item'
@@ -49,7 +50,7 @@ export async function addFolder(params: AddFolderParams): Promise<FolderItem> {
 
   const real = await fs.realpath(requested).catch(() => null)
 
-  if (isNil(real) || real === '') {
+  if (!isNonEmptyString(real)) {
     throw new FolderError(404, 'Folder not found')
   }
 
@@ -223,7 +224,7 @@ async function classifySymlink(params: ClassifyEntryParams): Promise<EntryOutcom
 
   const real = await fs.realpath(full).catch(() => null)
 
-  if (isNil(real) || real === '' || !isInside(rootReal, real)) {
+  if (!isNonEmptyString(real) || !isInside(rootReal, real)) {
     return { isFile: false }
   }
 

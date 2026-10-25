@@ -3,6 +3,7 @@ import 'server-only'
 import { isNil } from 'lodash-es'
 import type { ZodError } from 'zod'
 
+import { isNonEmptyString } from '@/core/guards'
 import { MEDIA_KINDS } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 
@@ -86,7 +87,7 @@ export function zodError(error: ZodError): Response {
 
 /** Keeps known media kinds from a comma-separated query value. */
 export function parseKinds(value: string | null): MediaKind[] {
-  if (isNil(value) || value === '') {
+  if (!isNonEmptyString(value)) {
     return []
   }
 

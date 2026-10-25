@@ -1,5 +1,6 @@
 import { isNil } from 'lodash-es'
 
+import { isNonEmptyString } from './guards'
 import type { MediaKind } from './media-types'
 
 export const MEDIA_KINDS = ['image', 'video', 'audio'] as const satisfies readonly MediaKind[]
@@ -115,7 +116,7 @@ export function kindFromFile(file: FileInfo): MediaKind | null {
 
   const ext = Object.entries(MIME_TYPES).find(([, mime]) => mime === file.type)?.[0]
 
-  if (isNil(ext) || ext === '') {
+  if (!isNonEmptyString(ext)) {
     return null
   }
 

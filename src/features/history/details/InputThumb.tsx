@@ -1,8 +1,8 @@
 'use client'
 
 import { type KeyboardEvent, useState } from 'react'
-import { isNil } from 'lodash-es'
 
+import { isNonEmptyString } from '@/core/guards'
 import { cn } from '@/lib/cn'
 import { Tooltip } from '@/ui/Tooltip'
 
@@ -36,7 +36,7 @@ export function InputThumb(props: InputThumbProps) {
 
   const title = `${item.label} \u00b7 ${item.name}`
   const sent = item.sent
-  const isContent = isNil(sent) || sent === ''
+  const isContent = !isNonEmptyString(sent)
 
   const content = isContent ? title : `${title} \u00b7 ${sent}`
 

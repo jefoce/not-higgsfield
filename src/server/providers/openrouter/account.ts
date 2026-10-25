@@ -4,9 +4,10 @@ import { z } from 'zod'
 
 import { FETCH_TIMEOUTS } from '@/core/constants'
 import { messageOf } from '@/core/errors'
+import { isNonEmptyString } from '@/core/guards'
 
 import { globalState } from '../../global-state'
-import { getSecret, isNonEmptyString, onSecretsChange, secretsReady } from '../../secrets'
+import { getSecret, onSecretsChange, secretsReady } from '../../secrets'
 import type { AccountLookupParams, ProviderAccount } from '../types'
 
 const BASE_URL = 'https://openrouter.ai'
