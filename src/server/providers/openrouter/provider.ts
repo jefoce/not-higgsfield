@@ -216,9 +216,5 @@ function toExpiresAt(value: number | undefined): number | null {
 }
 
 function rethrowClassified(error: unknown): never {
-  if (error instanceof OpenRouterError) {
-    throw classifyOpenRouterError(error)
-  }
-
-  throw error
+  throw classifyOpenRouterError(error)
 }

@@ -57,13 +57,30 @@ describe('classifyOpenRouterError', () => {
     expect(error.code).toBe(code ?? null)
   })
 
-  it('classifies a non-provider error as unknown with status 0', () => {
-    const error = classifyOpenRouterError(new Error('boom'))
+  it('maps a fetch failure to timeout with status 0', () => {
+    const error = new TypeError('fetch failed', { cause: new Error('connect ECONNREFUSED') })
 
-    expect(error.kind).toBe('unknown')
-    expect(error.status).toBe(0)
-    expect(error.message).toBe('boom')
-    expect(error.storedMessage).toBe('boom')
-    expect(error.code).toBeNull()
+    const mapped = classifyOpenRouterError(error)
+
+    expect(mapped).toBeInstanceOf(ProviderError)
+    expect(mapped.providerId).toBe('openrouter')
+    expect(mapped.kind).toBe('timeout')
+    expect(mapped.message).toBe('fetch failed')
+    expect(mapped.storedMessage).toBe('fetch failed')
+    expect(mapped.status).toBe(0)
+    expect(mapped.code).toBeNull()
+  })
+
+  it('rethrows an ordinary error unchanged', () => {
+    const error = new Error('boom')
+    let caught: unknown
+
+    try {
+      classifyOpenRouterError(error)
+    } catch (thrown) {
+      caught = thrown
+    }
+
+    expect(caught).toBe(error)
   })
 })

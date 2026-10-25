@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { isNil } from 'lodash-es'
+
 import type { ProviderErrorKind } from '../provider-error'
 import { ProviderError } from '../provider-error'
 import { OpenRouterError } from './error'
@@ -65,20 +67,27 @@ function kindFor(error: OpenRouterError): ProviderErrorKind {
   return STATUS_KINDS[status] ?? 'unknown'
 }
 
+function isFetchFailure(error: unknown): error is TypeError {
+  if (!(error instanceof TypeError)) {
+    return false
+  }
+
+  return !isNil(error.cause) && error.message === 'fetch failed'
+}
+
 export function classifyOpenRouterError(error: unknown): ProviderError {
-  if (!(error instanceof OpenRouterError)) {
+  if (error instanceof OpenRouterError) {
     return providerError({
-      kind: 'unknown',
-      message: error instanceof Error ? error.message : 'Unknown provider error',
-      status: 0,
-      code: null,
+      kind: kindFor(error),
+      message: error.message,
+      status: error.status,
+      code: error.code ?? null,
     })
   }
 
-  return providerError({
-    kind: kindFor(error),
-    message: error.message,
-    status: error.status,
-    code: error.code ?? null,
-  })
+  if (isFetchFailure(error)) {
+    return providerError({ kind: 'timeout', message: error.message, status: 0, code: null })
+  }
+
+  throw error
 }
