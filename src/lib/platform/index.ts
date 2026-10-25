@@ -4,15 +4,8 @@ import type { FolderItem } from '@/core/schemas/folder-item'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
 
-import type {
-  AppInfo,
-  AppUpdate,
-  ChooseFilesParams,
-  InstallResult,
-  Platform,
-  SavedVideos,
-  UpdateListener,
-} from './types'
+import type { ChooseFilesParams, Platform, SavedVideos, UpdateListener } from './types'
+import type { AppInfo, AppUpdate, InstallResult } from './update-schemas'
 
 let instance: Promise<Platform> | null = null
 

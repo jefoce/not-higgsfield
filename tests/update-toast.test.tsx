@@ -5,7 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useUpdateStore } from '@/features/updates/update-store'
 import { UpdateToast } from '@/features/updates/UpdateToast'
 import { useInstallUpdate } from '@/features/updates/use-install-update'
-import type { InstallResult, UpdateListener } from '@/lib/platform/types'
+import type { UpdateListener } from '@/lib/platform/types'
+import type { InstallResult } from '@/lib/platform/update-schemas'
 
 const platformMock = vi.hoisted(() => {
   return {

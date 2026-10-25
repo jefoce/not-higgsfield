@@ -1,6 +1,8 @@
 import { z } from 'zod'
 
-import { INSTALL_KINDS, UPDATE_PHASES } from './types'
+export const UPDATE_PHASES = ['downloading', 'installing'] as const
+
+export const INSTALL_KINDS = ['macos', 'windows', 'appimage', 'linux-package', 'browser'] as const
 
 const InstallKindSchema = z.enum(INSTALL_KINDS)
 
@@ -28,3 +30,11 @@ export const UpdateProgressSchema = z.object({
 export const InstallResultSchema = z.object({
   cancelled: z.boolean(),
 })
+
+export type AppInfo = z.infer<typeof AppInfoSchema>
+
+export type AppUpdate = z.infer<typeof AppUpdateSchema>
+
+export type UpdateProgress = z.infer<typeof UpdateProgressSchema>
+
+export type InstallResult = z.infer<typeof InstallResultSchema>

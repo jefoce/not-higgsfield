@@ -9,7 +9,8 @@ import {
   fetchSystemCapabilities,
 } from '@/lib/api/system'
 
-import type { AppInfo, InstallResult, Platform, UpdateListener } from './types'
+import type { Platform, UpdateListener } from './types'
+import type { AppInfo, InstallResult } from './update-schemas'
 
 const RELEASE_URL = 'https://github.com/jefoce/not-higgsfield/releases/latest'
 

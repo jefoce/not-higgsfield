@@ -3,7 +3,7 @@
 import { isNil } from 'lodash-es'
 import { create } from 'zustand'
 
-import type { AppInfo, AppUpdate, UpdateProgress } from '@/lib/platform/types'
+import type { AppInfo, AppUpdate, UpdateProgress } from '@/lib/platform/update-schemas'
 
 export type UpdateStatus =
   'idle' | 'checking' | 'available' | 'downloading' | 'installing' | 'upToDate' | 'error'

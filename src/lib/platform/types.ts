@@ -4,6 +4,8 @@ import type { FolderItem } from '@/core/schemas/folder-item'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
 
+import type { AppInfo, AppUpdate, InstallResult, UpdateProgress } from './update-schemas'
+
 export interface ChooseFilesParams {
   kinds: MediaKind[]
   multiple: boolean
@@ -14,37 +16,6 @@ export interface SavedVideos {
   saved: number
   folder?: string
 }
-
-export interface AppInfo {
-  version: string
-  installKind: InstallKind
-  autoCheck: boolean
-  lastCheck: string | null
-}
-
-export interface AppUpdate {
-  version: string
-  notes: string
-  date: string | null
-}
-
-export const UPDATE_PHASES = ['downloading', 'installing'] as const
-
-type UpdatePhase = (typeof UPDATE_PHASES)[number]
-
-export interface UpdateProgress {
-  downloaded: number
-  total: number | null
-  phase: UpdatePhase
-}
-
-export interface InstallResult {
-  cancelled: boolean
-}
-
-export const INSTALL_KINDS = ['macos', 'windows', 'appimage', 'linux-package', 'browser'] as const
-
-type InstallKind = (typeof INSTALL_KINDS)[number]
 
 export type UpdateListener = (progress: UpdateProgress) => void
 

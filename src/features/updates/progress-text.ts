@@ -1,6 +1,6 @@
 import { isNil } from 'lodash-es'
 
-import type { UpdateProgress } from '@/lib/platform/types'
+import type { UpdateProgress } from '@/lib/platform/update-schemas'
 
 /** Progress line shared by the App section and the install toast. */
 export function progressText(progress: UpdateProgress): string {

@@ -3,7 +3,7 @@
 import { isNil } from 'lodash-es'
 import { useShallow } from 'zustand/react/shallow'
 
-import type { AppUpdate, UpdateProgress } from '@/lib/platform/types'
+import type { AppUpdate, UpdateProgress } from '@/lib/platform/update-schemas'
 import { useNow } from '@/lib/use-now'
 import { Button } from '@/ui/Button'
 import { Switch } from '@/ui/form/Switch'

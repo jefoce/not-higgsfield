@@ -19,9 +19,10 @@ import { createFolder } from '@/lib/api/folders'
 import { exportBatch, exportRecord } from '@/lib/api/generations'
 
 import { linkPaths } from './link-paths'
-import type { InstallResult, Platform, UpdateListener } from './types'
+import type { Platform, UpdateListener } from './types'
 import {
   AppInfoSchema,
+  type InstallResult,
   InstallResultSchema,
   UpdateCheckSchema,
   UpdateProgressSchema,

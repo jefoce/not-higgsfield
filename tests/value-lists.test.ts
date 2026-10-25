@@ -18,7 +18,7 @@ import {
   STATUS_FILTERS,
 } from '@/core/types'
 import { HISTORY_VIEWS } from '@/features/history/list/view-store'
-import { INSTALL_KINDS, UPDATE_PHASES } from '@/lib/platform/types'
+import { INSTALL_KINDS, UPDATE_PHASES } from '@/lib/platform/update-schemas'
 
 describe('shared value lists', () => {
   it('keeps the accepted values', () => {
