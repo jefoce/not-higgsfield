@@ -25,7 +25,7 @@ export function useMediaWidth(ref: RefObject<HTMLDivElement | null>): number {
     observer.observe(node)
 
     return () => {
-      return observer.disconnect()
+      observer.disconnect()
     }
   }, [ref])
 

@@ -231,7 +231,7 @@ describe('mixed selection bar', () => {
     fireEvent.click(remove)
 
     await waitFor(() => {
-      return expect(apiPost).toHaveBeenCalledWith('/api/generations/batch', {
+      expect(apiPost).toHaveBeenCalledWith('/api/generations/batch', {
         action: 'delete',
         ids: ['a', 'b'],
       })

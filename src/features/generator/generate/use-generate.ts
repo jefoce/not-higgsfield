@@ -75,7 +75,7 @@ function showError(params: ShowErrorParams): void {
     action: {
       label: 'Open Settings',
       onClick: () => {
-        return openSettings('openrouter')
+        openSettings('openrouter')
       },
     },
   })

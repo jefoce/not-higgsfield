@@ -21,7 +21,7 @@ export function FilterChoice<T extends string>(props: FilterChoiceProps<T>) {
   const { label, value, options } = props
 
   const handleSelect = (event: MouseEvent<HTMLButtonElement>) => {
-    return props.onChange(event.currentTarget.value as T)
+    props.onChange(event.currentTarget.value as T)
   }
 
   return (

@@ -132,7 +132,7 @@ export function FrameSlot(props: FrameSlotProps) {
   const { isBroken, isPreviewable } = frameState({ hasFrame, upload })
 
   const handlePick = (): void => {
-    return openMediaPicker({
+    openMediaPicker({
       target: TARGETS[slot],
       kinds: ['image'],
       max: 1,
@@ -142,7 +142,7 @@ export function FrameSlot(props: FrameSlotProps) {
   }
 
   const handleRemove = (): void => {
-    return setFrame(slot, null)
+    setFrame(slot, null)
   }
 
   const handlePreview = (): void => {

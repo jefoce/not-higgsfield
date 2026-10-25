@@ -20,13 +20,13 @@ export function useVideoFullscreen(
 
   useEffect(() => {
     const onChange = () => {
-      return setIsFullscreen(document.fullscreenElement === rootRef.current)
+      setIsFullscreen(document.fullscreenElement === rootRef.current)
     }
 
     document.addEventListener('fullscreenchange', onChange)
 
     return () => {
-      return document.removeEventListener('fullscreenchange', onChange)
+      document.removeEventListener('fullscreenchange', onChange)
     }
   }, [rootRef])
 

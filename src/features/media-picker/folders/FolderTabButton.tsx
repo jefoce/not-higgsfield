@@ -20,7 +20,7 @@ export function FolderTabButton(props: FolderTabButtonProps) {
   const { folder, isActive } = props
 
   const handleSelect = () => {
-    return props.onTabChange(folder.id)
+    props.onTabChange(folder.id)
   }
 
   const handleDisconnect = (event: MouseEvent<HTMLButtonElement>) => {

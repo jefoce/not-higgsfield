@@ -54,10 +54,10 @@ export const useMediaPickerStore = create<MediaPickerState>((set) => {
   return {
     request: null,
     open: (request) => {
-      return set({ request: { ...request, id: (nextId += 1) } })
+      set({ request: { ...request, id: (nextId += 1) } })
     },
     close: () => {
-      return set({ request: null })
+      set({ request: null })
     },
   }
 })

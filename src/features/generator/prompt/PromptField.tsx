@@ -74,7 +74,7 @@ export function PromptField(props: PromptFieldProps) {
 
   const handleChange = useCallback(
     (state: EditorState) => {
-      return setPrompt(serializeEditor(state))
+      setPrompt(serializeEditor(state))
     },
     [setPrompt],
   )

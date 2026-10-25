@@ -42,7 +42,7 @@ export function DeleteConfirm(props: DeleteConfirmProps) {
   })
 
   const handleCancel = () => {
-    return props.onOpenChange(false)
+    props.onOpenChange(false)
   }
 
   return (

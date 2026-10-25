@@ -32,7 +32,7 @@ export function useHistoryScroll(params: HistoryScrollParams) {
     observer.observe(node)
 
     return () => {
-      return observer.disconnect()
+      observer.disconnect()
     }
   }, [hasMore, loadMore])
 

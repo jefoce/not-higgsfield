@@ -16,7 +16,7 @@ export function FolderBreadcrumbs(props: FolderBreadcrumbsProps) {
   const segments = sub.split('/').filter(Boolean)
 
   const handleRoot = () => {
-    return props.onNavigate('')
+    props.onNavigate('')
   }
 
   const isRoot = isEmpty(segments)

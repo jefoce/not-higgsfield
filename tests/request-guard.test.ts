@@ -33,7 +33,7 @@ describe('assertLocalRequest', () => {
   it('accepts a local GET', () => {
     expect(
       statusOf(() => {
-        return assertLocalRequest(makeRequest({}))
+        assertLocalRequest(makeRequest({}))
       }),
     ).toBeNull()
   })
@@ -41,13 +41,13 @@ describe('assertLocalRequest', () => {
   it('accepts localhost and IPv6 hosts', () => {
     expect(
       statusOf(() => {
-        return assertLocalRequest(makeRequest({ host: 'localhost:3000' }))
+        assertLocalRequest(makeRequest({ host: 'localhost:3000' }))
       }),
     ).toBeNull()
 
     expect(
       statusOf(() => {
-        return assertLocalRequest(makeRequest({ host: '[::1]:3000' }))
+        assertLocalRequest(makeRequest({ host: '[::1]:3000' }))
       }),
     ).toBeNull()
   })
@@ -55,7 +55,7 @@ describe('assertLocalRequest', () => {
   it('rejects a foreign host with 403', () => {
     expect(
       statusOf(() => {
-        return assertLocalRequest(makeRequest({ host: 'evil.example' }))
+        assertLocalRequest(makeRequest({ host: 'evil.example' }))
       }),
     ).toBe(403)
   })
@@ -68,7 +68,7 @@ describe('assertLocalRequest', () => {
 
     expect(
       statusOf(() => {
-        return assertLocalRequest(request)
+        assertLocalRequest(request)
       }),
     ).toBe(403)
   })
@@ -81,7 +81,7 @@ describe('assertLocalRequest', () => {
 
     expect(
       statusOf(() => {
-        return assertLocalRequest(request)
+        assertLocalRequest(request)
       }),
     ).toBeNull()
   })
@@ -94,7 +94,7 @@ describe('assertLocalRequest', () => {
 
     expect(
       statusOf(() => {
-        return assertLocalRequest(request)
+        assertLocalRequest(request)
       }),
     ).toBe(403)
   })
@@ -119,7 +119,7 @@ describe('assertLocalRequest session', () => {
 
     expect(
       statusOf(() => {
-        return guard.assertLocalRequest(makeRequest({}))
+        guard.assertLocalRequest(makeRequest({}))
       }),
     ).toBe(401)
   })
@@ -130,7 +130,7 @@ describe('assertLocalRequest session', () => {
 
     expect(
       statusOf(() => {
-        return guard.assertLocalRequest(request)
+        guard.assertLocalRequest(request)
       }),
     ).toBeNull()
   })
@@ -140,13 +140,13 @@ describe('assertLocalRequest session', () => {
 
     expect(
       statusOf(() => {
-        return guard.assertLocalRequest(makeRequest({}), { session: false })
+        guard.assertLocalRequest(makeRequest({}), { session: false })
       }),
     ).toBeNull()
 
     expect(
       statusOf(() => {
-        return guard.assertLocalRequest(makeRequest({ host: 'evil.example' }), { session: false })
+        guard.assertLocalRequest(makeRequest({ host: 'evil.example' }), { session: false })
       }),
     ).toBe(403)
 
@@ -157,7 +157,7 @@ describe('assertLocalRequest session', () => {
 
     expect(
       statusOf(() => {
-        return guard.assertLocalRequest(crossSite, { session: false })
+        guard.assertLocalRequest(crossSite, { session: false })
       }),
     ).toBe(403)
   })

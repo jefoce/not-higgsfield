@@ -110,7 +110,7 @@ function showChanges(records: GenerationRecord[]): void {
 
   if (!isNil(first)) {
     window.setTimeout(() => {
-      return scrollToRecord(first.id)
+      scrollToRecord(first.id)
     }, HISTORY_SCROLL_DELAY_MS)
   }
 }
@@ -179,7 +179,7 @@ export function useJobNotifications(params: JobNotificationParams): void {
       action: {
         label: 'Show',
         onClick: () => {
-          return showChanges(changes)
+          showChanges(changes)
         },
       },
     })
@@ -213,7 +213,7 @@ export function useJobNotifications(params: JobNotificationParams): void {
           action: {
             label: 'Show',
             onClick: () => {
-              return scrollToRecord(record.id)
+              scrollToRecord(record.id)
             },
           },
         })

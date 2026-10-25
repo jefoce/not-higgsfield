@@ -14,7 +14,7 @@ export function BreadcrumbSegment(props: BreadcrumbSegmentProps) {
   const { label, target, isCurrent } = props
 
   const handleSelect = () => {
-    return props.onNavigate(target)
+    props.onNavigate(target)
   }
 
   const currentClass = isCurrent ? 'shrink-0 text-fg' : 'shrink-0 transition hover:text-fg'

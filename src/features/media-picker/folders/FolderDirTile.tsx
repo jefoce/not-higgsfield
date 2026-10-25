@@ -14,7 +14,7 @@ export function FolderDirTile(props: FolderDirTileProps) {
   const { dir } = props
 
   const handleSelect = () => {
-    return props.onNavigate(dir.rel)
+    props.onNavigate(dir.rel)
   }
 
   return (

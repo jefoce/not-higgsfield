@@ -73,7 +73,7 @@ export function playAudio(src: string): void {
   }
 
   void player.play().catch(() => {
-    return notify()
+    notify()
   })
 }
 

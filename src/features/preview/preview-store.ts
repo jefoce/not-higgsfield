@@ -39,7 +39,7 @@ export const usePreviewStore = create<PreviewState>((set) => {
   return {
     request: null,
     open: (request) => {
-      return set({
+      set({
         request: {
           ...request,
           index: Math.min(Math.max(0, request.index), Math.max(0, request.items.length - 1)),
@@ -47,7 +47,7 @@ export const usePreviewStore = create<PreviewState>((set) => {
       })
     },
     close: () => {
-      return set({ request: null })
+      set({ request: null })
     },
   }
 })

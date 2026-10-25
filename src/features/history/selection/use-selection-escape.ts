@@ -20,7 +20,7 @@ export function useSelectionEscape(handleClear: () => void) {
     document.addEventListener('keydown', onKey)
 
     return () => {
-      return document.removeEventListener('keydown', onKey)
+      document.removeEventListener('keydown', onKey)
     }
   }, [handleClear])
 }

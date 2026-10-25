@@ -47,7 +47,7 @@ export function AspectOption(props: AspectOptionProps) {
   const reason = isReason ? null : `Only at ${onlyAt.join(', ')}`
 
   const handleSelect = (): void => {
-    return props.onSelect(option)
+    props.onSelect(option)
   }
 
   return (

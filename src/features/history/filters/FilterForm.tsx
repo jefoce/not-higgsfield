@@ -36,7 +36,7 @@ export function FilterForm() {
 
   useEffect(() => {
     return () => {
-      return commitQuery.cancel()
+      commitQuery.cancel()
     }
   }, [commitQuery])
 

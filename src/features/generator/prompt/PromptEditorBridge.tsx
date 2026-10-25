@@ -85,7 +85,7 @@ function focusSlotInEditor(params: FocusSlotParams): void {
     )
 
     editor.update(() => {
-      return $setSelection(null)
+      $setSelection(null)
     })
   }
 
@@ -142,7 +142,7 @@ export function PromptEditorBridge(props: PromptEditorBridgeProps) {
   useEffect(() => {
     if (serializeEditor(editor.getEditorState()) !== prompt) {
       editor.update(() => {
-        return buildEditor(prompt)
+        buildEditor(prompt)
       })
     }
   }, [editor, prompt])
@@ -151,7 +151,7 @@ export function PromptEditorBridge(props: PromptEditorBridgeProps) {
     const counts = slotCounts(useGeneratorStore.getState())
 
     editor.update(() => {
-      return $convertLiteralMentions(counts)
+      $convertLiteralMentions(counts)
     })
   }, [editor, refsKey])
 
@@ -168,17 +168,17 @@ export function PromptEditorBridge(props: PromptEditorBridgeProps) {
     })
 
     return () => {
-      return registerInserter(null)
+      registerInserter(null)
     }
   }, [editor, insertMention, registerInserter])
 
   useEffect(() => {
     registerFocuser((slot, occurrence) => {
-      return focusSlotInEditor({ editor, slot, occurrence })
+      focusSlotInEditor({ editor, slot, occurrence })
     })
 
     return () => {
-      return registerFocuser(null)
+      registerFocuser(null)
     }
   }, [editor, registerFocuser])
 

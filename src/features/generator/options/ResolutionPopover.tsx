@@ -48,7 +48,7 @@ export function ResolutionPopover() {
   const discount = pricing?.discount ?? 0
 
   const handleSelectResolution = (option: Resolution): void => {
-    return setResolution(option)
+    setResolution(option)
   }
 
   return (

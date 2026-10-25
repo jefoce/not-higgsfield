@@ -16,7 +16,7 @@ export function PreviewActionButton(props: PreviewActionButtonProps) {
   const { actionKey, label, variant } = props
 
   const handleClick = () => {
-    return props.onRun(actionKey)
+    props.onRun(actionKey)
   }
 
   return (

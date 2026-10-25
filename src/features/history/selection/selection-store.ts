@@ -33,7 +33,7 @@ export const useSelectionStore = create<SelectionState>()((set, get) => {
     anchorId: null,
 
     toggle: (id) => {
-      return set((state) => {
+      set((state) => {
         const ids = new Set(state.ids)
 
         if (ids.has(id)) {
@@ -77,11 +77,11 @@ export const useSelectionStore = create<SelectionState>()((set, get) => {
     },
 
     setOrder: (order) => {
-      return set({ order })
+      set({ order })
     },
 
     setMany: (list, isOn) => {
-      return set((state) => {
+      set((state) => {
         const ids = new Set(state.ids)
 
         for (const id of list) {
@@ -97,11 +97,11 @@ export const useSelectionStore = create<SelectionState>()((set, get) => {
     },
 
     clear: () => {
-      return set({ ids: new Set(), anchorId: null })
+      set({ ids: new Set(), anchorId: null })
     },
 
     prune: (existing) => {
-      return set((state) => {
+      set((state) => {
         const ids = new Set(
           [...state.ids].filter((id) => {
             return existing.has(id)

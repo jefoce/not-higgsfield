@@ -14,7 +14,7 @@ type FrameActions = Pick<GeneratorState, 'setFrame'>
 export function createFrameActions(set: SetState): FrameActions {
   return {
     setFrame: (slot, upload) => {
-      return set((state) => {
+      set((state) => {
         const preset = getPreset(state.presetId)
         const frames = { ...state.frames, [slot]: upload?.id ?? null }
         const shouldClearStart = slot === 'start' && !upload

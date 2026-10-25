@@ -35,7 +35,7 @@ export function useImagePlan(presetId: string, ids: string[]): ReferencePlan | n
     }, 400)
 
     return () => {
-      return window.clearTimeout(timer)
+      window.clearTimeout(timer)
     }
   }, [presetId, key, answerKey])
 

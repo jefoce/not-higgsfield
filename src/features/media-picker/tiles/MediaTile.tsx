@@ -46,7 +46,7 @@ export function MediaTile(props: MediaTileProps) {
   const mediaSrc = mediaUrl(mediaRef, item.mime)
 
   const handleThumbError = () => {
-    return setBrokenSrc(thumbSrc)
+    setBrokenSrc(thumbSrc)
   }
 
   return (

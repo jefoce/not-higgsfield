@@ -41,7 +41,7 @@ export function CreditsPopover() {
     : `${money(credits.keyLimitRemaining)} / ${money(credits.keyLimit)}`
 
   const handleRefresh = (): void => {
-    return refresh(true)
+    refresh(true)
   }
 
   const balance = credits?.balance

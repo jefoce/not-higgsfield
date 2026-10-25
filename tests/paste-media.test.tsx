@@ -112,7 +112,7 @@ describe('usePasteMedia', () => {
     })
 
     await waitFor(() => {
-      return expect(onUploaded).toHaveBeenCalledWith([video])
+      expect(onUploaded).toHaveBeenCalledWith([video])
     })
 
     expect(linkAbsPath).toHaveBeenCalledWith('/tmp/clip.mp4')

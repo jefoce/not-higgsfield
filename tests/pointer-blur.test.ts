@@ -38,7 +38,7 @@ function click(element: HTMLElement, detail = 1): void {
 describe('usePointerBlur', () => {
   it('drops focus after a mouse click', () => {
     renderHook(() => {
-      return usePointerBlur()
+      usePointerBlur()
     })
 
     const button = mountControl()
@@ -52,7 +52,7 @@ describe('usePointerBlur', () => {
 
   it('keeps focus on menu triggers', () => {
     renderHook(() => {
-      return usePointerBlur()
+      usePointerBlur()
     })
 
     const button = mountControl({ 'aria-haspopup': 'menu' })
@@ -66,7 +66,7 @@ describe('usePointerBlur', () => {
 
   it('keeps focus for keyboard activation', () => {
     renderHook(() => {
-      return usePointerBlur()
+      usePointerBlur()
     })
 
     const button = mountControl()
@@ -80,7 +80,7 @@ describe('usePointerBlur', () => {
 
   it('keeps focus inside an open menu', () => {
     renderHook(() => {
-      return usePointerBlur()
+      usePointerBlur()
     })
 
     const menu = document.createElement('div')

@@ -35,7 +35,7 @@ export function useSecretActions(params: UseSecretActionsParams) {
   const [testing, setTesting] = useState<SettingsSection | null>(null)
 
   const resetResults = useCallback(() => {
-    return setResults(EMPTY_RESULTS)
+    setResults(EMPTY_RESULTS)
   }, [])
 
   const onTest = async (target: SettingsSection) => {

@@ -22,7 +22,7 @@ export function SegmentedTab(props: SegmentedTabProps) {
   const { option, isActive, sizeClass } = props
 
   const handleSelect = () => {
-    return props.onValueChange(option.value)
+    props.onValueChange(option.value)
   }
 
   return (

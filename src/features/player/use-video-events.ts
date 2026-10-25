@@ -29,7 +29,7 @@ export function useVideoEvents(params: UseVideoEventsParams): void {
     onMuted(video.muted)
 
     const syncTime = () => {
-      return onTime(video.currentTime)
+      onTime(video.currentTime)
     }
 
     const syncDuration = () => {
@@ -40,11 +40,11 @@ export function useVideoEvents(params: UseVideoEventsParams): void {
     }
 
     const syncPaused = () => {
-      return onPaused(video.paused)
+      onPaused(video.paused)
     }
 
     const syncMuted = () => {
-      return onMuted(video.muted)
+      onMuted(video.muted)
     }
 
     video.addEventListener('timeupdate', syncTime)

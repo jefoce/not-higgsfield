@@ -33,7 +33,7 @@ export function useUploadFiles(params: UseUploadFilesParams) {
     setProgress(0)
 
     const handleProgress = (sent: number, total: number) => {
-      return setProgress(progressPercent(sent, total))
+      setProgress(progressPercent(sent, total))
     }
 
     try {

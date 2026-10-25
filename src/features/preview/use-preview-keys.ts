@@ -34,7 +34,7 @@ export function usePreviewKeys(params: PreviewKeysParams): void {
     window.addEventListener('keydown', onKey)
 
     return () => {
-      return window.removeEventListener('keydown', onKey)
+      window.removeEventListener('keydown', onKey)
     }
   }, [isOpen, length, setIndex])
 }

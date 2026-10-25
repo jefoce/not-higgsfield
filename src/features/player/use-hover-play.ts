@@ -53,19 +53,19 @@ export function useHoverPlay(params: UseHoverPlayParams): HoverPlayHandlers {
   )
 
   const handleHoverEnter = useCallback(() => {
-    return setInside(pointerInside, true)
+    setInside(pointerInside, true)
   }, [setInside])
 
   const handleHoverLeave = useCallback(() => {
-    return setInside(pointerInside, false)
+    setInside(pointerInside, false)
   }, [setInside])
 
   const handleFocus = useCallback(() => {
-    return setInside(focusInside, true)
+    setInside(focusInside, true)
   }, [setInside])
 
   const handleBlur = useCallback(() => {
-    return setInside(focusInside, false)
+    setInside(focusInside, false)
   }, [setInside])
 
   useEffect(() => {

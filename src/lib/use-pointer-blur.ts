@@ -42,7 +42,7 @@ export function usePointerBlur(): void {
     document.addEventListener('click', onClick, true)
 
     return () => {
-      return document.removeEventListener('click', onClick, true)
+      document.removeEventListener('click', onClick, true)
     }
   }, [])
 }

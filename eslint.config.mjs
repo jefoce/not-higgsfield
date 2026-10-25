@@ -119,6 +119,7 @@ export default defineConfig([
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
+      '@typescript-eslint/no-confusing-void-expression': 'error',
       '@typescript-eslint/max-params': ['error', { max: 2 }],
       '@typescript-eslint/no-deprecated': 'error',
       '@typescript-eslint/no-non-null-assertion': 'error',

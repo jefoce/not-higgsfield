@@ -24,7 +24,7 @@ export function ResolutionOption(props: ResolutionOptionProps) {
   const { option, isSelected, rate, listRate, discount } = props
 
   const handleSelect = (): void => {
-    return props.onSelect(option)
+    props.onSelect(option)
   }
 
   return (

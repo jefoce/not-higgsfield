@@ -20,7 +20,7 @@ type ReferenceActions = Pick<
 export function createReferenceActions(set: SetState): ReferenceActions {
   return {
     addReferences: (items) => {
-      return set((state) => {
+      set((state) => {
         const preset = getPreset(state.presetId)
         const uploadsById = { ...state.uploadsById }
         const references = [...state.references]
@@ -51,7 +51,7 @@ export function createReferenceActions(set: SetState): ReferenceActions {
       })
     },
     replaceReference: (id, upload) => {
-      return set((state) => {
+      set((state) => {
         const uploadsById = { ...state.uploadsById, [upload.id]: upload }
         const index = state.references.indexOf(id)
 
@@ -80,7 +80,7 @@ export function createReferenceActions(set: SetState): ReferenceActions {
       })
     },
     removeReference: (id) => {
-      return set((state) => {
+      set((state) => {
         const references = state.references.filter((ref) => {
           return ref !== id
         })

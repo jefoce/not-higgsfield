@@ -8,11 +8,11 @@ export function useDebouncedValue<T>(value: T, delayMs: number): T {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      return setDebouncedValue(value)
+      setDebouncedValue(value)
     }, delayMs)
 
     return () => {
-      return clearTimeout(timer)
+      clearTimeout(timer)
     }
   }, [delayMs, value])
 

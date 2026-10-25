@@ -8,7 +8,7 @@ import { pauseAudio } from '@/lib/audio-player'
 export function usePauseAudioOnUnmount(): void {
   useEffect(() => {
     return () => {
-      return pauseAudio()
+      pauseAudio()
     }
   }, [])
 }

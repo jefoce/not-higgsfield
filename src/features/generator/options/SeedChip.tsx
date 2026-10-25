@@ -41,11 +41,11 @@ export function SeedChip() {
   }
 
   const handleSeedChange = (value: number | null): void => {
-    return setSeed(value ?? 0)
+    setSeed(value ?? 0)
   }
 
   const handleRandomize = (): void => {
-    return setSeed(randomSeed())
+    setSeed(randomSeed())
   }
 
   if (!preset.seed) {

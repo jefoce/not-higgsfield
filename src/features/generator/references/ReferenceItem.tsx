@@ -67,7 +67,7 @@ export function ReferenceItem(props: ReferenceItemProps) {
   }
 
   const handleRemoveAction = (item: UploadItem): void => {
-    return props.onRemove(item.id)
+    props.onRemove(item.id)
   }
 
   const handleLabel = (item: UploadItem): string | null => {
@@ -75,7 +75,7 @@ export function ReferenceItem(props: ReferenceItemProps) {
   }
 
   const handleRemove = (): void => {
-    return props.onRemove(id)
+    props.onRemove(id)
   }
 
   const handlePreview = (): void => {

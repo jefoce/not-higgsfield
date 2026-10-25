@@ -34,10 +34,14 @@ export function useAddFolderBrowse(isOpen: boolean): AddFolderBrowse {
 
     browseDirs(path ?? undefined, isHidden)
       .then((result) => {
-        return isAlive && setData(result)
+        if (isAlive) {
+          setData(result)
+        }
       })
       .catch((error) => {
-        return isAlive && toastError(error)
+        if (isAlive) {
+          toastError(error)
+        }
       })
 
     return () => {
@@ -55,11 +59,11 @@ export function useAddFolderBrowse(isOpen: boolean): AddFolderBrowse {
   }, [])
 
   const navigateRoot = useCallback(() => {
-    return navigate('/')
+    navigate('/')
   }, [navigate])
 
   const navigateParent = useCallback(() => {
-    return navigate(data?.parent ?? '/')
+    navigate(data?.parent ?? '/')
   }, [data?.parent, navigate])
 
   const reset = useCallback(() => {

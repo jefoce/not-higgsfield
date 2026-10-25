@@ -24,7 +24,7 @@ export function AudioChip() {
   )
 
   const handleToggle = (): void => {
-    return setAudio(!isAudio)
+    setAudio(!isAudio)
   }
 
   if (!preset.audio.supported) {

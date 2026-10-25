@@ -50,7 +50,7 @@ export function AspectRatioPopover() {
   }
 
   const handleSelectAspect = (option: AspectChoice): void => {
-    return setAspectRatio(option)
+    setAspectRatio(option)
   }
 
   const label = aspectRatio === 'auto' ? 'Auto' : aspectRatio

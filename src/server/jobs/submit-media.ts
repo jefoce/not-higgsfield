@@ -87,7 +87,7 @@ export async function uploadUrls(params: UploadUrlsParams): Promise<void> {
     }
 
     void saveProgress(id, progress).catch((error) => {
-      return console.error(`[not-higgsfield] submit progress failed for ${id}`, error)
+      console.error(`[not-higgsfield] submit progress failed for ${id}`, error)
     })
   }
 

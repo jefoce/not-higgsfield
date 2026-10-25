@@ -152,7 +152,7 @@ async function tick(): Promise<void> {
           return withLock(record.id, () => {
             return processById(record.id)
           }).catch((error) => {
-            return console.error(`[not-higgsfield] poll failed for ${record.id}`, error)
+            console.error(`[not-higgsfield] poll failed for ${record.id}`, error)
           })
         }),
       )

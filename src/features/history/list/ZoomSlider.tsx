@@ -18,7 +18,7 @@ export function ZoomSlider() {
   })
 
   const handleReset = () => {
-    return handleZoomChange(ZOOM_DEFAULT)
+    handleZoomChange(ZOOM_DEFAULT)
   }
 
   return (

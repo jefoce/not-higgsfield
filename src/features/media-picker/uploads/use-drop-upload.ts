@@ -73,10 +73,10 @@ function uploadDropped(params: UploadDroppedParams): void {
 
   void uploadFiles(accepted)
     .then((items) => {
-      return onUploaded.current(items)
+      onUploaded.current(items)
     })
     .catch((error) => {
-      return toastError(error)
+      toastError(error)
     })
 }
 
@@ -116,7 +116,7 @@ export function useDropUpload(params: DropUploadParams): UseDropUpload {
       },
       onHover: setIsDragging,
       onUploaded: (items) => {
-        return callback.current(items)
+        callback.current(items)
       },
     })
   }, [id, isEnabled])

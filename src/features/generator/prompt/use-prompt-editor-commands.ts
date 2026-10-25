@@ -86,7 +86,7 @@ export function usePromptEditorCommands(editor: LexicalEditor, onSubmit: () => v
         const counts = slotCounts(useGeneratorStore.getState())
 
         editor.update(() => {
-          return $convertLiteralMentions(counts)
+          $convertLiteralMentions(counts)
         })
 
         return false

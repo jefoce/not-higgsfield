@@ -14,7 +14,7 @@ export function DirectoryButton(props: DirectoryButtonProps) {
   const { dir } = props
 
   const handleSelect = () => {
-    return props.onNavigate(dir.path)
+    props.onNavigate(dir.path)
   }
 
   return (

@@ -40,19 +40,19 @@ export function UploadTile(props: UploadTileProps) {
   }
 
   const handleDragEnter = () => {
-    return setIsOver(true)
+    setIsOver(true)
   }
 
   const handleDragOver = () => {
-    return setIsOver(true)
+    setIsOver(true)
   }
 
   const handleDragLeave = () => {
-    return setIsOver(false)
+    setIsOver(false)
   }
 
   const handleDrop = () => {
-    return setIsOver(false)
+    setIsOver(false)
   }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {

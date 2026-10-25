@@ -30,7 +30,7 @@ export function ViewToggle() {
   })
 
   const handleSelect = (event: MouseEvent<HTMLButtonElement>) => {
-    return setView(event.currentTarget.value as HistoryView)
+    setView(event.currentTarget.value as HistoryView)
   }
 
   return (

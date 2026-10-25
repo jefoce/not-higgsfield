@@ -97,7 +97,7 @@ describe('portal clicks', () => {
     fireEvent.click(within(dialog).getByRole('button', { name: 'Delete' }))
 
     await waitFor(() => {
-      return expect(apiDelete).toHaveBeenCalledWith('/api/generations/b')
+      expect(apiDelete).toHaveBeenCalledWith('/api/generations/b')
     })
 
     expect(ids()).toEqual(['a'])

@@ -24,11 +24,11 @@ export function FolderFileTile(props: FolderFileTileProps) {
   const isAudio = file.kind === 'audio'
 
   const handleSelect = () => {
-    return props.onPickFile(file.rel)
+    props.onPickFile(file.rel)
   }
 
   const handleImageError = () => {
-    return props.onBroken(src)
+    props.onBroken(src)
   }
 
   const handleExpandClick = (event: MouseEvent<HTMLButtonElement>) => {

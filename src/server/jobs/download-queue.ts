@@ -117,7 +117,7 @@ function drainDownloads(): void {
       await finalize({ ...task.record, favorite: current.favorite }, task.job)
     })
       .catch((error) => {
-        return console.error(`[not-higgsfield] download failed for ${id}`, error)
+        console.error(`[not-higgsfield] download failed for ${id}`, error)
       })
       .finally(() => {
         downloads.active.delete(id)

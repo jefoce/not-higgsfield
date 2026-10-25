@@ -25,10 +25,10 @@ export const useSettingsStore = create<SettingsState>((set) => {
     open: false,
     section: 'openrouter',
     openSettings: (section = 'openrouter') => {
-      return set({ open: true, section })
+      set({ open: true, section })
     },
     closeSettings: () => {
-      return set({ open: false })
+      set({ open: false })
     },
   }
 })

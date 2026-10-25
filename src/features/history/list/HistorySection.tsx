@@ -57,11 +57,11 @@ export function HistorySection() {
   const paddingClass = isSelecting ? 'pb-28' : 'pb-14'
 
   const handleOpen = (record: GenerationRecord) => {
-    return setSelectedId(record.id)
+    setSelectedId(record.id)
   }
 
   const handleDeleted = () => {
-    return setSelectedId(null)
+    setSelectedId(null)
   }
 
   const handleOpenChange = (isOpen: boolean) => {

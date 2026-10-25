@@ -287,7 +287,7 @@ describe('history selection batches', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Like selected videos' }))
 
     await waitFor(() => {
-      return expect(apiPost).toHaveBeenCalledTimes(2)
+      expect(apiPost).toHaveBeenCalledTimes(2)
     })
 
     const sizes = apiPost.mock.calls

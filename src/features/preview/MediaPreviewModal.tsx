@@ -45,7 +45,7 @@ export function MediaPreviewModal() {
     acquire(playerId)
 
     return () => {
-      return release(playerId)
+      release(playerId)
     }
   }, [acquire, item, playerId, release])
 

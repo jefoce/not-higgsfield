@@ -31,7 +31,7 @@ export function AddFolderDialog(props: AddFolderDialogProps) {
   }
 
   const handleClose = () => {
-    return handleOpenChange(false)
+    handleOpenChange(false)
   }
 
   const connect = useFolderConnect({

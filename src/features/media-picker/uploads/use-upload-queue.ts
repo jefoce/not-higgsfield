@@ -32,7 +32,7 @@ async function runUpload(params: RunUploadParams): Promise<void> {
   controllers.current.set(entry.id, controller)
 
   const patch = (change: Partial<UploadProgressItem>) => {
-    return setItems((previous) => {
+    setItems((previous) => {
       return previous.map((item) => {
         if (item.id !== entry.id) {
           return item

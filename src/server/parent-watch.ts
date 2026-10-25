@@ -24,7 +24,7 @@ export function startParentWatch(): () => void {
   }, CHECK_MS)
 
   return () => {
-    return clearInterval(timer)
+    clearInterval(timer)
   }
 }
 

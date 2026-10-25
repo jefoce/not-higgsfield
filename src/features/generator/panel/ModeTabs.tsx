@@ -29,7 +29,7 @@ export function ModeTabs() {
   const isRefsDisabled = refs.image + refs.video + refs.audio === 0
 
   const handleValueChange = (value: string): void => {
-    return setTab(value as GeneratorTab)
+    setTab(value as GeneratorTab)
   }
 
   useEffect(() => {

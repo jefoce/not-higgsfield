@@ -15,15 +15,15 @@ export function useBoolean(isInitiallyOn = false): BooleanState {
   const [isOn, setIsOn] = useState(isInitiallyOn)
 
   const on = useCallback(() => {
-    return setIsOn(true)
+    setIsOn(true)
   }, [])
 
   const off = useCallback(() => {
-    return setIsOn(false)
+    setIsOn(false)
   }, [])
 
   const toggle = useCallback(() => {
-    return setIsOn((isCurrent) => {
+    setIsOn((isCurrent) => {
       return !isCurrent
     })
   }, [])

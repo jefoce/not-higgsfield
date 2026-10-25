@@ -73,10 +73,10 @@ function handlePastedPath(event: PasteLike, params: PasteMediaOptions): void {
 
   void linkAbsPath(path)
     .then((item) => {
-      return params.onUploaded([item])
+      params.onUploaded([item])
     })
     .catch((error) => {
-      return toastError(error)
+      toastError(error)
     })
 }
 
@@ -141,13 +141,13 @@ export function usePasteMedia(params: PasteMediaOptions): UsePasteMedia {
     }
 
     const listener = (event: globalThis.ClipboardEvent) => {
-      return handlePaste(event, current.current)
+      handlePaste(event, current.current)
     }
 
     window.addEventListener('paste', listener)
 
     return () => {
-      return window.removeEventListener('paste', listener)
+      window.removeEventListener('paste', listener)
     }
   }, [scope, isEnabled])
 

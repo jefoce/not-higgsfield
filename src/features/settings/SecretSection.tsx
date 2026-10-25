@@ -48,7 +48,7 @@ export function SecretSection(props: SecretSectionProps) {
   const creditsUrl = descriptor.links.credits
 
   const handleTest = () => {
-    return props.onTest(descriptor.id)
+    props.onTest(descriptor.id)
   }
 
   const keysUrl = descriptor.links.keys

@@ -68,7 +68,7 @@ export function FilterChoices() {
   })
 
   const handleStatusChange = (status: StatusFilter) => {
-    return setFilters({ status })
+    setFilters({ status })
   }
 
   const handleModeChange = (mode: HistoryMode) => {
@@ -79,19 +79,19 @@ export function FilterChoices() {
   }
 
   const handleModelChange = (model: string) => {
-    return setFilters({ model })
+    setFilters({ model })
   }
 
   const handleResolutionChange = (resolution: ResolutionFilter) => {
-    return setFilters({ resolution })
+    setFilters({ resolution })
   }
 
   const handleAspectChange = (aspect: AspectFilter) => {
-    return setFilters({ aspect })
+    setFilters({ aspect })
   }
 
   const handleAudioChange = (audio: AudioFilter) => {
-    return setFilters({ audio })
+    setFilters({ audio })
   }
 
   return (

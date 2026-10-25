@@ -11,7 +11,7 @@ export function useMediaQuery(query: string): boolean {
       list.addEventListener('change', notify)
 
       return () => {
-        return list.removeEventListener('change', notify)
+        list.removeEventListener('change', notify)
       }
     },
     () => {

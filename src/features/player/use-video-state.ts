@@ -80,7 +80,7 @@ export function useVideoState(params: UseVideoStateParams): VideoApi {
 
     if (video.paused) {
       void video.play().catch(() => {
-        return setIsPaused(true)
+        setIsPaused(true)
       })
     } else {
       video.pause()

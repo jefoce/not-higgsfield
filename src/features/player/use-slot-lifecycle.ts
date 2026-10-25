@@ -35,13 +35,13 @@ export function useSlotLifecycle(params: UseSlotLifecycleParams): void {
     observer.observe(node)
 
     return () => {
-      return observer.disconnect()
+      observer.disconnect()
     }
   }, [id, release, rootRef])
 
   useEffect(() => {
     return () => {
-      return release(id)
+      release(id)
     }
   }, [id, release])
 

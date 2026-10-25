@@ -79,7 +79,7 @@ export function usePanelPaste() {
     void uploadFiles(files)
       .then(route)
       .catch((error) => {
-        return toastError(error)
+        toastError(error)
       })
   }
 
@@ -126,10 +126,10 @@ export function useUploadsRefresh() {
 
       void fetchUploads({ ids })
         .then((items) => {
-          return useGeneratorStore.getState().upsertUploads(items)
+          useGeneratorStore.getState().upsertUploads(items)
         })
         .catch((error) => {
-          return toastError(error)
+          toastError(error)
         })
     }
 
@@ -137,7 +137,7 @@ export function useUploadsRefresh() {
     window.addEventListener('focus', refresh)
 
     return () => {
-      return window.removeEventListener('focus', refresh)
+      window.removeEventListener('focus', refresh)
     }
   }, [idsKey])
 }

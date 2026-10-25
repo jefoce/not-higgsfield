@@ -58,7 +58,7 @@ function open(label: string): HTMLElement {
 
 function expectClosed(): Promise<void> {
   return waitFor(() => {
-    return expect(screen.queryByRole('dialog')).toBeNull()
+    expect(screen.queryByRole('dialog')).toBeNull()
   })
 }
 

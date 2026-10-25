@@ -80,7 +80,7 @@ function normalizedDraft(params: NormalizedDraftParams): Partial<GeneratorState>
 export function createDraftActions(set: SetState): DraftActions {
   return {
     setPreset: (id) => {
-      return set((state) => {
+      set((state) => {
         const preset = findPreset(id)
 
         if (!preset) {
@@ -91,20 +91,20 @@ export function createDraftActions(set: SetState): DraftActions {
       })
     },
     setTab: (tab) => {
-      return set((state) => {
+      set((state) => {
         return nextTabState({ state, preset: getPreset(state.presetId), tab })
       })
     },
     setPrompt: (text) => {
-      return set((state) => {
+      set((state) => {
         return { prompts: { ...state.prompts, [state.tab]: text } }
       })
     },
     setAudio: (isAudio) => {
-      return set({ audio: isAudio })
+      set({ audio: isAudio })
     },
     setDuration: (duration) => {
-      return set((state) => {
+      set((state) => {
         const preset = getPreset(state.presetId)
 
         const limit = maxDurationFor({
@@ -117,7 +117,7 @@ export function createDraftActions(set: SetState): DraftActions {
       })
     },
     setAspectRatio: (aspectRatio) => {
-      return set((state) => {
+      set((state) => {
         if (aspectRatio !== 'auto') {
           return { aspectRatio }
         }
@@ -133,7 +133,7 @@ export function createDraftActions(set: SetState): DraftActions {
       })
     },
     setResolution: (resolution) => {
-      return set((state) => {
+      set((state) => {
         return normalizedDraft({
           state,
           preset: getPreset(state.presetId),

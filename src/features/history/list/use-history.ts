@@ -47,7 +47,7 @@ export function useHistory(): HistoryResult {
     registerHistoryRefresh(mutate)
 
     return () => {
-      return registerHistoryRefresh(null)
+      registerHistoryRefresh(null)
     }
   }, [mutate])
 

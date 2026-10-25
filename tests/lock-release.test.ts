@@ -66,7 +66,7 @@ describe('releaseInstanceLock', () => {
     const { releaseInstanceLock } = await loadLock()
 
     expect(() => {
-      return releaseInstanceLock()
+      releaseInstanceLock()
     }).not.toThrow()
   })
 })

@@ -80,7 +80,7 @@ export function FolderTab(props: FolderTabProps) {
 
   const handleExpand = (file: FolderFile) => {
     const handleSelect = () => {
-      return handleSelectFile(file.rel)
+      handleSelectFile(file.rel)
     }
 
     openPreview({
@@ -91,7 +91,7 @@ export function FolderTab(props: FolderTabProps) {
   }
 
   const handleBroken = (src: string) => {
-    return setBroken((previous) => {
+    setBroken((previous) => {
       return [...previous, src]
     })
   }

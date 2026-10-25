@@ -21,7 +21,7 @@ export function PickerTabs(props: PickerTabsProps) {
   const { folders, activeTab } = props
 
   const handleUploadsTab = () => {
-    return props.onTabChange('uploads')
+    props.onTabChange('uploads')
   }
 
   return (

@@ -35,7 +35,7 @@ export function InputThumb(props: InputThumbProps) {
   }
 
   const handleError = () => {
-    return setIsBroken(true)
+    setIsBroken(true)
   }
 
   const title = `${item.label} \u00b7 ${item.name}`

@@ -11,7 +11,7 @@ export function FolderCrumbButton(props: FolderCrumbButtonProps) {
   const { label, path } = props
 
   const handleSelect = () => {
-    return props.onNavigate(path)
+    props.onNavigate(path)
   }
 
   return (

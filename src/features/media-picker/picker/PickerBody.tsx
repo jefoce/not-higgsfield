@@ -58,7 +58,7 @@ export function PickerBody(props: PickerBodyProps) {
   }
 
   const handleSelectUpload = (item: UploadItem) => {
-    return commit([item])
+    commit([item])
   }
 
   const activeFolder = foldersState.activeFolder
