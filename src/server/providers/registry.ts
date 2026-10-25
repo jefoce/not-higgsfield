@@ -11,7 +11,9 @@ const DEFAULT_PROVIDER_ID: VideoProviderId = VIDEO_PROVIDER_IDS[0]
 
 const providers = new Map<VideoProviderId, VideoProvider>()
 
-const FACTORIES: { readonly [id in VideoProviderId]: () => VideoProvider } = {
+type VideoProviderFactory = () => VideoProvider
+
+const FACTORIES: Record<VideoProviderId, VideoProviderFactory> = {
   openrouter: createOpenRouterProvider,
 }
 
