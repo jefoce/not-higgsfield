@@ -15,6 +15,7 @@ import { errorMessage } from '@/lib/errors'
 import { ApiError } from '@/lib/fetcher'
 import { getPlatform } from '@/lib/platform'
 import { refreshHistory } from '@/lib/swr-keys'
+import { useAsyncAction } from '@/lib/use-async-action'
 
 import { useGeneratorStore } from '../store/store'
 import { inputFromState } from '../store/store-draft'
@@ -75,25 +76,19 @@ function showError(params: ShowErrorParams): void {
 
 /** Submits the draft, refreshes generation lists and credits. Returns the record id. */
 export function useGenerate() {
-  const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const inFlight = useRef(false)
+  const resultId = useRef<string | null>(null)
 
-  const generate = useCallback(async (): Promise<string | null> => {
-    if (inFlight.current) {
-      return null
-    }
-
-    inFlight.current = true
+  const submit = async (): Promise<void> => {
+    resultId.current = null
     requestNotifications()
-    setIsGenerating(true)
     setError(null)
 
     try {
       const input = inputForSubmit(inputFromState(useGeneratorStore.getState()))
       const record = await createGeneration(input)
 
-      setIsGenerating(false)
+      resultId.current = record.id
 
       if (record.status === 'failed') {
         showError({
@@ -109,12 +104,11 @@ export function useGenerate() {
       }
 
       await Promise.all([refreshHistory(), refreshCredits()])
-
-      return record.id
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : 'Request failed'
       const preset = getPreset(useGeneratorStore.getState().presetId)
 
+      resultId.current = null
       setError(message)
 
       showError({
@@ -123,13 +117,16 @@ export function useGenerate() {
         presetTitle: preset.title,
         provider: VIDEO_PROVIDER_IDS[0],
       })
-
-      return null
-    } finally {
-      inFlight.current = false
-      setIsGenerating(false)
     }
-  }, [])
+  }
+
+  const { isRunning: isGenerating, run } = useAsyncAction(submit)
+
+  const generate = useCallback(async (): Promise<string | null> => {
+    await run()
+
+    return resultId.current
+  }, [run])
 
   return { generate, isGenerating, error }
 }

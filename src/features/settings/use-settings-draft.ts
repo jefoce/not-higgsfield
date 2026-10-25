@@ -15,6 +15,7 @@ import { refreshRemoteStatus } from '@/lib/api/remote'
 import { saveSecrets } from '@/lib/api/settings'
 import { errorMessage } from '@/lib/errors'
 import { platform } from '@/lib/platform'
+import { useAsyncAction } from '@/lib/use-async-action'
 
 import type { SettingsSection } from './settings-store'
 import { useSecretActions } from './use-secret-actions'
@@ -147,17 +148,31 @@ function getDraftFlags(params: DraftFlagsParams): DraftFlags {
 export function useSettingsDraft(params: UseSettingsDraftParams): SettingsDraft {
   const { status, mock: isMock, closeSettings } = params
   const [edits, setEdits] = useState<Edits>({})
-  const [isSaving, setIsSaving] = useState(false)
+  const isDirty = !isEmpty(edits)
 
-  const { isDirty, canSave, sectionReady, storageValid } = getDraftFlags({
+  const { results, testing, isRetrying, onTest, onRetry, resetResults } = useSecretActions({
+    isDirty,
+  })
+
+  const saveDraft = async (): Promise<void> => {
+    try {
+      await saveSecrets(edits)
+      await Promise.all([refreshCredits(), refreshRemoteStatus(), refreshModels()])
+      setEdits({})
+      resetResults()
+      toast.success('Settings saved')
+    } catch (error) {
+      toast.error(errorMessage(error, 'Save failed'))
+    }
+  }
+
+  const { isRunning: isSaving, run: runSave } = useAsyncAction(saveDraft)
+
+  const { canSave, sectionReady, storageValid } = getDraftFlags({
     edits,
     status,
     isMock,
     isSaving,
-  })
-
-  const { results, testing, isRetrying, onTest, onRetry, resetResults } = useSecretActions({
-    isDirty,
   })
 
   const onFieldChange = (name: SecretName, change: SecretChange) => {
@@ -183,19 +198,7 @@ export function useSettingsDraft(params: UseSettingsDraftParams): SettingsDraft 
       return
     }
 
-    setIsSaving(true)
-
-    try {
-      await saveSecrets(edits)
-      await Promise.all([refreshCredits(), refreshRemoteStatus(), refreshModels()])
-      setEdits({})
-      resetResults()
-      toast.success('Settings saved')
-    } catch (error) {
-      toast.error(errorMessage(error, 'Save failed'))
-    } finally {
-      setIsSaving(false)
-    }
+    await runSave()
   }
 
   return {

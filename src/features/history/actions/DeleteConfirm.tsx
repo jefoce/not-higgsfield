@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
 import { toast } from 'sonner'
 
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { deleteGeneration } from '@/lib/api/generations'
 import { errorMessage } from '@/lib/errors'
 import { ApiError } from '@/lib/fetcher'
+import { useAsyncAction } from '@/lib/use-async-action'
 import { Button } from '@/ui/Button'
 import { Modal } from '@/ui/Modal'
 
@@ -22,11 +22,8 @@ interface DeleteConfirmProps {
 /** Delete confirmation, refuses active jobs and refreshes every list page. */
 export function DeleteConfirm(props: DeleteConfirmProps) {
   const { record, open: isOpen } = props
-  const [isDeleting, setIsDeleting] = useState(false)
 
-  const handleDelete = async () => {
-    setIsDeleting(true)
-
+  const deleteRecord = async (): Promise<void> => {
     try {
       await deleteGeneration(record.id)
       toast.success('Deleted')
@@ -41,10 +38,12 @@ export function DeleteConfirm(props: DeleteConfirmProps) {
       }
 
       toast.error(errorMessage(error))
-    } finally {
-      setIsDeleting(false)
     }
   }
+
+  const { isRunning: isDeleting, run: runDelete } = useAsyncAction(deleteRecord)
+
+  const handleDelete = () => void runDelete()
 
   const handleCancel = () => props.onOpenChange(false)
 

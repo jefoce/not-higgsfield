@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { toast } from 'sonner'
 import { useSWRConfig } from 'swr'
 
@@ -10,6 +10,7 @@ import { deleteFolder } from '@/lib/api/folders'
 import { linkFolderFile } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
 import { platform } from '@/lib/platform'
+import { useAsyncAction } from '@/lib/use-async-action'
 
 interface UsePickerFoldersParams {
   activeTab: string
@@ -30,7 +31,6 @@ export interface PickerFolders {
 export function usePickerFolders(params: UsePickerFoldersParams): PickerFolders {
   const { activeTab, folders, onTabChange, onCommit } = params
   const { mutate } = useSWRConfig()
-  const [isBusy, setIsBusy] = useState(false)
   const activeFolder = folders.find((folder) => folder.id === activeTab)
 
   const handleAdded = useCallback(
@@ -66,20 +66,15 @@ export function usePickerFolders(params: UsePickerFoldersParams): PickerFolders 
     [handleDisconnectSync],
   )
 
-  const handleLinkFile = useCallback(
-    async (folderId: string, relPath: string) => {
-      setIsBusy(true)
+  const linkFile = async (folderId: string, relPath: string): Promise<void> => {
+    try {
+      onCommit([await linkFolderFile({ folderId, relPath })])
+    } catch (error) {
+      toast.error(errorMessage(error))
+    }
+  }
 
-      try {
-        onCommit([await linkFolderFile({ folderId, relPath })])
-      } catch (error) {
-        toast.error(errorMessage(error))
-      } finally {
-        setIsBusy(false)
-      }
-    },
-    [onCommit],
-  )
+  const { isRunning: isBusy, run: runLinkFile } = useAsyncAction(linkFile)
 
   const handlePickFile = useCallback(
     (rel: string) => {
@@ -87,9 +82,9 @@ export function usePickerFolders(params: UsePickerFoldersParams): PickerFolders 
         return
       }
 
-      void handleLinkFile(activeFolder.id, rel)
+      void runLinkFile(activeFolder.id, rel)
     },
-    [activeFolder, handleLinkFile],
+    [activeFolder, runLinkFile],
   )
 
   return { activeFolder, isBusy, handleAdded, handleDisconnect, handlePickFile }

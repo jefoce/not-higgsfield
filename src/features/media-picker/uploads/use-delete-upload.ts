@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { deleteUpload } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
+import { useAsyncAction } from '@/lib/use-async-action'
 
 interface UseDeleteUploadParams {
   mutate: () => Promise<unknown>
@@ -25,14 +26,11 @@ export interface DeleteUpload {
 export function useDeleteUpload(params: UseDeleteUploadParams): DeleteUpload {
   const { mutate, onDeleted } = params
   const [pending, setPending] = useState<UploadItem | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
 
-  const handleDelete = useCallback(async () => {
+  const deletePending = async (): Promise<void> => {
     if (!pending) {
       return
     }
-
-    setIsDeleting(true)
 
     try {
       await deleteUpload(pending.id)
@@ -42,10 +40,10 @@ export function useDeleteUpload(params: UseDeleteUploadParams): DeleteUpload {
       setPending(null)
     } catch (error) {
       toast.error(errorMessage(error))
-    } finally {
-      setIsDeleting(false)
     }
-  }, [mutate, onDeleted, pending])
+  }
+
+  const { isRunning: isDeleting, run: runDelete } = useAsyncAction(deletePending)
 
   const handleDeleteRequest = useCallback((item: UploadItem) => setPending(item), [])
 
@@ -57,7 +55,7 @@ export function useDeleteUpload(params: UseDeleteUploadParams): DeleteUpload {
 
   const handleCancelDelete = useCallback(() => setPending(null), [])
 
-  const handleConfirmDelete = useCallback(() => void handleDelete(), [handleDelete])
+  const handleConfirmDelete = useCallback(() => void runDelete(), [runDelete])
 
   return {
     pending,

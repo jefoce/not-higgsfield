@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 
 import { retrySecrets, testSecretTarget } from '@/lib/api/settings'
 import { errorMessage } from '@/lib/errors'
+import { useAsyncAction } from '@/lib/use-async-action'
 
 import { SETTINGS_SECTION_IDS, type SettingsSection } from './settings-store'
 import { testLine, type TestMessage } from './use-secrets'
@@ -12,6 +13,14 @@ import { testLine, type TestMessage } from './use-secrets'
 const EMPTY_RESULTS = Object.fromEntries(
   SETTINGS_SECTION_IDS.map((section) => [section, null]),
 ) as Record<SettingsSection, TestMessage | null>
+
+async function retrySecretsWithToast(): Promise<void> {
+  try {
+    await retrySecrets()
+  } catch (error) {
+    toast.error(errorMessage(error, 'Retry failed'))
+  }
+}
 
 interface UseSecretActionsParams {
   isDirty: boolean
@@ -22,7 +31,6 @@ export function useSecretActions(params: UseSecretActionsParams) {
   const { isDirty } = params
   const [results, setResults] = useState(EMPTY_RESULTS)
   const [testing, setTesting] = useState<SettingsSection | null>(null)
-  const [isRetrying, setIsRetrying] = useState(false)
 
   const resetResults = useCallback(() => setResults(EMPTY_RESULTS), [])
 
@@ -52,17 +60,7 @@ export function useSecretActions(params: UseSecretActionsParams) {
     }
   }
 
-  const onRetry = async () => {
-    setIsRetrying(true)
-
-    try {
-      await retrySecrets()
-    } catch (error) {
-      toast.error(errorMessage(error, 'Retry failed'))
-    } finally {
-      setIsRetrying(false)
-    }
-  }
+  const { isRunning: isRetrying, run: onRetry } = useAsyncAction(retrySecretsWithToast)
 
   return { results, testing, isRetrying, onTest, onRetry, resetResults }
 }

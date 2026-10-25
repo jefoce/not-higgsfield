@@ -1,12 +1,13 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { isEmpty, isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
 import type { FolderItem } from '@/core/schemas/folder-item'
 import { linkFolderFile } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
+import { useAsyncAction } from '@/lib/use-async-action'
 
 import { closeMediaPicker, type PickerRequest } from './store'
 
@@ -21,9 +22,25 @@ interface UsePickerConfirmParams {
 /** Confirms uploads, or links the picked folder files before committing them. */
 export function usePickerConfirm(params: UsePickerConfirmParams) {
   const { request, activeFolder, activeTab, selectedFolderRels, onConfirmUploads } = params
-  const [isAddingFolderFiles, setIsAddingFolderFiles] = useState(false)
 
-  const handleConfirm = useCallback(async () => {
+  const linkFolderFiles = async (folder: FolderItem): Promise<void> => {
+    try {
+      const rels = selectedFolderRels.slice(0, request.max)
+
+      const uploads = await Promise.all(
+        rels.map((rel) => linkFolderFile({ folderId: folder.id, relPath: rel })),
+      )
+
+      request.onPick(uploads)
+      closeMediaPicker()
+    } catch (error) {
+      toast.error(errorMessage(error))
+    }
+  }
+
+  const { isRunning: isAddingFolderFiles, run } = useAsyncAction(linkFolderFiles)
+
+  const handleConfirm = useCallback(() => {
     if (isNil(activeFolder) || activeTab === 'uploads') {
       onConfirmUploads()
 
@@ -34,23 +51,8 @@ export function usePickerConfirm(params: UsePickerConfirmParams) {
       return
     }
 
-    setIsAddingFolderFiles(true)
-
-    try {
-      const rels = selectedFolderRels.slice(0, request.max)
-
-      const uploads = await Promise.all(
-        rels.map((rel) => linkFolderFile({ folderId: activeFolder.id, relPath: rel })),
-      )
-
-      request.onPick(uploads)
-      closeMediaPicker()
-    } catch (error) {
-      toast.error(errorMessage(error))
-    } finally {
-      setIsAddingFolderFiles(false)
-    }
-  }, [activeFolder, activeTab, selectedFolderRels, onConfirmUploads, request])
+    void run(activeFolder)
+  }, [activeFolder, activeTab, onConfirmUploads, run, selectedFolderRels])
 
   return { isAddingFolderFiles, handleConfirm }
 }
