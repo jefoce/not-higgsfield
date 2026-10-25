@@ -2,22 +2,11 @@
 
 import { KIND_PLURAL, MEDIA_KINDS } from '@/core/media-kinds'
 import type { ModelPreset } from '@/core/presets/types'
+import { joinWords } from '@/core/text'
 import type { DropProps } from '@/features/media-picker/uploads/use-drop-upload'
 import { cn } from '@/lib/cn'
 
 import { REFERENCE_ICONS } from './reference-icons'
-
-function joinList(items: string[]): string {
-  if (items.length < 2) {
-    return items[0] ?? ''
-  }
-
-  if (items.length === 2) {
-    return `${items[0]} and ${items[1]}`
-  }
-
-  return `${items.slice(0, -1).join(', ')}, and ${items.at(-1)}`
-}
 
 interface ReferencesEmptyProps {
   preset: ModelPreset
@@ -57,7 +46,11 @@ export function ReferencesEmpty(props: ReferencesEmptyProps) {
       </span>
       <span className="text-sm font-medium text-fg-2">Add references</span>
       <span className="mt-1 text-xs font-medium text-fg-2">
-        Up to {joinList(kinds.map((kind) => `${preset.references[kind]} ${KIND_PLURAL[kind]}`))}
+        Up to{' '}
+        {joinWords(
+          kinds.map((kind) => `${preset.references[kind]} ${KIND_PLURAL[kind]}`),
+          'and',
+        )}
       </span>
     </button>
   )

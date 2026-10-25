@@ -3,21 +3,12 @@ import { isEmpty, isNil } from 'lodash-es'
 import { KIND_TITLE } from './media-kinds'
 import type { ModelPreset, ReferenceLimits } from './presets/types'
 import type { UploadItem } from './schemas/upload-item'
+import { joinWords } from './text'
 
 const MB = 1024 * 1024
 
 /** Whole seconds stay plain, fractions keep up to two decimals. */
 export const seconds = (value: number): string => String(Number(value.toFixed(2)))
-
-const joinOr = (items: readonly string[]): string => {
-  const [first] = items
-
-  if (items.length < 2) {
-    return first ?? ''
-  }
-
-  return `${items.slice(0, -1).join(', ')} or ${items.at(-1)}`
-}
 
 const formatRatio = (ratio: number): string => String(Number(ratio.toFixed(1)))
 
@@ -52,7 +43,7 @@ const checkFormat = (ctx: ReferenceLimitContext): void => {
   }
 
   errors.push(
-    `${preset.title} takes ${upload.kind} references as ${joinOr(formats)} (${upload.originalName})`,
+    `${preset.title} takes ${upload.kind} references as ${joinWords(formats, 'or')} (${upload.originalName})`,
   )
 }
 
