@@ -5,13 +5,13 @@ import { isEmpty } from 'lodash-es'
 import { ChevronRight } from 'lucide-react'
 
 import { getPreset, MODEL_PRESETS } from '@/core/presets'
+import { useModelEntry } from '@/lib/api/models'
 import { useMediaQuery } from '@/lib/use-media-query'
 import { SearchInput } from '@/ui/form/SearchInput'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
 import { discountLabel } from '@/ui/Price'
 
 import { useGeneratorStore } from '../store/store'
-import { usePricing } from '../use-pricing'
 import { ModelRow } from './ModelRow'
 
 /** Panel-width preset picker with search and capability badges. */
@@ -22,8 +22,8 @@ export function ModelPicker() {
   const setPreset = useGeneratorStore((state) => state.setPreset)
   const isWide = useMediaQuery('(min-width: 900px)')
   const preset = getPreset(presetId)
-  const { pricing } = usePricing()
-  const discount = pricing?.discount ?? 0
+  const entry = useModelEntry(presetId)
+  const discount = entry?.pricing?.discount ?? 0
 
   const options = MODEL_PRESETS.filter((option) =>
     option.title.toLowerCase().includes(query.trim().toLowerCase()),

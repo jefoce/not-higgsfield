@@ -10,6 +10,7 @@ import type { SecretName } from '@/core/secret-names'
 import { secretError } from '@/core/secret-names'
 import type { SecretStatus } from '@/core/types'
 import { refreshCredits } from '@/lib/api/credits'
+import { refreshModels } from '@/lib/api/models'
 import { refreshRemoteStatus } from '@/lib/api/remote'
 import { saveSecrets } from '@/lib/api/settings'
 import { errorMessage } from '@/lib/errors'
@@ -165,7 +166,7 @@ export function useSettingsDraft(params: UseSettingsDraftParams) {
 
     try {
       await saveSecrets(edits)
-      await Promise.all([refreshCredits(), refreshRemoteStatus()])
+      await Promise.all([refreshCredits(), refreshRemoteStatus(), refreshModels()])
       setEdits({})
       resetResults()
       toast.success('Settings saved')

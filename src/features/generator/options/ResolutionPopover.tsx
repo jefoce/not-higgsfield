@@ -6,10 +6,10 @@ import { Diamond } from 'lucide-react'
 import { getPreset } from '@/core/presets'
 import type { Resolution } from '@/core/presets/types'
 import { pricePerSec } from '@/core/pricing'
+import { useModelEntry } from '@/lib/api/models'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
 
 import { useGeneratorStore } from '../store/store'
-import { usePricing } from '../use-pricing'
 import { ResolutionOption } from './ResolutionOption'
 
 /** Resolution button and preset list with list and discounted per-second rates. */
@@ -26,7 +26,7 @@ export function ResolutionPopover() {
   )
 
   const preset = getPreset(useGeneratorStore((state) => state.presetId))
-  const { pricing } = usePricing()
+  const pricing = useModelEntry(preset.id)?.pricing
   const discount = pricing?.discount ?? 0
 
   const handleSelectResolution = useCallback(

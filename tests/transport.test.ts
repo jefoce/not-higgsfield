@@ -26,9 +26,11 @@ describe('resolveTransport', () => {
     expect(
       resolveTransport({ binding: primaryBinding(wan), kind: 'video', remoteConfigured: true }),
     ).toBe('url')
+
     expect(
       resolveTransport({ binding: primaryBinding(wan), kind: 'video', remoteConfigured: false }),
     ).toBe('url')
+
     expect(
       resolveTransport({ binding: primaryBinding(wan), kind: 'audio', remoteConfigured: false }),
     ).toBe('url')

@@ -5,14 +5,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { formatRate } from '@/core/pricing'
 import type { PricingInfo } from '@/core/types'
 import { ModelPicker } from '@/features/generator/model/ModelPicker'
-import { usePricing } from '@/features/generator/use-pricing'
+import { useModelEntry } from '@/lib/api/models'
+import type { CatalogEntry } from '@/server/services/model-catalog'
 import { Price } from '@/ui/Price'
 
-vi.mock('@/features/generator/use-pricing', () => ({
-  usePricing: vi.fn(() => ({ pricing: undefined })),
+vi.mock('@/lib/api/models', () => ({
+  useModelEntry: vi.fn(() => null),
 }))
 
-const mockUsePricing = vi.mocked(usePricing)
+const mockUseModelEntry = vi.mocked(useModelEntry)
 
 const PRICING: PricingInfo = {
   skus: {
@@ -30,6 +31,17 @@ const PRICING: PricingInfo = {
   fetchedAt: '',
 }
 
+function entry(pricing: PricingInfo): CatalogEntry {
+  return {
+    modelId: 'alibaba/wan-3.0',
+    presetId: 'wan-3.0',
+    provider: 'openrouter',
+    status: 'available',
+    reason: null,
+    pricing,
+  }
+}
+
 class Observer {
   observe() {}
   unobserve() {}
@@ -37,7 +49,7 @@ class Observer {
 }
 
 beforeEach(() => {
-  mockUsePricing.mockReturnValue({ pricing: undefined })
+  mockUseModelEntry.mockReturnValue(null)
   vi.stubGlobal('ResizeObserver', Observer)
 
   vi.stubGlobal('matchMedia', () => ({
@@ -77,7 +89,7 @@ describe('ModelPicker duration badge', () => {
 
 describe('ModelPicker rows', () => {
   it('shows the struck list rate, the discounted rate and no description', () => {
-    mockUsePricing.mockReturnValue({ pricing: PRICING })
+    mockUseModelEntry.mockReturnValue(entry(PRICING))
     render(<ModelPicker />)
     fireEvent.click(screen.getByRole('button', { name: /Model/ }))
     const dialog = screen.getByRole('dialog')
@@ -91,7 +103,7 @@ describe('ModelPicker rows', () => {
 
 describe('ModelPicker header', () => {
   it('shows only the percent off next to the Model label', () => {
-    mockUsePricing.mockReturnValue({ pricing: PRICING })
+    mockUseModelEntry.mockReturnValue(entry(PRICING))
     render(<ModelPicker />)
     const trigger = screen.getByRole('button', { name: /Model/ })
 

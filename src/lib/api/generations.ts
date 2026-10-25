@@ -7,7 +7,6 @@ import type {
   GenerationInput,
   GenerationListResult,
   GenerationRecord,
-  PricingInfo,
 } from '@/core/types'
 import { apiDelete, apiPatch, apiPost, fetcher } from '@/lib/fetcher'
 import type { GenerationEstimateKey } from '@/lib/swr-keys'
@@ -103,14 +102,6 @@ export function fetchGenerationsByIds(ids: string[]): Promise<GenerationListResu
   return fetcher<GenerationListResult>(
     `/api/generations?ids=${ids.map(encodeURIComponent).join(',')}`,
   )
-}
-
-export function pricingKey(presetId: string): string {
-  return `/api/pricing?preset=${encodeURIComponent(presetId)}`
-}
-
-export function fetchPricing(key: string): Promise<PricingInfo> {
-  return fetcher<PricingInfo>(key)
 }
 
 export function requestReferencePlan(presetId: string, ids: string[]): Promise<ReferencePlan> {

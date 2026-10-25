@@ -7,10 +7,10 @@ import { AudioLines, Check, Clock, Diamond, type LucideIcon, Sparkles, Volume2 }
 import { minDuration } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
 import { formatRate, pricePerSec } from '@/core/pricing'
+import { useModelEntry } from '@/lib/api/models'
 import { cn } from '@/lib/cn'
 import { Price } from '@/ui/Price'
 
-import { usePricing } from '../use-pricing'
 import { ModelBadge } from './ModelBadge'
 
 function quality(preset: ModelPreset): string {
@@ -45,6 +45,22 @@ function fromRate(preset: ModelPreset, skus?: Record<string, number>): number | 
   return rates.length > 0 ? Math.min(...rates) : null
 }
 
+interface ListRateParams {
+  preset: ModelPreset
+  skus: Record<string, number> | undefined
+  discount: number
+}
+
+function listRate(params: ListRateParams): number | null {
+  const { preset, skus, discount } = params
+
+  if (discount <= 0) {
+    return null
+  }
+
+  return fromRate(preset, skus)
+}
+
 interface ModelRowProps {
   option: ModelPreset
   selected: boolean
@@ -54,14 +70,10 @@ interface ModelRowProps {
 /** One selectable row in the model picker. */
 export function ModelRow(props: ModelRowProps) {
   const { option, selected: isSelected, onSelect } = props
-  const { pricing } = usePricing(option.id)
+  const pricing = useModelEntry(option.id)?.pricing
   const discount = pricing?.discount ?? 0
   const from = fromRate(option, pricing?.skus)
-  let listFrom: number | null = null
-
-  if (discount > 0) {
-    listFrom = fromRate(option, pricing?.listSkus)
-  }
+  const listFrom = listRate({ preset: option, skus: pricing?.listSkus, discount })
 
   const Icon = PRESET_ICONS[option.icon]
 

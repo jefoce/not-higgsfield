@@ -9,8 +9,8 @@ import { useGeneratorStore } from '@/features/generator/store/store'
 
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
 
-vi.mock('@/features/generator/use-pricing', () => ({
-  usePricing: () => ({ pricing: null }),
+vi.mock('@/lib/api/models', () => ({
+  useModelEntry: () => null,
 }))
 
 class Observer {

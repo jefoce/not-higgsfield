@@ -16,6 +16,7 @@ import { type PriceInput, validateInput } from '@/core/validation'
 import { ValidationError } from '../errors'
 import { getVideoProvider } from '../providers/registry'
 import { getActiveCount } from '../repos/generations'
+import { getModelCatalog } from '../services/model-catalog'
 import { getObjectStore } from '../storage/registry'
 import { loadUploads } from './run-submit'
 
@@ -28,6 +29,8 @@ export interface GenerationDraft {
 /** Validates one draft and loads only its referenced uploads. */
 export async function loadDraft(raw: GenerationInput): Promise<GenerationDraft> {
   const preset = getPreset(raw.presetId)
+
+  await assertCatalogUsable(preset.id)
   const base = inputForSubmit(raw)
   const uploads = await loadUploads(base)
   const input = withCanonicalPrompt(base, uploads)
@@ -52,10 +55,26 @@ export async function loadDraft(raw: GenerationInput): Promise<GenerationDraft> 
 /** Uploads for a price-only draft. No validation, active count, remote or secrets. */
 export async function loadPriceDraft(raw: PriceInput): Promise<GenerationDraft> {
   const preset = getPreset(raw.presetId)
+
+  await assertCatalogUsable(preset.id)
   const input = inputForSubmit({ ...raw, prompt: '', seed: null })
   const uploads = await loadUploads(input)
 
   return { preset, input, uploads }
+}
+
+/** Missing and unconfigured models fail loudly. Unverified ones proceed. */
+async function assertCatalogUsable(presetId: string): Promise<void> {
+  const { entries } = await getModelCatalog()
+  const entry = entries.find((item) => item.presetId === presetId)
+
+  if (isNil(entry)) {
+    return
+  }
+
+  if (entry.status === 'missing' || entry.status === 'no_provider') {
+    throw new ValidationError([entry.reason ?? 'Model unavailable'])
+  }
 }
 
 /** Discounted and list totals for a validated draft. */

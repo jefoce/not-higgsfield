@@ -1,6 +1,7 @@
 export const REMOTE_STATUS_KEY = '/api/remote/status'
 export const CREDITS_KEY = '/api/credits'
 export const SECRETS_KEY = '/api/settings/secrets'
+export const MODELS_KEY = '/api/models'
 
 const GENERATION_ESTIMATE_URL = '/api/generations/estimate'
 
