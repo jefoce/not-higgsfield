@@ -34,7 +34,15 @@ Single user, local app on macOS, Windows and Linux. It is not a server for a net
 
 The webview never receives key material. In desktop mode the Node server asks the Rust shell for secrets over stdin/stdout, so keychain calls happen in the signed app process.
 
-## 4. Known limits
+## 4. Updates
+
+The updater downloads a signed `latest.json` and the installer it points to, then verifies both against the Ed25519 public key embedded in `tauri.conf.json` before it installs anything. A download that fails the check is rejected and the server keeps running.
+
+The private signing key lives only in the GitHub secrets `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` and in the owner's password manager. It is never in the repo or on a build runner outside a release job.
+
+A lost or leaked key cannot be replaced for an installed app, because the embedded public key is fixed at build time. Every user must then reinstall by hand from the Releases page. Keep a backup of the key.
+
+## 5. Known limits
 
 - The app is ad hoc signed. macOS can show Keychain prompts again after a rebuild or update, and Gatekeeper needs the first-open bypass. A Developer ID signature is planned. See [DEVELOPMENT.md](DEVELOPMENT.md).
 - Browser mode has no session token. Any local process that can reach `127.0.0.1:3000` can call the API. Use browser mode for development only.
@@ -42,6 +50,6 @@ The webview never receives key material. In desktop mode the Node server asks th
 - If Linux has no keyring service, keys fall back to `~/.not-higgsfield/secrets.json` with mode 0600. File permissions, not the OS keyring, protect that file. macOS and Windows do not use the file fallback.
 - The R2 token can read and write the configured bucket. Create a token scoped to that bucket only.
 
-## 5. Reporting
+## 6. Reporting
 
 Security problems: use GitHub private vulnerability reporting (Security tab, "Report a vulnerability"). Normal bugs: open an issue. Do not include keys, account ids, presigned URLs or private media in the report.

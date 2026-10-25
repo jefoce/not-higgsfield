@@ -4,6 +4,7 @@
 
 ### Added
 
+- The app tells you about new versions and installs them from Settings.
 - Unavailable models show as disabled with the reason they cannot run.
 - The cost estimate includes the seconds of reference videos.
 - Reference durations show their exact values.

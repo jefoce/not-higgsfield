@@ -320,6 +320,16 @@ Prebuilt ffmpeg and Node sidecars and the ffmpeg source archives are public on G
 [not-higgsfield-sidecars](https://github.com/users/jefoce/packages/container/package/not-higgsfield-sidecars),
 [not-higgsfield-sources](https://github.com/users/jefoce/packages/container/package/not-higgsfield-sources).
 
+### Updates
+
+Release builds pass `--config src-tauri/tauri.updater.conf.json`, which turns on `createUpdaterArtifacts`. Only `.github/workflows/release.yml` passes it. `ci.yml` and local builds keep `createUpdaterArtifacts: false` and need no key. The build job reads `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` from repository secrets and uploads one `.sig` per installer. The `updater-manifest` job then writes `latest.json` from those signatures and the notes for the version in `CHANGELOG.md`.
+
+Test the update path against an rc manifest by setting `NH_UPDATE_ENDPOINT` before launch, for example `https://github.com/jefoce/not-higgsfield/releases/download/v0.2.0-rc.2/latest.json`, then run the packaged app.
+
+A local test against `http://127.0.0.1` needs `dangerousInsecureTransportProtocol` passed inline with `--config`, for example `pnpm desktop:build -- --config '{"plugins":{"updater":{"dangerousInsecureTransportProtocol":true}}}'`. Never commit the flag to `tauri.conf.json` or `tauri.updater.conf.json`.
+
+To roll back a bad release, delete the `latest.json` asset from that release so `latest` falls back to the previous release, or publish a fixed patch release.
+
 ## 17. Later: Developer ID and notarization
 
 Not done yet. Until a Developer ID exists, `xattr -dr com.apple.quarantine "/Applications/Not Higgsfield.app"` is a required install step, documented in the README, not an optional fix for a damaged app. It only clears the local quarantine flag for the downloaded copy. It does not change the signature, and it does not replace notarization.

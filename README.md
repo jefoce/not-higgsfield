@@ -75,6 +75,18 @@ No administrator rights needed. The app appears in the Start menu.
 
 Each release has a `SHA256SUMS.txt` if you want to check your download.
 
+## Updates
+
+The app checks once a day and shows a notice when a new version exists. Settings → **App** has the switch for that check and **Check now**.
+
+- **macOS and Windows:** **Install and restart** downloads the new version and installs it in place.
+- **Linux AppImage:** the same button replaces the running AppImage.
+- **Linux `.deb` and `.rpm`:** the app cannot replace a system package. **Download** opens the [Releases page](https://github.com/jefoce/not-higgsfield/releases/latest) so you install the new version as before.
+
+On macOS, the first launch after an update asks for keychain access once. Choose **Always Allow**.
+
+Version 0.1.0 has no updater. Install 0.2.0 by hand once from the Releases page. Later versions update themselves.
+
 ## Messages your computer may show
 
 The app is not signed with a paid certificate yet, so your system asks more questions than usual. They are all normal.

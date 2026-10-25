@@ -293,6 +293,7 @@ const deletion = useAsyncAction(async () => {
 - Platform bridge: `src/lib/platform`
 - Shared UI: `src/ui`, `src/ui/form`
 - Desktop shell: `src-tauri/src`
+- Updates: `src-tauri/src/updater.rs`, `src/features/updates`
 - ffmpeg build: `scripts/ffmpeg`
 - Node build: `scripts/node`
 - Workflow helpers: `.github/scripts`

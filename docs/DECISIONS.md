@@ -428,6 +428,14 @@ Why: the raw text stays available for Details and Copy, and table fixes apply to
 
 Rejected: rewriting stored errors at write time.
 
+## 2026-10-25 - Updates run in Rust
+
+Decision: the Tauri shell checks for, downloads and installs updates with `tauri-plugin-updater`. The webview calls five commands: `update_info`, `update_check`, `update_install`, `update_set_auto` and `update_open_release`.
+
+Why: the webview never gets the updater permission or the signing key. The shell stops the Node server before it replaces the app, so no job writes into a bundle that is being swapped. Every download is checked against the public key embedded in `tauri.conf.json`, and the `latest` endpoint skips drafts and prereleases until they are published.
+
+Rejected: an in-page updater (needs the webview permission and a server stop from the wrong side), and manual downloads for every release.
+
 ## Deferred on purpose
 
 | Item | Why not now | Bring it back when |
@@ -439,4 +447,3 @@ Rejected: rewriting stored errors at write time.
 | `react-hook-form` | one small form | a second real form appears |
 | Virtual scroll (`@tanstack/react-virtual`) | content-visibility covers expected history sizes | history passes about 1,500 items or memory grows after deep scrolling. Spec: list with `measureElement`, grid virtualized by rows from width and zoom, load next page within 5 rows of the end, `scrollToIndex` for jump-to-item, players stop when scrolled out |
 | Developer ID signing and notarization (macOS), code signing (Windows) | costs money. Until then the required macOS xattr step stays in the install docs | you publish beyond friends, or keychain prompts after updates get annoying |
-| Auto-update (`tauri-plugin-updater`) | needs a signing key and a hosted `latest.json` | more than a few users |
