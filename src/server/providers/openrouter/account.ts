@@ -6,8 +6,8 @@ import { FETCH_TIMEOUTS } from '@/core/constants'
 import { messageOf } from '@/core/errors'
 import { isNonEmptyString } from '@/core/guards'
 
-import { globalState } from '../../global-state'
 import { getSecret, onSecretsChange, secretsReady } from '../../secrets'
+import { createTtlCache, type TtlLoadResult } from '../../sync/ttl-cache'
 import type { AccountLookupParams, ProviderAccount } from '../types'
 
 const BASE_URL = 'https://openrouter.ai'
@@ -37,29 +37,30 @@ type KeyData = z.infer<typeof KeyDataSchema>
 
 type CreditsData = z.infer<typeof CreditsDataSchema>
 
-interface CacheEntry {
-  info: ProviderAccount
-  at: number
+const cache = createTtlCache<ProviderAccount>({
+  key: 'credits',
+  okTtlMs: CACHE_MS,
+  failTtlMs: 0,
+})
+
+let lastAccount: ProviderAccount | null = null
+
+/** Key and management credits, cached for 30 seconds. Failures are retried, never cached. */
+export async function getProviderAccount(opts?: AccountLookupParams): Promise<ProviderAccount> {
+  return cache.get('account', loadAccount, opts?.fresh === true)
 }
 
-const cache = globalState('credits', () => ({ entry: undefined as CacheEntry | undefined }))
-
-/** Key and management credits, cached for 30 seconds. Never throws. */
-export async function getProviderAccount(opts?: AccountLookupParams): Promise<ProviderAccount> {
-  const cached = cache.entry
-
-  if (opts?.fresh !== true && cached && Date.now() - cached.at < CACHE_MS) {
-    return cached.info
-  }
-
+async function loadAccount(): Promise<TtlLoadResult<ProviderAccount>> {
   try {
     const info = await loadCredits()
 
-    cache.entry = { info, at: Date.now() }
+    lastAccount = info
 
-    return info
+    return { value: info, isOk: true }
   } catch (error) {
-    return withError(cached?.info ?? null, messageOf(error, 'Credits request failed'))
+    const value = withError(lastAccount, messageOf(error, 'Credits request failed'))
+
+    return { value, isOk: false }
   }
 }
 
@@ -158,5 +159,6 @@ function withError(last: ProviderAccount | null, message: string): ProviderAccou
 }
 
 onSecretsChange(() => {
-  cache.entry = undefined
+  cache.clear()
+  lastAccount = null
 })

@@ -8,7 +8,8 @@ import type { ModelPreset } from '@/core/presets/types'
 import { primaryBinding } from '@/core/pricing'
 import type { PricingInfo } from '@/core/types'
 
-import { globalState } from '../../global-state'
+import { onSecretsChange } from '../../secrets'
+import { createTtlCache, type TtlLoadResult } from '../../sync/ttl-cache'
 
 const API_URL = 'https://openrouter.ai/api/v1'
 const MODELS_URL = `${API_URL}/videos/models`
@@ -31,27 +32,21 @@ const EndpointsDataSchema = z.object({ endpoints: z.array(EndpointSchema) }).loo
 
 const EndpointsSchema = z.object({ data: EndpointsDataSchema }).loose()
 
-interface CacheEntry {
-  info: PricingInfo
-  at: number
-}
-
-const cache = globalState<Map<string, CacheEntry>>('pricing', () => new Map())
+const cache = createTtlCache<PricingInfo>({
+  key: 'pricing',
+  okTtlMs: LIVE_TTL_MS,
+  failTtlMs: PRICING_FALLBACK_TTL_MS,
+})
 
 /** List and discounted rates. Live results cache for an hour, fallback for five minutes. */
 export async function getPricing(preset: ModelPreset, isForce = false): Promise<PricingInfo> {
-  const cached = cache.get(preset.id)
-  const ttl = cached?.info.source === 'live' ? LIVE_TTL_MS : PRICING_FALLBACK_TTL_MS
+  return cache.get(preset.id, () => loadPricing(preset), isForce)
+}
 
-  if (!isForce && cached && Date.now() - cached.at < ttl) {
-    return cached.info
-  }
-
+async function loadPricing(preset: ModelPreset): Promise<TtlLoadResult<PricingInfo>> {
   const info = await fetchPricing(preset)
 
-  cache.set(preset.id, { info, at: Date.now() })
-
-  return info
+  return { value: info, isOk: info.source === 'live' }
 }
 
 function fallback(preset: ModelPreset): PricingInfo {
@@ -181,3 +176,7 @@ function readSkus(skus: Record<string, unknown> | undefined): Record<string, num
 
   return result
 }
+
+onSecretsChange(() => {
+  cache.clear()
+})

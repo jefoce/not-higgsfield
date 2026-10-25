@@ -4,8 +4,8 @@ import { z } from 'zod'
 
 import { FETCH_TIMEOUTS, PRICING_FALLBACK_TTL_MS } from '@/core/constants'
 
-import { globalState } from '../../global-state'
 import { onSecretsChange } from '../../secrets'
+import { createTtlCache, type TtlLoadResult } from '../../sync/ttl-cache'
 import type { ProviderModel, ProviderModelList } from '../types'
 import { BASE_URL } from './http'
 
@@ -26,35 +26,28 @@ const ModelSchema = z
 
 const ModelsSchema = z.object({ data: z.array(ModelSchema) }).loose()
 
-interface CacheEntry {
-  models: readonly ProviderModel[]
-  at: number
-  isFallback: boolean
-}
+const cache = createTtlCache<ProviderModelList>({
+  key: 'providerModels',
+  okTtlMs: LIVE_TTL_MS,
+  failTtlMs: PRICING_FALLBACK_TTL_MS,
+})
 
-const cache = globalState('providerModels', () => ({ entry: undefined as CacheEntry | undefined }))
+let lastModels: readonly ProviderModel[] = []
 
 /** Live model capabilities. A good result caches for an hour, a failure for five minutes. */
 export async function listModels(): Promise<ProviderModelList> {
-  const cached = cache.entry
-  const ttl = cached?.isFallback === true ? PRICING_FALLBACK_TTL_MS : LIVE_TTL_MS
+  return cache.get('models', loadModels)
+}
 
-  if (cached && Date.now() - cached.at < ttl) {
-    return { models: cached.models, isFresh: !cached.isFallback }
-  }
-
+async function loadModels(): Promise<TtlLoadResult<ProviderModelList>> {
   try {
     const models = await fetchModels()
 
-    cache.entry = { models, at: Date.now(), isFallback: false }
+    lastModels = models
 
-    return { models, isFresh: true }
+    return { value: { models, isFresh: true }, isOk: true }
   } catch {
-    const models = cached?.models ?? []
-
-    cache.entry = { models, at: Date.now(), isFallback: true }
-
-    return { models, isFresh: false }
+    return { value: { models: lastModels, isFresh: false }, isOk: false }
   }
 }
 
@@ -90,5 +83,6 @@ function toModel(model: z.infer<typeof ModelSchema>): ProviderModel {
 }
 
 onSecretsChange(() => {
-  cache.entry = undefined
+  cache.clear()
+  lastModels = []
 })
