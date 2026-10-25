@@ -21,6 +21,13 @@ tester.run('callback-props', rule as Rule.RuleModule, {
       code: 'function Comp(props) { return <button onClick={props.onClose} /> }',
     },
     {
+      name: 'passes a hook member',
+      code: `function Comp() {
+  const confirmDialog = useBoolean()
+  return <button onClick={confirmDialog.on} />
+}`,
+    },
+    {
       name: 'passes a setter from state',
       code: `function Comp() {
   const [isOpen, setIsOpen] = useState(false)
@@ -51,6 +58,11 @@ tester.run('callback-props', rule as Rule.RuleModule, {
   return <button onClick={handleClose} />
 }`,
       errors: [{ messageId: 'alias' }],
+    },
+    {
+      name: 'rejects a props member without the on prefix',
+      code: 'function Comp(props) { return <button onClick={props.close} /> }',
+      errors: [{ messageId: 'callbackName' }],
     },
     {
       name: 'rejects a destructured callback used in JSX',

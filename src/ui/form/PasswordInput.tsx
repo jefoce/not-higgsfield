@@ -16,8 +16,6 @@ export const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
     const reveal = useBoolean()
     const isValueEmpty = !isNonEmptyString(value)
 
-    const handleToggleReveal = () => reveal.toggle()
-
     const canReveal = reveal.value && !isValueEmpty
     const inputType = canReveal ? 'text' : 'password'
     const RevealIcon = reveal.value ? EyeOff : Eye
@@ -38,7 +36,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
         {isDisabled !== true && (
           <button
             type="button"
-            onClick={handleToggleReveal}
+            onClick={reveal.toggle}
             disabled={isValueEmpty}
             aria-label={revealLabel}
             className="absolute inset-y-0 right-0 flex w-8 items-center justify-center text-fg-2 hover:text-fg disabled:opacity-30"

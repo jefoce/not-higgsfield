@@ -114,6 +114,7 @@ const callbackProps = {
       destructured:
         'Read callbacks as props.{{name}}. Destructure only when every use is inside a hook callback.',
       renamed: 'Keep the callback name: props.{{name}}.',
+      callbackName: 'Callback props are named on<Action>.',
     },
   },
   create(context) {
@@ -186,6 +187,20 @@ const callbackProps = {
 
         const expression =
           node.value?.type === 'JSXExpressionContainer' ? node.value.expression : null
+
+        if (expression?.type === 'MemberExpression') {
+          if (
+            expression.object.type === 'Identifier' &&
+            expression.object.name === 'props' &&
+            !expression.computed &&
+            expression.property.type === 'Identifier' &&
+            !CALLBACK_PROP.test(expression.property.name)
+          ) {
+            context.report({ node, messageId: 'callbackName' })
+          }
+
+          return
+        }
 
         if (expression?.type !== 'Identifier') {
           return

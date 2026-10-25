@@ -43,8 +43,6 @@ export function DetailsActions(props: DetailsActionsProps) {
 
   const handleFavorite = () => void toggleFavorite(record)
 
-  const handleOpenDelete = () => confirmDialog.on()
-
   const handleConfirmOpenChange = (isOpen: boolean): void => {
     confirmDialog.set(isOpen)
   }
@@ -80,7 +78,7 @@ export function DetailsActions(props: DetailsActionsProps) {
             <button
               type="button"
               aria-label="Remove"
-              onClick={handleOpenDelete}
+              onClick={confirmDialog.on}
               className="ml-auto inline-flex h-6 w-7.5 items-center justify-center rounded-lg text-danger transition hover:bg-danger/10"
             >
               <Trash2 size={14} aria-hidden />

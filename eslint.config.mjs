@@ -188,15 +188,6 @@ export default defineConfig([
       'react/jsx-max-depth': ['error', { max: 6 }],
       'react/hook-use-state': 'error',
       'react-hooks/exhaustive-deps': 'error',
-      'react/jsx-handler-names': [
-        'error',
-        {
-          eventHandlerPrefix: 'handle',
-          eventHandlerPropPrefix: 'on',
-          checkLocalVariables: false,
-          checkInlineFunction: false,
-        },
-      ],
 
       // Project rules from AGENTS.md live in the per-layer blocks below.
 

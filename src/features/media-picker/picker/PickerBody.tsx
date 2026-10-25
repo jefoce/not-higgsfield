@@ -53,8 +53,6 @@ export function PickerBody(props: PickerBodyProps) {
   const upload = usePickerUpload({ request, onCommit: commit })
   const addFolderDialog = useBoolean()
 
-  const handleAddFolderOpen = () => addFolderDialog.on()
-
   const handleAddOpenChange = (isOpen: boolean): void => {
     addFolderDialog.set(isOpen)
   }
@@ -83,7 +81,7 @@ export function PickerBody(props: PickerBodyProps) {
           folders={folders}
           activeTab={activeTab}
           onTabChange={handleTabChange}
-          onAddFolder={handleAddFolderOpen}
+          onAddFolder={addFolderDialog.on}
           onClose={closeMediaPicker}
           onDisconnectFolder={foldersState.handleDisconnect}
         />
