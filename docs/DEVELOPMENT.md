@@ -56,16 +56,57 @@ Mock mode keeps the Test button enabled without stored keys.
 
 ## 5. Adding a model
 
-1. Find the provider docs and the OpenRouter slug. Check `/api/v1/videos/models` for `supported_*` fields and `pricing_skus`.
+1. Find the provider docs and the OpenRouter model id. Check `/api/v1/videos/models` for `supported_*` fields and `pricing_skus`.
 2. Same family as an existing model: add `src/core/presets/<family>/<model>.ts` with only what differs from `family.ts`. New family: add `src/core/presets/<family>/family.ts` with references, `referenceLimits` for every media kind it accepts, `errors`, `icon`.
 3. Add it to `MODEL_PRESETS` in `src/core/presets/index.ts` (the order is the picker order).
-4. Put a source link in a comment next to every limit, and in the commit message.
-5. `pnpm vitest run tests/presets-contract.test.ts`. It checks defaults, duration options, sizes, pricing keys, reference limits and the error table.
-   After adding or changing a preset, run `LIVE_CATALOG=1 corepack pnpm vitest run tests/catalog-live.test.ts`. A red weekly run of it means the presets drifted from the live OpenRouter catalog.
-6. One real-key run with a prompt, then one with each reference kind. Record anything learned (for example `promptOptional`, the billing floor) in the preset with the date.
+4. Write one or more bindings in priority order. The first binding whose provider is configured wins.
+
+   ```ts
+   bindings: [
+     {
+       provider: 'openrouter',
+       modelId: 'alibaba/wan-3.0',
+       pricing: {
+         kind: 'perSecond',
+         unit: 'usd',
+         skuRules,
+         tiers,
+         fallback,
+         minBillableSec,
+         referenceVideoFactor,
+       },
+       transport: { image: 'base64', video: 'auto', audio: 'auto' },
+     },
+   ]
+   ```
+
+5. `skuRules` is ordered. Each rule has `when` conditions (`hasVideoInput`, `audio`, `hasTier`) and a `key` where `{resolution}` and `{tier}` are replaced. The first matching rule wins. `tiers` maps a resolution to its SKU suffix, for example `1080p` to `_1080p`. `fallback` needs a rate for every key the rules can produce.
+6. Put a source link in a comment next to every limit, and in the commit message.
+7. `pnpm vitest run tests/presets-contract.test.ts`. It checks defaults, duration options, sizes, pricing keys, reference limits and the error table.
+8. After adding or changing a preset, run `LIVE_CATALOG=1 corepack pnpm vitest run tests/catalog-live.test.ts`. A red weekly run means the presets drifted from the live OpenRouter catalog.
+9. One real-key run with a prompt, then one with each reference kind. Record anything learned (for example `promptOptional`, the billing floor) in the preset with the date.
    Never branch on a preset id outside `src/core/presets`. Add a preset field instead.
 
-## 6. Environment variables
+## 6. Adding a video provider
+
+1. Add the id to `VIDEO_PROVIDER_IDS` in `src/core/providers/types.ts`.
+2. Add one descriptor in `src/core/providers`, then list it in `VIDEO_PROVIDERS` in `src/core/providers/registry.ts`. The descriptor holds the label, secret fields, required secrets, links and HTTP rule table.
+3. Add one adapter under `src/server/providers/<id>` with a factory that returns `VideoProvider` from `src/server/providers/types.ts`. Implement submit, poll, content, account, pricing, model list and connection test.
+4. Classify every failure as `ProviderError` with a `ProviderErrorKind`. Jobs branch only on `kind`, never on HTTP status or provider name.
+5. Register the factory in `FACTORIES` in `src/server/providers/registry.ts`.
+6. The contract is `VideoProvider`. Add one mapping case per kind to `tests/provider-error-mapping.test.ts` and the catalog states to `tests/model-catalog.test.ts`.
+7. Mock mode returns the mock adapter from the registry. Records keep the real provider id.
+
+## 7. Adding object storage
+
+1. Add the id to `STORAGE_PROVIDER_IDS` in `src/core/providers/types.ts`.
+2. Add one descriptor in `src/core/providers`, then list it in `STORAGE_PROVIDERS` in `src/core/providers/registry.ts`.
+3. Add a config function that returns `S3StoreConfig` from secrets: `endpoint`, `region`, `bucket`, `accessKeyId`, `secretAccessKey`. Return null when one is missing.
+4. Select it in `src/server/storage/registry.ts` with `createS3Store(config)`. A store that is not S3 implements `ObjectStore` directly.
+5. Add the secret names to `SecretName` so Settings renders the descriptor fields.
+6. Test the store through `tests/remote-inputs.test.ts` and the mock store.
+
+## 8. Environment variables
 
 | Variable | Purpose |
 |---|---|
@@ -89,7 +130,7 @@ Mock mode keeps the Test button enabled without stored keys.
 
 Env values override stored keys and are read-only in Settings.
 
-## 7. Tests
+## 9. Tests
 
 Suite layout: `tests/*.test.{ts,tsx}`. Most tests cover `src/core` pure logic, route helpers, repos, locks and secrets with fake backends in the Node environment. Component tests opt in per file with `// @vitest-environment jsdom` and Testing Library.
 
@@ -107,13 +148,13 @@ pnpm vitest
 
 `tests/docs.test.ts` checks the README status table, the architecture models and bounds tables, and that relative doc links exist.
 
-## 8. Lint and dead code
+## 10. Lint and dead code
 
 `pnpm lint` runs ESLint. `pnpm knip` reports unused files, exports and dependencies. Clear findings before adding it to the lint script.
 
 `.github/workflows/ci.yml` runs typecheck, lint, deps, format, knip, tests and build on pushes to any branch and on pull requests, tag pushes are left to the release workflow, which runs the same checks for `v*-rc.*`. Dependabot opens one grouped monthly pull request for npm, cargo and GitHub Actions against `releases`, semver-major updates are ignored. CodeQL default setup runs weekly on actions, JavaScript/TypeScript and Rust.
 
-## 9. Code shape rules
+## 11. Code shape rules
 
 - Keep files near 200 lines or less. Split by component or job, not by squeezed formatting.
 - One exported component per file. The file name matches the main export. Private subcomponents stay in the same file only when they exist for one caller.
@@ -126,7 +167,7 @@ pnpm vitest
 - No focus rings. Keyboard focus uses the `:focus-visible` hover UI, never `focus-visible:ring-*`.
 - Mock first: `OPENROUTER_MOCK=1` for generation work, `REMOTE_MOCK=1` for storage work.
 
-## 10. Desktop build
+## 12. Desktop build
 
 `pnpm desktop:build` builds the installers for the current platform only: dmg on macOS, NSIS on Windows, AppImage/deb/rpm on Linux.
 
@@ -172,7 +213,7 @@ Measured on 2026-10-21, macOS arm64: DMG 62.72 MiB, installed app 181.76 MiB. In
 
 Build per architecture. arm64 builds on Apple Silicon. x64 needs an Intel Mac, or an x64 Node and matching native modules.
 
-## 11. Own ffmpeg build
+## 13. Own ffmpeg build
 
 - `pnpm ffmpeg:build` builds the redistributable ffmpeg for this machine into `~/.cache/not-higgsfield-build/ffmpeg/<version>-<profile>/<triple>/`. `pnpm desktop:build` picks it up from there.
 - ffmpeg 9.0.2 with the `full` profile lands in `~/.cache/not-higgsfield-build/ffmpeg/9.0.2-full/<triple>/ffmpeg-<triple>`. The full build has x264, AAC, PNG, MJPEG, WebP and the filters the app uses, and no nonfree components.
@@ -188,7 +229,7 @@ Build per architecture. arm64 builds on Apple Silicon. x64 needs an Intel Mac, o
 
 Measured on macOS arm64: full 22.1 MiB, minimal 8.9 MiB, `ffmpeg-static` fallback 43.5 MiB.
 
-## 12. Own Node build
+## 14. Own Node build
 
 `pnpm node:build` runs `scripts/node/build-unix.sh` and builds Node 24.22.1 with `small-icu`, no npm and no corepack. The result lands in `~/.cache/not-higgsfield-build/node/24.22.1-small-icu/<triple>/not-higgsfield-server-<triple>`, and `prepare-desktop.mjs` uses it when present. Source is the official `.tar.xz`, checked against `NODE_SHA256` in `scripts/node/versions.env`.
 
@@ -210,7 +251,7 @@ Measured on 2026-10-22, macOS arm64: custom binary 65.0 MiB against 116.9 MiB fo
 
 The first build compiles Node from source and is slow. Later runs reuse the cached binary.
 
-## 13. Debugging
+## 15. Debugging
 
 ### Stale builds
 
@@ -250,7 +291,7 @@ PORT=47821 HOSTNAME=127.0.0.1 APP_TOKEN=test \
 
 Then open `http://127.0.0.1:47821/api/session?t=test`.
 
-## 14. Release checklist
+## 16. Release checklist
 
 `.github/workflows/release.yml` runs on pushes to `releases`, on `v*-rc.*` tags and on manual `workflow_dispatch` with a `tag` input. A `draft` job creates one draft release before any build. The `ffmpeg` and `node` jobs pull their sidecar from GHCR or build and push it, build jobs download artifacts (or a reused run), verify sidecars, stage the server, run the smoke test, build installers, rename them `not-higgsfield-<version>-<platform>-<arch><suffix>` and upload them by release id. The checksums job reads ffmpeg sources from GHCR first and from the run artifact second, then uploads `SHA256SUMS.txt` and the archives by release id. On a push to `releases`, the `tag` job creates and pushes `vX.Y.Z` only after every job passed. Every oras push carries `org.opencontainers.image.source` linking the package to this repo.
 
@@ -276,7 +317,7 @@ Prebuilt ffmpeg and Node sidecars and the ffmpeg source archives are public on G
 [not-higgsfield-sidecars](https://github.com/users/jefoce/packages/container/package/not-higgsfield-sidecars),
 [not-higgsfield-sources](https://github.com/users/jefoce/packages/container/package/not-higgsfield-sources).
 
-## 15. Later: Developer ID and notarization
+## 17. Later: Developer ID and notarization
 
 Not done yet. Until a Developer ID exists, `xattr -dr com.apple.quarantine "/Applications/Not Higgsfield.app"` is a required install step, documented in the README, not an optional fix for a damaged app. It only clears the local quarantine flag for the downloaded copy. It does not change the signature, and it does not replace notarization.
 

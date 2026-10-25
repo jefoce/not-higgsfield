@@ -52,6 +52,7 @@ pnpm typecheck && pnpm lint && pnpm deps && pnpm format:check && pnpm knip && pn
 - No `any`. Use `unknown` plus a zod schema or a type guard.
 - Data from outside (OpenRouter responses, request bodies, JSON files on disk, localStorage) is parsed with zod. Types come from `z.infer`, never hand-written next to a schema.
 - One type per API shape, in `src/core`, imported by both the route and the client. No copies of a response type in a component.
+- Flat object types. One level per object type. Every nested shape gets a name. Owner-prefixed when the part belongs to one owner (`RecordJob`, `RecordOutput`), shared when the shape repeats (`PixelSize`, `FrameSlots`, `MediaKindCounts`). Width and height pairs use `PixelSize`. No inline `z.object` inside another schema. Tests are exempt.
 - `satisfies` for literal config objects (presets, tables). `as const` for fixed lists.
 - No nested ternaries. Branch on simple values only (identifier, literal, member access, template string, JSX, `null`, single-argument call). A function, object, array, `await`, assignment or nested ternary in a branch becomes a named handler, variable or early return.
 - Boolean variables and params start with `is`, `has`, `can`, `should` or `did`. Types are PascalCase. Module constants are UPPER_CASE or camelCase.
@@ -103,6 +104,27 @@ async function copyUnique(params: CopyUniqueParams): Promise<string> {
 - Components follow the same rule with `props`: `function HistoryRow(props: HistoryRowProps)`, then `const { record } = props` on the first line.
 - Hooks with 3 or more inputs take `params` too (`useVideoState(params)`).
 - Exceptions: callbacks with a fixed signature (event handlers, `map`/`filter`/`reduce`, zustand `set`, `Array.sort`), route handlers (`request`, `{ params }` from Next), and tiny private helpers where the call reads like math (`clamp(value, min, max)`).
+
+## Modules
+
+- No re-exports. Import from the module that defines the symbol.
+- `src/lib/api` is the only place an API URL is written. Components and hooks call those functions.
+- `src/server/jobs` never reads an HTTP status code or a provider name. It branches on `ProviderError.kind`.
+- Feature direction, where an arrow means "may import":
+
+| From                    | May import                              |
+| ----------------------- | --------------------------------------- |
+| `src/app`               | `features/studio`, server route helpers |
+| `features/studio`       | every feature                           |
+| `features/history`      | `generator`, `preview`, `player`        |
+| `features/generator`    | `media-picker`, `preview`, `settings`   |
+| `features/media-picker` | `preview`, `player`                     |
+| `features/preview`      | `player`                                |
+| `features/settings`     | nothing in `features`                   |
+| `features/player`       | nothing in `features`                   |
+| `features`, `ui`        | `lib`, `core`, `ui`                     |
+| `lib`                   | `core`                                  |
+| `core`                  | packages only                           |
 
 ## React
 

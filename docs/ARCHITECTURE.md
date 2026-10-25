@@ -24,18 +24,27 @@ Two run modes, one server:
 |---|---|
 | `src/core` | Pure logic, no IO. Shared by client and server. |
 | `src/core/presets` | One file per model under its family folder. `family.ts` holds what the family shares. |
+| `src/core/providers` | Provider descriptors for video and storage: ids, secret fields, links, HTTP rules. |
+| `src/core/schemas` | Zod schemas for stored JSON: records, uploads, folders. |
 | `src/core/provider-errors` | Error types, family tables, app rules and HTTP codes behind one `friendlyError`. |
 | `src/core/types.ts` | Shared API shapes: records, uploads, folders, pricing, secrets, capabilities. |
-| `src/server` | IO: route helpers, jobs, repos, secrets, media, remote storage. |
+| `src/server` | IO: boot, route helpers, jobs, services, repos, providers, storage, secrets, media. |
+| `src/server/boot.ts` | Composition root. Lock, secrets, queue wiring, poller, parent watch, ffmpeg. |
 | `src/server/jobs` | `submit-queue`, `run-submit`, `submit-media`, `submit-record`, `poller`, `download-queue`, `reconcile`. |
+| `src/server/services` | Orchestration for routes and jobs: `credits`, `model-catalog`, `remote-inputs`, `upload-probe`, `uploads`, `connection-test`. |
+| `src/server/providers` | `VideoProvider` interface, registry, OpenRouter adapter, mock adapter, `ProviderError` kinds. |
+| `src/server/storage` | `ObjectStore` interface, registry, generic S3 store, R2 config, mock store, hashing. |
 | `src/server/repos` | `generations`, `uploads`, `folders`, `json-dir-store`. |
+| `src/server/sync` | `withLock`, the per-key serialization primitive. |
 | `src/server/media` | `image-data-url`, `to-data-url`, `thumbs`, `compat`, `ffmpeg`. |
-| `src/server/remote` | R2 and mock stores, content-addressed inputs, hashing. |
-| `src/features` | UI grouped by feature: generator, history, media picker, preview, settings, player. |
-| `src/features/history` | One component per file, `selection-store` and `view-store`, `record-view` helpers, `record-actions`. |
+| `src/features` | UI grouped by feature: generator, history, media picker, preview, settings, player, studio. |
+| `src/features/generator` | `panel`, `store`, `references`, `frames`, `prompt`, `options`, `model`, `credits`, `generate`. |
+| `src/features/history` | `list`, `details`, `status`, `filters`, `selection`, `actions`. |
+| `src/features/media-picker` | `picker`, `uploads`, `folders`, `tiles`. |
 | `src/ui` | Primitives (button, modal, popover, tabs, slider, tooltip). |
 | `src/ui/form` | `Field`, `Input`, `NumberInput`, `PasswordInput`, `SearchInput`, `Switch`. |
 | `src/lib` | Client helpers, `platform/` (browser and desktop), drop router, media support. |
+| `src/lib/api` | Client functions for every route. The only place an API URL is written. |
 | `src/app` | Next routes and the page shell. |
 | `src-tauri` | Desktop shell, sidecar supervisor, window and settings. |
 | `scripts` | `prepare-desktop.mjs`, `smoke-server.mjs`, `notices.mjs`. |
@@ -162,7 +171,13 @@ If a provider rejects base64 input, submit retries once with all media as URLs. 
 | Seedance 2.0 | 4-15 s | 480p, 720p, 1080p, 4K | 9 / 3 / 3 | video |
 | Seedance 2.5 | 4-30 s | 480p, 720p | 30 / 10 / 10 | video |
 
-Pricing keeps list and effective rates. `getPricing` fetches `/api/v1/videos/models` for SKUs and `/api/v1/models/{author}/{slug}/endpoints` for the live `pricing.discount` in parallel, then applies `effective = list * (1 - discount)`. At the time of writing Wan 3.0 reports 0.15 while Prime and Seedance report 0. A failed endpoints call keeps live list rates at discount 0. Mock and fallback modes always use list prices. The Quality popover shows the struck list rate and the effective rate, plus a `% off` hint when a discount exists. No HTML scraping.
+Each model holds `bindings` in priority order. A binding is `provider`, `modelId`, `pricing` and `transport` per media kind. The first binding whose provider is configured wins. A record stores the chosen provider and model id at submit time, so polling and download keep using that provider after settings change.
+
+Pricing is serializable data. `skuRules` is an ordered list. Each rule has `when` conditions (`hasVideoInput`, `audio`, `hasTier`) and a `key` where `{resolution}` and `{tier}` are replaced. The first matching rule wins. `tiers` maps a resolution to its SKU suffix, for example `1080p` to `_1080p`. `fallback` holds a list rate for every key the rules can produce.
+
+`/api/models` returns one catalog entry per preset. `available` means the provider lists the model. `unverified` means the model list cannot be read. `missing` means the list lacks the model. `no_provider` means no binding has a configured key. The catalog controls picker availability and price only. It never narrows preset capabilities at runtime.
+
+Live pricing keeps list and effective rates. `getPricing` fetches `/api/v1/videos/models` for SKUs and `/api/v1/models/{author}/{slug}/endpoints` for the live `pricing.discount` in parallel, then applies `effective = list * (1 - discount)`. At the time of writing Wan 3.0 reports 0.15 while Prime and Seedance report 0. A failed endpoints call keeps live list rates at discount 0. Mock and fallback modes always use list prices. The Quality popover shows the struck list rate and the effective rate, plus a `% off` hint when a discount exists. No HTML scraping.
 
 `minDuration` raises the selectable floor to `minBillableSec` when it is higher. The shortest selectable duration is 5 s on Wan and 4 s on Seedance. Wan presets bill at least 5 s, so a 2 s request costs 5 × the effective rate. `usage.cost` is the truth, and stored `pricePerSec` stays the raw rate.
 

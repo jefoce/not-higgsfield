@@ -1,5 +1,61 @@
 # Decisions
 
+## 2026-10-25 - Composition root in `server/boot.ts`
+
+Decision: `bootServer()` acquires the instance lock, starts secrets without blocking, wires the submit queue and job events, starts the poller and parent watch, then checks ffmpeg. `instrumentation.ts` only guards the runtime and calls it.
+
+Why: one ordered startup path, and no side effects at module load in jobs.
+
+Rejected: side-effect imports and dynamic imports scattered through server modules.
+
+## 2026-10-25 - Services layer
+
+Decision: `src/server/services` orchestrates adapters, repos, media and sync for routes and jobs. It holds `credits`, `model-catalog`, `remote-inputs`, `upload-probe`, `uploads` and `connection-test`.
+
+Why: routes stay thin, jobs keep one dependency direction, and provider and storage adapters never import services.
+
+Rejected: route handlers reaching into provider or storage internals.
+
+## 2026-10-25 - Provider bindings
+
+Decision: a preset holds `bindings` in priority order. Each binding has `provider`, `modelId`, `pricing` and `transport`. The first binding whose provider is configured wins. The record stores the chosen provider and model id at submit time.
+
+Why: route-specific data leaves the model definition, and several providers can serve one catalog.
+
+Rejected: one OpenRouter id and pricing table on the preset.
+
+## 2026-10-25 - Availability-only runtime catalog
+
+Decision: `/api/models` uses live provider data only for availability and pricing. Presets stay the source of durations, resolutions, references and limits.
+
+Why: feature code reads presets synchronously, so live capability narrowing would push async state through the store. Drift is caught offline by `tests/catalog-live.test.ts`.
+
+Rejected: runtime capability narrowing from provider model lists.
+
+## 2026-10-25 - No cross-provider fallback after a failure
+
+Decision: a failed submit or poll never retries on another binding. A new generation is the only way to switch providers.
+
+Why: a failed submit can still be billed, so a silent retry on another provider can bill twice.
+
+Rejected: automatic fallback across provider bindings.
+
+## 2026-10-25 - Flat types with named parts
+
+Decision: every object type is one level. Nested shapes become named interfaces, owner-prefixed when the part belongs to one owner (`RecordJob`, `RecordOutput`), and shared names when the shape repeats (`PixelSize`, `FrameSlots`). No inline `z.object` inside another schema.
+
+Why: named parts are readable, reusable and testable. `no-restricted-syntax` enforces the rule in `src`, tests stay exempt.
+
+Rejected: inline object literals for parameter bags, return types and nested schema fields.
+
+## 2026-10-25 - Stored data schemas with `schemaVersion`
+
+Decision: files on disk parse through `src/core/schemas` with `safeParse`. `GenerationRecord` carries `schemaVersion: 1`, defaulted for older files. An invalid file is skipped and logged, never thrown.
+
+Why: JSON on disk is outside data, and a version field allows a later migration.
+
+Rejected: `JSON.parse(text) as T` and silent casts.
+
 ## 2026-10-23 - Server-owned price estimate
 
 Decision: estimate is a price-only server route. `buildPriceInputSchema` has presetId, tab, audio, duration, aspectRatio, resolution, frames, references. Client sends no prompt or seed. SWR key uses those fields, disables focus and stale revalidation, keeps previous data. Spinner covers only the debounce and first key fetch. Create keeps full validation. Actual `usage.cost` wins.
