@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { shouldRetryAsBase64 } from '@/server/jobs/submit-retry'
-import { OpenRouterError } from '@/server/openrouter/client'
+import { OpenRouterError } from '@/server/openrouter/error'
 
 vi.mock('server-only', () => ({}))
 

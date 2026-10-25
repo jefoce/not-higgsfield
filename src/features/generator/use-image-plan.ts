@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import type { ReferencePlan } from '@/core/types'
+import type { ReferencePlan } from '@/core/media-types'
 import { requestReferencePlan } from '@/lib/api/generations'
 
 /** Debounced share of the submit encoder. Stale answers for older lists are dropped. */

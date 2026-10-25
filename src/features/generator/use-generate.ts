@@ -14,7 +14,8 @@ import { ApiError } from '@/lib/fetcher'
 import { getPlatform } from '@/lib/platform'
 import { refreshHistory } from '@/lib/swr-keys'
 
-import { inputFromState, useGeneratorStore } from './store'
+import { useGeneratorStore } from './store'
+import { inputFromState } from './store-draft'
 
 function requestNotifications(): void {
   void getPlatform()

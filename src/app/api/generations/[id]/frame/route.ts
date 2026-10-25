@@ -4,10 +4,11 @@ import path from 'node:path'
 
 import { z } from 'zod'
 
-import { assertLocalRequest, errorResponse, jsonError, readJsonBody, zodError } from '@/server/http'
+import { errorResponse, jsonError, zodError } from '@/server/http'
 import { extractBoundaryFrame } from '@/server/media/ffmpeg'
 import { downloadPaths, DOWNLOADS_DIR } from '@/server/paths'
 import { getGeneration } from '@/server/repos/generations'
+import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 import { createFileUpload } from '@/server/services/uploads'
 
 const BodySchema = z.object({ at: z.enum(['first', 'last']) })

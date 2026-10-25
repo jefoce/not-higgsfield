@@ -8,7 +8,13 @@ import path from 'node:path'
 import { isNil, orderBy } from 'lodash-es'
 
 import { kindFromName } from '@/core/media-kinds'
-import type { FolderDir, FolderFile, FolderItem, FolderListing, MediaKind } from '@/core/types'
+import type {
+  FolderDir,
+  FolderFile,
+  FolderItem,
+  FolderListing,
+  MediaKind,
+} from '@/core/media-types'
 
 import { HttpError } from '../errors'
 import { readJson, writeJsonAtomic } from '../fs/json-file'

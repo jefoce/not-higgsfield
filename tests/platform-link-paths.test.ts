@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 
 const mocks = vi.hoisted(() => ({ linkAbsPath: vi.fn(), toastError: vi.fn() }))
 

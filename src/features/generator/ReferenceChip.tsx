@@ -12,7 +12,8 @@ import { cn } from '@/lib/cn'
 
 import { mentionSlot } from './prompt-convert'
 import { ReferenceIcon } from './ReferenceIcon'
-import { uploadForSlot, useGeneratorStore } from './store'
+import { useGeneratorStore } from './store'
+import { uploadForSlot } from './store-helpers'
 
 /** Inline slot chip, resolved live to the attached upload. */
 export const ReferenceChip = forwardRef<

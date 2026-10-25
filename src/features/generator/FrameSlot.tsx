@@ -3,8 +3,8 @@
 import { type MouseEvent, useCallback } from 'react'
 import { isNil } from 'lodash-es'
 
+import type { UploadItem } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
-import type { UploadItem } from '@/core/types'
 import { extensionsFromLimits, openMediaPicker } from '@/features/media-picker/store'
 import { useDropUpload } from '@/features/media-picker/use-drop-upload'
 import { openPreview } from '@/features/preview/preview-store'

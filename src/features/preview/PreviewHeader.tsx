@@ -4,7 +4,7 @@ import { isNil } from 'lodash-es'
 import { Link2 } from 'lucide-react'
 
 import { KIND_TITLE } from '@/core/media-kinds'
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 
 import type { PreviewActions } from './preview-store'
 import { PreviewMeta } from './PreviewMeta'

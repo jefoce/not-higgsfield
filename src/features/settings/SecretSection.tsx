@@ -2,12 +2,14 @@
 
 import type { ReactNode, RefObject } from 'react'
 
+import type { SecretName } from '@/core/secret-names'
+import type { SecretKeyStatus } from '@/core/types'
 import { Button } from '@/ui/Button'
 
 import type { SecretChange, SecretFieldDef } from './secret-fields'
 import { SecretFields } from './SecretFields'
 import { TestMessageLine } from './TestMessageLine'
-import type { SecretKeyStatus, SecretName, TestMessage } from './use-secrets'
+import type { TestMessage } from './use-secrets'
 
 interface SecretSectionProps {
   sectionRef: RefObject<HTMLElement | null>

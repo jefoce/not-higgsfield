@@ -1,6 +1,6 @@
 import { Ratio } from 'lucide-react'
 
-import type { AspectChoice } from '@/core/presets'
+import type { AspectChoice } from '@/core/presets/types'
 
 interface RatioIconProps {
   ratio: AspectChoice

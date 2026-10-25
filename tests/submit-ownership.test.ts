@@ -12,7 +12,7 @@ vi.mock('@/server/jobs/submit-queue', () => ({
 let needsInterruptFail: (record: GenerationRecord) => boolean
 
 beforeAll(async () => {
-  ;({ needsInterruptFail } = await import('@/server/jobs/poller'))
+  ;({ needsInterruptFail } = await import('@/server/jobs/reconcile'))
 })
 
 describe('needsInterruptFail', () => {

@@ -4,7 +4,7 @@ import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 
 import { acceptForKinds } from '@/core/media-kinds'
-import type { MediaKind } from '@/core/types'
+import type { MediaKind } from '@/core/media-types'
 
 import type { SystemAdapter } from './index'
 

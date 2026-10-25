@@ -3,7 +3,8 @@
 import { useCallback } from 'react'
 
 import { type RefSlot, slotLabel } from '@/core/prompt-tokens'
-import { issueText, type ValidationIssue } from '@/core/validation'
+import { issueText } from '@/core/validation'
+import type { ValidationIssue } from '@/core/validation-types'
 
 interface PromptWarningRowProps {
   issue: ValidationIssue

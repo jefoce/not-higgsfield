@@ -7,7 +7,7 @@ import path from 'node:path'
 import { isNil } from 'lodash-es'
 
 import { FFMPEG_TIMEOUTS } from '@/core/constants'
-import type { MediaKind } from '@/core/types'
+import type { MediaKind } from '@/core/media-types'
 
 import { globalState } from '../global-state'
 import { COMPAT_DIR } from '../paths'

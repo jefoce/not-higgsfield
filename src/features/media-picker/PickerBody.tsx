@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { isNil } from 'lodash-es'
 import useSWR from 'swr'
 
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 import { fetchFolders } from '@/lib/api/folders'
 import { pauseAudio } from '@/lib/audio-player'
 

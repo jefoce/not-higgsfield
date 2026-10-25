@@ -8,7 +8,7 @@ import { promisify } from 'node:util'
 import { isNil } from 'lodash-es'
 
 import { acceptForKinds } from '@/core/media-kinds'
-import type { MediaKind } from '@/core/types'
+import type { MediaKind } from '@/core/media-types'
 
 import { HttpError } from '../errors'
 import type { SystemAdapter } from './index'

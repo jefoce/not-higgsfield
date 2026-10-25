@@ -2,9 +2,11 @@ import { clamp, isNil } from 'lodash-es'
 
 import { durationLimitFor } from './duration-limits'
 import { MEDIA_KINDS } from './media-kinds'
+import type { MediaKind, UploadItem } from './media-types'
 import { aspectAllowed } from './output-size'
-import { minDuration, type ModelPreset } from './presets'
-import type { GenerationInput, MediaKind, UploadItem } from './types'
+import { minDuration } from './presets'
+import type { ModelPreset } from './presets/types'
+import type { GenerationInput } from './types'
 
 /** Drop media belonging to the inactive tab. Returns a new object. */
 export function inputForSubmit(input: GenerationInput): GenerationInput {

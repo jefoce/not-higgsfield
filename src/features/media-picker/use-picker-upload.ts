@@ -3,7 +3,7 @@
 import { useCallback } from 'react'
 import { useSWRConfig } from 'swr'
 
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 
 import type { PickerRequest } from './store'
 import { useMediaPickerStore } from './store'

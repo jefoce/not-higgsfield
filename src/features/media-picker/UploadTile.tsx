@@ -7,7 +7,7 @@ import type { ChangeEvent } from 'react'
 import { toast } from 'sonner'
 
 import { acceptForKinds, type KindExtensions } from '@/core/media-kinds'
-import type { MediaKind, UploadItem } from '@/core/types'
+import type { MediaKind, UploadItem } from '@/core/media-types'
 import { uploadFilesWithProgress } from '@/lib/api/uploads'
 import { cn } from '@/lib/cn'
 import { errorMessage } from '@/lib/errors'

@@ -1,4 +1,5 @@
-import { assertLocalRequest, errorResponse } from '@/server/http'
+import { errorResponse } from '@/server/http'
+import { assertLocalRequest } from '@/server/request-guard'
 import { getCredits } from '@/server/services/credits'
 
 export async function GET(request: Request) {

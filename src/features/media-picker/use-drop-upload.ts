@@ -6,7 +6,7 @@ import type { DragEvent, RefObject } from 'react'
 import { toast } from 'sonner'
 
 import { acceptFiles, type KindExtensions } from '@/core/media-kinds'
-import type { MediaKind, UploadItem } from '@/core/types'
+import type { MediaKind, UploadItem } from '@/core/media-types'
 import { uploadFiles } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
 import { isDesktop } from '@/lib/platform'

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { applyFilters, countActive, paginate, sortRecords } from '@/core/history-filters'
-import type { AspectChoice, Resolution } from '@/core/presets'
+import type { AspectChoice, Resolution } from '@/core/presets/types'
 import type { GenerationRecord, GeneratorTab, JobStatus } from '@/core/types'
 
 interface RecordOptions {

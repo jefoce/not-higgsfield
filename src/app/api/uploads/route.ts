@@ -1,6 +1,7 @@
-import type { UploadItem } from '@/core/types'
-import { assertLocalRequest, errorResponse, jsonError, parseKinds } from '@/server/http'
+import type { UploadItem } from '@/core/media-types'
+import { errorResponse, jsonError, parseKinds } from '@/server/http'
 import { listUploads } from '@/server/repos/uploads'
+import { assertLocalRequest } from '@/server/request-guard'
 import { createFileUpload } from '@/server/services/uploads'
 
 export const dynamic = 'force-dynamic'

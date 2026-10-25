@@ -2,9 +2,11 @@
 
 import { isNull } from 'lodash-es'
 
+import type { SecretName } from '@/core/secret-names'
+import type { SecretKeyStatus } from '@/core/types'
+
 import type { SecretChange, SecretFieldDef } from './secret-fields'
 import { SecretField } from './SecretField'
-import type { SecretKeyStatus, SecretName } from './use-secrets'
 
 interface SecretFieldsProps {
   fields: SecretFieldDef[]

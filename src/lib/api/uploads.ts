@@ -1,6 +1,6 @@
 import { isEmpty, isNil } from 'lodash-es'
 
-import type { MediaKind, UploadItem } from '@/core/types'
+import type { MediaKind, UploadItem } from '@/core/media-types'
 import { apiDelete, apiPost, fetcher } from '@/lib/fetcher'
 
 export interface FetchUploadsParams {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import type { MediaKind } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
 import {
   canonicalizePrompt,
@@ -14,7 +15,6 @@ import {
   slotLabel,
   slotToken,
 } from '@/core/prompt-tokens'
-import type { MediaKind } from '@/core/types'
 
 const counts = (image = 0, video = 0, audio = 0): Record<MediaKind, number> => ({
   image,

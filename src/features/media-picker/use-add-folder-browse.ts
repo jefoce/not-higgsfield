@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import type { BrowseResult } from '@/core/types'
+import type { BrowseResult } from '@/core/media-types'
 import { browseDirs } from '@/lib/api/folders'
 import { errorMessage } from '@/lib/errors'
 

@@ -1,8 +1,8 @@
 import { isEmpty, isNil } from 'lodash-es'
 
 import { KIND_TITLE } from './media-kinds'
-import type { ModelPreset, ReferenceLimits } from './presets'
-import type { UploadItem } from './types'
+import type { UploadItem } from './media-types'
+import type { ModelPreset, ReferenceLimits } from './presets/types'
 
 const MB = 1024 * 1024
 

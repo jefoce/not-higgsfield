@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
+import type { UploadItem } from '@/core/media-types'
 import { normalizeForPreset } from '@/core/normalize-input'
 import { getPreset, minDuration } from '@/core/presets'
 import { billableSeconds } from '@/core/pricing'
-import type { GenerationInput, UploadItem } from '@/core/types'
+import type { GenerationInput } from '@/core/types'
 import { validateInput } from '@/core/validation'
 
 const wan = getPreset('wan-3.0')

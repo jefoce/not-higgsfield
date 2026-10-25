@@ -5,7 +5,7 @@ import { isEmpty } from 'lodash-es'
 import { FolderOpen } from 'lucide-react'
 import { toast } from 'sonner'
 
-import type { MediaKind, UploadItem } from '@/core/types'
+import type { MediaKind, UploadItem } from '@/core/media-types'
 import { errorMessage } from '@/lib/errors'
 import { getPlatform } from '@/lib/platform'
 import { Spinner } from '@/ui/Spinner'

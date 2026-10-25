@@ -1,6 +1,7 @@
 import { DEFAULT_PRESET_ID, findPreset } from '@/core/presets'
-import { assertLocalRequest, errorResponse, jsonError } from '@/server/http'
+import { errorResponse, jsonError } from '@/server/http'
 import { getPricing } from '@/server/openrouter/pricing'
+import { assertLocalRequest } from '@/server/request-guard'
 
 export async function GET(request: Request) {
   try {

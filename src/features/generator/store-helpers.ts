@@ -2,10 +2,12 @@ import { clamp, isNil, sumBy } from 'lodash-es'
 import { toast } from 'sonner'
 
 import { SEED_MAX } from '@/core/constants'
-import { minDuration, type ModelPreset } from '@/core/presets'
+import { maxDurationFor } from '@/core/duration-limits'
+import type { MediaKind, UploadItem } from '@/core/media-types'
+import { minDuration } from '@/core/presets'
+import type { ModelPreset } from '@/core/presets/types'
 import { idForSlot, referenceSlots, type RefSlot, type SlotCounts } from '@/core/prompt-tokens'
-import type { GenerationInput, MediaKind, UploadItem } from '@/core/types'
-import { maxDurationFor } from '@/core/validation'
+import type { GenerationInput } from '@/core/types'
 import { formatSecondsExact } from '@/lib/format'
 
 interface ReferenceState {

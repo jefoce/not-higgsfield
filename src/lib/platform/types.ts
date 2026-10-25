@@ -1,5 +1,6 @@
 import type { KindExtensions } from '@/core/media-kinds'
-import type { FolderItem, GenerationRecord, MediaKind, UploadItem } from '@/core/types'
+import type { FolderItem, MediaKind, UploadItem } from '@/core/media-types'
+import type { GenerationRecord } from '@/core/types'
 
 interface ChooseFilesParams {
   kinds: MediaKind[]

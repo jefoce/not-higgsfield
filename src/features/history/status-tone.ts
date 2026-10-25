@@ -1,6 +1,6 @@
 import { isNil } from 'lodash-es'
 
-import type { FriendlyError } from '@/core/provider-errors'
+import type { FriendlyError } from '@/core/provider-errors/types'
 import { STATUS_HELP, statusHelpKey } from '@/core/status-help'
 import type { GenerationRecord, JobStatus } from '@/core/types'
 

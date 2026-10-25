@@ -17,6 +17,7 @@ import {
 import { isNil } from 'lodash-es'
 
 import { kindFromTitle, MEDIA_KINDS } from '@/core/media-kinds'
+import type { MediaKind } from '@/core/media-types'
 import {
   parsePromptParts,
   type PromptPart,
@@ -25,10 +26,11 @@ import {
   slotLabel,
   slotToken,
 } from '@/core/prompt-tokens'
-import type { MediaKind } from '@/core/types'
 import { thumbUrl } from '@/lib/api/media-urls'
 
-import { type GeneratorState, slotCounts, uploadForSlot, useGeneratorStore } from './store'
+import { useGeneratorStore } from './store'
+import type { GeneratorState } from './store-actions'
+import { slotCounts, uploadForSlot } from './store-helpers'
 
 const LABEL = /^(Image|Video|Audio) (\d+)$/
 

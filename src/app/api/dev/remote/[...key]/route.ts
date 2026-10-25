@@ -1,8 +1,9 @@
 import { isNil } from 'lodash-es'
 
 import { streamFile } from '@/server/fs/range-response'
-import { assertLocalRequest, errorResponse, jsonError } from '@/server/http'
+import { errorResponse, jsonError } from '@/server/http'
 import { mockObjectPath, verifyMockSignature } from '@/server/remote/mock'
+import { assertLocalRequest } from '@/server/request-guard'
 
 export const dynamic = 'force-dynamic'
 

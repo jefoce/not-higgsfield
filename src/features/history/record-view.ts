@@ -8,7 +8,8 @@ import {
   type RefSlot,
   type SlotCounts,
 } from '@/core/prompt-tokens'
-import { type FriendlyError, friendlyError } from '@/core/provider-errors'
+import { friendlyError } from '@/core/provider-errors'
+import type { FriendlyError } from '@/core/provider-errors/types'
 import type { GenerationRecord } from '@/core/types'
 import { downloadMediaUrl, thumbUrl, uploadThumbUrl } from '@/lib/api/media-urls'
 

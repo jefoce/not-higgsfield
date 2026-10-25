@@ -3,7 +3,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 import { cn } from '@/lib/cn'
 
 import { ReferenceThumb } from './ReferenceThumb'

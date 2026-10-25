@@ -3,7 +3,7 @@
 import { useCallback } from 'react'
 import { Folder } from 'lucide-react'
 
-import type { FolderDir } from '@/core/types'
+import type { FolderDir } from '@/core/media-types'
 
 interface FolderDirTileProps {
   dir: FolderDir

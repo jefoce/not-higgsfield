@@ -2,8 +2,8 @@
 
 import { useCallback } from 'react'
 
-import type { AspectChoice } from '@/core/presets'
 import { getPreset } from '@/core/presets'
+import type { AspectChoice } from '@/core/presets/types'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
 import { RatioIcon } from '@/ui/RatioIcon'
 

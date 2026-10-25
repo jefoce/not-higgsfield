@@ -2,7 +2,7 @@ import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
 import { acceptFiles, type KindExtensions } from '@/core/media-kinds'
-import type { MediaKind, UploadItem } from '@/core/types'
+import type { MediaKind, UploadItem } from '@/core/media-types'
 
 import { getPlatform } from './index'
 import { linkPaths } from './link-paths'

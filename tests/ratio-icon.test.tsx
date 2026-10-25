@@ -2,7 +2,7 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { AspectRatio } from '@/core/presets'
+import type { AspectRatio } from '@/core/presets/types'
 import type { GenerationRecord } from '@/core/types'
 import { AspectRatioPopover } from '@/features/generator/AspectRatioPopover'
 import { useGeneratorStore } from '@/features/generator/store'

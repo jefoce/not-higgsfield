@@ -3,7 +3,7 @@
 import { useCallback } from 'react'
 import { X } from 'lucide-react'
 
-import type { FolderItem } from '@/core/types'
+import type { FolderItem } from '@/core/media-types'
 import { Modal } from '@/ui/Modal'
 
 import { AddFolderFooter } from './AddFolderFooter'

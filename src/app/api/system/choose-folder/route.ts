@@ -1,8 +1,9 @@
 import { isNil } from 'lodash-es'
 import { z } from 'zod'
 
-import { assertLocalRequest, errorResponse, readJsonBody, zodError } from '@/server/http'
+import { errorResponse, zodError } from '@/server/http'
 import { addFolder } from '@/server/repos/folders'
+import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 import { getSystem } from '@/server/system'
 
 const BodySchema = z.object({})

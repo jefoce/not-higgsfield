@@ -4,8 +4,9 @@ import { isNil } from 'lodash-es'
 
 import { resolveMediaRef } from '@/server/fs/media-ref'
 import { streamFile } from '@/server/fs/range-response'
-import { assertLocalRequest, errorResponse, jsonError } from '@/server/http'
+import { errorResponse, jsonError } from '@/server/http'
 import { CompatError, getCompatMedia } from '@/server/media/compat'
+import { assertLocalRequest } from '@/server/request-guard'
 
 export const dynamic = 'force-dynamic'
 

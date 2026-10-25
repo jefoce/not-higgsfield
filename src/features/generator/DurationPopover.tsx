@@ -3,15 +3,15 @@
 import { Clock } from 'lucide-react'
 import { useShallow } from 'zustand/react/shallow'
 
-import { referenceVideoSeconds } from '@/core/duration-limits'
+import { maxDurationFor, referenceVideoSeconds } from '@/core/duration-limits'
 import { getPreset, minDuration } from '@/core/presets'
-import { maxDurationFor } from '@/core/validation'
 import { formatSecondsExact } from '@/lib/format'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
 import { Slider } from '@/ui/Slider'
 
 import { DurationChip } from './DurationChip'
-import { inputFromState, useGeneratorStore } from './store'
+import { useGeneratorStore } from './store'
+import { inputFromState } from './store-draft'
 
 /** Duration setting button and slider popover isCapped by reference video length. */
 export function DurationPopover() {

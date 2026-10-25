@@ -4,8 +4,9 @@ import path from 'node:path'
 import { isNil } from 'lodash-es'
 import { z } from 'zod'
 
-import { assertLocalRequest, errorResponse, jsonError, readJsonBody, zodError } from '@/server/http'
+import { errorResponse, jsonError, zodError } from '@/server/http'
 import { getGeneration } from '@/server/repos/generations'
+import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 import { sessionRequired } from '@/server/session'
 
 import { copyExclusive, videoSource } from '../../export-files'

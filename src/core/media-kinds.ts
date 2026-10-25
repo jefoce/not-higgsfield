@@ -1,6 +1,6 @@
 import { isNil } from 'lodash-es'
 
-import type { MediaKind } from './types'
+import type { MediaKind } from './media-types'
 
 export const MEDIA_KINDS = ['image', 'video', 'audio'] as const satisfies readonly MediaKind[]
 

@@ -1,7 +1,8 @@
 import { isNil } from 'lodash-es'
 
-import { assertLocalRequest, errorResponse } from '@/server/http'
+import { errorResponse } from '@/server/http'
 import { getRemoteStore } from '@/server/remote/remote-store'
+import { assertLocalRequest } from '@/server/request-guard'
 import { secretsReady } from '@/server/secrets'
 
 /** Tells the client whether cloud storage exists, so validation can warn early. */

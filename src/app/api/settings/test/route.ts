@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
-import { assertLocalRequest, errorResponse, readJsonBody, zodError } from '@/server/http'
+import { errorResponse, zodError } from '@/server/http'
+import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 import { testConnection } from '@/server/services/connection-test'
 
 const BodySchema = z.object({ target: z.enum(['openrouter', 'r2']) })

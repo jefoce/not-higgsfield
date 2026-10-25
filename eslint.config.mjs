@@ -37,6 +37,13 @@ const SHARED_SELECTORS = [
   },
 ]
 
+const MODULE_SELECTORS = [
+  {
+    selector: 'ExportAllDeclaration, ExportNamedDeclaration[source]',
+    message: 'No re-exports. Import from the module that defines it.',
+  },
+]
+
 const SERVER_SELECTORS = [
   {
     selector: 'ImportExpression',
@@ -312,14 +319,19 @@ export default defineConfig([
   {
     files: ['src/**/*.{ts,tsx}'],
     rules: {
-      'no-restricted-syntax': restrict(SHARED_SELECTORS, PROPS_SELECTOR, SECRET_SELECTORS),
+      'no-restricted-syntax': restrict(
+        SHARED_SELECTORS,
+        MODULE_SELECTORS,
+        PROPS_SELECTOR,
+        SECRET_SELECTORS,
+      ),
     },
   },
   {
     // Preset literal checks would flag the data files themselves.
     files: ['src/core/presets/**'],
     rules: {
-      'no-restricted-syntax': restrict(SHARED_SELECTORS, PROPS_SELECTOR),
+      'no-restricted-syntax': restrict(SHARED_SELECTORS, MODULE_SELECTORS, PROPS_SELECTOR),
     },
   },
   {
@@ -327,6 +339,7 @@ export default defineConfig([
     rules: {
       'no-restricted-syntax': restrict(
         SHARED_SELECTORS,
+        MODULE_SELECTORS,
         PROPS_SELECTOR,
         SECRET_SELECTORS,
         SERVER_SELECTORS,
@@ -337,14 +350,19 @@ export default defineConfig([
     // Secrets code reads process.env directly.
     files: ['src/server/secrets/**'],
     rules: {
-      'no-restricted-syntax': restrict(SHARED_SELECTORS, PROPS_SELECTOR, SERVER_SELECTORS),
+      'no-restricted-syntax': restrict(
+        SHARED_SELECTORS,
+        MODULE_SELECTORS,
+        PROPS_SELECTOR,
+        SERVER_SELECTORS,
+      ),
     },
   },
   {
     // The keychain lazily loads its native module, the one allowed dynamic import.
     files: ['src/server/secrets/keychain.ts'],
     rules: {
-      'no-restricted-syntax': restrict(SHARED_SELECTORS, PROPS_SELECTOR),
+      'no-restricted-syntax': restrict(SHARED_SELECTORS, MODULE_SELECTORS, PROPS_SELECTOR),
     },
   },
   {
@@ -352,7 +370,7 @@ export default defineConfig([
     // SECRET_SELECTORS stays: the old block dropped it by accident.
     files: ['src/app/api/**/route.ts'],
     rules: {
-      'no-restricted-syntax': restrict(SHARED_SELECTORS, SECRET_SELECTORS),
+      'no-restricted-syntax': restrict(SHARED_SELECTORS, MODULE_SELECTORS, SECRET_SELECTORS),
     },
   },
   {
@@ -361,6 +379,7 @@ export default defineConfig([
     rules: {
       'no-restricted-syntax': restrict(
         SHARED_SELECTORS,
+        MODULE_SELECTORS,
         PROPS_SELECTOR,
         SECRET_SELECTORS,
         OBJECT_FUNCTION_SELECTOR,

@@ -1,6 +1,7 @@
-import type { ModelPreset } from '@/core/presets'
+import type { MediaKind, UploadItem } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
-import type { GenerationInput, MediaKind, UploadItem } from '@/core/types'
+import type { ModelPreset } from '@/core/presets/types'
+import type { GenerationInput } from '@/core/types'
 
 export const wan = getPreset('wan-3.0')
 

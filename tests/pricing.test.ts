@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import type { ModelPreset, PresetPricing, Resolution } from '@/core/presets'
 import { getPreset } from '@/core/presets'
+import type { ModelPreset, PresetPricing, Resolution } from '@/core/presets/types'
 import type { PriceContext } from '@/core/pricing'
 import { estimatePrice, formatRate, pricePerSec } from '@/core/pricing'
 

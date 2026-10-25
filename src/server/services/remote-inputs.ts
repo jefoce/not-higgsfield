@@ -5,7 +5,7 @@ import fs from 'node:fs/promises'
 import { groupBy, isNil } from 'lodash-es'
 
 import { REMOTE_LINK_TTL_SEC, REMOTE_UNUSED_DAYS } from '@/core/constants'
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 
 import { globalState } from '../global-state'
 import { uploadPaths } from '../paths'
@@ -16,7 +16,8 @@ import {
   type RemotePutOptions,
   type RemoteStore,
 } from '../remote/remote-store'
-import { listUploads, updateUpload } from '../repos/uploads'
+import { updateUpload } from '../repos/upload-record'
+import { listUploads } from '../repos/uploads'
 import { secretsReady } from '../secrets'
 
 type Remote = NonNullable<UploadItem['remote']>

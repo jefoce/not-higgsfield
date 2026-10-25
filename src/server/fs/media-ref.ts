@@ -6,7 +6,7 @@ import path from 'node:path'
 import { isNil } from 'lodash-es'
 
 import { kindFromExt, kindFromName } from '@/core/media-kinds'
-import type { FolderItem, MediaKind, UploadItem } from '@/core/types'
+import type { FolderItem, MediaKind, UploadItem } from '@/core/media-types'
 
 import { HttpError } from '../errors'
 import { DOWNLOADS_DIR, FOLDERS_FILE, uploadPaths, UPLOADS_DIR } from '../paths'

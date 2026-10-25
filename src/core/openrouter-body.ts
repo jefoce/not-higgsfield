@@ -1,8 +1,9 @@
 import { isNil } from 'lodash-es'
 
-import type { ModelPreset } from './presets'
+import type { MediaKind } from './media-types'
+import type { ModelPreset } from './presets/types'
 import { renderPromptForApi } from './prompt-tokens'
-import type { GenerationInput, MediaKind } from './types'
+import type { GenerationInput } from './types'
 
 export interface ResolvedMedia {
   id: string

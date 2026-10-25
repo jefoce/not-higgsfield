@@ -14,7 +14,7 @@ import {
   THUMBS_MAX_BYTES,
   THUMBS_TARGET_BYTES,
 } from '@/core/constants'
-import type { MediaKind } from '@/core/types'
+import type { MediaKind } from '@/core/media-types'
 
 import { HttpError } from '../errors'
 import { THUMBS_DIR } from '../paths'

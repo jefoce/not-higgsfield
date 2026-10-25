@@ -2,11 +2,12 @@ import { isNil, uniq } from 'lodash-es'
 import { z } from 'zod'
 
 import { MAX_IDS, MAX_REQUEST_MB, REQUEST_RESERVE_MB } from '@/core/constants'
+import type { UploadItem } from '@/core/media-types'
 import { findPreset } from '@/core/presets'
-import type { UploadItem } from '@/core/types'
-import { assertLocalRequest, errorResponse, jsonError, readJsonBody, zodError } from '@/server/http'
+import { errorResponse, jsonError, zodError } from '@/server/http'
 import { encodeImages } from '@/server/media/image-data-url'
 import { getUpload } from '@/server/repos/uploads'
+import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 
 export const dynamic = 'force-dynamic'
 

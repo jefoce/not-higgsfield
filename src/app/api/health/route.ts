@@ -1,10 +1,11 @@
 import { isNil } from 'lodash-es'
 
-import { assertLocalRequest, errorResponse } from '@/server/http'
+import { errorResponse } from '@/server/http'
 import { downloadQueueIds } from '@/server/jobs/download-queue'
 import { isBooted } from '@/server/jobs/poller'
 import { sendingCount } from '@/server/jobs/submit-queue'
 import { listGenerations } from '@/server/repos/generations'
+import { assertLocalRequest } from '@/server/request-guard'
 import { sessionRequired } from '@/server/session'
 
 export const dynamic = 'force-dynamic'

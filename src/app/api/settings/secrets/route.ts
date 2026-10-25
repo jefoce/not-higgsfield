@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 import { SECRET_NAMES, SECRET_SCHEMAS } from '@/core/secret-names'
-import { assertLocalRequest, errorResponse, readJsonBody, zodError } from '@/server/http'
+import { errorResponse, zodError } from '@/server/http'
+import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 import { secretsReady, secretStatus, setSecrets } from '@/server/secrets'
 
 const BodySchema = z.object({

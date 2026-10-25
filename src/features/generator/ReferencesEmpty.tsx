@@ -1,7 +1,7 @@
 'use client'
 
 import { KIND_PLURAL, MEDIA_KINDS } from '@/core/media-kinds'
-import type { ModelPreset } from '@/core/presets'
+import type { ModelPreset } from '@/core/presets/types'
 import type { DropProps } from '@/features/media-picker/use-drop-upload'
 import { cn } from '@/lib/cn'
 

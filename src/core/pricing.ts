@@ -1,7 +1,7 @@
 import { isNil } from 'lodash-es'
 
 import { outputSize } from './output-size'
-import type { AspectChoice, ModelPreset, Resolution } from './presets'
+import type { AspectChoice, ModelPreset, Resolution } from './presets/types'
 
 export interface PriceContext {
   resolution: Resolution

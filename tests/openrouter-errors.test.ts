@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { submitError } from '@/server/jobs/run-submit'
-import { errorFromResponse, OpenRouterError } from '@/server/openrouter/client'
+import { errorFromResponse } from '@/server/openrouter/client'
+import { OpenRouterError } from '@/server/openrouter/error'
 
 vi.mock('server-only', () => ({}))
 

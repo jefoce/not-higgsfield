@@ -1,7 +1,7 @@
 import { isNil } from 'lodash-es'
 
+import type { ReferencePlan, UploadItem } from '@/core/media-types'
 import { type RefSlot, slotLabel } from '@/core/prompt-tokens'
-import type { ReferencePlan, UploadItem } from '@/core/types'
 
 export type PlannedImage = ReferencePlan['images'][number]
 

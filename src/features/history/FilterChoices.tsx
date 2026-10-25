@@ -3,7 +3,9 @@
 import { useCallback } from 'react'
 import { uniq } from 'lodash-es'
 
-import { type AspectChoice, MODEL_PRESETS, type Resolution, RESOLUTIONS } from '@/core/presets'
+import { MODEL_PRESETS } from '@/core/presets'
+import type { AspectChoice, Resolution } from '@/core/presets/types'
+import { RESOLUTIONS } from '@/core/presets/types'
 
 import { FilterChoice } from './FilterChoice'
 import { type HistoryMode, useHistoryViewStore, type ViewFilters } from './view-store'

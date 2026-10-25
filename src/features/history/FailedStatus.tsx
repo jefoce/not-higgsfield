@@ -2,7 +2,7 @@
 
 import { isNil } from 'lodash-es'
 
-import type { FriendlyError } from '@/core/provider-errors'
+import type { FriendlyError } from '@/core/provider-errors/types'
 import type { StatusHelp } from '@/core/status-help'
 import { cn } from '@/lib/cn'
 import { Button } from '@/ui/Button'

@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { OpenRouterError } from '../openrouter/client'
+import { OpenRouterError } from '../openrouter/error'
 
 const PROVIDER_URL_ERROR = /url|download|fetch|image_url|video_url|audio_url/i
 

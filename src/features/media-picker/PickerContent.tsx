@@ -2,7 +2,7 @@
 
 import { isNil } from 'lodash-es'
 
-import type { FolderItem, UploadItem } from '@/core/types'
+import type { FolderItem, UploadItem } from '@/core/media-types'
 
 import { FolderTab } from './FolderTab'
 import type { PickerRequest } from './store'

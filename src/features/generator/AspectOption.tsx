@@ -5,7 +5,7 @@ import { isNil } from 'lodash-es'
 import { Check } from 'lucide-react'
 
 import { aspectAllowed } from '@/core/output-size'
-import type { AspectChoice, ModelPreset, Resolution } from '@/core/presets'
+import type { AspectChoice, ModelPreset, Resolution } from '@/core/presets/types'
 import { cn } from '@/lib/cn'
 import { PopoverClose } from '@/ui/Popover'
 import { RatioIcon } from '@/ui/RatioIcon'

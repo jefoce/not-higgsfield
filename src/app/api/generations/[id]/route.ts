@@ -1,8 +1,9 @@
 import { z } from 'zod'
 
-import { assertLocalRequest, errorResponse, jsonError, readJsonBody, zodError } from '@/server/http'
+import { errorResponse, jsonError, zodError } from '@/server/http'
 import { deleteGeneration, setFavorite } from '@/server/jobs/generation-actions'
 import { getGeneration } from '@/server/repos/generations'
+import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 
 const PatchSchema = z.object({ favorite: z.boolean() })
 

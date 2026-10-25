@@ -10,7 +10,7 @@ import { ApiError } from '@/lib/fetcher'
 import { Button } from '@/ui/Button'
 import { Modal } from '@/ui/Modal'
 
-import { revalidateHistory } from './use-history'
+import { revalidateHistory } from './history-pages'
 
 interface DeleteConfirmProps {
   record: GenerationRecord

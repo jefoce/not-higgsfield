@@ -4,7 +4,7 @@ import { isNil } from 'lodash-es'
 import useSWR from 'swr'
 
 import { extensionAllowed } from '@/core/media-kinds'
-import type { MediaKind, UploadItem } from '@/core/types'
+import type { MediaKind, UploadItem } from '@/core/media-types'
 import type { PreviewActions } from '@/features/preview/preview-store'
 import { fetchUploads } from '@/lib/api/uploads'
 import { getPlatform } from '@/lib/platform'

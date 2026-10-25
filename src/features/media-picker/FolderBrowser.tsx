@@ -2,7 +2,7 @@
 
 import { ArrowUp } from 'lucide-react'
 
-import type { BrowseResult } from '@/core/types'
+import type { BrowseResult } from '@/core/media-types'
 import { Spinner } from '@/ui/Spinner'
 
 import { DirectoryButton } from './DirectoryButton'

@@ -6,7 +6,7 @@ import path from 'node:path'
 
 import { isNil, orderBy } from 'lodash-es'
 
-import type { BrowseResult } from '@/core/types'
+import type { BrowseResult } from '@/core/media-types'
 
 import { HttpError } from '../errors'
 

@@ -5,8 +5,9 @@ import { clamp } from 'lodash-es'
 import { THUMB_WIDTH } from '@/core/constants'
 import { resolveMediaRef } from '@/server/fs/media-ref'
 import { streamFile } from '@/server/fs/range-response'
-import { assertLocalRequest, errorResponse, jsonError } from '@/server/http'
+import { errorResponse, jsonError } from '@/server/http'
 import { getThumbnail } from '@/server/media/thumbs'
+import { assertLocalRequest } from '@/server/request-guard'
 
 interface Params {
   params: Promise<{ ref: string[] }>

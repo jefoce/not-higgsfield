@@ -1,13 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  ASPECT_RATIOS,
-  DEFAULT_PRESET_ID,
-  findPreset,
-  getPreset,
-  MODEL_PRESETS,
-  RESOLUTIONS,
-} from '@/core/presets'
+import { DEFAULT_PRESET_ID, findPreset, getPreset, MODEL_PRESETS } from '@/core/presets'
+import { ASPECT_RATIOS, RESOLUTIONS } from '@/core/presets/types'
 
 describe('MODEL_PRESETS', () => {
   it('ships Wan and Seedance presets in order', () => {

@@ -5,7 +5,7 @@ import { isEmpty } from 'lodash-es'
 import useSWR from 'swr'
 
 import { extensionAllowed, extWithDot, mimeFromExt } from '@/core/media-kinds'
-import type { FolderFile, MediaKind } from '@/core/types'
+import type { FolderFile, MediaKind } from '@/core/media-types'
 import { openPreview, type PreviewItem } from '@/features/preview/preview-store'
 import { fetchFolderFiles } from '@/lib/api/folders'
 import { thumbUrl } from '@/lib/api/media-urls'

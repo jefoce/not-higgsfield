@@ -3,7 +3,8 @@
 import { useCallback } from 'react'
 import { Diamond } from 'lucide-react'
 
-import { getPreset, type Resolution } from '@/core/presets'
+import { getPreset } from '@/core/presets'
+import type { Resolution } from '@/core/presets/types'
 import { pricePerSec } from '@/core/pricing'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
 

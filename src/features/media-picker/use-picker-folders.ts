@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { useSWRConfig } from 'swr'
 
-import type { FolderItem, UploadItem } from '@/core/types'
+import type { FolderItem, UploadItem } from '@/core/media-types'
 import { deleteFolder } from '@/lib/api/folders'
 import { linkFolderFile } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'

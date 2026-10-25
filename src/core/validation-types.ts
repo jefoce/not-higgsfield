@@ -1,6 +1,7 @@
-import type { ModelPreset } from './presets'
+import type { UploadItem } from './media-types'
+import type { ModelPreset } from './presets/types'
 import type { RefSlot } from './prompt-tokens'
-import type { GenerationInput, UploadItem } from './types'
+import type { GenerationInput } from './types'
 
 export type ValidationIssue =
   { type: 'missing-slot'; slot: RefSlot; attached: number } | { type: 'text'; text: string }

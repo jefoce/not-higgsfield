@@ -1,4 +1,4 @@
-import type { FolderItem, UploadItem } from '@/core/types'
+import type { FolderItem, UploadItem } from '@/core/media-types'
 
 import type { Platform } from './types'
 
@@ -37,5 +37,3 @@ export const platform = {
     ...args: Parameters<Platform['saveVideos']>
   ): Promise<{ saved: number; folder?: string }> => (await impl()).saveVideos(...args),
 }
-
-export type { Platform } from './types'

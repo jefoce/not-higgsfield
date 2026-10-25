@@ -18,8 +18,6 @@ import { isDownloadQueued, stopDownloads } from './download-queue'
 import { processRecord } from './poll-record'
 import { interruptText, needsInterruptFail, reconcile } from './reconcile'
 
-export { needsInterruptFail } from './reconcile'
-
 const SWEEP_INTERVAL_MS = 24 * 60 * 60_000
 
 interface PollerState {

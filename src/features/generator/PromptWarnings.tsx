@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from 'react'
 import { TriangleAlert } from 'lucide-react'
 
 import type { RefSlot } from '@/core/prompt-tokens'
-import type { ValidationIssue } from '@/core/validation'
+import type { ValidationIssue } from '@/core/validation-types'
 import { Chip } from '@/ui/Chip'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
 

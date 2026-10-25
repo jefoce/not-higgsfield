@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 import { isNil } from 'lodash-es'
 import { Check } from 'lucide-react'
 
-import type { Resolution } from '@/core/presets'
+import type { Resolution } from '@/core/presets/types'
 import { formatRate } from '@/core/pricing'
 import { cn } from '@/lib/cn'
 import { PopoverClose } from '@/ui/Popover'

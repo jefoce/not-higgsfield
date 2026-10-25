@@ -4,12 +4,10 @@ import { isNil } from 'lodash-es'
 import type { ZodError } from 'zod'
 
 import { MEDIA_KINDS } from '@/core/media-kinds'
-import type { MediaKind } from '@/core/types'
+import type { MediaKind } from '@/core/media-types'
 
 import { HttpError, ValidationError } from './errors'
-import { OpenRouterError } from './openrouter/client'
-
-export { assertLocalRequest, readJsonBody } from './request-guard'
+import { OpenRouterError } from './openrouter/error'
 
 interface JsonErrorParams {
   status: number

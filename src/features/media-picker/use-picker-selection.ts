@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react'
 import { isEmpty } from 'lodash-es'
 
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 
 import { closeMediaPicker, type PickerRequest, useMediaPickerStore } from './store'
 

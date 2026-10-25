@@ -1,5 +1,5 @@
-import type { ModelPreset } from './presets'
-import type { MediaKind } from './types'
+import type { MediaKind } from './media-types'
+import type { ModelPreset } from './presets/types'
 
 export type ResolvedTransport = 'base64' | 'url'
 

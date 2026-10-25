@@ -10,7 +10,7 @@ import { PlainTextPlugin } from '@lexical/react/LexicalPlainTextPlugin'
 import { defineExtension, type EditorState } from 'lexical'
 import { BeautifulMentionsPlugin, createBeautifulMentionNode } from 'lexical-beautiful-mentions'
 
-import type { ValidationIssue } from '@/core/validation'
+import type { ValidationIssue } from '@/core/validation-types'
 
 import { AudioChip } from './AudioChip'
 import { mentionItems, serializeEditor } from './prompt-convert'
@@ -20,7 +20,8 @@ import { ReferenceChip } from './ReferenceChip'
 import { ReferencePickerMenu } from './ReferencePickerMenu'
 import { ReferencePickerMenuItem } from './ReferencePickerMenuItem'
 import { SeedChip } from './SeedChip'
-import { promptFor, useGeneratorStore } from './store'
+import { useGeneratorStore } from './store'
+import { promptFor } from './store-draft'
 
 const PLACEHOLDER = 'Describe the video. Refer to inputs as Image 1, Video 1, or Audio 1'
 const EDITOR_NODES = createBeautifulMentionNode(ReferenceChip)

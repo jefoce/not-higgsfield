@@ -2,7 +2,7 @@
 
 import { isNil } from 'lodash-es'
 
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 
 import { type ActionKey, type PreviewActions } from './preview-store'
 import { PreviewActionButton } from './PreviewActionButton'

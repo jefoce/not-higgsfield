@@ -3,12 +3,13 @@
 import { type ChangeEvent, type ReactNode, useCallback } from 'react'
 import { isEmpty } from 'lodash-es'
 
+import type { SecretName } from '@/core/secret-names'
 import { secretError } from '@/core/secret-names'
+import type { SecretKeyStatus } from '@/core/types'
 import { Field } from '@/ui/form/Field'
 import { PasswordInput } from '@/ui/form/PasswordInput'
 
 import type { SecretChange } from './secret-fields'
-import type { SecretKeyStatus, SecretName } from './use-secrets'
 
 interface SecretFieldProps {
   name: SecretName

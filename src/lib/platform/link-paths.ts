@@ -1,7 +1,7 @@
 import { chunk } from 'lodash-es'
 import { toast } from 'sonner'
 
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 import { linkAbsPath } from '@/lib/api/uploads'
 import { errorMessage } from '@/lib/errors'
 

@@ -29,7 +29,8 @@ import {
   mentionSlot,
   serializeEditor,
 } from './prompt-convert'
-import { slotCounts, useGeneratorStore } from './store'
+import { useGeneratorStore } from './store'
+import { slotCounts } from './store-helpers'
 
 interface PromptEditorBridgeProps {
   prompt: string

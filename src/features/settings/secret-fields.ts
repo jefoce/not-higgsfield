@@ -1,4 +1,4 @@
-import type { SecretName } from './use-secrets'
+import type { SecretName } from '@/core/secret-names'
 
 export interface SecretChange {
   value?: string

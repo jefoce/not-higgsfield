@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
-import { assertLocalRequest, errorResponse, readJsonBody, zodError } from '@/server/http'
+import { errorResponse, zodError } from '@/server/http'
+import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 import { createGenerationLinkUpload, createLinkUpload } from '@/server/services/uploads'
 
 const BodySchema = z.union([

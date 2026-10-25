@@ -14,8 +14,6 @@ import { loadedRecords, revalidateHistory } from './history-pages'
 import { useHistoryPoll } from './use-history-poll'
 import { FILTER_PARAMS, useHistoryViewStore, type ViewFilters } from './view-store'
 
-export { revalidateHistory } from './history-pages'
-
 function historyKey(filters: ViewFilters): string {
   const params = new URLSearchParams({ limit: String(HISTORY_PAGE_SIZE) })
   const query = filters.q?.trim()

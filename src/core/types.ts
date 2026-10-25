@@ -1,18 +1,6 @@
 import type { UploadItem } from './media-types'
-import type { AspectChoice, Resolution } from './presets'
+import type { AspectChoice, Resolution } from './presets/types'
 import type { SecretName } from './secret-names'
-
-export type {
-  BrowseResult,
-  FolderDir,
-  FolderFile,
-  FolderItem,
-  FolderListing,
-  LinkMode,
-  MediaKind,
-  ReferencePlan,
-  UploadItem,
-} from './media-types'
 
 export type GeneratorTab = 'frames' | 'references'
 

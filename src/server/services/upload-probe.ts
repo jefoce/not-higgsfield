@@ -3,7 +3,7 @@ import 'server-only'
 import { isNil } from 'lodash-es'
 
 import { kindFromExt } from '@/core/media-kinds'
-import type { MediaKind, UploadItem } from '@/core/types'
+import type { MediaKind, UploadItem } from '@/core/media-types'
 
 import { UploadError } from '../errors'
 import { probeMedia } from '../media/ffmpeg'

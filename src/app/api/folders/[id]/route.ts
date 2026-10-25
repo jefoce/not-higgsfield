@@ -1,5 +1,6 @@
-import { assertLocalRequest, errorResponse } from '@/server/http'
+import { errorResponse } from '@/server/http'
 import { removeFolder } from '@/server/repos/folders'
+import { assertLocalRequest } from '@/server/request-guard'
 
 interface Params {
   params: Promise<{ id: string }>

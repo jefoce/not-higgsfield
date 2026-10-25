@@ -1,4 +1,5 @@
-import type { FolderItem, MediaKind, SystemCapabilities, UploadItem } from '@/core/types'
+import type { FolderItem, MediaKind, UploadItem } from '@/core/media-types'
+import type { SystemCapabilities } from '@/core/types'
 import { apiPost, fetcher } from '@/lib/fetcher'
 
 /** OS dialog support for the current server. */

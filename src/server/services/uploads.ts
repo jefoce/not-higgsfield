@@ -8,7 +8,7 @@ import path from 'node:path'
 import { isNil, isString } from 'lodash-es'
 
 import { extWithDot, mimeFromExt } from '@/core/media-kinds'
-import type { LinkMode, UploadItem } from '@/core/types'
+import type { LinkMode, UploadItem } from '@/core/media-types'
 
 import { UploadError } from '../errors'
 import { removeFile, writeJsonAtomic } from '../fs/json-file'

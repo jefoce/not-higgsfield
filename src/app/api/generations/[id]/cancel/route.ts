@@ -1,7 +1,8 @@
 import { canCancelInGrace } from '@/core/submit-state'
-import { assertLocalRequest, errorResponse, jsonError } from '@/server/http'
+import { errorResponse, jsonError } from '@/server/http'
 import { cancelScheduledSubmit } from '@/server/jobs/submit-queue'
 import { deleteGenerationFiles, getGeneration } from '@/server/repos/generations'
+import { assertLocalRequest } from '@/server/request-guard'
 import { withLock } from '@/server/sync/lock'
 
 interface Params {

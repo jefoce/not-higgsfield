@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
-import { assertLocalRequest, errorResponse, readJsonBody, zodError } from '@/server/http'
+import { errorResponse, zodError } from '@/server/http'
 import { addFolder, listFolders } from '@/server/repos/folders'
+import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 
 const BodySchema = z.object({ path: z.string().trim().min(1) })
 

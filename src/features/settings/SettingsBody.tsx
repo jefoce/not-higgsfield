@@ -3,11 +3,11 @@
 import { type RefObject, useCallback } from 'react'
 import { isEmpty } from 'lodash-es'
 
+import type { SecretStatus } from '@/core/types'
 import { Button } from '@/ui/Button'
 
 import { OPENROUTER_FIELDS, R2_FIELDS } from './secret-fields'
 import { SecretSection } from './SecretSection'
-import type { SecretStatus } from './use-secrets'
 import type { SettingsDraft } from './use-settings-draft'
 
 interface SettingsBodyProps {

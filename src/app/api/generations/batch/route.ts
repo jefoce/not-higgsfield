@@ -3,8 +3,9 @@ import { z } from 'zod'
 
 import { HISTORY_BATCH_MAX } from '@/core/constants'
 import type { BatchSkip } from '@/core/types'
-import { assertLocalRequest, errorResponse, jsonError, readJsonBody, zodError } from '@/server/http'
+import { errorResponse, jsonError, zodError } from '@/server/http'
 import { deleteGeneration, setFavorite } from '@/server/jobs/generation-actions'
+import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 
 const BodySchema = z.object({
   action: z.enum(['favorite', 'delete']),

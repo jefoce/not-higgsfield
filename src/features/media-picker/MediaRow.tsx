@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react'
 
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 import { openPreview, type PreviewActions } from '@/features/preview/preview-store'
 
 import { MediaTile } from './MediaTile'

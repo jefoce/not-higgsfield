@@ -1,14 +1,15 @@
 import { isNil } from 'lodash-es'
 
 import { GRACE_STALE_MS } from './constants'
+import type { UploadItem } from './media-types'
 import {
   buildOpenRouterBody,
   type BuildOpenRouterBodyParams,
   type OpenRouterVideoBody,
 } from './openrouter-body'
-import type { ModelPreset } from './presets'
+import type { ModelPreset } from './presets/types'
 import { type ResolvedTransport, resolveTransport } from './transport'
-import type { GenerationInput, GenerationRecord, JobStatus, UploadItem } from './types'
+import type { GenerationInput, GenerationRecord, JobStatus } from './types'
 
 /** Remaining grace delay in ms. A missing, invalid or past notBefore is 0. */
 export function graceDelayMs(notBefore: string | undefined, now = Date.now()): number {

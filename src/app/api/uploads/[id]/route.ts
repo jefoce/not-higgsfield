@@ -1,7 +1,8 @@
 import { inputIds } from '@/core/submit-state'
 import { UploadError } from '@/server/errors'
-import { assertLocalRequest, errorResponse } from '@/server/http'
+import { errorResponse } from '@/server/http'
 import { listActiveGenerations } from '@/server/repos/generations'
+import { assertLocalRequest } from '@/server/request-guard'
 import { removeUpload } from '@/server/services/uploads'
 
 interface Params {

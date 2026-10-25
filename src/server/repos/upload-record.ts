@@ -2,7 +2,7 @@ import 'server-only'
 
 import path from 'node:path'
 
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 
 import { readJson, writeJsonAtomic } from '../fs/json-file'
 import { isUuid } from '../fs/media-ref'

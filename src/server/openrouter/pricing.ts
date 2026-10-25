@@ -4,7 +4,7 @@ import { isEmpty, isNil } from 'lodash-es'
 import { z } from 'zod'
 
 import { FETCH_TIMEOUTS, PRICING_FALLBACK_TTL_MS } from '@/core/constants'
-import type { ModelPreset } from '@/core/presets'
+import type { ModelPreset } from '@/core/presets/types'
 import type { PricingInfo } from '@/core/types'
 
 import { globalState } from '../global-state'

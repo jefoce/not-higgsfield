@@ -10,8 +10,6 @@ import { getSecret } from '../secrets'
 import { OpenRouterError } from './error'
 import { mockContent, type MockContentFallback, mockJob, mockSubmit } from './mock-provider'
 
-export { OpenRouterError } from './error'
-
 const BASE_URL = 'https://openrouter.ai'
 
 const SubmitSchema = z

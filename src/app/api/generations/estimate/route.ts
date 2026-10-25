@@ -2,8 +2,9 @@ import { z } from 'zod'
 
 import { findPreset } from '@/core/presets'
 import { buildPriceInputSchema } from '@/core/validation'
-import { assertLocalRequest, errorResponse, jsonError, readJsonBody, zodError } from '@/server/http'
+import { errorResponse, jsonError, zodError } from '@/server/http'
 import { estimateGeneration, loadPriceDraft } from '@/server/jobs/estimate-generation'
+import { assertLocalRequest, readJsonBody } from '@/server/request-guard'
 
 export const dynamic = 'force-dynamic'
 

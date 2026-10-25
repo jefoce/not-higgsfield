@@ -1,6 +1,6 @@
 import { isNil } from 'lodash-es'
 
-import type { AspectRatio, ModelPreset, Resolution } from './presets'
+import type { AspectRatio, ModelPreset, Resolution } from './presets/types'
 
 export const SHORT_SIDE = {
   '480p': 480,

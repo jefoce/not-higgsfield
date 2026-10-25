@@ -1,5 +1,6 @@
-import { assertLocalRequest, errorResponse, parseKinds } from '@/server/http'
+import { errorResponse, parseKinds } from '@/server/http'
 import { listFolderFiles } from '@/server/repos/folders'
+import { assertLocalRequest } from '@/server/request-guard'
 
 interface Params {
   params: Promise<{ id: string }>

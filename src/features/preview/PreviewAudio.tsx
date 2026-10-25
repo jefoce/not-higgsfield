@@ -4,7 +4,7 @@ import { useCallback, useEffect } from 'react'
 import { isNil } from 'lodash-es'
 import { Pause, Play } from 'lucide-react'
 
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 import {
   currentDuration,
   currentSrc,

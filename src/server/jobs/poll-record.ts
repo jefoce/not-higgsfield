@@ -6,12 +6,9 @@ import { MAX_JOB_AGE_MIN } from '@/core/constants'
 import { asJobStatus } from '@/core/submit-state'
 import type { GenerationRecord, JobStatus } from '@/core/types'
 
-import {
-  getVideoJob,
-  isMockMode,
-  OpenRouterError,
-  type VideoJobResponse,
-} from '../openrouter/client'
+import type { VideoJobResponse } from '../openrouter/client'
+import { getVideoJob, isMockMode } from '../openrouter/client'
+import { OpenRouterError } from '../openrouter/error'
 import { saveGeneration } from '../repos/generations'
 import { queueDownload } from './download-queue'
 

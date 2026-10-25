@@ -5,17 +5,12 @@ import { isNil } from 'lodash-es'
 import useSWR from 'swr'
 import { z } from 'zod'
 
-import { R2_NAMES, type SecretName } from '@/core/secret-names'
 import type { SecretStatus, TestResult } from '@/core/types'
 import { fetchSecrets } from '@/lib/api/settings'
 import { readLocal, writeLocal } from '@/lib/local-store'
 import { SECRETS_KEY } from '@/lib/swr-keys'
 
 import { openSettings, type SettingsSection } from './settings-store'
-
-export { R2_NAMES, type SecretName }
-
-export type { SecretKeyStatus, SecretStatus, TestResult } from '@/core/types'
 
 export interface TestMessage {
   tone: 'ok' | 'error' | 'info'

@@ -1,10 +1,11 @@
 import { isNil } from 'lodash-es'
 
 import { LOW_RES_MIN_PX, MAX_ACTIVE_JOBS, MAX_INLINE_MEDIA_MB } from './constants'
+import type { UploadItem } from './media-types'
 import { aspectAllowed } from './output-size'
-import type { ModelPreset } from './presets'
+import type { ModelPreset } from './presets/types'
 import { resolveTransport } from './transport'
-import type { GenerationInput, UploadItem } from './types'
+import type { GenerationInput } from './types'
 import { checkReferenceLimits } from './validation-media'
 import type {
   RuleResult,
@@ -12,8 +13,6 @@ import type {
   ValidateWithContextParams,
   ValidationIssue,
 } from './validation-types'
-
-export { validateReferences } from './validation-references'
 
 const byteLimit = MAX_INLINE_MEDIA_MB * 1024 * 1024
 

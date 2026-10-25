@@ -1,5 +1,6 @@
 import { isNil } from 'lodash-es'
 
+import type { ReferencePlan, UploadItem } from '@/core/media-types'
 import type {
   BatchSkip,
   GenerationEstimate,
@@ -7,8 +8,6 @@ import type {
   GenerationListResult,
   GenerationRecord,
   PricingInfo,
-  ReferencePlan,
-  UploadItem,
 } from '@/core/types'
 import { apiDelete, apiPatch, apiPost, fetcher } from '@/lib/fetcher'
 import type { GenerationEstimateKey } from '@/lib/swr-keys'

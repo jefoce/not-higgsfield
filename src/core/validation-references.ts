@@ -2,10 +2,11 @@ import { isNil, sumBy } from 'lodash-es'
 
 import { maxDurationFor } from './duration-limits'
 import { KIND_TITLE, MEDIA_KINDS } from './media-kinds'
-import type { ModelPreset } from './presets'
+import type { MediaKind, UploadItem } from './media-types'
+import type { ModelPreset } from './presets/types'
 import { missingSlots, referenceSlots, type SlotCounts } from './prompt-tokens'
 import { resolveTransport } from './transport'
-import type { GenerationInput, MediaKind, UploadItem } from './types'
+import type { GenerationInput } from './types'
 import { checkReferenceLimits, seconds } from './validation-media'
 import type {
   RuleResult,

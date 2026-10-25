@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { getPreset } from '@/core/presets'
-import { validateInput, type ValidationIssue } from '@/core/validation'
+import { validateInput } from '@/core/validation'
+import type { ValidationIssue } from '@/core/validation-types'
 
 import { input, preset, upload, uploadsOf } from './helpers/validation-fixtures'
 

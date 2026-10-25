@@ -3,7 +3,8 @@
 import { compact, uniq } from 'lodash-es'
 import { toast } from 'sonner'
 
-import type { GenerationRecord, UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
+import type { GenerationRecord } from '@/core/types'
 import { useGeneratorStore } from '@/features/generator/store'
 import { cancelGenerationRequest, fetchUploadsByIds, setFavorite } from '@/lib/api/generations'
 import { errorMessage } from '@/lib/errors'

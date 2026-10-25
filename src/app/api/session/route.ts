@@ -1,4 +1,5 @@
-import { assertLocalRequest, errorResponse, jsonError } from '@/server/http'
+import { errorResponse, jsonError } from '@/server/http'
+import { assertLocalRequest } from '@/server/request-guard'
 import { SESSION_COOKIE, sessionRequired, tokenMatches } from '@/server/session'
 
 export const dynamic = 'force-dynamic'

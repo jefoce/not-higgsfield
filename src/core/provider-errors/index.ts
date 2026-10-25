@@ -6,8 +6,6 @@ import { SEEDANCE_RULES } from './seedance'
 import type { ErrorFamily, FriendlyError, HttpRule, Rule } from './types'
 import { WAN_RULES } from './wan'
 
-export type { FriendlyError } from './types'
-
 function matches(rule: Rule, raw: string): boolean {
   if (isFunction(rule.match)) {
     return rule.match(raw)

@@ -1,8 +1,9 @@
 import { isNil } from 'lodash-es'
 import { toast } from 'sonner'
 
+import type { UploadItem } from '@/core/media-types'
 import { referenceSlots, slotLabel } from '@/core/prompt-tokens'
-import type { GenerationRecord, UploadItem } from '@/core/types'
+import type { GenerationRecord } from '@/core/types'
 import { useGeneratorStore } from '@/features/generator/store'
 import { openPreview, type PreviewActions } from '@/features/preview/preview-store'
 import { fetchUploads } from '@/lib/api/uploads'

@@ -6,14 +6,12 @@ import fs from 'node:fs/promises'
 import { filter, isNil, orderBy } from 'lodash-es'
 
 import { extWithDot, kindFromExt, mimeFromExt } from '@/core/media-kinds'
-import type { MediaKind, UploadItem } from '@/core/types'
+import type { MediaKind, UploadItem } from '@/core/media-types'
 
 import { UploadError } from '../errors'
 import { removeFile, writeJsonAtomic } from '../fs/json-file'
 import { uploadPaths, UPLOADS_DIR } from '../paths'
 import { forgetUpload, getUploadRecord, listUploadRecords, rememberUpload } from './upload-record'
-
-export { saveUploadItem, updateUpload } from './upload-record'
 
 interface SaveFileUploadParams {
   bytes: Uint8Array

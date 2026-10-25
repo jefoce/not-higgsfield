@@ -4,7 +4,7 @@ import { closestCenter, DndContext } from '@dnd-kit/core'
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import { keyBy } from 'lodash-es'
 
-import type { ModelPreset } from '@/core/presets'
+import type { ModelPreset } from '@/core/presets/types'
 import { referenceSlots } from '@/core/prompt-tokens'
 import type { PickerExtensions } from '@/features/media-picker/store'
 import { UploadProgressTile } from '@/features/media-picker/UploadProgressTile'

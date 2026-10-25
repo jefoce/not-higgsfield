@@ -3,6 +3,7 @@ import 'server-only'
 import { isNil } from 'lodash-es'
 
 import { MAX_REQUEST_MB } from '@/core/constants'
+import type { UploadItem } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
 import {
   asJobStatus,
@@ -12,9 +13,10 @@ import {
   withTransports,
 } from '@/core/submit-state'
 import type { ResolvedTransport } from '@/core/transport'
-import type { GenerationRecord, UploadItem } from '@/core/types'
+import type { GenerationRecord } from '@/core/types'
 
-import { OpenRouterError, stripStatusPrefix } from '../openrouter/client'
+import { stripStatusPrefix } from '../openrouter/client'
+import { OpenRouterError } from '../openrouter/error'
 import { getRemoteStore } from '../remote/remote-store'
 import { getGeneration, saveGeneration } from '../repos/generations'
 import { getUpload } from '../repos/uploads'

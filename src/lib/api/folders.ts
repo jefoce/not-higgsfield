@@ -1,6 +1,6 @@
 import { isEmpty, isNil } from 'lodash-es'
 
-import type { BrowseResult, FolderItem, FolderListing, MediaKind } from '@/core/types'
+import type { BrowseResult, FolderItem, FolderListing, MediaKind } from '@/core/media-types'
 import { apiDelete, apiPost, fetcher } from '@/lib/fetcher'
 
 import { withQuery } from './uploads'

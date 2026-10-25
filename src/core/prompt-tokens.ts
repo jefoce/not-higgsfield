@@ -1,8 +1,8 @@
 import { isNil } from 'lodash-es'
 
 import { KIND_TITLE } from './media-kinds'
-import type { ModelPreset } from './presets'
-import type { MediaKind } from './types'
+import type { MediaKind } from './media-types'
+import type { ModelPreset } from './presets/types'
 
 export interface RefSlot {
   kind: MediaKind

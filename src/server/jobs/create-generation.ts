@@ -3,7 +3,8 @@ import 'server-only'
 import { randomInt, randomUUID } from 'node:crypto'
 
 import { MAX_REQUEST_MB, REQUEST_RESERVE_MB, SEED_MAX, SUBMIT_GRACE_MS } from '@/core/constants'
-import type { GenerationInput, GenerationRecord, ReferencePlan, UploadItem } from '@/core/types'
+import type { ReferencePlan, UploadItem } from '@/core/media-types'
+import type { GenerationInput, GenerationRecord } from '@/core/types'
 
 import { encodeImages } from '../media/image-data-url'
 import { saveGeneration } from '../repos/generations'

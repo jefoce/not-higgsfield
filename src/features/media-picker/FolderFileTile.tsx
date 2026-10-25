@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 import { Film, Image as ImageIcon, Link2, Maximize2, Play } from 'lucide-react'
 import type { MouseEvent } from 'react'
 
-import type { FolderFile } from '@/core/types'
+import type { FolderFile } from '@/core/media-types'
 import { cn } from '@/lib/cn'
 
 import { SELECTED_TILE_CLASSES } from './tile-classes'

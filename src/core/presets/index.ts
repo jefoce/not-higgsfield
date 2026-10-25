@@ -4,8 +4,6 @@ import type { ModelPreset } from './types'
 import { WAN_30 } from './wan/wan-3.0'
 import { WAN_30_PRIME } from './wan/wan-3.0-prime'
 
-export * from './types'
-
 export const MODEL_PRESETS = [
   WAN_30,
   WAN_30_PRIME,

@@ -1,4 +1,4 @@
-import type { MediaKind } from '../types'
+import type { MediaKind } from '../media-types'
 
 export const RESOLUTIONS = ['480p', '720p', '768p', '1080p', '2K', '4K'] as const
 export type Resolution = (typeof RESOLUTIONS)[number]

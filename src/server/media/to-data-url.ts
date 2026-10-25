@@ -3,7 +3,7 @@ import 'server-only'
 import fs from 'node:fs/promises'
 
 import { MAX_INLINE_MEDIA_MB } from '@/core/constants'
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 
 import { HttpError } from '../errors'
 import { uploadPaths } from '../paths'

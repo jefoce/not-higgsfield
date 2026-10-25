@@ -3,8 +3,8 @@
 import { DragOverlay } from '@dnd-kit/core'
 import { isNil } from 'lodash-es'
 
+import type { UploadItem } from '@/core/media-types'
 import type { RefSlot } from '@/core/prompt-tokens'
-import type { UploadItem } from '@/core/types'
 import type { PickerExtensions } from '@/features/media-picker/store'
 
 import { labelFor, noteFor, type PlannedImage } from './reference-notes'

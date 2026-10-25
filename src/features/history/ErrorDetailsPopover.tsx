@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 import { Copy } from 'lucide-react'
 import { toast } from 'sonner'
 
-import type { FriendlyError } from '@/core/provider-errors'
+import type { FriendlyError } from '@/core/provider-errors/types'
 import { cn } from '@/lib/cn'
 import { Button } from '@/ui/Button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'

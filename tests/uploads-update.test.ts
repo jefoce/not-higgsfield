@@ -5,7 +5,7 @@ import path from 'node:path'
 import { isNil } from 'lodash-es'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 
 vi.mock('server-only', () => ({}))
 
@@ -25,7 +25,7 @@ let removeUpload: (id: string) => Promise<void>
 beforeAll(async () => {
   await fs.rm(ROOT, { recursive: true, force: true })
 
-  ;({ updateUpload, saveUploadItem } = await import('@/server/repos/uploads'))
+  ;({ updateUpload, saveUploadItem } = await import('@/server/repos/upload-record'))
 
   ;({ removeUpload } = await import('@/server/services/uploads'))
 })

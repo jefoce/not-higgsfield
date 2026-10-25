@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { getPreset, type Resolution } from '@/core/presets'
+import { getPreset } from '@/core/presets'
+import type { Resolution } from '@/core/presets/types'
 import { validateInput } from '@/core/validation'
 
 import { input, preset, upload, uploadsOf } from './helpers/validation-fixtures'

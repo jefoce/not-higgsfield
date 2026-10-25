@@ -1,5 +1,6 @@
 import { browseDirectories } from '@/server/fs/browse'
-import { assertLocalRequest, errorResponse } from '@/server/http'
+import { errorResponse } from '@/server/http'
+import { assertLocalRequest } from '@/server/request-guard'
 
 export async function GET(request: Request) {
   try {

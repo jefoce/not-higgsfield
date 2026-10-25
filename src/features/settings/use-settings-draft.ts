@@ -4,7 +4,9 @@ import { useState } from 'react'
 import { isEmpty, isNull, isUndefined } from 'lodash-es'
 import { toast } from 'sonner'
 
-import { secretError } from '@/core/secret-names'
+import type { SecretName } from '@/core/secret-names'
+import { R2_NAMES, secretError } from '@/core/secret-names'
+import type { SecretStatus } from '@/core/types'
 import { refreshCredits } from '@/lib/api/credits'
 import { refreshRemoteStatus } from '@/lib/api/remote'
 import { saveSecrets } from '@/lib/api/settings'
@@ -13,7 +15,6 @@ import { platform } from '@/lib/platform'
 
 import type { SecretChange } from './secret-fields'
 import { useSecretActions } from './use-secret-actions'
-import { R2_NAMES, type SecretName, type SecretStatus } from './use-secrets'
 
 type Edits = Partial<Record<SecretName, string | null>>
 

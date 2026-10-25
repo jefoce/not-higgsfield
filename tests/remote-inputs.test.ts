@@ -5,7 +5,7 @@ import path from 'node:path'
 import { isNil } from 'lodash-es'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
-import type { UploadItem } from '@/core/types'
+import type { UploadItem } from '@/core/media-types'
 import type { FileHash } from '@/server/remote/hash'
 import type {
   RemoteObjectInfo,
@@ -113,7 +113,7 @@ beforeAll(async () => {
 
   ;({ ensureRemote, putOnce } = await import('@/server/services/remote-inputs'))
 
-  ;({ saveUploadItem } = await import('@/server/repos/uploads'))
+  ;({ saveUploadItem } = await import('@/server/repos/upload-record'))
 
   ;({ removeUpload } = await import('@/server/services/uploads'))
 

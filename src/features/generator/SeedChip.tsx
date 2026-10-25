@@ -12,7 +12,8 @@ import { Switch } from '@/ui/form/Switch'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
 import { Tooltip } from '@/ui/Tooltip'
 
-import { randomSeed, useGeneratorStore } from './store'
+import { useGeneratorStore } from './store'
+import { randomSeed } from './store-helpers'
 
 /** Random / fixed seed chip with its popover. Hidden when the model has no seed. */
 export function SeedChip() {

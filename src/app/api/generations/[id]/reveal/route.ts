@@ -1,8 +1,9 @@
 import fs from 'node:fs/promises'
 
-import { assertLocalRequest, errorResponse, jsonError } from '@/server/http'
+import { errorResponse, jsonError } from '@/server/http'
 import { downloadPaths } from '@/server/paths'
 import { getGeneration } from '@/server/repos/generations'
+import { assertLocalRequest } from '@/server/request-guard'
 import { getSystem } from '@/server/system'
 
 interface Params {

@@ -4,8 +4,8 @@ import { isEmpty, isNil } from 'lodash-es'
 import { create } from 'zustand'
 
 import { type KindExtensions, MEDIA_KINDS } from '@/core/media-kinds'
-import type { ModelPreset } from '@/core/presets'
-import type { MediaKind, UploadItem } from '@/core/types'
+import type { MediaKind, UploadItem } from '@/core/media-types'
+import type { ModelPreset } from '@/core/presets/types'
 
 type PickerTarget = 'frame-start' | 'frame-end' | 'references'
 
