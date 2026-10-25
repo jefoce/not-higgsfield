@@ -270,14 +270,14 @@ const deletion = useAsyncAction(async () => {
 
 ## Where to look
 
-| Topic                                                                                                 | Document                                            |
-| ----------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| Setup, scripts, mock modes, desktop build, ffmpeg and Node builds, adding a model, debugging, release | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)          |
-| Runtime, data model, lifecycle, concurrency, bounds, edge cases                                       | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)        |
-| Threat model and controls                                                                             | [docs/SECURITY.md](docs/SECURITY.md)                |
-| Why a design exists                                                                                   | [docs/DECISIONS.md](docs/DECISIONS.md)              |
-| User-facing behavior                                                                                  | [README.md](README.md)                              |
-| Setup steps for users                                                                                 | docs/user/OPENROUTER.md, docs/user/CLOUDFLARE-R2.md |
+| Topic                                                                                                 | Document                                                                                                     |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Setup, scripts, mock modes, desktop build, ffmpeg and Node builds, adding a model, debugging, release | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)                                                                   |
+| Runtime, data model, lifecycle, concurrency, bounds, edge cases                                       | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)                                                                 |
+| Threat model and controls                                                                             | [docs/SECURITY.md](docs/SECURITY.md)                                                                         |
+| Why a design exists                                                                                   | [docs/DECISIONS.md](docs/DECISIONS.md)                                                                       |
+| User-facing behavior                                                                                  | [README.md](README.md)                                                                                       |
+| Setup steps for users                                                                                 | [docs/user/OPENROUTER.md](docs/user/OPENROUTER.md), [docs/user/CLOUDFLARE-R2.md](docs/user/CLOUDFLARE-R2.md) |
 
 ## Quick map
 

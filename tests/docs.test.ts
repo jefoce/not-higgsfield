@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { isString } from 'lodash-es'
+import { find, isString } from 'lodash-es'
 import { describe, expect, it } from 'vitest'
 
 import * as bounds from '@/core/constants'
@@ -85,6 +85,13 @@ function imageTargets(markdown: string): string[] {
 /** Rule title as text, throwing when the rule builds it from raw text. */
 function ruleTitle(title: unknown, label: string): string {
   return required(isString(title) ? title : null, `Rule title for ${label}`)
+}
+
+/** Friendly title of the APP_RULES entry that matches the raw text. */
+function appTitle(match: string): string {
+  const rule = required(find(APP_RULES, { match }), `App rule for ${match}`)
+
+  return ruleTitle(rule.title, match)
 }
 
 /** Status labels packed in the first cell of a row, split on `/`. */
@@ -248,19 +255,12 @@ describe('user guides', () => {
     const unauthorized = required(OPENROUTER_DESCRIPTOR.httpRules[401], '401 rule')
     const insufficient = required(OPENROUTER_DESCRIPTOR.httpRules[402], '402 rule')
 
-    const capRule = required(
-      APP_RULES.find((rule) => {
-        return rule.match === "R2 is at the app's"
-      }),
-      'R2 cap rule',
-    )
-
-    const capTitle = ruleTitle(capRule.title, 'R2 cap')
-
     expect(openrouter).toContain(ruleTitle(unauthorized.title, '401'))
     expect(openrouter).toContain(ruleTitle(insufficient.title, '402'))
-    expect(r2).toContain(capTitle)
-    expect(readme).toContain(capTitle)
+    expect(r2).toContain(appTitle("R2 is at the app's"))
+    expect(readme).toContain(appTitle('key is not set'))
+    expect(readme).toContain(ruleTitle(unauthorized.title, '401'))
+    expect(readme).toContain(appTitle("R2 is at the app's"))
     expect(readme).not.toContain("R2 is at the app's")
   })
 })
