@@ -2,7 +2,6 @@
 
 import { omit } from 'lodash-es'
 import { toast } from 'sonner'
-import type { StoreApi } from 'zustand'
 
 import { maxDurationFor } from '@/core/duration-limits'
 import { isNonEmptyString } from '@/core/guards'
@@ -13,9 +12,7 @@ import type { GenerationInput, GeneratorTab } from '@/core/schemas/generation-re
 
 import { inputFromState } from './store-draft'
 import { clampReferenceDuration } from './store-helpers'
-import type { GeneratorState } from './store-state'
-
-type SetState = StoreApi<GeneratorState>['setState']
+import type { GeneratorSetState, GeneratorState } from './store-state'
 
 type DraftActions = Pick<
   GeneratorState,
@@ -77,7 +74,7 @@ function normalizedDraft(params: NormalizedDraftParams): Partial<GeneratorState>
 }
 
 /** Draft fields and their actions, kept out of the store creator. */
-export function createDraftActions(set: SetState): DraftActions {
+export function createDraftActions(set: GeneratorSetState): DraftActions {
   return {
     setPreset: (id) => {
       set((state) => {

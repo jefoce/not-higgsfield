@@ -32,7 +32,7 @@ export function UploadTile(props: UploadTileProps) {
   const fileInputId = useId()
   const inputRef = useRef<HTMLInputElement>(null)
   const [isOver, setIsOver] = useState(false)
-  const { progress, isBusy, handleFiles } = useUploadFiles({ onUploaded: props.onUploaded })
+  const { progress, isBusy, handleFiles } = useUploadFiles(props.onUploaded)
 
   const handleOpenFile = () => {
     return inputRef.current?.click()

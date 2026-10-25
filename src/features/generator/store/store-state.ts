@@ -1,3 +1,5 @@
+import type { StoreApi } from 'zustand'
+
 import type { UploadsById } from '@/core/media-types'
 import type { AspectChoice, Resolution } from '@/core/presets/types'
 import type { RefSlot } from '@/core/prompt-tokens'
@@ -36,3 +38,7 @@ export interface GeneratorState extends GeneratorDraft {
   registerSlotFocuser: (fn: SlotFocuser | null) => void
   upsertUploads: (uploads: UploadItem[]) => void
 }
+
+export type GeneratorSetState = StoreApi<GeneratorState>['setState']
+
+export type GeneratorGetState = StoreApi<GeneratorState>['getState']

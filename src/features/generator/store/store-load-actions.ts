@@ -2,7 +2,6 @@
 
 import { isEqual, keyBy, omit, pick } from 'lodash-es'
 import { toast } from 'sonner'
-import type { StoreApi } from 'zustand'
 
 import { normalizeForPreset } from '@/core/normalize-input'
 import { DEFAULT_PRESET_ID, findPreset, getPreset } from '@/core/presets'
@@ -10,16 +9,12 @@ import { canonicalizePrompt, referenceSlots } from '@/core/prompt-tokens'
 
 import { inputFromState } from './store-draft'
 import { clampReferenceDuration } from './store-helpers'
-import type { GeneratorState } from './store-state'
-
-type SetState = StoreApi<GeneratorState>['setState']
-
-type GetState = StoreApi<GeneratorState>['getState']
+import type { GeneratorGetState, GeneratorSetState, GeneratorState } from './store-state'
 
 type LoadActions = Pick<GeneratorState, 'loadInput' | 'normalizeLoaded'>
 
 /** Loading a saved input and normalizing the current draft. */
-export function createLoadActions(set: SetState, get: GetState): LoadActions {
+export function createLoadActions(set: GeneratorSetState, get: GeneratorGetState): LoadActions {
   return {
     loadInput: (input, uploads) => {
       const cache = { ...get().uploadsById, ...keyBy(uploads, 'id') }

@@ -95,7 +95,7 @@ export function HistorySection() {
     )
   }, [records])
 
-  const sentinel = useHistoryScroll({ hasMore, loadMore })
+  const sentinel = useHistoryScroll(hasMore, loadMore)
 
   return (
     <section id="history-section" className="relative flex h-full flex-col overflow-hidden">

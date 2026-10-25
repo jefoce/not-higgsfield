@@ -1,17 +1,13 @@
 'use client'
 
-import type { StoreApi } from 'zustand'
-
 import { getPreset } from '@/core/presets'
 
-import type { GeneratorState } from './store-state'
-
-type SetState = StoreApi<GeneratorState>['setState']
+import type { GeneratorSetState, GeneratorState } from './store-state'
 
 type FrameActions = Pick<GeneratorState, 'setFrame'>
 
 /** Frame slot attach and clear actions, kept out of the store creator. */
-export function createFrameActions(set: SetState): FrameActions {
+export function createFrameActions(set: GeneratorSetState): FrameActions {
   return {
     setFrame: (slot, upload) => {
       set((state) => {

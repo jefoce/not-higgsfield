@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 
 /** Clears the selection on Escape unless a dialog or menu is open. */
-export function useSelectionEscape(handleClear: () => void) {
+export function useSelectionEscape(onClear: () => void) {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'Escape' || event.defaultPrevented) {
@@ -14,7 +14,7 @@ export function useSelectionEscape(handleClear: () => void) {
         return
       }
 
-      handleClear()
+      onClear()
     }
 
     document.addEventListener('keydown', onKey)
@@ -22,5 +22,5 @@ export function useSelectionEscape(handleClear: () => void) {
     return () => {
       document.removeEventListener('keydown', onKey)
     }
-  }, [handleClear])
+  }, [onClear])
 }

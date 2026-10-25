@@ -3,14 +3,8 @@
 import { useEffect, useRef } from 'react'
 import { isNil } from 'lodash-es'
 
-interface HistoryScrollParams {
-  hasMore: boolean
-  loadMore: () => void
-}
-
 /** Infinite-scroll sentinel for the history feed. */
-export function useHistoryScroll(params: HistoryScrollParams) {
-  const { hasMore, loadMore } = params
+export function useHistoryScroll(hasMore: boolean, loadMore: () => void) {
   const sentinel = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

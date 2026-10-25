@@ -1,15 +1,12 @@
 'use client'
 
 import { uniq } from 'lodash-es'
-import type { StoreApi } from 'zustand'
 
 import { getPreset } from '@/core/presets'
 
 import { inputFromState } from './store-draft'
 import { clampReferenceDuration, kindCounts } from './store-helpers'
-import type { GeneratorState } from './store-state'
-
-type SetState = StoreApi<GeneratorState>['setState']
+import type { GeneratorSetState, GeneratorState } from './store-state'
 
 type ReferenceActions = Pick<
   GeneratorState,
@@ -17,7 +14,7 @@ type ReferenceActions = Pick<
 >
 
 /** Reference add, replace and remove actions, kept out of the store creator. */
-export function createReferenceActions(set: SetState): ReferenceActions {
+export function createReferenceActions(set: GeneratorSetState): ReferenceActions {
   return {
     addReferences: (items) => {
       set((state) => {

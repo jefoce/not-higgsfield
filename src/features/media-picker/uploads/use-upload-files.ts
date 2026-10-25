@@ -7,10 +7,6 @@ import type { UploadItem } from '@/core/schemas/upload-item'
 import { uploadFilesWithProgress } from '@/lib/api/uploads'
 import { toastError } from '@/lib/notify'
 
-interface UseUploadFilesParams {
-  onUploaded: (items: UploadItem[]) => void
-}
-
 function progressPercent(sent: number, total: number): number {
   if (total <= 0) {
     return 0
@@ -20,8 +16,7 @@ function progressPercent(sent: number, total: number): number {
 }
 
 /** Uploads picked files and tracks the progress percent. */
-export function useUploadFiles(params: UseUploadFilesParams) {
-  const { onUploaded } = params
+export function useUploadFiles(onUploaded: (items: UploadItem[]) => void) {
   const [progress, setProgress] = useState<number | null>(null)
   const isBusy = !isNil(progress)
 
