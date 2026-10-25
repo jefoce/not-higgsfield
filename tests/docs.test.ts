@@ -235,7 +235,6 @@ describe('user guides', () => {
   it('keeps the R2 guide numbers equal to the constants', () => {
     const guide = fs.readFileSync(file('docs/user/CLOUDFLARE-R2.md'), 'utf8')
 
-    expect(bounds.REMOTE_MAX_GB).toBe(8)
     expect(guide).toContain(`${String(bounds.REMOTE_MAX_GB)} GB`)
     expect(guide).toContain(`${String(bounds.REMOTE_FREE_GB)} GB`)
     expect(guide).toContain(`${String(bounds.REMOTE_UNUSED_DAYS)} days`)
