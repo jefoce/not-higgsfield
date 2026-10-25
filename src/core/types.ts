@@ -9,6 +9,12 @@ import type { SecretName } from './secret-names'
 
 export type GeneratorTab = StoredGeneratorTab
 
+/** Start and end frame data URLs. */
+export interface FrameSlots {
+  start: string | null
+  end: string | null
+}
+
 /** Exact generate panel state. Saved in record, copied back by Rerun. */
 export type GenerationInput = StoredGenerationInput
 

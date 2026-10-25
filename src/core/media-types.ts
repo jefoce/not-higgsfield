@@ -1,3 +1,4 @@
+import type { PixelSize } from './geometry'
 import type { FolderItem as StoredFolderItem } from './schemas/folder-item'
 import type {
   LinkMode as StoredLinkMode,
@@ -5,6 +6,13 @@ import type {
 } from './schemas/upload-item'
 
 export type MediaKind = 'image' | 'video' | 'audio'
+
+/** Count per media kind. */
+export interface MediaKindCounts {
+  image: number
+  video: number
+  audio: number
+}
 
 export type UploadItem = StoredUploadItem
 export type LinkMode = StoredLinkMode
@@ -30,11 +38,16 @@ export interface FolderListing {
   files: FolderFile[]
 }
 
+export interface BrowseDir {
+  name: string
+  path: string
+}
+
 /** Directory browser result for the add-folder dialog. */
 export interface BrowseResult {
   path: string
   parent: string | null
-  dirs: { name: string; path: string }[]
+  dirs: BrowseDir[]
 }
 
 /** Planned encoding for the attached images. One step for the whole request. */
@@ -45,10 +58,8 @@ export interface ReferencePlan {
   images: ReferencePlanImage[]
 }
 
-interface ReferencePlanImage {
+interface ReferencePlanImage extends PixelSize {
   id: string
-  width: number
-  height: number
   bytes: number
   format: 'jpeg' | 'png'
   flattened?: '#ffffff' | '#1c1e20'

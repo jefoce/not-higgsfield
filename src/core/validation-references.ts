@@ -128,11 +128,14 @@ interface CheckDurationTotalsParams {
   errors: string[]
 }
 
+interface DurationTotals {
+  videoTotal: number
+  audioTotal: number
+}
+
 const totalDuration = (items: UploadItem[]): number => sumBy(items, (item) => item.durationSec ?? 0)
 
-const checkDurationTotals = (
-  params: CheckDurationTotalsParams,
-): { videoTotal: number; audioTotal: number } => {
+const checkDurationTotals = (params: CheckDurationTotalsParams): DurationTotals => {
   const { videos, audio, preset, errors } = params
   const videoTotal = totalDuration(videos)
   const audioTotal = totalDuration(audio)

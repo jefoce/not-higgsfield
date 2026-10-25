@@ -7,6 +7,7 @@ import type { UploadItem } from './media-types'
 import { minDuration } from './presets'
 import type { ModelPreset } from './presets/types'
 import { slotLabel } from './prompt-tokens'
+import { FrameSlotsSchema } from './schemas/generation-record'
 import type { GenerationInput } from './types'
 import { validateReferences } from './validation-references'
 import {
@@ -49,7 +50,7 @@ function priceInputSchema(preset: ModelPreset) {
     duration: durationSchema(preset),
     aspectRatio: z.enum([...preset.aspectRatios, 'auto']),
     resolution: z.enum(preset.resolutions),
-    frames: z.object({ start: z.string().nullable(), end: z.string().nullable() }),
+    frames: FrameSlotsSchema,
     references: z.array(z.string()),
   })
 }

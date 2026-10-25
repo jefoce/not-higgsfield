@@ -1,4 +1,4 @@
-import type { MediaKind } from '../media-types'
+import type { MediaKind, MediaKindCounts } from '../media-types'
 import type { VideoProviderId } from '../providers/types'
 
 export const RESOLUTIONS = ['480p', '720p', '768p', '1080p', '2K', '4K'] as const
@@ -50,6 +50,7 @@ export interface ReferenceLimits {
 
 export type SkuTable = Readonly<Record<string, number>>
 export type ResolutionTiers = Readonly<Partial<Record<Resolution, string>>>
+export type SizeByAspect = Partial<Record<AspectRatio, `${number}x${number}`>>
 
 export interface SkuContext {
   resolution: Resolution
@@ -102,6 +103,33 @@ export interface ProviderBinding {
   transport: TransportByKind
 }
 
+export interface PresetDuration {
+  min: number
+  max: number
+  default: number
+  options?: readonly number[]
+}
+
+export interface PresetAudio {
+  supported: boolean
+  default: boolean
+}
+
+export interface PresetFrames {
+  start: boolean
+  end: boolean
+}
+
+export interface PresetReferences extends MediaKindCounts {
+  videoTotalSec: number
+  audioTotalSec: number
+  videoMinSec?: number
+  videoMaxSec?: number
+  audioMinSec?: number
+  audioMaxSec?: number
+  audioNeedsVisual?: boolean
+}
+
 export interface ModelPreset {
   id: string
   title: string
@@ -109,7 +137,7 @@ export interface ModelPreset {
 
   /** Key the picker maps to a lucide icon. */
   icon: PresetIcon
-  duration: { min: number; max: number; default: number; options?: readonly number[] }
+  duration: PresetDuration
 
   aspectRatios: readonly AspectRatio[]
   defaultAspectRatio: AspectRatio
@@ -119,25 +147,14 @@ export interface ModelPreset {
   promptOptional: boolean
   resolutions: readonly Resolution[]
   defaultResolution: Resolution
-  audio: { supported: boolean; default: boolean }
-  frames: { start: boolean; end: boolean }
-  references: {
-    image: number
-    video: number
-    audio: number
-    videoTotalSec: number
-    audioTotalSec: number
-    videoMinSec?: number
-    videoMaxSec?: number
-    audioMinSec?: number
-    audioMaxSec?: number
-    audioNeedsVisual?: boolean
-  }
+  audio: PresetAudio
+  frames: PresetFrames
+  references: PresetReferences
   referenceLimits?: Partial<Record<MediaKind, ReferenceLimits>>
   maxInputPlusOutputSec: number | null
   promptMaxChars: number
   seed: boolean
   refLabel: string
-  outputSizes?: Partial<Record<Resolution, Partial<Record<AspectRatio, `${number}x${number}`>>>>
+  outputSizes?: Partial<Record<Resolution, SizeByAspect>>
   bindings: readonly [ProviderBinding, ...ProviderBinding[]]
 }

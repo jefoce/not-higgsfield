@@ -125,9 +125,12 @@ interface AcceptFilesParams<T> {
   extensions?: KindExtensions
 }
 
-export function acceptFiles<T extends FileInfo>(
-  params: AcceptFilesParams<T>,
-): { accepted: T[]; skipped: number } {
+interface AcceptedFiles<T> {
+  accepted: T[]
+  skipped: number
+}
+
+export function acceptFiles<T extends FileInfo>(params: AcceptFilesParams<T>): AcceptedFiles<T> {
   const { files, kinds, extensions } = params
 
   const accepted = files.filter((file) => {

@@ -143,7 +143,12 @@ export function sortRecords(records: GenerationRecord[]): GenerationRecord[] {
   return orderBy(records, ['createdAt', 'id'], ['desc', 'desc'])
 }
 
-function parseCursor(cursor: string): { createdAt: string; id: string } {
+interface Cursor {
+  createdAt: string
+  id: string
+}
+
+function parseCursor(cursor: string): Cursor {
   const sep = cursor.lastIndexOf('|')
 
   if (sep < 0) {
@@ -153,7 +158,7 @@ function parseCursor(cursor: string): { createdAt: string; id: string } {
   return { createdAt: cursor.slice(0, sep), id: cursor.slice(sep + 1) }
 }
 
-const isAfter = (record: GenerationRecord, cursor: { createdAt: string; id: string }): boolean =>
+const isAfter = (record: GenerationRecord, cursor: Cursor): boolean =>
   record.createdAt < cursor.createdAt ||
   (record.createdAt === cursor.createdAt && record.id < cursor.id)
 
@@ -163,10 +168,12 @@ interface PaginateParams {
   limit: number
 }
 
-export function paginate(params: PaginateParams): {
+interface HistoryPage {
   items: GenerationRecord[]
   nextCursor: string | null
-} {
+}
+
+export function paginate(params: PaginateParams): HistoryPage {
   const { records, cursor, limit } = params
   const truncatedLimit = Math.trunc(limit)
 

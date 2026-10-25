@@ -1,5 +1,6 @@
 import { isNil } from 'lodash-es'
 
+import type { PixelSize } from './geometry'
 import type { AspectRatio, ModelPreset, Resolution } from './presets/types'
 
 export const SHORT_SIDE = {
@@ -37,7 +38,7 @@ interface OutputSizeParams {
 }
 
 /** Exact preset size when listed, else an even-dimension estimate from the short side. */
-export function outputSize(params: OutputSizeParams): { width: number; height: number } | null {
+export function outputSize(params: OutputSizeParams): PixelSize | null {
   const { preset, resolution, aspect } = params
   const exact = preset.outputSizes?.[resolution]?.[aspect]
 

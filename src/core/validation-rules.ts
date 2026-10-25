@@ -90,7 +90,11 @@ export function validatePrompt(input: GenerationInput, preset: ModelPreset): Rul
   return { errors: [...promptTextErrors(params), ...aspectErrors(params)], warnings: [] }
 }
 
-const checkFrameOrder = (params: ValidateFramesParams & { errors: string[] }): void => {
+interface CheckFrameOrderParams extends ValidateFramesParams {
+  errors: string[]
+}
+
+const checkFrameOrder = (params: CheckFrameOrderParams): void => {
   const { input, preset, errors } = params
 
   const hasEnd = !isNil(input.frames.end) && input.frames.end !== ''

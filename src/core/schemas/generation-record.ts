@@ -21,7 +21,7 @@ export type JobStatus = z.infer<typeof JobStatusSchema>
 
 const PriceSourceSchema = z.enum(['live', 'fallback', 'mock', 'unknown'])
 
-const RecordInputFramesSchema = z.object({
+export const FrameSlotsSchema = z.object({
   start: z.string().nullable(),
   end: z.string().nullable(),
 })
@@ -37,7 +37,7 @@ export const GenerationInputSchema = z.object({
   duration: z.number(),
   aspectRatio: AspectChoiceSchema,
   resolution: ResolutionSchema,
-  frames: RecordInputFramesSchema,
+  frames: FrameSlotsSchema,
   references: z.array(z.string()),
   seed: z.number().nullable(),
 })

@@ -2,11 +2,11 @@ import { clamp, isNil } from 'lodash-es'
 
 import { durationLimitFor } from './duration-limits'
 import { MEDIA_KINDS } from './media-kinds'
-import type { MediaKind, UploadItem } from './media-types'
+import type { MediaKindCounts, UploadItem } from './media-types'
 import { aspectAllowed } from './output-size'
 import { minDuration } from './presets'
 import type { ModelPreset } from './presets/types'
-import type { GenerationInput } from './types'
+import type { FrameSlots, GenerationInput } from './types'
 
 /** Drop media belonging to the inactive tab. Returns a new object. */
 export function inputForSubmit(input: GenerationInput): GenerationInput {
@@ -49,10 +49,7 @@ function normalizeAspect(params: NormalizeAspectParams): GenerationInput['aspect
   return aspectAllowed({ preset, resolution, aspect }) ? aspect : preset.defaultAspectRatio
 }
 
-function normalizeFrames(
-  frames: GenerationInput['frames'],
-  preset: ModelPreset,
-): GenerationInput['frames'] {
+function normalizeFrames(frames: FrameSlots, preset: ModelPreset): FrameSlots {
   if (!preset.frames.start || isNil(frames.start) || frames.start === '') {
     return { start: null, end: null }
   }
@@ -73,11 +70,16 @@ interface TrimReferencesParams {
   uploads: Record<string, UploadItem>
 }
 
+interface TrimReferencesResult {
+  references: string[]
+  notes: string[]
+}
+
 /** Keep references in order, dropping any past the per-kind limit. */
-function trimReferences(params: TrimReferencesParams): { references: string[]; notes: string[] } {
+function trimReferences(params: TrimReferencesParams): TrimReferencesResult {
   const { ids, preset, uploads } = params
-  const counts: Record<MediaKind, number> = { image: 0, video: 0, audio: 0 }
-  const removed: Record<MediaKind, number> = { image: 0, video: 0, audio: 0 }
+  const counts: MediaKindCounts = { image: 0, video: 0, audio: 0 }
+  const removed: MediaKindCounts = { image: 0, video: 0, audio: 0 }
 
   const references = ids.filter((id) => {
     const kind = uploads[id]?.kind
@@ -110,11 +112,13 @@ interface NormalizeForPresetParams {
   uploads?: Record<string, UploadItem>
 }
 
-/** Fit a draft input to a preset without mutating it. Notes list every change. */
-export function normalizeForPreset(params: NormalizeForPresetParams): {
+interface NormalizedInput {
   input: GenerationInput
   notes: string[]
-} {
+}
+
+/** Fit a draft input to a preset without mutating it. Notes list every change. */
+export function normalizeForPreset(params: NormalizeForPresetParams): NormalizedInput {
   const { input, preset, uploads = {} } = params
   const notes: string[] = []
   let tab = input.tab

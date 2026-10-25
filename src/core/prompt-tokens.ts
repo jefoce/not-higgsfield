@@ -1,7 +1,7 @@
 import { isNil } from 'lodash-es'
 
 import { KIND_TITLE } from './media-kinds'
-import type { MediaKind } from './media-types'
+import type { MediaKind, MediaKindCounts } from './media-types'
 import type { ModelPreset } from './presets/types'
 
 export interface RefSlot {
@@ -9,7 +9,17 @@ export interface RefSlot {
   n: number
 }
 
-export type PromptPart = { type: 'text'; text: string } | { type: 'slot'; slot: RefSlot }
+export interface PromptTextPart {
+  type: 'text'
+  text: string
+}
+
+export interface PromptSlotPart {
+  type: 'slot'
+  slot: RefSlot
+}
+
+export type PromptPart = PromptTextPart | PromptSlotPart
 
 const KIND_WORD: Record<string, MediaKind> = {
   image: 'image',
@@ -27,13 +37,18 @@ const CANONICAL = /@(Image|Video|Audio) (\d{1,2})(?!\d)/g
 const LOOSE =
   /@(image|img|video|audio)\s?(\d{1,2})(?!\d)|\[(image|img|video|audio)\s?(\d{1,2})\]|\b(Image|Video|Audio)\s(\d{1,2})(?!\d)/gi
 
-export type SlotCounts = Record<MediaKind, number>
+export type SlotCounts = MediaKindCounts
+
+export interface ReferenceSlotsResult {
+  counts: SlotCounts
+  slots: Map<string, RefSlot>
+}
 
 /** Slot per id in reference order. Unknown ids (not loaded yet, or deleted) are skipped. */
 export function referenceSlots(
   ids: readonly string[],
   kindOf: (id: string) => MediaKind | undefined,
-): { counts: SlotCounts; slots: Map<string, RefSlot> } {
+): ReferenceSlotsResult {
   const counts: SlotCounts = { image: 0, video: 0, audio: 0 }
   const slots = new Map<string, RefSlot>()
 
