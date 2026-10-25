@@ -26,6 +26,7 @@ function record(
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
     status,
+    provider: 'openrouter',
     input: {
       presetId: 'seedance-2.0',
       tab: 'references',

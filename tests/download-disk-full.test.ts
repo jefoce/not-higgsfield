@@ -34,7 +34,9 @@ let getGeneration: typeof GetGeneration
 
 beforeAll(async () => {
   await fs.mkdir(root, { recursive: true })
+
   ;({ queueDownload } = await import('@/server/jobs/download-queue'))
+
   ;({ getGeneration } = await import('@/server/repos/generations'))
 })
 
@@ -106,6 +108,7 @@ function makeRecord(): GenerationRecord {
     createdAt: now,
     updatedAt: now,
     status: 'in_progress',
+    provider: 'openrouter',
     input: {
       presetId: 'wan-3.0',
       tab: 'frames',

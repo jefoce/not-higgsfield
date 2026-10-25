@@ -28,6 +28,7 @@ function record(options: RecordOptions): GenerationRecord {
     createdAt: options.createdAt,
     updatedAt: options.createdAt,
     status: options.status ?? 'completed',
+    provider: 'openrouter',
     input: inputFor(options),
     preset: { id: 'wan-3.0', title: options.title ?? 'Wan 3.0', slug: 'alibaba/wan-3.0' },
     inputsSnapshot: {},

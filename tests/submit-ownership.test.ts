@@ -62,6 +62,7 @@ function makeRecord(
     createdAt: now,
     updatedAt: now,
     status: 'submitting',
+    provider: 'openrouter',
     input: {
       presetId: 'mock',
       tab: 'frames',

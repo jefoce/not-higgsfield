@@ -12,7 +12,6 @@ import { isNil } from 'lodash-es'
 import { FETCH_TIMEOUTS, MAX_DOWNLOAD_RETRIES } from '@/core/constants'
 import { isNonEmptyString } from '@/core/guards'
 import { COPY_EXPIRED_TEXT } from '@/core/provider-errors/app'
-import { recordProvider } from '@/core/providers/registry'
 import type { GenerationRecord, RecordOutput } from '@/core/schemas/generation-record'
 
 import { exists, isDiskFull } from '../fs/stat'
@@ -286,7 +285,7 @@ async function openContent(params: DownloadParams): Promise<Response> {
   const submittedAt = record.job?.submittedAt ?? ''
 
   try {
-    return await getVideoProvider(recordProvider(record)).fetchContent({
+    return await getVideoProvider(record.provider).fetchContent({
       job: { jobId: record.id, submittedAt },
       index: 0,
       fallback: record.input,

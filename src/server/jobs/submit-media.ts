@@ -5,7 +5,6 @@ import { chunk, isNil, sumBy } from 'lodash-es'
 import { MAX_REQUEST_MB, REQUEST_RESERVE_MB } from '@/core/constants'
 import type { ReferencePlan, UploadsById } from '@/core/media-types'
 import type { ModelPreset } from '@/core/presets/types'
-import { recordProvider } from '@/core/providers/registry'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { base64Only } from '@/core/submit-state'
 import type { ResolvedTransport } from '@/core/transport'
@@ -191,7 +190,7 @@ export async function recordSent(id: string, plan: ReferencePlan): Promise<void>
 
 export async function send(params: SendParams): Promise<SubmittedJob> {
   const { record, preset, uploads, transports, built } = params
-  const provider = getVideoProvider(recordProvider(record))
+  const provider = getVideoProvider(record.provider)
 
   try {
     return await provider.submit({ input: record.input, preset, media: built.media })

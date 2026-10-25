@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { inputForSubmit } from '@/core/normalize-input'
 import { getPreset } from '@/core/presets'
 import { friendlyError } from '@/core/provider-errors'
-import { recordProvider, videoProviderDescriptor } from '@/core/providers/registry'
+import { videoProviderDescriptor } from '@/core/providers/registry'
 import { VIDEO_PROVIDER_IDS, type VideoProviderId } from '@/core/providers/types'
 import { openSettings } from '@/features/settings/settings-store'
 import { refreshCredits } from '@/lib/api/credits'
@@ -95,7 +95,7 @@ export function useGenerate() {
           message: record.error ?? 'Submit failed',
           presetId: record.input.presetId,
           presetTitle: record.preset.title,
-          provider: recordProvider(record),
+          provider: record.provider,
         })
       } else {
         toast.success('Generation starts in 10s', {

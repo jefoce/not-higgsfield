@@ -4,7 +4,6 @@ import { isNil } from 'lodash-es'
 
 import { MAX_JOB_AGE_MIN } from '@/core/constants'
 import { isNonEmptyString } from '@/core/guards'
-import { recordProvider } from '@/core/providers/registry'
 import type { GenerationRecord, JobStatus, RecordJob } from '@/core/schemas/generation-record'
 
 import { ProviderError, type ProviderErrorKind } from '../providers/provider-error'
@@ -61,7 +60,7 @@ async function pollJob(params: PollJobParams): Promise<JobSnapshot | null> {
   const { record, current } = params
 
   try {
-    return await getVideoProvider(recordProvider(record)).getJob({
+    return await getVideoProvider(record.provider).getJob({
       jobId: current.id,
       submittedAt: current.submittedAt,
     })

@@ -76,6 +76,7 @@ function makeRecord(): GenerationRecord {
     createdAt: now,
     updatedAt: now,
     status: 'submitting',
+    provider: 'openrouter',
     input: {
       presetId: 'wan-3.0',
       tab: 'frames',

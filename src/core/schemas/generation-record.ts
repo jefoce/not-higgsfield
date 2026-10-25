@@ -128,7 +128,7 @@ export const GenerationRecordSchema = z.object({
   createdAt: z.string(),
   updatedAt: z.string(),
   status: JobStatusSchema,
-  provider: z.enum(VIDEO_PROVIDER_IDS).optional(),
+  provider: z.enum(VIDEO_PROVIDER_IDS).default('openrouter'),
   input: GenerationInputSchema,
   preset: RecordPresetSchema,
   inputsSnapshot: InputSnapshotSchema,

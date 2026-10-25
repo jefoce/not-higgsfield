@@ -37,6 +37,16 @@ describe('stored schemas', () => {
     }
   })
 
+  it('defaults the provider for files written before it existed', async () => {
+    const parsed = GenerationRecordSchema.safeParse(await loadJson('records/submitting.json'))
+
+    expect(parsed.success).toBe(true)
+
+    if (parsed.success) {
+      expect(parsed.data.provider).toBe('openrouter')
+    }
+  })
+
   it('parses an upload item', async () => {
     expect(UploadItemSchema.safeParse(await loadJson('uploads/item.json')).success).toBe(true)
   })

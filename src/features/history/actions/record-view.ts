@@ -7,7 +7,7 @@ import { findPreset } from '@/core/presets'
 import { canonicalizePrompt, referenceSlots, type RefSlot } from '@/core/prompt-tokens'
 import { friendlyError } from '@/core/provider-errors'
 import type { FriendlyError } from '@/core/provider-errors/types'
-import { recordProvider, videoProviderDescriptor } from '@/core/providers/registry'
+import { videoProviderDescriptor } from '@/core/providers/registry'
 import type { GenerationRecord, JobStatus } from '@/core/schemas/generation-record'
 import { downloadMediaUrl, thumbUrl, uploadThumbUrl } from '@/lib/api/media-urls'
 
@@ -27,7 +27,7 @@ export function recordError(record: GenerationRecord): FriendlyError | null {
   return friendlyError({
     raw: record.error,
     family: findPreset(record.input.presetId)?.family ?? null,
-    httpRules: videoProviderDescriptor(recordProvider(record)).httpRules,
+    httpRules: videoProviderDescriptor(record.provider).httpRules,
   })
 }
 
