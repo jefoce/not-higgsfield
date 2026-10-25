@@ -31,9 +31,8 @@ interface MoreMenuProps {
 
 /** Record actions: frame capture, reference copy, clipboard, reveal, delete. */
 export function MoreMenu(props: MoreMenuProps) {
-  const { record, onDeleted: handleDeleted, className, variant = 'overlay' } = props
+  const { record, className, variant = 'overlay' } = props
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
-  const handleConfirmOpenChange = setIsConfirmOpen
   const isCompleted = record.status === 'completed'
   const hasFullVideoRefs = getPreset(record.preset.id).references.video === 0
 
@@ -88,8 +87,8 @@ export function MoreMenu(props: MoreMenuProps) {
       <DeleteConfirm
         record={record}
         open={isConfirmOpen}
-        onOpenChange={handleConfirmOpenChange}
-        onDeleted={handleDeleted}
+        onOpenChange={setIsConfirmOpen}
+        onDeleted={props.onDeleted}
       />
     </>
   )

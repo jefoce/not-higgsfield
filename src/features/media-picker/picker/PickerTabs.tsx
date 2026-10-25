@@ -19,16 +19,9 @@ export interface PickerTabsProps {
 
 /** Scrollable pill tabs for uploads and connected folders. */
 export function PickerTabs(props: PickerTabsProps) {
-  const {
-    folders,
-    activeTab,
-    onTabChange: handleTabChange,
-    onAddFolder: handleAddFolder,
-    onDisconnectFolder: handleDisconnectFolder,
-    onClose: handleClose,
-  } = props
+  const { folders, activeTab, onTabChange } = props
 
-  const handleUploadsTab = useCallback(() => handleTabChange('uploads'), [handleTabChange])
+  const handleUploadsTab = useCallback(() => onTabChange('uploads'), [onTabChange])
 
   return (
     <div className="flex h-12 shrink-0 items-center gap-2">
@@ -46,14 +39,14 @@ export function PickerTabs(props: PickerTabsProps) {
             key={folder.id}
             folder={folder}
             isActive={activeTab === folder.id}
-            onTabChange={handleTabChange}
-            onDisconnectFolder={handleDisconnectFolder}
+            onTabChange={props.onTabChange}
+            onDisconnectFolder={props.onDisconnectFolder}
           />
         ))}
 
         <button
           type="button"
-          onClick={handleAddFolder}
+          onClick={props.onAddFolder}
           className="flex h-9 shrink-0 items-center gap-1 rounded-lg px-3 text-xs text-fg-2 transition hover:bg-white/5 hover:text-fg"
         >
           <Plus className="size-4" />
@@ -63,7 +56,7 @@ export function PickerTabs(props: PickerTabsProps) {
 
       <button
         type="button"
-        onClick={handleClose}
+        onClick={props.onClose}
         aria-label="Close picker"
         className="flex size-8 shrink-0 items-center justify-center rounded-full text-fg-2 transition hover:bg-white/5 hover:text-fg"
       >

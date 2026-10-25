@@ -21,7 +21,7 @@ interface DeleteConfirmProps {
 
 /** Delete confirmation, refuses active jobs and refreshes every list page. */
 export function DeleteConfirm(props: DeleteConfirmProps) {
-  const { record, open: isOpen, onOpenChange: handleOpenChange, onDeleted } = props
+  const { record, open: isOpen, onOpenChange, onDeleted } = props
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDelete = useCallback(async () => {
@@ -31,7 +31,7 @@ export function DeleteConfirm(props: DeleteConfirmProps) {
       await deleteGeneration(record.id)
       toast.success('Deleted')
       await revalidateHistory()
-      handleOpenChange(false)
+      onOpenChange(false)
       onDeleted?.()
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {
@@ -44,12 +44,12 @@ export function DeleteConfirm(props: DeleteConfirmProps) {
     } finally {
       setIsDeleting(false)
     }
-  }, [record, handleOpenChange, onDeleted])
+  }, [record, onOpenChange, onDeleted])
 
-  const handleCancel = useCallback(() => handleOpenChange(false), [handleOpenChange])
+  const handleCancel = useCallback(() => onOpenChange(false), [onOpenChange])
 
   return (
-    <Modal open={isOpen} onOpenChange={handleOpenChange} label="Delete video" className="w-100">
+    <Modal open={isOpen} onOpenChange={props.onOpenChange} label="Delete video" className="w-100">
       <div className="p-5">
         <h2 className="text-sm font-semibold text-fg">Delete video?</h2>
         <p className="mt-2 text-sm text-fg-2">

@@ -33,7 +33,7 @@ interface ReferencesGridProps {
 
 /** Sortable reference grid with counters, drag reorder and upload progress. */
 export function ReferencesGrid(props: ReferencesGridProps) {
-  const { preset, extensions, max, queue, dropProps, isDragging, onPick: handlePick } = props
+  const { preset, extensions, max, queue, dropProps, isDragging } = props
   const references = useGeneratorStore((state) => state.references)
   const uploadsById = useGeneratorStore((state) => state.uploadsById)
   const handleSelectSlot = useGeneratorStore((state) => state.insertMention)
@@ -78,7 +78,7 @@ export function ReferencesGrid(props: ReferencesGridProps) {
       >
         <ReferenceCounters counts={counts} preset={preset} plan={plan} />
         <div className="grid grid-cols-4 justify-center gap-2">
-          {max > 0 && <AddReferenceTile onPick={handlePick} />}
+          {max > 0 && <AddReferenceTile onPick={props.onPick} />}
           <SortableContext items={references} strategy={rectSortingStrategy}>
             {references.map((id) => (
               <ReferenceItem

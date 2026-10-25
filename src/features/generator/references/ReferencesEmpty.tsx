@@ -28,13 +28,13 @@ interface ReferencesEmptyProps {
 
 /** Drop target shown when no references are attached. */
 export function ReferencesEmpty(props: ReferencesEmptyProps) {
-  const { preset, dropProps, dragging: isDragging, onPick: handlePick } = props
+  const { preset, dropProps, dragging: isDragging } = props
   const kinds = MEDIA_KINDS.filter((kind) => preset.references[kind] > 0)
 
   return (
     <button
       type="button"
-      onClick={handlePick}
+      onClick={props.onPick}
       {...dropProps}
       className={cn(
         'flex min-h-30 w-full flex-col items-center justify-center rounded-2xl border border-dashed border-divider bg-surface p-4',

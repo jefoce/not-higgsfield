@@ -24,17 +24,7 @@ interface ReferenceDragOverlayProps {
 
 /** Lifted tile shown under the pointer while dragging a reference. */
 export function ReferenceDragOverlay(props: ReferenceDragOverlayProps) {
-  const {
-    activeId,
-    uploadsById,
-    planned,
-    slots,
-    previewUploads,
-    extensions,
-    onSelectSlot: handleSelectSlot,
-    onReplace: handleReplace,
-    onRemove: handleRemove,
-  } = props
+  const { activeId, uploadsById, planned, slots, previewUploads, extensions } = props
 
   return (
     <DragOverlay>
@@ -47,9 +37,9 @@ export function ReferenceDragOverlay(props: ReferenceDragOverlayProps) {
           previewUploads={previewUploads}
           slots={slots}
           extensions={extensions}
-          onSelectSlot={handleSelectSlot}
-          onReplace={handleReplace}
-          onRemove={handleRemove}
+          onSelectSlot={props.onSelectSlot}
+          onReplace={props.onReplace}
+          onRemove={props.onRemove}
           isLifted
         />
       )}

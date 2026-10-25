@@ -33,13 +33,7 @@ interface StatusOverlayProps {
 
 /** Placeholder for non-completed records: status pill, glow, timer and cost. */
 export function StatusOverlay(props: StatusOverlayProps) {
-  const {
-    record,
-    compact: isCompact = false,
-    boxAspect,
-    fill: isFill = false,
-    onCancel: handleCancel,
-  } = props
+  const { record, compact: isCompact = false, boxAspect, fill: isFill = false } = props
 
   const key = statusHelpKey(record)
   const help = STATUS_HELP[key]
@@ -55,7 +49,7 @@ export function StatusOverlay(props: StatusOverlayProps) {
   const graceNowMs = graceDelayMs(record.submit?.notBefore, now)
   const remainingMs = isGrace ? graceNowMs : 0
   const graceSeconds = Math.ceil(remainingMs / 1000)
-  const canCancel = isGraceCancelVisible({ record, remainingMs, onCancel: handleCancel })
+  const canCancel = isGraceCancelVisible({ record, remainingMs, onCancel: props.onCancel })
   const aspectStyle = { aspectRatio: boxAspect ?? recordAspect(record), margin: '0 auto' }
   const boxStyle = isFill ? undefined : aspectStyle
 
@@ -90,7 +84,7 @@ export function StatusOverlay(props: StatusOverlayProps) {
           tone={tone}
           label={label}
           help={help}
-          onCancel={handleCancel}
+          onCancel={props.onCancel}
         />
       )}
     </div>

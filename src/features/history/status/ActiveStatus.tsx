@@ -23,18 +23,9 @@ interface ActiveStatusProps {
 
 /** Active card: pill and optional grace cancel. */
 export function ActiveStatus(props: ActiveStatusProps) {
-  const {
-    record,
-    isCompact,
-    canCancel,
-    graceSeconds,
-    tone,
-    label,
-    help,
-    onCancel: handleCancel,
-  } = props
+  const { record, isCompact, canCancel, graceSeconds, tone, label, help } = props
 
-  const handleCancelClick = handleCancel ?? noop
+  const handleCancelClick = props.onCancel ?? noop
 
   return (
     <div

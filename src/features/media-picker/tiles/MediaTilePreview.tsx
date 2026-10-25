@@ -18,10 +18,9 @@ interface MediaTilePreviewProps {
 
 /** Thumbnail, broken fallback and kind overlays for a media tile. */
 export function MediaTilePreview(props: MediaTilePreviewProps) {
-  const { kind, isBroken, thumbSrc, durationSec, onThumbError } = props
+  const { kind, isBroken, thumbSrc, durationSec } = props
   const isPreviewable = kind === 'image' || kind === 'video'
   const isVideo = kind === 'video'
-  const handleThumbError = onThumbError
 
   return (
     <>
@@ -33,7 +32,7 @@ export function MediaTilePreview(props: MediaTilePreviewProps) {
           src={thumbSrc}
           loading="lazy"
           alt=""
-          onError={handleThumbError}
+          onError={props.onThumbError}
           className="pointer-events-none absolute inset-0 size-full bg-black/40 object-cover"
         />
       )}

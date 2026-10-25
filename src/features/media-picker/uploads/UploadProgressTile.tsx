@@ -22,7 +22,7 @@ export interface UploadProgressTileProps {
 
 /** Dashed placeholder for a file being copied into app storage. */
 export function UploadProgressTile(props: UploadProgressTileProps) {
-  const { item, onRetry: handleRetry, onDismiss: handleDismiss } = props
+  const { item } = props
   const hasError = !isNil(item.error) && item.error !== ''
 
   return (
@@ -37,19 +37,19 @@ export function UploadProgressTile(props: UploadProgressTileProps) {
           <span className="line-clamp-2 text-xxs break-all text-danger">{item.file.name}</span>
           <span className="text-xxs text-danger">Failed</span>
           <div className="flex items-center gap-1">
-            {!isNil(handleRetry) && (
+            {!isNil(props.onRetry) && (
               <button
                 type="button"
-                onClick={handleRetry}
+                onClick={props.onRetry}
                 className="rounded-sm px-1.5 py-0.5 text-xxs font-medium text-fg transition hover:bg-white/10"
               >
                 Retry
               </button>
             )}
-            {!isNil(handleDismiss) && (
+            {!isNil(props.onDismiss) && (
               <button
                 type="button"
-                onClick={handleDismiss}
+                onClick={props.onDismiss}
                 aria-label="Dismiss upload"
                 className="rounded-sm p-0.5 text-fg-2 transition hover:bg-white/10 hover:text-fg"
               >

@@ -19,7 +19,6 @@ interface PromptWarningsProps {
 export function PromptWarnings(props: PromptWarningsProps) {
   const { warnings, onFocus } = props
   const [isOpen, setIsOpen] = useState(false)
-  const handleOpenChange = setIsOpen
   const occurrences = useRef<Record<string, number>>({})
 
   const handleGo = useCallback(
@@ -39,7 +38,7 @@ export function PromptWarnings(props: PromptWarningsProps) {
   }
 
   return (
-    <Popover open={isOpen} onOpenChange={handleOpenChange}>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Chip
           variant="warning"

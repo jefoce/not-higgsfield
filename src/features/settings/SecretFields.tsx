@@ -18,7 +18,7 @@ interface SecretFieldsProps {
 
 /** Renders a list of secret fields bound to the modal draft. */
 export function SecretFields(props: SecretFieldsProps) {
-  const { fields, keys, values, onChange: handleChange } = props
+  const { fields, keys, values } = props
 
   return (
     <div className="space-y-3">
@@ -31,7 +31,7 @@ export function SecretFields(props: SecretFieldsProps) {
           status={keys[field.name]}
           value={values[field.name] ?? ''}
           remove={isNull(values[field.name])}
-          onChange={handleChange}
+          onChange={props.onChange}
         />
       ))}
     </div>

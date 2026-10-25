@@ -35,9 +35,6 @@ export function MediaTile(props: MediaTileProps) {
     disabled: isDisabled,
     missing: isMissing,
     thumbVersion,
-    onDelete,
-    onSelect,
-    onPreview,
   } = props
 
   const [brokenSrc, setBrokenSrc] = useState<string | null>(null)
@@ -49,10 +46,6 @@ export function MediaTile(props: MediaTileProps) {
   const mediaSrc = mediaUrl(mediaRef, item.mime)
 
   const handleThumbError = useCallback(() => setBrokenSrc(thumbSrc), [thumbSrc])
-
-  const handleSelect = onSelect
-  const handlePreview = onPreview
-  const handleDelete = onDelete
 
   return (
     <div
@@ -79,9 +72,9 @@ export function MediaTile(props: MediaTileProps) {
         isBlocked={isBlocked}
         isSelected={isSelected === true}
         isMissing={isMissing === true}
-        onSelect={handleSelect}
-        onPreview={handlePreview}
-        onDelete={handleDelete}
+        onSelect={props.onSelect}
+        onPreview={props.onPreview}
+        onDelete={props.onDelete}
       />
 
       <MediaTileBadges

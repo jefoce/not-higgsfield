@@ -25,9 +25,8 @@ interface DetailsActionsProps {
 
 /** Timestamps on the left, hover actions on the right, delete dialog for failed records. */
 export function DetailsActions(props: DetailsActionsProps) {
-  const { record, isActive, now, onDeleted: handleDeleted } = props
+  const { record, isActive, now } = props
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
-  const handleConfirmOpenChange = setIsConfirmOpen
   const isFailed = record.status === 'failed'
   let friendly: ReturnType<typeof recordError> = null
 
@@ -85,7 +84,7 @@ export function DetailsActions(props: DetailsActionsProps) {
           {!isFailed && (
             <MoreMenu
               record={record}
-              onDeleted={handleDeleted}
+              onDeleted={props.onDeleted}
               variant="panel"
               className="ml-auto h-6 w-7.5 rounded-lg border-0"
             />
@@ -95,8 +94,8 @@ export function DetailsActions(props: DetailsActionsProps) {
       <DeleteConfirm
         record={record}
         open={isConfirmOpen}
-        onOpenChange={handleConfirmOpenChange}
-        onDeleted={handleDeleted}
+        onOpenChange={setIsConfirmOpen}
+        onDeleted={props.onDeleted}
       />
     </>
   )

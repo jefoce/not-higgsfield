@@ -16,7 +16,7 @@ interface PreviewAudioWaveProps {
 
 /** Waveform bars that seek on click and keyboard, with play state coloring. */
 export function PreviewAudioWave(props: PreviewAudioWaveProps) {
-  const { bars, played, at, total, onToggle: handleToggle } = props
+  const { bars, played, at, total, onToggle } = props
 
   const handleSeek = useCallback(
     (event: MouseEvent<HTMLDivElement>) => {
@@ -45,10 +45,10 @@ export function PreviewAudioWave(props: PreviewAudioWaveProps) {
 
       if (event.key === ' ') {
         event.preventDefault()
-        handleToggle()
+        onToggle()
       }
     },
-    [at, handleToggle],
+    [at, onToggle],
   )
 
   return (

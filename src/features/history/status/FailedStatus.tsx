@@ -26,17 +26,7 @@ interface FailedStatusProps {
 
 /** Failed card: pill and checkbox in the corner, reason and actions in the middle. */
 export function FailedStatus(props: FailedStatusProps) {
-  const {
-    id,
-    isCompact,
-    isSelecting,
-    label,
-    help,
-    tone,
-    friendly,
-    line,
-    onRerun: handleRerun,
-  } = props
+  const { id, isCompact, isSelecting, label, help, tone, friendly, line } = props
 
   return (
     <>
@@ -61,7 +51,7 @@ export function FailedStatus(props: FailedStatusProps) {
           <p className="line-clamp-2 text-danger">{friendly?.title ?? help.label}</p>
           {!isNil(line) && <p className="line-clamp-3 text-sm text-fg-2">{line}</p>}
           <div className="flex flex-wrap items-center justify-center gap-2">
-            <Button size="sm" variant="outline" onClick={handleRerun}>
+            <Button size="sm" variant="outline" onClick={props.onRerun}>
               Reuse
             </Button>
             {!isNil(friendly) && <ErrorDetailsPopover error={friendly} />}

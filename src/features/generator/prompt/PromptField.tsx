@@ -45,7 +45,7 @@ interface PromptFieldProps {
 
 /** Lexical prompt editor with per-mode drafts, live reference chips and warning chip. */
 export function PromptField(props: PromptFieldProps) {
-  const { onSubmit: handleSubmit, warnings } = props
+  const { warnings } = props
   const prompt = useGeneratorStore(promptFor)
   const setPrompt = useGeneratorStore((state) => state.setPrompt)
   const tab = useGeneratorStore((state) => state.tab)
@@ -82,7 +82,7 @@ export function PromptField(props: PromptFieldProps) {
             />
             <OnChangePlugin ignoreSelectionChange onChange={handleChange} />
             <HistoryPlugin />
-            <PromptEditorBridge prompt={prompt} onSubmit={handleSubmit} />
+            <PromptEditorBridge prompt={prompt} onSubmit={props.onSubmit} />
             {tab === 'references' && (
               <BeautifulMentionsPlugin
                 items={items}

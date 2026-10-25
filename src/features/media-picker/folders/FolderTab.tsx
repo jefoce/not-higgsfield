@@ -56,7 +56,7 @@ function folderPreviewItem(params: FolderPreviewItemParams): PreviewItem {
 /** Folder browser. */
 export function FolderTab(props: FolderTabProps) {
   const { folderId, folderName, kinds, max, extensions, sub, selectedRels } = props
-  const { onPickFile, onNavigate: handleNavigate, onToggleFile } = props
+  const { onPickFile, onToggleFile } = props
 
   const handleSelectFile = useCallback(
     (rel: string) => {
@@ -101,7 +101,7 @@ export function FolderTab(props: FolderTabProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex h-14 shrink-0 items-center px-4">
-        <FolderBreadcrumbs folderName={folderName} sub={sub} onNavigate={handleNavigate} />
+        <FolderBreadcrumbs folderName={folderName} sub={sub} onNavigate={props.onNavigate} />
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
@@ -112,7 +112,7 @@ export function FolderTab(props: FolderTabProps) {
             ))}
 
           {dirs.map((dir) => (
-            <FolderDirTile key={dir.rel} dir={dir} onNavigate={handleNavigate} />
+            <FolderDirTile key={dir.rel} dir={dir} onNavigate={props.onNavigate} />
           ))}
 
           {files.map((file) => {

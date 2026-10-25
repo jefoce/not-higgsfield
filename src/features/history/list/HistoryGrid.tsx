@@ -12,7 +12,7 @@ interface HistoryGridProps {
 
 /** Fixed column count per zoom, tiles stay square and fill their column. */
 export function HistoryGrid(props: HistoryGridProps) {
-  const { records, onOpen: handleOpen } = props
+  const { records } = props
   const zoom = useHistoryViewStore((state) => state.zoom)
   const columns = zoomToGridColumns(zoom)
 
@@ -23,7 +23,7 @@ export function HistoryGrid(props: HistoryGridProps) {
     >
       {records.map((record) => (
         <div key={record.id} id={`history-item-${record.id}`}>
-          <HistoryTile record={record} onOpen={handleOpen} />
+          <HistoryTile record={record} onOpen={props.onOpen} />
         </div>
       ))}
     </div>

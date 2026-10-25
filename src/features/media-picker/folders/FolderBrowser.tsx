@@ -32,10 +32,7 @@ function crumbPaths(path: string): FolderCrumb[] {
 
 /** Path bar and directory list for the add-folder dialog. */
 export function FolderBrowser(props: FolderBrowserProps) {
-  const { path, data, onNavigate, onNavigateRoot, onNavigateParent } = props
-  const handleNavigate = onNavigate
-  const handleNavigateRoot = onNavigateRoot
-  const handleNavigateParent = onNavigateParent
+  const { path, data } = props
   const crumbs = crumbPaths(data?.path ?? path ?? '')
 
   return (
@@ -43,7 +40,7 @@ export function FolderBrowser(props: FolderBrowserProps) {
       <div className="mt-3 flex h-10 min-w-0 scrollbar-none items-center gap-0.5 overflow-x-auto rounded-lg bg-surface px-3 font-mono text-xs text-fg-2 [&::-webkit-scrollbar]:hidden">
         <button
           type="button"
-          onClick={handleNavigateRoot}
+          onClick={props.onNavigateRoot}
           className="shrink-0 transition hover:text-fg"
         >
           /
@@ -53,7 +50,7 @@ export function FolderBrowser(props: FolderBrowserProps) {
             key={crumb.path}
             label={crumb.label}
             path={crumb.path}
-            onNavigate={handleNavigate}
+            onNavigate={props.onNavigate}
           />
         ))}
       </div>
@@ -68,7 +65,7 @@ export function FolderBrowser(props: FolderBrowserProps) {
         {Boolean(data?.parent) && (
           <button
             type="button"
-            onClick={handleNavigateParent}
+            onClick={props.onNavigateParent}
             className="flex h-10 w-full items-center gap-2 rounded-lg px-2 text-left text-sm text-fg-2 transition hover:bg-white/5 hover:text-fg"
           >
             <ArrowUp className="size-4" />
@@ -77,7 +74,7 @@ export function FolderBrowser(props: FolderBrowserProps) {
         )}
 
         {data?.dirs.map((dir) => (
-          <DirectoryButton key={dir.path} dir={dir} onNavigate={handleNavigate} />
+          <DirectoryButton key={dir.path} dir={dir} onNavigate={props.onNavigate} />
         ))}
       </div>
     </>

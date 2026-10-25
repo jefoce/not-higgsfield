@@ -20,10 +20,7 @@ interface MediaTileControlsProps {
 
 /** Selection, preview and delete controls for a media tile. */
 export function MediaTileControls(props: MediaTileControlsProps) {
-  const { label, isPreviewable, isBlocked, isSelected, isMissing, onSelect, onPreview, onDelete } =
-    props
-
-  const handleSelect = onSelect
+  const { label, isPreviewable, isBlocked, isSelected, isMissing, onPreview, onDelete } = props
 
   const handlePreviewClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
@@ -50,7 +47,7 @@ export function MediaTileControls(props: MediaTileControlsProps) {
     <>
       <button
         type="button"
-        onClick={handleSelect}
+        onClick={props.onSelect}
         disabled={isBlocked}
         aria-label={label}
         aria-pressed={isSelected}
@@ -61,7 +58,7 @@ export function MediaTileControls(props: MediaTileControlsProps) {
         )}
       />
 
-      {!isNil(onPreview) && !isMissing && isPreviewable && (
+      {!isNil(props.onPreview) && !isMissing && isPreviewable && (
         <button
           type="button"
           onClick={handlePreviewClick}
@@ -72,7 +69,7 @@ export function MediaTileControls(props: MediaTileControlsProps) {
         </button>
       )}
 
-      {!isNil(onDelete) && (
+      {!isNil(props.onDelete) && (
         <button
           type="button"
           onClick={handleDeleteClick}

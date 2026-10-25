@@ -41,7 +41,6 @@ export function PickerBody(props: PickerBodyProps) {
     [handleReset],
   )
 
-  const handleClose = closeMediaPicker
   const selection = usePickerSelection(request)
   const { commit, confirm } = selection
   const { data: folders = [] } = useSWR(['folders'], fetchFolders)
@@ -55,14 +54,11 @@ export function PickerBody(props: PickerBodyProps) {
 
   const upload = usePickerUpload({ request, onCommit: commit })
   const [isAddOpen, setIsAddOpen] = useState(false)
-  const handleAddOpenChange = setIsAddOpen
 
   const handleAddFolderOpen = useCallback(() => setIsAddOpen(true), [])
 
   const handleSelectUpload = useCallback((item: UploadItem) => commit([item]), [commit])
 
-  const handleAdded = foldersState.handleAdded
-  const handleDisconnect = foldersState.handleDisconnect
   const activeFolder = foldersState.activeFolder
   const isFolderTab = !isNil(activeFolder) && activeTab !== 'uploads'
 
@@ -86,8 +82,8 @@ export function PickerBody(props: PickerBodyProps) {
           activeTab={activeTab}
           onTabChange={handleTabChange}
           onAddFolder={handleAddFolderOpen}
-          onClose={handleClose}
-          onDisconnectFolder={handleDisconnect}
+          onClose={closeMediaPicker}
+          onDisconnectFolder={foldersState.handleDisconnect}
         />
 
         <div className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl bg-surface">
@@ -116,7 +112,11 @@ export function PickerBody(props: PickerBodyProps) {
         <PickerDropOverlay isDragging={upload.isDragging} />
       </div>
 
-      <AddFolderDialog open={isAddOpen} onOpenChange={handleAddOpenChange} onAdded={handleAdded} />
+      <AddFolderDialog
+        open={isAddOpen}
+        onOpenChange={setIsAddOpen}
+        onAdded={foldersState.handleAdded}
+      />
     </>
   )
 }

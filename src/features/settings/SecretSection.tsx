@@ -39,7 +39,6 @@ export function SecretSection(props: SecretSectionProps) {
     description,
     keys,
     values,
-    onChange: handleChange,
     ready: isReady,
     testing: isTesting,
     result,
@@ -89,7 +88,7 @@ export function SecretSection(props: SecretSectionProps) {
         fields={descriptor.fields}
         keys={keys}
         values={values}
-        onChange={handleChange}
+        onChange={props.onChange}
       />
       {warning}
       <div className="flex items-center gap-3">

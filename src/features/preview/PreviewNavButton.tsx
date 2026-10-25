@@ -12,7 +12,7 @@ interface PreviewNavButtonProps {
 
 /** Round previous/next control on the preview stage. */
 export function PreviewNavButton(props: PreviewNavButtonProps) {
-  const { side, disabled: isDisabled, onClick: handleClick } = props
+  const { side, disabled: isDisabled } = props
   const Icon = side === 'left' ? ChevronLeft : ChevronRight
   const isLeft = side === 'left'
   const label = isLeft ? 'Previous media' : 'Next media'
@@ -21,7 +21,7 @@ export function PreviewNavButton(props: PreviewNavButtonProps) {
     <button
       type="button"
       disabled={isDisabled}
-      onClick={handleClick}
+      onClick={props.onClick}
       aria-label={label}
       className={cn(
         'absolute top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-fg backdrop-blur-sm transition hover:bg-black/80 disabled:opacity-30',

@@ -179,20 +179,12 @@ function thumbText(params: ThumbTextParams): ThumbText {
 
 /** One reference tile with preview and remove. Sorting lives in the wrapper. */
 export function ReferenceThumb(props: ReferenceThumbProps) {
-  const {
-    upload,
-    label,
-    missing: isMarkedMissing,
-    lifted: isLifted = false,
-    note,
-    onOpenPreview: handleOpenPreview,
-    onRemove: handleRemove,
-  } = props
+  const { upload, label, missing: isMarkedMissing, lifted: isLifted = false, note } = props
 
   const { isMissing, isBroken, isAudio, isVideo, isOpenable } = thumbState({
     upload,
     isMarkedMissing,
-    hasPreview: !isNil(handleOpenPreview),
+    hasPreview: !isNil(props.onOpenPreview),
   })
 
   const { audioSrc, imageSrc, videoDuration } = thumbMedia({ upload, isAudio, isVideo })
@@ -225,7 +217,7 @@ export function ReferenceThumb(props: ReferenceThumbProps) {
           isMissing={isMissing}
           isOpenable={isOpenable}
           isPreviewShown={isPreviewShown}
-          onOpenPreview={handleOpenPreview}
+          onOpenPreview={props.onOpenPreview}
         />
 
         <ReferenceRemoveButton
@@ -233,7 +225,7 @@ export function ReferenceThumb(props: ReferenceThumbProps) {
           audioSrc={audioSrc}
           isAudio={isAudio}
           overlayClass={overlayClass}
-          onRemove={handleRemove}
+          onRemove={props.onRemove}
         />
       </div>
     </Tooltip>

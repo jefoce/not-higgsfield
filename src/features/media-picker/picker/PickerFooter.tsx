@@ -13,8 +13,7 @@ interface PickerFooterProps {
 
 /** Hint plus the multi-select confirm button. */
 export function PickerFooter(props: PickerFooterProps) {
-  const { max, selectedCount, isBusy, onConfirm } = props
-  const handleConfirm = onConfirm
+  const { max, selectedCount, isBusy } = props
 
   return (
     <div className="mt-3 flex shrink-0 items-center justify-between gap-3 px-3 py-2">
@@ -27,7 +26,7 @@ export function PickerFooter(props: PickerFooterProps) {
             variant="primary"
             disabled={selectedCount === 0}
             loading={isBusy}
-            onClick={handleConfirm}
+            onClick={props.onConfirm}
           >
             Add
           </Button>

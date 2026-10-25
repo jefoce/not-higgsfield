@@ -33,12 +33,20 @@ function handleStopPropagation(event: MouseEvent<HTMLDivElement>): void {
 /** Bottom bar with seek, play, mute, clock and fullscreen. Hides while playing until hover. */
 export function PlayerControls(props: PlayerControlsProps) {
   const { video } = props
-  const { paused: isPaused, muted: isMuted, time, duration, fullscreen: isFullscreen } = video
+
+  const {
+    paused: isPaused,
+    muted: isMuted,
+    time,
+    duration,
+    fullscreen: isFullscreen,
+    togglePlay,
+    toggleMute,
+    toggleFullscreen,
+  } = video
+
   const rawProgress = duration > 0 ? (time / duration) * 100 : 0
   const progress = Math.min(100, rawProgress)
-  const handleTogglePlay = video.togglePlay
-  const handleToggleMute = video.toggleMute
-  const handleToggleFullscreen = video.toggleFullscreen
 
   const handleSeek = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -78,7 +86,7 @@ export function PlayerControls(props: PlayerControlsProps) {
         <button
           type="button"
           aria-label={playLabel}
-          onClick={handleTogglePlay}
+          onClick={togglePlay}
           className={CONTROL_BUTTON_CLASSES}
         >
           <PlayIcon size={16} className="fill-current" aria-hidden />
@@ -86,7 +94,7 @@ export function PlayerControls(props: PlayerControlsProps) {
         <button
           type="button"
           aria-label={muteLabel}
-          onClick={handleToggleMute}
+          onClick={toggleMute}
           className={CONTROL_BUTTON_CLASSES}
         >
           <MuteIcon size={16} aria-hidden />
@@ -97,7 +105,7 @@ export function PlayerControls(props: PlayerControlsProps) {
         <button
           type="button"
           aria-label={fullscreenLabel}
-          onClick={handleToggleFullscreen}
+          onClick={toggleFullscreen}
           className={cn(CONTROL_BUTTON_CLASSES, 'ml-auto')}
         >
           <FullscreenIcon size={16} aria-hidden />

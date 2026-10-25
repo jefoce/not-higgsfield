@@ -40,7 +40,6 @@ function disabledTooltip(isDisabled: boolean, error?: string): string | null {
 /** Primary generate action with price, validation tooltip and in-flight spinner. */
 export function GenerateButton(props: GenerateButtonProps) {
   const {
-    onGenerate: handleGenerate,
     isGenerating,
     isPriceLoading,
     disabled: isDisabled,
@@ -59,7 +58,7 @@ export function GenerateButton(props: GenerateButtonProps) {
       <span className="block w-full">
         <button
           type="button"
-          onClick={handleGenerate}
+          onClick={props.onGenerate}
           disabled={isDisabled || isGenerating}
           aria-busy={isBusy || undefined}
           className={cn(

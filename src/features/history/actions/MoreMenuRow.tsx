@@ -16,18 +16,12 @@ interface MoreMenuRowProps {
 
 /** One item in the record actions menu. */
 export function MoreMenuRow(props: MoreMenuRowProps) {
-  const {
-    children,
-    icon,
-    onSelect: handleSelect,
-    disabled: isDisabled,
-    destructive: isDestructive = false,
-  } = props
+  const { children, icon, disabled: isDisabled, destructive: isDestructive = false } = props
 
   return (
     <DropdownMenuPrimitive.Item
       disabled={isDisabled}
-      onSelect={handleSelect}
+      onSelect={props.onSelect}
       className={cn(
         MENU_ITEM_CLASSES,
         isDestructive && 'text-danger data-[highlighted]:bg-danger/10',

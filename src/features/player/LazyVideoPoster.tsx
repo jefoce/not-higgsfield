@@ -18,7 +18,7 @@ interface LazyVideoPosterProps {
 
 /** Poster or placeholder shown until this player owns a slot. */
 export function LazyVideoPoster(props: LazyVideoPosterProps) {
-  const { poster, alt, posterFit, showPlay: shouldShowPlay, onPlay: handlePlay } = props
+  const { poster, alt, posterFit, showPlay: shouldShowPlay } = props
 
   return (
     <>
@@ -41,7 +41,7 @@ export function LazyVideoPoster(props: LazyVideoPosterProps) {
           )}
         />
       )}
-      {shouldShowPlay && <LazyVideoPlayButton label="Play video" onPlay={handlePlay} />}
+      {shouldShowPlay && <LazyVideoPlayButton label="Play video" onPlay={props.onPlay} />}
     </>
   )
 }

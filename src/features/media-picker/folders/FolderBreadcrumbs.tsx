@@ -13,10 +13,10 @@ export interface FolderBreadcrumbsProps {
 
 /** Folder name plus clickable sub-path segments. */
 export function FolderBreadcrumbs(props: FolderBreadcrumbsProps) {
-  const { folderName, sub, onNavigate: handleNavigate } = props
+  const { folderName, sub, onNavigate } = props
   const segments = sub.split('/').filter(Boolean)
 
-  const handleRoot = useCallback(() => handleNavigate(''), [handleNavigate])
+  const handleRoot = useCallback(() => onNavigate(''), [onNavigate])
 
   const isRoot = isEmpty(segments)
   const rootClass = isRoot ? 'shrink-0 text-fg' : 'shrink-0 transition hover:text-fg'
@@ -36,7 +36,7 @@ export function FolderBreadcrumbs(props: FolderBreadcrumbsProps) {
             label={segment}
             target={target}
             isCurrent={isCurrent}
-            onNavigate={handleNavigate}
+            onNavigate={props.onNavigate}
           />
         )
       })}

@@ -23,15 +23,7 @@ function dataSelectedValue(isSelected: boolean | undefined): true | undefined {
 /** One typeahead row: thumb plus slot label. */
 export const ReferencePickerMenuItem = forwardRef<HTMLLIElement, BeautifulMentionsMenuItemProps>(
   function ReferencePickerMenuItem(props, ref) {
-    const {
-      selected,
-      item,
-      className,
-      onClick: handleClick,
-      onMouseDown: handleMouseDown,
-      onMouseEnter: handleMouseEnter,
-      tabIndex,
-    } = props
+    const { selected, item, className, tabIndex } = props
 
     const thumb = item.data?.thumb
     const kind = item.data?.kind
@@ -48,9 +40,9 @@ export const ReferencePickerMenuItem = forwardRef<HTMLLIElement, BeautifulMentio
         role="menuitem"
         data-selected={dataSelectedValue(selected)}
         aria-label={`Choose ${item.displayValue}`}
-        onClick={handleClick}
-        onMouseDown={handleMouseDown}
-        onMouseEnter={handleMouseEnter}
+        onClick={props.onClick}
+        onMouseDown={props.onMouseDown}
+        onMouseEnter={props.onMouseEnter}
         className={cn(
           'flex min-h-9 cursor-pointer items-center gap-2 rounded-lg p-2 text-sm font-medium text-fg hover:bg-white/5',
           Boolean(selected) && 'bg-white/10 text-lime',

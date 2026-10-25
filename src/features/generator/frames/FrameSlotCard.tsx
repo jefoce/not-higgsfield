@@ -21,9 +21,7 @@ interface FrameSlotCardProps {
 
 /** Visual frame drop slot with preview, replace and remove controls. */
 export function FrameSlotCard(props: FrameSlotCardProps) {
-  const { label, upload, hasFrame, isBroken, isPreviewable, isDisabled, onPress, onRemove } = props
-  const handleCardPress = onPress
-  const handleCardRemove = onRemove
+  const { label, upload, hasFrame, isBroken, isPreviewable, isDisabled } = props
   const previewLabel = isPreviewable ? `Preview ${label.toLowerCase()}` : label
 
   return (
@@ -37,7 +35,7 @@ export function FrameSlotCard(props: FrameSlotCardProps) {
         <button
           type="button"
           disabled={isDisabled}
-          onClick={handleCardPress}
+          onClick={props.onPress}
           aria-label={previewLabel}
           className="absolute inset-0 z-0 size-full cursor-pointer disabled:cursor-not-allowed"
         />
@@ -84,7 +82,7 @@ export function FrameSlotCard(props: FrameSlotCardProps) {
       {hasFrame && (
         <button
           type="button"
-          onClick={handleCardRemove}
+          onClick={props.onRemove}
           aria-label={`Remove ${label.toLowerCase()}`}
           className={cn(
             'absolute -top-1.5 -right-1.5 z-20 size-6 items-center justify-center rounded-full bg-black/70 text-fg backdrop-blur-sm hover:bg-black',

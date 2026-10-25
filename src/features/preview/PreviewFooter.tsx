@@ -35,7 +35,7 @@ interface PreviewFooterProps {
 
 /** Opener actions that apply to the current item. */
 export function PreviewFooter(props: PreviewFooterProps) {
-  const { item, actions, onRun: handleRun } = props
+  const { item, actions } = props
 
   if (!item) {
     return null
@@ -60,7 +60,7 @@ export function PreviewFooter(props: PreviewFooterProps) {
           actionKey={key}
           label={label}
           variant={ACTION_VARIANT[key]}
-          onRun={handleRun}
+          onRun={props.onRun}
         />
       ))}
     </footer>

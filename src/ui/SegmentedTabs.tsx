@@ -14,7 +14,7 @@ interface SegmentedTabsProps {
 
 /** Controlled segmented tab control. */
 export function SegmentedTabs(props: SegmentedTabsProps) {
-  const { options, value, onValueChange: handleValueChange, className, size = 'md' } = props
+  const { options, value, className, size = 'md' } = props
   const sizeClass = size === 'md' ? 'h-10 text-sm' : 'h-8 text-xs'
 
   return (
@@ -29,7 +29,7 @@ export function SegmentedTabs(props: SegmentedTabsProps) {
           option={option}
           isActive={option.value === value}
           sizeClass={sizeClass}
-          onValueChange={handleValueChange}
+          onValueChange={props.onValueChange}
         />
       ))}
     </div>

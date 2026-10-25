@@ -19,9 +19,9 @@ export interface AddFolderDialogProps {
 
 /** Server directory browser used to connect a folder. */
 export function AddFolderDialog(props: AddFolderDialogProps) {
-  const { open: isOpen, onOpenChange, onAdded } = props
+  const { open: isOpen, onOpenChange } = props
   const browse = useAddFolderBrowse(isOpen)
-  const { reset } = browse
+  const { reset, navigate, navigateRoot, navigateParent, toggleHidden } = browse
 
   const handleOpenChange = useCallback(
     (isNext: boolean) => {
@@ -36,13 +36,13 @@ export function AddFolderDialog(props: AddFolderDialogProps) {
 
   const handleClose = useCallback(() => handleOpenChange(false), [handleOpenChange])
 
-  const connect = useFolderConnect({ data: browse.data, onAdded, onClose: handleClose })
-  const handleNavigate = browse.navigate
-  const handleNavigateRoot = browse.navigateRoot
-  const handleNavigateParent = browse.navigateParent
-  const handleShowHidden = browse.toggleHidden
-  const handleAdd = connect.add
-  const handleChooseNative = connect.chooseNative
+  const connect = useFolderConnect({
+    data: browse.data,
+    onAdded: props.onAdded,
+    onClose: handleClose,
+  })
+
+  const { add, chooseNative } = connect
 
   return (
     <Modal
@@ -66,9 +66,9 @@ export function AddFolderDialog(props: AddFolderDialogProps) {
       <FolderBrowser
         path={browse.path}
         data={browse.data}
-        onNavigate={handleNavigate}
-        onNavigateRoot={handleNavigateRoot}
-        onNavigateParent={handleNavigateParent}
+        onNavigate={navigate}
+        onNavigateRoot={navigateRoot}
+        onNavigateParent={navigateParent}
       />
 
       <AddFolderFooter
@@ -76,10 +76,10 @@ export function AddFolderDialog(props: AddFolderDialogProps) {
         isHidden={browse.isHidden}
         isAdding={connect.isAdding}
         isChoosing={connect.isChoosing}
-        onAdd={handleAdd}
-        onChooseNative={handleChooseNative}
+        onAdd={add}
+        onChooseNative={chooseNative}
         onClose={handleClose}
-        onShowHidden={handleShowHidden}
+        onShowHidden={toggleHidden}
       />
     </Modal>
   )

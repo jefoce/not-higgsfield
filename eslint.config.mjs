@@ -9,6 +9,7 @@ import sonarjs from 'eslint-plugin-sonarjs'
 import unicorn from 'eslint-plugin-unicorn'
 import tseslint from 'typescript-eslint'
 
+import callbackProps from './eslint-rules/callback-props.mjs'
 import paddingAroundFunctions from './eslint-rules/padding-around-functions.mjs'
 
 const PRESET_IDS = /^(wan-3\.0|wan-3\.0-prime|seedance-2\.0|seedance-2\.5)$/
@@ -113,7 +114,12 @@ const TYPE_SELECTORS = [
   },
 ]
 
-const localPlugin = { rules: { 'padding-around-functions': paddingAroundFunctions } }
+const localPlugin = {
+  rules: {
+    'callback-props': callbackProps,
+    'padding-around-functions': paddingAroundFunctions,
+  },
+}
 
 export default defineConfig([
   ...nextVitals,
@@ -286,7 +292,7 @@ export default defineConfig([
         {
           eventHandlerPrefix: 'handle',
           eventHandlerPropPrefix: 'on',
-          checkLocalVariables: true,
+          checkLocalVariables: false,
           checkInlineFunction: false,
         },
       ],
@@ -537,6 +543,12 @@ export default defineConfig([
         },
       ],
     },
+  },
+
+  {
+    // Callback props stay on props, or use a handle<Action> created in the component.
+    files: ['src/**/*.tsx', 'src/**/use-*.ts'],
+    rules: { 'local/callback-props': 'error' },
   },
 
   globalIgnores([

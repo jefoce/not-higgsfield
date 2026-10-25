@@ -25,13 +25,7 @@ interface AddFolderFooterProps {
 
 /** Bottom controls for the add-folder dialog. */
 export function AddFolderFooter(props: AddFolderFooterProps) {
-  const { data, isHidden, isAdding, isChoosing, onAdd, onChooseNative, onClose, onShowHidden } =
-    props
-
-  const handleAdd = onAdd
-  const handleChooseNative = onChooseNative
-  const handleClose = onClose
-  const handleShowHidden = onShowHidden
+  const { data, isHidden, isAdding, isChoosing } = props
   const { data: capabilities } = useSWR('system-capabilities', fetchSystemCapabilities)
 
   return (
@@ -43,7 +37,7 @@ export function AddFolderFooter(props: AddFolderFooterProps) {
             variant="outline"
             className="h-9 text-xs"
             loading={isChoosing}
-            onClick={handleChooseNative}
+            onClick={props.onChooseNative}
           >
             {`Choose in ${nativeLabel(capabilities.platform)}`}
           </Button>
@@ -51,12 +45,12 @@ export function AddFolderFooter(props: AddFolderFooterProps) {
         <Switch
           id="show-hidden"
           checked={isHidden}
-          onCheckedChange={handleShowHidden}
+          onCheckedChange={props.onShowHidden}
           label="Show hidden"
         />
       </div>
       <div className="flex items-center gap-2">
-        <Button size="sm" variant="secondary" className="h-9 text-xs" onClick={handleClose}>
+        <Button size="sm" variant="secondary" className="h-9 text-xs" onClick={props.onClose}>
           Cancel
         </Button>
         <Button
@@ -65,7 +59,7 @@ export function AddFolderFooter(props: AddFolderFooterProps) {
           className="h-9 text-xs"
           loading={isAdding}
           disabled={!data}
-          onClick={handleAdd}
+          onClick={props.onAdd}
         >
           Add this folder
         </Button>

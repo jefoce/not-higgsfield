@@ -28,19 +28,7 @@ interface SelectionToolbarProps {
 
 /** Floating batch actions for the current selection. */
 export function SelectionToolbar(props: SelectionToolbarProps) {
-  const {
-    isActive,
-    count,
-    stack,
-    byId,
-    isAllCompleted,
-    isAllLiked,
-    isBusy,
-    onDownload: handleDownload,
-    onLike: handleLike,
-    onDelete: handleDelete,
-    onClear: handleClear,
-  } = props
+  const { isActive, count, stack, byId, isAllCompleted, isAllLiked, isBusy } = props
 
   const likeLabel = isAllLiked ? 'Unlike selected videos' : 'Like selected videos'
   const downloadTitle = isAllCompleted ? 'Download selected videos' : MIXED_TITLE
@@ -71,7 +59,7 @@ export function SelectionToolbar(props: SelectionToolbarProps) {
         type="button"
         className={cn(ACTION_BUTTON_CLASSES, 'gap-1.5 px-3.5')}
         disabled={!isAllCompleted || isBusy}
-        onClick={handleDownload}
+        onClick={props.onDownload}
         title={downloadTitle}
       >
         <Download size={15} aria-hidden />
@@ -82,7 +70,7 @@ export function SelectionToolbar(props: SelectionToolbarProps) {
         type="button"
         className={cn(ACTION_BUTTON_CLASSES, 'w-10')}
         disabled={!isAllCompleted || isBusy}
-        onClick={handleLike}
+        onClick={props.onLike}
         aria-label={likeLabel}
         title={likeTitle}
       >
@@ -93,7 +81,7 @@ export function SelectionToolbar(props: SelectionToolbarProps) {
         type="button"
         className={cn(ACTION_BUTTON_CLASSES, 'w-10')}
         disabled={isBusy}
-        onClick={handleDelete}
+        onClick={props.onDelete}
         aria-label="Delete selected videos"
         title="Delete selected videos"
       >
@@ -104,7 +92,7 @@ export function SelectionToolbar(props: SelectionToolbarProps) {
         type="button"
         aria-label="Clear selection"
         title="Clear selection"
-        onClick={handleClear}
+        onClick={props.onClear}
         className={cn(ACTION_BUTTON_CLASSES, 'w-10')}
       >
         <X size={16} aria-hidden />

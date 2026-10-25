@@ -31,18 +31,7 @@ export interface UploadsTabProps {
 
 /** Uploads grid host with selection and delete confirmation. */
 export function UploadsTab(props: UploadsTabProps) {
-  const {
-    kinds,
-    max,
-    extensions,
-    selected,
-    onSelect: handleSelect,
-    onUploaded: handleUploaded,
-    onDeleted,
-    uploading = [],
-    onRetry: handleRetryUpload,
-    onDismiss: handleDismissUpload,
-  } = props
+  const { kinds, max, extensions, selected, uploading = [] } = props
 
   const { data, isLoading, mutate } = useSWR(['uploads', kinds], () => fetchUploads({ kinds }))
 
@@ -70,12 +59,12 @@ export function UploadsTab(props: UploadsTabProps) {
   }
 
   const actions: PreviewActions = {
-    select: handleSelect,
-    deselect: handleSelect,
+    select: props.onSelect,
+    deselect: props.onSelect,
     available: handleAvailable,
   }
 
-  const deletion = useDeleteUpload({ mutate, onDeleted })
+  const deletion = useDeleteUpload({ mutate, onDeleted: props.onDeleted })
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -94,10 +83,10 @@ export function UploadsTab(props: UploadsTabProps) {
         max={max}
         extensions={extensions}
         actions={actions}
-        onUploaded={handleUploaded}
-        onRetry={handleRetryUpload}
-        onDismiss={handleDismissUpload}
-        onSelect={handleSelect}
+        onUploaded={props.onUploaded}
+        onRetry={props.onRetry}
+        onDismiss={props.onDismiss}
+        onSelect={props.onSelect}
         onDelete={deletion.handleDeleteRequest}
       />
 

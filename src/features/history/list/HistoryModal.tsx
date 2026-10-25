@@ -22,7 +22,7 @@ interface HistoryModalProps {
 
 /** Centered grid preview: 16:9 player left, details panel right. */
 export function HistoryModal(props: HistoryModalProps) {
-  const { record, open: isOpen, onOpenChange: handleOpenChange, onDeleted } = props
+  const { record, open: isOpen, onOpenChange, onDeleted } = props
 
   const handleCancel = useCallback(() => {
     if (isNil(record)) {
@@ -33,14 +33,14 @@ export function HistoryModal(props: HistoryModalProps) {
   }, [record])
 
   const handleDeleted = useCallback(() => {
-    handleOpenChange(false)
+    onOpenChange(false)
     onDeleted?.()
-  }, [handleOpenChange, onDeleted])
+  }, [onOpenChange, onDeleted])
 
   return (
     <Modal
       open={isOpen}
-      onOpenChange={handleOpenChange}
+      onOpenChange={props.onOpenChange}
       label="Video details"
       className="h-[min(80vh,820px)] w-[min(1100px,92vw)] overflow-hidden bg-surface p-3"
     >

@@ -46,18 +46,7 @@ export function UploadsGrid(props: UploadsGridProps) {
     max,
     extensions,
     actions,
-    onUploaded,
-    onRetry,
-    onDismiss,
-    onSelect,
-    onDelete,
   } = props
-
-  const handleRetry = onRetry
-  const handleDismiss = onDismiss
-  const handleUploaded = onUploaded
-  const handleSelect = onSelect
-  const handleDelete = onDelete
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
@@ -66,8 +55,8 @@ export function UploadsGrid(props: UploadsGridProps) {
           <UploadingRow
             key={entry.id}
             entry={entry}
-            onRetry={handleRetry}
-            onDismiss={handleDismiss}
+            onRetry={props.onRetry}
+            onDismiss={props.onDismiss}
           />
         ))}
         {canChooseFiles && (
@@ -75,11 +64,16 @@ export function UploadsGrid(props: UploadsGridProps) {
             kinds={kinds}
             max={max}
             extensions={extensions}
-            onUploaded={handleUploaded}
+            onUploaded={props.onUploaded}
           />
         )}
         {!canChooseFiles && (
-          <UploadTile kinds={kinds} max={max} extensions={extensions} onUploaded={handleUploaded} />
+          <UploadTile
+            kinds={kinds}
+            max={max}
+            extensions={extensions}
+            onUploaded={props.onUploaded}
+          />
         )}
         {isLoading &&
           SKELETON.map((key) => (
@@ -95,8 +89,8 @@ export function UploadsGrid(props: UploadsGridProps) {
               actions={actions}
               selectedIndex={selectedIds.indexOf(item.id)}
               isAtMax={isMaxReached}
-              onSelect={handleSelect}
-              onDelete={handleDelete}
+              onSelect={props.onSelect}
+              onDelete={props.onDelete}
             />
           ))}
         {!isLoading && isEmpty(items) && (

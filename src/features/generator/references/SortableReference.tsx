@@ -19,14 +19,7 @@ interface SortableReferenceProps {
 
 /** Grid cell that owns the sort transform and pointer/keyboard listeners. */
 export function SortableReference(props: SortableReferenceProps) {
-  const {
-    id,
-    upload,
-    label,
-    note,
-    onOpenPreview: handleOpenPreview,
-    onRemove: handleRemove,
-  } = props
+  const { id, upload, label, note } = props
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
@@ -50,8 +43,8 @@ export function SortableReference(props: SortableReferenceProps) {
         upload={upload}
         label={label}
         note={note}
-        onOpenPreview={handleOpenPreview}
-        onRemove={handleRemove}
+        onOpenPreview={props.onOpenPreview}
+        onRemove={props.onRemove}
       />
     </div>
   )

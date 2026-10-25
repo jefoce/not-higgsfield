@@ -38,25 +38,13 @@ function referenceLabel(slots: Map<string, RefSlot>, item: UploadItem): string |
 
 /** One reference cell with preview, replace and remove handlers. */
 export function ReferenceItem(props: ReferenceItemProps) {
-  const {
-    id,
-    upload,
-    label,
-    note,
-    isLifted,
-    previewUploads,
-    slots,
-    extensions,
-    onSelectSlot,
-    onReplace,
-    onRemove,
-  } = props
+  const { id, upload, label, note, isLifted, previewUploads, slots, extensions, onRemove } = props
 
   const handleInsert = (item: UploadItem): void => {
     const slot = slots.get(item.id)
 
     if (slot) {
-      onSelectSlot(slot)
+      props.onSelectSlot(slot)
     }
   }
 
@@ -65,7 +53,7 @@ export function ReferenceItem(props: ReferenceItemProps) {
       const [next] = items
 
       if (!isNil(next)) {
-        onReplace(item.id, next)
+        props.onReplace(item.id, next)
       }
     }
 
@@ -78,7 +66,7 @@ export function ReferenceItem(props: ReferenceItemProps) {
     })
   }
 
-  const handleRemoveAction = (item: UploadItem): void => onRemove(item.id)
+  const handleRemoveAction = (item: UploadItem): void => props.onRemove(item.id)
 
   const handleLabel = (item: UploadItem): string | null => referenceLabel(slots, item)
 

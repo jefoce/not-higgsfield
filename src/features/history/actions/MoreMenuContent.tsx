@@ -21,17 +21,7 @@ function handleCloseAutoFocus(event: Event): void {
 
 /** Menu items for one record, in display order. */
 export function MoreMenuContent(props: MoreMenuContentProps) {
-  const {
-    isCompleted,
-    hasFullVideoRefs,
-    onCaptureLast: handleCaptureLast,
-    onCaptureFirst: handleCaptureFirst,
-    onAddReference: handleAddReference,
-    onCopyPrompt: handleCopyPrompt,
-    onCopySeed: handleCopySeed,
-    onReveal: handleReveal,
-    onRemove: handleRemove,
-  } = props
+  const { isCompleted, hasFullVideoRefs } = props
 
   return (
     <DropdownMenuPrimitive.Portal>
@@ -44,40 +34,40 @@ export function MoreMenuContent(props: MoreMenuContentProps) {
         <MoreMenuRow
           icon={<Frame size={14} aria-hidden />}
           disabled={!isCompleted}
-          onSelect={handleCaptureLast}
+          onSelect={props.onCaptureLast}
         >
           Use last frame as start frame
         </MoreMenuRow>
         <MoreMenuRow
           icon={<Frame size={14} aria-hidden />}
           disabled={!isCompleted}
-          onSelect={handleCaptureFirst}
+          onSelect={props.onCaptureFirst}
         >
           Use first frame as start frame
         </MoreMenuRow>
         <MoreMenuRow
           icon={<Film size={14} aria-hidden />}
           disabled={!isCompleted || hasFullVideoRefs}
-          onSelect={handleAddReference}
+          onSelect={props.onAddReference}
         >
           Add video as reference
         </MoreMenuRow>
         <DropdownMenuPrimitive.Separator className="my-1 h-px bg-divider" />
-        <MoreMenuRow icon={<Copy size={14} aria-hidden />} onSelect={handleCopyPrompt}>
+        <MoreMenuRow icon={<Copy size={14} aria-hidden />} onSelect={props.onCopyPrompt}>
           Copy prompt
         </MoreMenuRow>
-        <MoreMenuRow icon={<Hash size={14} aria-hidden />} onSelect={handleCopySeed}>
+        <MoreMenuRow icon={<Hash size={14} aria-hidden />} onSelect={props.onCopySeed}>
           Copy seed
         </MoreMenuRow>
         <MoreMenuRow
           icon={<FolderOpen size={14} aria-hidden />}
           disabled={!isCompleted}
-          onSelect={handleReveal}
+          onSelect={props.onReveal}
         >
           Reveal in Finder
         </MoreMenuRow>
         <DropdownMenuPrimitive.Separator className="my-1 h-px bg-divider" />
-        <MoreMenuRow icon={<Trash2 size={14} aria-hidden />} destructive onSelect={handleRemove}>
+        <MoreMenuRow icon={<Trash2 size={14} aria-hidden />} destructive onSelect={props.onRemove}>
           Delete
         </MoreMenuRow>
       </DropdownMenuPrimitive.Content>

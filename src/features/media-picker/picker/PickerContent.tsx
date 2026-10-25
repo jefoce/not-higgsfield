@@ -37,17 +37,10 @@ export function PickerContent(props: PickerContentProps) {
     upload,
     folderSub,
     selectedFolderRels,
-    onSelectUpload,
-    onFolderNavigate: handleFolderNavigate,
-    onToggleFolderFile: handleToggleFolderFile,
   } = props
 
-  const handleSelectUpload = onSelectUpload
-  const handleDeleted = selection.removeSelected
-  const handlePickFile = foldersState.handlePickFile
-  const handleUploaded = upload.handleUploaded
-  const handleRetry = upload.queue.retry
-  const handleDismiss = upload.queue.dismiss
+  const { retry, dismiss } = upload.queue
+  const { removeSelected } = selection
 
   if (isNil(activeFolder) || activeTab === 'uploads') {
     return (
@@ -56,12 +49,12 @@ export function PickerContent(props: PickerContentProps) {
         max={request.max}
         extensions={request.extensions}
         selected={selection.selected}
-        onSelect={handleSelectUpload}
-        onUploaded={handleUploaded}
+        onSelect={props.onSelectUpload}
+        onUploaded={upload.handleUploaded}
         uploading={upload.queue.items}
-        onRetry={handleRetry}
-        onDismiss={handleDismiss}
-        onDeleted={handleDeleted}
+        onRetry={retry}
+        onDismiss={dismiss}
+        onDeleted={removeSelected}
       />
     )
   }
@@ -76,9 +69,9 @@ export function PickerContent(props: PickerContentProps) {
       extensions={request.extensions}
       sub={folderSub}
       selectedRels={selectedFolderRels}
-      onPickFile={handlePickFile}
-      onNavigate={handleFolderNavigate}
-      onToggleFile={handleToggleFolderFile}
+      onPickFile={foldersState.handlePickFile}
+      onNavigate={props.onFolderNavigate}
+      onToggleFile={props.onToggleFolderFile}
     />
   )
 }

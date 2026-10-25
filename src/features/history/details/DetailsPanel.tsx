@@ -19,7 +19,7 @@ interface DetailsPanelProps {
 
 /** Prompt, inputs, settings, actions and cost for one record. */
 export function DetailsPanel(props: DetailsPanelProps) {
-  const { record, onDeleted: handleDeleted } = props
+  const { record } = props
   const plain = canonicalPrompt(record)
   const cost = costInfo(record)
   const isActive = ACTIVE_STATUSES.includes(record.status)
@@ -44,7 +44,7 @@ export function DetailsPanel(props: DetailsPanelProps) {
 
       <DetailsSettings record={record} />
 
-      <DetailsActions record={record} isActive={isActive} now={now} onDeleted={handleDeleted} />
+      <DetailsActions record={record} isActive={isActive} now={now} onDeleted={props.onDeleted} />
     </div>
   )
 }

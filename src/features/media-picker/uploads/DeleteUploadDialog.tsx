@@ -13,15 +13,12 @@ interface DeleteUploadDialogProps {
 
 /** Confirmation dialog for deleting an upload. */
 export function DeleteUploadDialog(props: DeleteUploadDialogProps) {
-  const { isOpen, isDeleting, onOpenChange, onCancel, onConfirm } = props
-  const handleOpenChange = onOpenChange
-  const handleCancel = onCancel
-  const handleConfirm = onConfirm
+  const { isOpen, isDeleting } = props
 
   return (
     <Modal
       open={isOpen}
-      onOpenChange={handleOpenChange}
+      onOpenChange={props.onOpenChange}
       label="Delete upload?"
       className="w-[min(360px,90vw)] p-5"
     >
@@ -30,10 +27,10 @@ export function DeleteUploadDialog(props: DeleteUploadDialogProps) {
         Removes the app copy. Linked files keep the original on disk.
       </p>
       <div className="mt-4 flex justify-end gap-2">
-        <Button size="sm" variant="ghost" onClick={handleCancel}>
+        <Button size="sm" variant="ghost" onClick={props.onCancel}>
           Cancel
         </Button>
-        <Button size="sm" variant="danger" loading={isDeleting} onClick={handleConfirm}>
+        <Button size="sm" variant="danger" loading={isDeleting} onClick={props.onConfirm}>
           Delete
         </Button>
       </div>

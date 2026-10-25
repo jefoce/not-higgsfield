@@ -41,9 +41,9 @@ export function SettingsModal() {
   const sectionRefs = useMemo(() => createSectionRefs(), [])
 
   const note = backendNote(status?.backend)
-  const handleOpenChange = draft.onClose
+  const { onClose } = draft
 
-  const handleClose = useCallback(() => void handleOpenChange(false), [handleOpenChange])
+  const handleClose = useCallback(() => void onClose(false), [onClose])
 
   const handleSave = useCallback(() => void draft.onSave(), [draft])
 
@@ -60,7 +60,7 @@ export function SettingsModal() {
   return (
     <Modal
       open={isOpen}
-      onOpenChange={handleOpenChange}
+      onOpenChange={onClose}
       label="Settings"
       className="flex max-h-[85vh] w-[min(560px,92vw)] flex-col"
     >

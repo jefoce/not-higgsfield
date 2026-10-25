@@ -23,7 +23,7 @@ interface HistoryTileProps {
 
 /** Grid tile: hover plays a muted loop, actions replace the liked badge. */
 export function HistoryTile(props: HistoryTileProps) {
-  const { record, onOpen } = props
+  const { record } = props
   const isCompleted = record.status === 'completed'
   const zoom = useHistoryViewStore((state) => state.zoom)
   const tileWidth = zoomToTileWidth(zoom)
@@ -39,7 +39,7 @@ export function HistoryTile(props: HistoryTileProps) {
     isSelecting,
     canSelect,
     select,
-    onOpen,
+    onOpen: props.onOpen,
   })
 
   const handleCancel = useCallback(() => void cancelGeneration(record.id), [record.id])

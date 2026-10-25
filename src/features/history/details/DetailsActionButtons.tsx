@@ -14,7 +14,7 @@ interface DetailsActionButtonsProps {
 
 /** Download and favorite buttons for a details panel record. */
 export function DetailsActionButtons(props: DetailsActionButtonsProps) {
-  const { record, onDownload: handleDownload, onFavorite: handleFavorite } = props
+  const { record } = props
   const favoriteLabel = record.favorite ? 'Remove favorite' : 'Favorite'
 
   return (
@@ -23,7 +23,7 @@ export function DetailsActionButtons(props: DetailsActionButtonsProps) {
         <Tooltip content="Download">
           <button
             type="button"
-            onClick={handleDownload}
+            onClick={props.onDownload}
             aria-label="Download"
             className="inline-flex h-6 w-7.5 items-center justify-center rounded-lg text-fg-2 transition hover:bg-hover"
           >
@@ -36,7 +36,7 @@ export function DetailsActionButtons(props: DetailsActionButtonsProps) {
           <button
             type="button"
             aria-label={favoriteLabel}
-            onClick={handleFavorite}
+            onClick={props.onFavorite}
             className={cn(
               'inline-flex h-6 w-7.5 items-center justify-center rounded-lg text-fg-2 transition hover:bg-hover',
               record.favorite && 'text-favorite',

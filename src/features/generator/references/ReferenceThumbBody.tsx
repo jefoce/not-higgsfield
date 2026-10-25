@@ -39,7 +39,6 @@ export function ReferenceThumbBody(props: ReferenceThumbBodyProps) {
     isMissing,
     isOpenable,
     isPreviewShown,
-    onOpenPreview: handleOpenPreview,
   } = props
 
   return (
@@ -72,7 +71,7 @@ export function ReferenceThumbBody(props: ReferenceThumbBodyProps) {
       {isOpenable && (
         <button
           type="button"
-          onClick={handleOpenPreview}
+          onClick={props.onOpenPreview}
           aria-label={`Preview ${previewLabel}`}
           className="absolute inset-0 z-0 size-full cursor-pointer"
         />

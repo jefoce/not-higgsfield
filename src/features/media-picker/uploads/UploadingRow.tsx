@@ -12,16 +12,16 @@ interface UploadingRowProps {
 
 /** Wraps an upload entry with per-row retry and dismiss handlers. */
 export function UploadingRow(props: UploadingRowProps) {
-  const { entry, onRetry, onDismiss } = props
+  const { entry } = props
   let handleRetry: (() => void) | undefined
   let handleDismiss: (() => void) | undefined
 
-  if (!isNil(onRetry)) {
-    handleRetry = () => onRetry(entry.id)
+  if (!isNil(props.onRetry)) {
+    handleRetry = () => props.onRetry?.(entry.id)
   }
 
-  if (!isNil(onDismiss)) {
-    handleDismiss = () => onDismiss(entry.id)
+  if (!isNil(props.onDismiss)) {
+    handleDismiss = () => props.onDismiss?.(entry.id)
   }
 
   return <UploadProgressTile item={entry} onRetry={handleRetry} onDismiss={handleDismiss} />

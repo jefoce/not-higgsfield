@@ -20,7 +20,7 @@ interface GraceCancelProps {
 
 /** Cancel pill that fades over the grace window captured on mount. */
 export function GraceCancel(props: GraceCancelProps) {
-  const { notBefore, seconds, compact: isCompact, onCancel: handleCancel } = props
+  const { notBefore, seconds, compact: isCompact } = props
   const remainingMs = useMemo(() => graceDelayMs(notBefore), [notBefore])
 
   const style = {
@@ -34,7 +34,7 @@ export function GraceCancel(props: GraceCancelProps) {
     >
       <button
         type="button"
-        onClick={handleCancel}
+        onClick={props.onCancel}
         style={style}
         className={cn(
           PILL_CLASSES,
