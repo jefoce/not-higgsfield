@@ -14,6 +14,7 @@ import { DetailsPanel } from '../details/DetailsPanel'
 import { SelectionCheckbox } from '../selection/SelectionCheckbox'
 import { useSelectionItem } from '../selection/use-selection-item'
 import { StatusOverlay } from '../status/StatusOverlay'
+import { CardVignette } from './CardVignette'
 import { useMediaWidth } from './use-media-width'
 import { listVideoShare, useHistoryViewStore } from './view-store'
 
@@ -38,6 +39,7 @@ export function HistoryRow(props: HistoryRowProps) {
   const poster = posterForWidth(record, mediaWidth)
   const { selected: isSelected, selecting: isSelecting, select } = useSelectionItem(record.id)
   const canSelect = isSelectable(record)
+  const shouldShowCard = isCompleted && !isSelecting
 
   const handleSelect = (event: MouseEvent<HTMLDivElement>) => {
     const isRowClick =
@@ -47,10 +49,8 @@ export function HistoryRow(props: HistoryRowProps) {
       return
     }
 
-    if (event.shiftKey) {
-      if (canSelect) {
-        select(true)
-      }
+    if (event.shiftKey && canSelect) {
+      select(true)
 
       return
     }
@@ -76,7 +76,7 @@ export function HistoryRow(props: HistoryRowProps) {
       <div
         ref={mediaRef}
         onClick={handleSelect}
-        className="relative shrink-0 cursor-default self-start overflow-hidden rounded-2xl bg-surface select-none"
+        className="group/media relative shrink-0 cursor-default self-start overflow-hidden rounded-2xl bg-surface select-none"
         style={{
           width: `${videoShare * 100}%`,
           maxWidth: `calc(100% - ${DETAILS_MIN_WIDTH}px - 0.75rem)`,
@@ -96,6 +96,7 @@ export function HistoryRow(props: HistoryRowProps) {
             className="size-full"
           />
         )}
+        {shouldShowCard && <CardVignette scope="media" />}
         {!isCompleted && <StatusOverlay record={record} fill onCancel={handleCancel} />}
 
         {isSelected && (
@@ -105,7 +106,7 @@ export function HistoryRow(props: HistoryRowProps) {
           />
         )}
 
-        {isCompleted && !isSelecting && <CardActions record={record} className="top-3" pinHeart />}
+        {shouldShowCard && <CardActions record={record} className="top-3 z-20" pinHeart />}
       </div>
 
       <div

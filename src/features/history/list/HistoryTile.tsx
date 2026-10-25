@@ -11,6 +11,7 @@ import { isSelectable, posterSrc, videoSrc } from '../actions/record-view'
 import { SelectionCheckbox } from '../selection/SelectionCheckbox'
 import { useSelectionItem } from '../selection/use-selection-item'
 import { StatusOverlay } from '../status/StatusOverlay'
+import { CardVignette } from './CardVignette'
 import { useTileActivation } from './use-tile-activation'
 import { useHistoryViewStore, zoomToGridColumns, zoomToTileWidth } from './view-store'
 
@@ -97,7 +98,7 @@ export function HistoryTile(props: HistoryTileProps) {
 
       {isCompleted && !isSelecting && (
         <>
-          <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(0,0,0,0.55)_100%)] opacity-0 transition-opacity duration-300 ease-out group-hover/card:opacity-100 group-has-focus-visible/card:opacity-100" />
+          <CardVignette scope="card" />
           {record.favorite && <FavoriteBadge record={record} />}
           <CardActions record={record} className="top-3 z-20" />
         </>

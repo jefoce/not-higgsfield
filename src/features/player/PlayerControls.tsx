@@ -63,7 +63,7 @@ export function PlayerControls(props: PlayerControlsProps) {
     <div
       onClick={handleStopPropagation}
       className={cn(
-        'absolute inset-x-0 bottom-0 flex h-22 flex-col justify-end gap-2 bg-linear-to-t from-black/80 via-black/40 to-transparent px-3 pb-3 transition-opacity duration-150',
+        'absolute inset-x-0 bottom-0 z-20 flex h-22 flex-col justify-end gap-2 bg-linear-to-t from-black/80 via-black/40 to-transparent px-3 pb-3 transition-opacity duration-150',
         !isPaused && HOVER_REVEAL_CLASSES,
       )}
     >
