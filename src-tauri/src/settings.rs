@@ -22,6 +22,10 @@ pub struct DesktopSettings {
     pub port: u16,
     pub window: WindowBounds,
     pub close_hint_shown: bool,
+    #[serde(default = "default_auto_check_updates")]
+    pub auto_check_updates: bool,
+    #[serde(default)]
+    pub last_update_check: Option<String>,
 }
 
 impl Default for DesktopSettings {
@@ -30,8 +34,14 @@ impl Default for DesktopSettings {
             port: DEFAULT_PORT,
             window: WindowBounds::default(),
             close_hint_shown: false,
+            auto_check_updates: default_auto_check_updates(),
+            last_update_check: None,
         }
     }
+}
+
+fn default_auto_check_updates() -> bool {
+    true
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -154,4 +164,36 @@ pub fn ensure_dirs() -> Result<(), String> {
     #[cfg(not(unix))]
     fs::create_dir_all(&logs).map_err(|error| format!("create logs dir: {error}"))?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::DesktopSettings;
+
+    #[test]
+    fn old_settings_get_update_defaults() {
+        let settings: DesktopSettings = serde_json::from_str(
+            r#"{"port":47821,"window":{"x":null,"y":null,"width":1440.0,"height":900.0},"close_hint_shown":true}"#,
+        )
+        .expect("old settings");
+
+        assert!(settings.auto_check_updates);
+        assert!(settings.last_update_check.is_none());
+    }
+
+    #[test]
+    fn update_settings_round_trip() {
+        let mut settings = DesktopSettings::default();
+        settings.auto_check_updates = false;
+        settings.last_update_check = Some("2026-10-25T10:00:00Z".to_string());
+
+        let encoded = serde_json::to_string(&settings).expect("encode");
+        let decoded: DesktopSettings = serde_json::from_str(&encoded).expect("decode");
+
+        assert!(!decoded.auto_check_updates);
+        assert_eq!(
+            decoded.last_update_check.as_deref(),
+            Some("2026-10-25T10:00:00Z")
+        );
+    }
 }

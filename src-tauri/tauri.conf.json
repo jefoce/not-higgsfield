@@ -16,6 +16,17 @@
       "csp": null
     }
   },
+  "plugins": {
+    "updater": {
+      "pubkey": "untrusted comment: minisign public key: 89CF3DDB4BA85203\nRWQDUqhL2z3PiUvLnFUu5vQcJYRaqMqz8a2wgLbBRISzgzLmkeX/sRvK",
+      "endpoints": [
+        "https://github.com/jefoce/not-higgsfield/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  },
   "bundle": {
     "active": true,
     "targets": ["dmg", "nsis", "appimage", "deb", "rpm"],

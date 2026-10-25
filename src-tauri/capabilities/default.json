@@ -8,6 +8,11 @@
   },
   "permissions": [
     "core:default",
+    "allow-update-info",
+    "allow-update-check",
+    "allow-update-install",
+    "allow-update-set-auto",
+    "allow-update-open-release",
     "dialog:allow-open",
     "dialog:allow-save",
     "dialog:allow-ask",
