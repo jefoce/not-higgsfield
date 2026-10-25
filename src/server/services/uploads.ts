@@ -16,11 +16,11 @@ import { isUuid } from '../fs/media-ref'
 import { resolveInside, SafePathError } from '../fs/safe-path'
 import { removeEncoded } from '../media/image-cache'
 import { downloadPaths, uploadPaths } from '../paths'
-import { getRemoteStore } from '../remote/remote-store'
 import { getFolder } from '../repos/folders'
 import { getGeneration } from '../repos/generations'
 import { listUploadRecords, loadUploadRecord, rememberUpload } from '../repos/upload-record'
 import { deleteUploadFiles, saveFileUpload } from '../repos/uploads'
+import { getObjectStore } from '../storage/registry'
 import { withLock } from '../sync/lock'
 import { assertSupported, probe } from './upload-probe'
 
@@ -230,7 +230,7 @@ async function sharesRemote(item: UploadItem): Promise<boolean> {
 
 async function deleteRemote(key: string): Promise<void> {
   try {
-    await getRemoteStore()?.delete(key)
+    await getObjectStore()?.delete(key)
   } catch {
     // Best effort: a failed remote delete must not block local cleanup.
   }

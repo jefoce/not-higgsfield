@@ -13,10 +13,10 @@ import { OpenRouterError } from '../providers/openrouter/error'
 import { stripStatusPrefix } from '../providers/openrouter/http'
 import { ProviderError } from '../providers/provider-error'
 import type { SubmittedJob } from '../providers/types'
-import { getRemoteStore } from '../remote/remote-store'
 import { getGeneration, saveGeneration } from '../repos/generations'
 import { getUpload } from '../repos/uploads'
 import { secretsReady } from '../secrets'
+import { getObjectStore } from '../storage/registry'
 import { withLock } from '../sync/lock'
 import { emitJobSent } from './job-events'
 import { buildMedia, recordSent, send, uploadUrls } from './submit-media'
@@ -78,7 +78,7 @@ async function beginUpload(id: string): Promise<Prepared | null> {
     const transports = transportsFor({
       uploads,
       preset,
-      remoteConfigured: !isNil(getRemoteStore()),
+      remoteConfigured: !isNil(getObjectStore()),
     })
 
     const saved = await saveGeneration({

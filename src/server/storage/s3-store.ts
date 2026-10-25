@@ -13,21 +13,30 @@ import {
 } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { isNil, isObject, isString } from 'lodash-es'
+import { isObject, isString } from 'lodash-es'
 
-import { type SecretName } from '@/core/secret-names'
+import type { TestResult } from '@/core/types'
 
-import { messageOf } from '../errors'
-import { getSecret } from '../secrets'
-import type { RemoteObjectInfo, RemoteStore } from './remote-store'
+import type { ObjectInfo, ObjectStore } from './types'
 
 const PART_SIZE = 64 * 1024 * 1024
 
-export function createR2Store(): RemoteStore {
-  const { bucket, client } = r2Config()
+export interface S3StoreConfig {
+  endpoint: string
+  region: string
+  bucket: string
+  accessKeyId: string
+  secretAccessKey: string
+}
+
+/** Generic S3 store used by the R2 backend. */
+export function createS3Store(config: S3StoreConfig): ObjectStore {
+  const { bucket, client } = clientFor(config)
 
   return {
-    async head(key): Promise<RemoteObjectInfo | null> {
+    id: 'r2',
+
+    async head(key): Promise<ObjectInfo | null> {
       try {
         const res = await client.send(
           new HeadObjectCommand({ Bucket: bucket, Key: key, ChecksumMode: 'ENABLED' }),
@@ -47,14 +56,14 @@ export function createR2Store(): RemoteStore {
       }
     },
 
-    async put(params): Promise<RemoteObjectInfo> {
-      const { key, file, opts } = params
+    async put(params): Promise<ObjectInfo> {
+      const { key, file, contentType, sha256, onProgress } = params
       const stats = await fs.stat(file)
       const isMultipart = stats.size > PART_SIZE
       const checksum: { ChecksumSHA256?: string } = {}
 
       if (!isMultipart) {
-        checksum.ChecksumSHA256 = opts.sha256
+        checksum.ChecksumSHA256 = sha256
       }
 
       const upload = new Upload({
@@ -63,7 +72,7 @@ export function createR2Store(): RemoteStore {
           Bucket: bucket,
           Key: key,
           Body: createReadStream(file),
-          ContentType: opts.contentType,
+          ContentType: contentType,
           ContentLength: stats.size,
           ChecksumAlgorithm: 'SHA256',
           ...checksum,
@@ -73,7 +82,7 @@ export function createR2Store(): RemoteStore {
       })
 
       upload.on('httpUploadProgress', ({ loaded, total }) => {
-        opts.onProgress?.(loaded ?? 0, total ?? stats.size)
+        onProgress?.(loaded ?? 0, total ?? stats.size)
       })
 
       const res = await upload.done()
@@ -94,50 +103,40 @@ export function createR2Store(): RemoteStore {
     async delete(key): Promise<void> {
       await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }))
     },
+
+    /** Writes, reads and deletes a 4-byte probe. Returns the S3 error code on failure. */
+    async testConnection(): Promise<TestResult> {
+      const key = `probe/${randomUUID()}.txt`
+
+      try {
+        await client.send(
+          new PutObjectCommand({ Bucket: bucket, Key: key, Body: 'test', ContentLength: 4 }),
+        )
+
+        await client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }))
+
+        return { ok: true }
+      } catch (error) {
+        return { ok: false, error: s3ErrorCode(error) }
+      } finally {
+        await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key })).catch(() => {})
+      }
+    },
   }
 }
 
-function r2Config(): { bucket: string; client: S3Client } {
+function clientFor(config: S3StoreConfig): { bucket: string; client: S3Client } {
+  const { endpoint, region, bucket, accessKeyId, secretAccessKey } = config
+
   return {
-    bucket: required('R2_BUCKET'),
+    bucket,
     client: new S3Client({
-      region: 'auto',
-      endpoint: `https://${required('R2_ACCOUNT_ID')}.r2.cloudflarestorage.com`,
-      credentials: {
-        accessKeyId: required('R2_ACCESS_KEY_ID'),
-        secretAccessKey: required('R2_SECRET_ACCESS_KEY'),
-      },
+      region,
+      endpoint,
+      credentials: { accessKeyId, secretAccessKey },
       requestChecksumCalculation: 'WHEN_REQUIRED',
       responseChecksumValidation: 'WHEN_REQUIRED',
     }),
-  }
-}
-
-/** Writes, reads and deletes a 4-byte probe. Returns the S3 error code on failure. */
-export async function testR2(): Promise<{ ok: boolean; error?: string }> {
-  let config: ReturnType<typeof r2Config>
-
-  try {
-    config = r2Config()
-  } catch (error) {
-    return { ok: false, error: messageOf(error, 'R2 test failed') }
-  }
-
-  const { bucket, client } = config
-  const key = `probe/${randomUUID()}.txt`
-
-  try {
-    await client.send(
-      new PutObjectCommand({ Bucket: bucket, Key: key, Body: 'test', ContentLength: 4 }),
-    )
-
-    await client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }))
-
-    return { ok: true }
-  } catch (error) {
-    return { ok: false, error: s3ErrorCode(error) }
-  } finally {
-    await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key })).catch(() => {})
   }
 }
 
@@ -151,16 +150,6 @@ function s3ErrorCode(error: unknown): string {
   }
 
   return 'R2 test failed'
-}
-
-function required(name: SecretName): string {
-  const value = getSecret(name)
-
-  if (isNil(value) || value === '') {
-    throw new Error(`${name} is not set`)
-  }
-
-  return value
 }
 
 function isNotFound(error: unknown): boolean {

@@ -1,9 +1,9 @@
 import { isNil } from 'lodash-es'
 
 import { errorResponse } from '@/server/http'
-import { getRemoteStore } from '@/server/remote/remote-store'
 import { assertLocalRequest } from '@/server/request-guard'
 import { secretsReady } from '@/server/secrets'
+import { getObjectStore } from '@/server/storage/registry'
 
 /** Tells the client whether cloud storage exists, so validation can warn early. */
 export async function GET(request: Request) {
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     await secretsReady()
 
     return Response.json({
-      configured: !isNil(getRemoteStore()),
+      configured: !isNil(getObjectStore()),
       mock: Boolean(process.env.REMOTE_MOCK?.trim()),
     })
   } catch (error) {

@@ -14,7 +14,7 @@ const FACTORIES: { readonly [id in VideoProviderId]: () => VideoProvider } = {
 }
 
 /** True when the registry selects the mock adapter for this provider. */
-export function isMockProvider(id: VideoProviderId): boolean {
+function isMockProvider(id: VideoProviderId): boolean {
   return id === 'openrouter' && isMockMode()
 }
 

@@ -1,10 +1,13 @@
 import 'server-only'
 
+import { isNil } from 'lodash-es'
+
 import type { TestResult } from '@/core/types'
 
-import { getVideoProvider, isMockProvider } from '../providers/registry'
-import { testR2 } from '../remote/r2'
+import { getVideoProvider } from '../providers/registry'
 import { secretsReady } from '../secrets'
+import { testR2 } from '../storage/r2'
+import { getObjectStore } from '../storage/registry'
 
 type TestTarget = 'openrouter' | 'r2'
 
@@ -16,9 +19,11 @@ export async function testConnection(target: TestTarget): Promise<TestResult> {
     return getVideoProvider('openrouter').testConnection()
   }
 
-  if ((process.env.REMOTE_MOCK?.trim() ?? '') !== '' && isMockProvider('openrouter')) {
-    return { ok: true, mock: true }
+  const store = getObjectStore()
+
+  if (isNil(store)) {
+    return testR2()
   }
 
-  return testR2()
+  return store.testConnection()
 }

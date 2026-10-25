@@ -14,8 +14,8 @@ import { type PriceInput, validateInput } from '@/core/validation'
 
 import { ValidationError } from '../errors'
 import { getPricing } from '../providers/openrouter/pricing'
-import { getRemoteStore } from '../remote/remote-store'
 import { getActiveCount } from '../repos/generations'
+import { getObjectStore } from '../storage/registry'
 import { loadUploads } from './run-submit'
 
 export interface GenerationDraft {
@@ -37,7 +37,7 @@ export async function loadDraft(raw: GenerationInput): Promise<GenerationDraft> 
     preset,
     ctx: {
       activeCount: await getActiveCount(),
-      remoteConfigured: !isNil(getRemoteStore()),
+      remoteConfigured: !isNil(getObjectStore()),
     },
   })
 

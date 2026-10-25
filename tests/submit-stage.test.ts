@@ -20,7 +20,7 @@ const submitVideo = vi.hoisted(() => vi.fn(async () => ({ jobId: 'job-1', status
 
 vi.mock('@/server/secrets', () => ({ secretsReady: async () => {} }))
 vi.mock('@/server/repos/uploads', () => ({ getUpload: async () => null }))
-vi.mock('@/server/remote/remote-store', () => ({ getRemoteStore: () => null }))
+vi.mock('@/server/storage/registry', () => ({ getObjectStore: () => null }))
 vi.mock('@/server/jobs/poller', () => ({ startPoller: () => {} }))
 vi.mock('@/server/jobs/submit-retry', () => ({ shouldRetryAsBase64: () => false }))
 

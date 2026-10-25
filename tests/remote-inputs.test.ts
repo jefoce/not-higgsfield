@@ -6,13 +6,13 @@ import { isNil } from 'lodash-es'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import type { UploadItem } from '@/core/media-types'
-import type { FileHash } from '@/server/remote/hash'
+import type { FileHash } from '@/server/storage/hash'
 import type {
-  RemoteObjectInfo,
-  RemotePresignParams,
-  RemotePutParams,
-  RemoteStore,
-} from '@/server/remote/remote-store'
+  ObjectInfo,
+  ObjectStore,
+  PresignParams,
+  PutObjectParams,
+} from '@/server/storage/types'
 
 vi.mock('server-only', () => ({}))
 
@@ -24,7 +24,7 @@ process.env.STORAGE_ROOT = ROOT
 interface EnsureRemoteParams {
   upload: UploadItem
   onProgress?: (sent: number, total: number) => void
-  store?: RemoteStore
+  store?: ObjectStore
 }
 
 type EnsureRemote = (params: EnsureRemoteParams) => Promise<UploadItem>
@@ -35,40 +35,45 @@ let removeUpload: (id: string) => Promise<void>
 let hashFile: (file: string) => Promise<FileHash>
 
 interface PutOnceParams {
-  store: RemoteStore
+  store: ObjectStore
   key: string
   file: string
   opts: { contentType: string; sha256: string }
 }
 
-let putOnce: (params: PutOnceParams) => Promise<RemoteObjectInfo>
+let putOnce: (params: PutOnceParams) => Promise<ObjectInfo>
 
-class FakeStore implements RemoteStore {
-  readonly objects = new Map<string, RemoteObjectInfo>()
+class FakeStore implements ObjectStore {
+  readonly id = 'r2'
+  readonly objects = new Map<string, ObjectInfo>()
   readonly puts: string[] = []
 
-  async head(key: string): Promise<RemoteObjectInfo | null> {
+  async head(key: string): Promise<ObjectInfo | null> {
     return this.objects.get(key) ?? null
   }
 
-  async put(params: RemotePutParams): Promise<RemoteObjectInfo> {
-    const { key, file, opts } = params
+  async put(params: PutObjectParams): Promise<ObjectInfo> {
+    const { key, file, sha256 } = params
 
     this.puts.push(key)
     const stats = await fs.stat(file)
-    const info = { key, size: stats.size, serverSha256: opts.sha256 }
+    const info = { key, size: stats.size, serverSha256: sha256 }
 
     this.objects.set(key, info)
 
     return info
   }
 
-  async presign(params: RemotePresignParams): Promise<string> {
+  async presign(params: PresignParams): Promise<string> {
     return `mock://${params.key}`
   }
 
   async delete(key: string): Promise<void> {
     this.objects.delete(key)
+  }
+
+  async testConnection(): Promise<{ ok: boolean }> {
+    return { ok: true }
   }
 }
 
@@ -83,7 +88,7 @@ class GatedStore extends FakeStore {
     this.finishPut = resolve
   })
 
-  override async put(params: RemotePutParams): Promise<RemoteObjectInfo> {
+  override async put(params: PutObjectParams): Promise<ObjectInfo> {
     const { key } = params
 
     this.startPut()
@@ -117,7 +122,7 @@ beforeAll(async () => {
 
   ;({ removeUpload } = await import('@/server/services/uploads'))
 
-  ;({ hashFile } = await import('@/server/remote/hash'))
+  ;({ hashFile } = await import('@/server/storage/hash'))
 })
 
 afterAll(async () => {

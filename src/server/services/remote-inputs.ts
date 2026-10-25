@@ -9,33 +9,35 @@ import type { UploadItem } from '@/core/media-types'
 
 import { globalState } from '../global-state'
 import { uploadPaths } from '../paths'
-import { hashFile } from '../remote/hash'
-import {
-  getRemoteStore,
-  type RemoteObjectInfo,
-  type RemotePutOptions,
-  type RemoteStore,
-} from '../remote/remote-store'
 import { updateUpload } from '../repos/upload-record'
 import { listUploads } from '../repos/uploads'
 import { secretsReady } from '../secrets'
+import { hashFile } from '../storage/hash'
+import { getObjectStore } from '../storage/registry'
+import type { ObjectInfo, ObjectStore, ProgressCallback } from '../storage/types'
 
 type Remote = NonNullable<UploadItem['remote']>
 
-const puts = globalState('remotePuts', () => new Map<string, Promise<RemoteObjectInfo>>())
+const puts = globalState('remotePuts', () => new Map<string, Promise<ObjectInfo>>())
+
+interface PutObjectOptions {
+  contentType: string
+  sha256: string
+  onProgress?: ProgressCallback
+}
 
 interface PutOnceParams {
-  store: RemoteStore
+  store: ObjectStore
   key: string
   file: string
-  opts: RemotePutOptions
+  opts: PutObjectOptions
 }
 
 /** Uploads when the object is missing or stale, then refreshes lastUsedAt. */
 interface EnsureRemoteParams {
   upload: UploadItem
-  onProgress?: (sent: number, total: number) => void
-  store?: RemoteStore
+  onProgress?: ProgressCallback
+  store?: ObjectStore
 }
 
 export async function ensureRemote(params: EnsureRemoteParams): Promise<UploadItem> {
@@ -107,10 +109,10 @@ export async function presignFor(upload: UploadItem): Promise<string> {
 
 /** Deletes objects whose uploads all passed REMOTE_UNUSED_DAYS, clears their remote. */
 export async function sweepRemote(
-  store?: RemoteStore,
+  store?: ObjectStore,
 ): Promise<{ deleted: number; cleared: number }> {
   await secretsReady()
-  const remoteStore = store ?? getRemoteStore()
+  const remoteStore = store ?? getObjectStore()
 
   if (!remoteStore) {
     return { deleted: 0, cleared: 0 }
@@ -148,7 +150,7 @@ export async function sweepRemote(
 }
 
 /** One put per key at a time. Later callers wait for the first. */
-export function putOnce(params: PutOnceParams): Promise<RemoteObjectInfo> {
+export function putOnce(params: PutOnceParams): Promise<ObjectInfo> {
   const { store, key, file, opts } = params
   const running = puts.get(key)
 
@@ -156,7 +158,15 @@ export function putOnce(params: PutOnceParams): Promise<RemoteObjectInfo> {
     return running
   }
 
-  const job = store.put({ key, file, opts }).finally(() => puts.delete(key))
+  const job = store
+    .put({
+      key,
+      file,
+      contentType: opts.contentType,
+      sha256: opts.sha256,
+      onProgress: opts.onProgress ?? null,
+    })
+    .finally(() => puts.delete(key))
 
   puts.set(key, job)
 
@@ -222,8 +232,8 @@ function sameDigest(params: SameDigestParams): boolean {
   return prev?.sha256 === digest.sha256Hex && head.serverSha256 === prev.serverSha256
 }
 
-function requireStore(): RemoteStore {
-  const store = getRemoteStore()
+function requireStore(): ObjectStore {
+  const store = getObjectStore()
 
   if (!store) {
     throw new Error('Remote storage is not configured')

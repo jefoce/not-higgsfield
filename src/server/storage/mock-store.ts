@@ -10,12 +10,13 @@ import { setTimeout as delay } from 'node:timers/promises'
 import { isString } from 'lodash-es'
 
 import { REMOTE_MOCK_MBPS } from '@/core/constants'
+import type { TestResult } from '@/core/types'
 
 import { readJson, removeFile } from '../fs/json-file'
 import { globalState } from '../global-state'
 import { MOCK_REMOTE_PREFIX } from '../local-url'
 import { STORAGE_ROOT } from '../paths'
-import type { RemoteObjectInfo, RemoteStore } from './remote-store'
+import type { ObjectInfo, ObjectStore, PutObjectParams } from './types'
 
 interface MockMeta {
   size: number
@@ -24,12 +25,14 @@ interface MockMeta {
 
 const SECRET = globalState('mockRemoteSecret', () => randomBytes(32))
 
-export function createMockStore(): RemoteStore {
+export function createMockStore(): ObjectStore {
   const mode = process.env.REMOTE_MOCK?.trim() === 'fail' ? 'fail' : 'ok'
   const mbps = numberFromEnv('REMOTE_MOCK_MBPS', REMOTE_MOCK_MBPS)
 
   return {
-    async head(key): Promise<RemoteObjectInfo | null> {
+    id: 'r2',
+
+    async head(key): Promise<ObjectInfo | null> {
       const meta = await readJson<MockMeta>(metaPath(key))
 
       if (!meta || typeof meta.size !== 'number' || !isString(meta.serverSha256)) {
@@ -39,8 +42,8 @@ export function createMockStore(): RemoteStore {
       return { key, size: meta.size, serverSha256: meta.serverSha256 }
     },
 
-    async put(params): Promise<RemoteObjectInfo> {
-      const { key, file, opts } = params
+    async put(params: PutObjectParams): Promise<ObjectInfo> {
+      const { key, file, sha256, onProgress } = params
       const target = objectPath(key)
 
       try {
@@ -49,14 +52,14 @@ export function createMockStore(): RemoteStore {
           target,
           mbps,
           mode,
-          onProgress: opts.onProgress,
+          onProgress: onProgress ?? undefined,
         })
 
-        const meta: MockMeta = { size, serverSha256: opts.sha256 }
+        const meta: MockMeta = { size, serverSha256: sha256 }
 
         await fs.writeFile(metaPath(key), JSON.stringify(meta), 'utf8')
 
-        return { key, size, serverSha256: opts.sha256 }
+        return { key, size, serverSha256: sha256 }
       } catch (error) {
         await Promise.all([removeFile(target), removeFile(metaPath(key))])
 
@@ -73,6 +76,10 @@ export function createMockStore(): RemoteStore {
 
     async delete(key): Promise<void> {
       await Promise.all([removeFile(objectPath(key)), removeFile(metaPath(key))])
+    },
+
+    async testConnection(): Promise<TestResult> {
+      return { ok: true, mock: true }
     },
   }
 }
