@@ -9,6 +9,7 @@ import type { SeekKeys } from '@/features/player/use-player-input'
 import { mediaUrl, thumbUrl } from '@/lib/api/media-urls'
 import { cn } from '@/lib/cn'
 import { MediaBox } from '@/ui/MediaBox'
+import { ZoomLayer } from '@/ui/ZoomLayer'
 
 import type { PreviewItem } from './preview-store'
 import { PreviewAudio } from './PreviewAudio'
@@ -101,14 +102,16 @@ export function PreviewBody(props: PreviewBodyProps) {
   }
 
   return (
-    <MediaBox aspect={aspect}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- full original, not a thumb */}
-      <img
-        src={src}
-        alt={item.originalName}
-        className={cn('size-full object-contain transition-opacity duration-150', imageFade)}
-        onLoad={handleImageLoad}
-      />
-    </MediaBox>
+    <ZoomLayer resetKey={item.id}>
+      <MediaBox aspect={aspect}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- full original, not a thumb */}
+        <img
+          src={src}
+          alt={item.originalName}
+          className={cn('size-full object-contain transition-opacity duration-150', imageFade)}
+          onLoad={handleImageLoad}
+        />
+      </MediaBox>
+    </ZoomLayer>
   )
 }

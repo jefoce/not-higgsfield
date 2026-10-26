@@ -172,6 +172,8 @@ To back up or move to a new computer, copy the whole folder, then enter your key
 
 - `Left` and `Right`: previous or next item in the viewer or a preview list.
 - `Shift+Left` and `Shift+Right`: seek 5 seconds inside the viewer.
+- `+` and `-`: zoom a photo in or out in the viewer.
+- `0`: fit a zoomed photo back to the screen.
 - `Space`: play or pause a focused player.
 - `F`: fullscreen for a focused player.
 - `Escape`: close a dialog or clear the selection.

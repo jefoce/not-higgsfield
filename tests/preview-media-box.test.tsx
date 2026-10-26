@@ -1,12 +1,25 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render } from '@testing-library/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PreviewBody } from '@/features/preview/PreviewBody'
 
 import { upload } from './helpers/validation-fixtures'
 
-afterEach(cleanup)
+class Observer {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+beforeEach(() => {
+  vi.stubGlobal('ResizeObserver', Observer)
+})
+
+afterEach(() => {
+  cleanup()
+  vi.unstubAllGlobals()
+})
 
 /** MediaBox root, the only element carrying an aspect-ratio style. */
 function boxOf(container: HTMLElement): HTMLElement {
