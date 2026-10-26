@@ -9,6 +9,7 @@ Looping playback, clearer pricing, reused release sources.
 - Videos loop until you pause them.
 - A bigger media viewer with a blurred backdrop.
 - Previous and next in the history viewer and in every preview list.
+- Reference button: adds the video as a reference, or its last frame as the start frame.
 
 ### Fixed
 

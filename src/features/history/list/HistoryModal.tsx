@@ -160,6 +160,10 @@ export function HistoryModal(props: HistoryModalProps) {
     void cancelGeneration(record.id)
   }
 
+  const handleApplied = () => {
+    props.onOpenChange(false)
+  }
+
   return (
     <Modal
       open={isOpen}
@@ -196,7 +200,7 @@ export function HistoryModal(props: HistoryModalProps) {
             className="group/card min-h-0 w-80 shrink-0 overflow-hidden"
             style={{ minWidth: DETAILS_MIN_WIDTH }}
           >
-            <DetailsPanel record={record} />
+            <DetailsPanel record={record} onApplied={handleApplied} />
           </div>
         </div>
       )}

@@ -15,6 +15,7 @@ import { InputThumbs } from './InputThumbs'
 interface DetailsPanelProps {
   record: GenerationRecord
   onDeleted?: () => void
+  onApplied?: () => void
 }
 
 /** Prompt, inputs, settings, actions and cost for one record. */
@@ -44,7 +45,13 @@ export function DetailsPanel(props: DetailsPanelProps) {
 
       <DetailsSettings record={record} />
 
-      <DetailsActions record={record} isActive={isActive} now={now} onDeleted={props.onDeleted} />
+      <DetailsActions
+        record={record}
+        isActive={isActive}
+        now={now}
+        onDeleted={props.onDeleted}
+        onApplied={props.onApplied}
+      />
     </div>
   )
 }
