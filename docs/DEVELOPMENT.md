@@ -324,6 +324,28 @@ checksums + updater-manifest -> tag (releases push only)
 
 `ffmpeg` and `node` skip when `reuse_sidecars_run_id` or `SIDECARS_RUN_ID` is set. `build` runs only when `checks` passed. It keeps `pnpm test` on each runner because the tests cover Windows paths and secrets backends, and drops the other checks.
 
+### Build installers
+
+"Build installers" runs the repo's pinned `@tauri-apps/cli` through `pnpm tauri build --target <target> --config src-tauri/tauri.release.conf.json`. No third-party action runs the build, so the signing key only reaches the CLI we ship.
+
+`NH_PREPARED=1` short-circuits `prepare-desktop.mjs`, which already ran in "Stage server". `tauri.release.conf.json` turns on `createUpdaterArtifacts` and clears `beforeBuildCommand`, so `notices` and `next build` run once, in `pnpm desktop:prepare`, not again inside `tauri build`. Local `pnpm desktop:build` keeps the full `beforeBuildCommand` and stays on the default config.
+
+The ffmpeg job runs "Plan ffmpeg build" (`ffmpeg-plan.sh`) after the GHCR restore and the Linux sources pull. It writes `build` and `out`:
+
+| Restored sidecar | Linux sources | `build` | `out` |
+| --- | --- | --- | --- |
+| no | any | `true` | `ffmpeg-out` |
+| yes | no | `true` | `ffmpeg-rebuild` |
+| yes | yes | `false` | `ffmpeg-out` |
+
+A sources-only rebuild writes to `ffmpeg-rebuild`, never over the verified binary and manifest restored from GHCR. "macOS toolchain", "Cache ffmpeg downloads and build", "Linux packages", "Windows buildconf tool" and "Build ffmpeg" run only when `build` is `true`.
+
+### Caches and timeouts
+
+The ffmpeg cache (`~/.cache/not-higgsfield-build/ffmpeg`) restores only when the job builds. The Node cache (`.../node`) restores only on a GHCR miss. The build job's `~/.cache/not-higgsfield-build` cache restores only when no Node artifact exists (`needs.node.result == 'skipped'` and no reuse run), because only then does `prepare-desktop.mjs` download official Node. A GHCR hit skips every cache download.
+
+The build job has a 90-minute timeout, sized for a cold `rust-cache` on Windows: `pnpm install`, the tests, `desktop:prepare`, the smoke test and a release build with `lto = true` and `codegen-units = 1`.
+
 ### Composite actions
 
 | Action | Inputs | Does |
@@ -341,6 +363,7 @@ Each script takes arguments and runs with `set -euo pipefail`. Expressions reach
 | Script | Arguments |
 | --- | --- |
 | `checksums.sh` | `build <target> <dist>` or `merge <dist> <sources>` |
+| `ffmpeg-plan.sh` | none (`RESTORE_FOUND`, `SOURCES_FOUND`, `TARGET` in the environment) |
 | `ffmpeg-sources-tag.sh` | none |
 | `ghcr-pull.sh` | `<ref> <dir> <required-file>...` |
 | `ghcr-push.sh` | `<ref> <dir> <file>...` (`FORCE` in the environment) |
@@ -356,7 +379,7 @@ Each script takes arguments and runs with `set -euo pipefail`. Expressions reach
 | `updater-manifest.mjs` | `--version --tag --repo --changelog --pub-date --signatures --out` |
 | `upload-release-assets.sh` | `<release-id> <file>...` |
 
-`tests/ci-scripts.test.ts` covers the rename, version and sources tag scripts, plus the GHCR pull flattening, with a fake `oras`. The ffmpeg and Node builds under `scripts/ffmpeg` and `scripts/node` do not change. Any byte there changes a GHCR key.
+`tests/ci-scripts.test.ts` covers the rename, version, sources tag and ffmpeg plan scripts, plus the GHCR pull flattening, with a fake `oras`. The ffmpeg and Node builds under `scripts/ffmpeg` and `scripts/node` do not change. Any byte there changes a GHCR key.
 
 ### Sidecar artifacts (GHCR)
 
