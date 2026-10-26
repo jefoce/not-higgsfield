@@ -17,8 +17,6 @@ export interface PreviewActions {
   remove?: (item: UploadItem) => void | boolean
   select?: (item: UploadItem) => void | boolean
   deselect?: (item: UploadItem) => void | boolean
-  useAsStart?: (item: UploadItem) => void | boolean
-  addAsReference?: (item: UploadItem) => void | boolean
   available?: (item: UploadItem) => ActionKey[]
   isSelected?: (item: UploadItem) => boolean
   label?: (item: UploadItem) => string | null
@@ -28,6 +26,7 @@ export interface PreviewRequest {
   items: PreviewItem[]
   index: number
   actions?: PreviewActions
+  allowUse?: boolean
 }
 
 interface PreviewState {

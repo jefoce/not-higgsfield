@@ -91,8 +91,12 @@ module.exports = {
     {
       name: 'preview-uses-player-only',
       severity: 'error',
+      comment: 'The viewer Use button is a generator control rendered by the preview stage.',
       from: { path: '^src/features/preview/' },
-      to: { path: '^src/features/(?!(preview|player)/)' },
+      to: {
+        path: '^src/features/(?!(preview|player)/)',
+        pathNot: '^src/features/generator/UseMediaButton\\.tsx$',
+      },
     },
     {
       name: 'picker-uses-preview-and-player',

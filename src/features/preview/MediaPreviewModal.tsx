@@ -1,8 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { isNil } from 'lodash-es'
 
+import { UseMediaButton } from '@/features/generator/UseMediaButton'
 import { usePlayerSlot } from '@/features/player/use-player-slot'
 import { thumbUrl } from '@/lib/api/media-urls'
 import { preloadPosters } from '@/lib/preload-posters'
@@ -48,6 +49,15 @@ function handleOpenChange(isOpen: boolean): void {
   if (!isOpen) {
     closePreview()
   }
+}
+
+/** Use button for the current item, null when the opener opts out or it is missing. */
+function previewToolbar(request: PreviewRequest, item: PreviewItem | undefined): ReactNode {
+  if (isNil(item) || item.missing === true || request.allowUse === false) {
+    return null
+  }
+
+  return <UseMediaButton target={{ kind: 'upload', upload: item }} />
 }
 
 interface RunPreviewActionParams {
@@ -174,6 +184,8 @@ export function MediaPreviewModal() {
     return null
   }
 
+  const toolbar = previewToolbar(request, item)
+
   return (
     <Modal
       open
@@ -187,6 +199,7 @@ export function MediaPreviewModal() {
 
         <MediaStage
           backdrop={stageBackdrop(item, backdropPoster)}
+          toolbar={toolbar}
           nav={{
             hasPrevious: index > 0,
             hasNext: index < items.length - 1,

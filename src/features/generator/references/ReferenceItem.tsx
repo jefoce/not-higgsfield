@@ -86,6 +86,7 @@ export function ReferenceItem(props: ReferenceItemProps) {
     openPreview({
       items: previewUploads,
       index,
+      allowUse: false,
       actions: {
         insert: handleInsert,
         replace: handleReplace,

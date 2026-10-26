@@ -9,8 +9,7 @@ import type {
   SnapshotItem,
 } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
-import { useGeneratorStore } from '@/features/generator/store/store'
-import { openPreview, type PreviewActions } from '@/features/preview/preview-store'
+import { openPreview } from '@/features/preview/preview-store'
 import { fetchUploads } from '@/lib/api/uploads'
 import { formatBytes } from '@/lib/format'
 import { toastError } from '@/lib/notify'
@@ -111,31 +110,6 @@ export function thumbItems(record: GenerationRecord): ThumbItem[] {
   return items
 }
 
-function handleUseAsStart(current: UploadItem): void {
-  const store = useGeneratorStore.getState()
-
-  store.setTab('frames')
-  store.setFrame('start', current)
-}
-
-function handleAddAsReference(current: UploadItem): void {
-  useGeneratorStore.getState().addReferences([current])
-}
-
-function availableActions(current: UploadItem): ('useAsStart' | 'addAsReference')[] {
-  if (current.kind === 'image') {
-    return ['useAsStart', 'addAsReference']
-  }
-
-  return ['addAsReference']
-}
-
-const THUMB_ACTIONS: PreviewActions = {
-  useAsStart: handleUseAsStart,
-  addAsReference: handleAddAsReference,
-  available: availableActions,
-}
-
 export interface OpenThumbParams {
   item: ThumbItem
   items: ThumbItem[]
@@ -185,7 +159,7 @@ export async function openThumb(params: OpenThumbParams): Promise<void> {
       chain.push(upload)
     }
 
-    openPreview({ items: chain, index: chainIndex, actions: THUMB_ACTIONS })
+    openPreview({ items: chain, index: chainIndex })
   } catch (error) {
     toastError(error)
   }

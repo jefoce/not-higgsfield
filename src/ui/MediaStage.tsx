@@ -30,6 +30,7 @@ interface MediaStageProps {
   backdrop: StageBackdrop
   children: ReactNode
   nav?: StageNav
+  toolbar?: ReactNode
 }
 
 /**
@@ -37,7 +38,7 @@ interface MediaStageProps {
  * @public
  */
 export function MediaStage(props: MediaStageProps) {
-  const { backdrop, children, nav } = props
+  const { backdrop, children, nav, toolbar } = props
 
   return (
     <div className="group/stage relative isolate flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-2xl">
@@ -62,6 +63,12 @@ export function MediaStage(props: MediaStageProps) {
       <div className="relative flex size-full min-h-0 items-center justify-center p-4">
         {children}
       </div>
+
+      {Boolean(toolbar) && (
+        <div className="pointer-events-none absolute top-4 right-4 z-10 flex opacity-0 transition-opacity group-hover/stage:pointer-events-auto group-hover/stage:opacity-100 focus-within:pointer-events-auto focus-within:opacity-100 pointer-coarse:pointer-events-auto pointer-coarse:opacity-100">
+          {toolbar}
+        </div>
+      )}
 
       {nav && (
         <>

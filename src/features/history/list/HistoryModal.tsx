@@ -1,11 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { type ReactNode, useCallback, useEffect, useRef } from 'react'
 import { isEmpty, isNil } from 'lodash-es'
 import { useShallow } from 'zustand/react/shallow'
 
 import { DETAILS_MIN_WIDTH } from '@/core/constants'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
+import { UseMediaButton } from '@/features/generator/UseMediaButton'
 import { LazyVideo } from '@/features/player/LazyVideo'
 import { preloadPosters } from '@/lib/preload-posters'
 import { useChainKeys } from '@/lib/use-chain-keys'
@@ -52,6 +53,21 @@ function stageBackdrop(record: GenerationRecord, poster: string | undefined) {
   }
 
   return { kind: 'image' as const, src: poster }
+}
+
+function handleOpenChange(isNextOpen: boolean): void {
+  if (!isNextOpen) {
+    useHistoryViewerStore.getState().close()
+  }
+}
+
+/** Use button for a completed record, null while it is still running or failed. */
+function recordToolbar(record: GenerationRecord | null): ReactNode {
+  if (isNil(record) || record.status !== 'completed') {
+    return null
+  }
+
+  return <UseMediaButton target={{ kind: 'record', record }} />
 }
 
 /** Record position in the view order, paging and delete recovery. */
@@ -179,11 +195,7 @@ export function HistoryModal(props: HistoryModalProps) {
     void cancelGeneration(record.id)
   }
 
-  const handleOpenChange = (isNextOpen: boolean) => {
-    if (!isNextOpen) {
-      close()
-    }
-  }
+  const toolbar = recordToolbar(record)
 
   return (
     <Modal
@@ -196,7 +208,11 @@ export function HistoryModal(props: HistoryModalProps) {
       {!isNil(record) && (
         <div ref={scopeRef} className="flex h-full min-h-0 flex-col gap-3 compact:flex-row">
           <div className="flex min-h-[50vh] min-w-0 flex-1 compact:min-h-0">
-            <MediaStage backdrop={stageBackdrop(record, backdropPoster)} nav={nav}>
+            <MediaStage
+              backdrop={stageBackdrop(record, backdropPoster)}
+              nav={nav}
+              toolbar={toolbar}
+            >
               {record.status === 'completed' && (
                 <MediaBox aspect={recordAspect(record)}>
                   <LazyVideo

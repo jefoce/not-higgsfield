@@ -18,8 +18,6 @@ const ACTIONS: PreviewAction[] = [
   { key: 'remove', label: 'Remove' },
   { key: 'select', label: 'Select' },
   { key: 'deselect', label: 'Deselect' },
-  { key: 'useAsStart', label: 'Use as start frame' },
-  { key: 'addAsReference', label: 'Add as reference' },
 ]
 
 const ACTION_VARIANT: Partial<Record<ActionKey, 'primary' | 'danger'>> = {
