@@ -11,13 +11,14 @@ permissions:
 jobs:
   version:
     runs-on: ubuntu-22.04
+    timeout-minutes: 5
     steps:
       - name: Reject Dependabot PRs
         shell: bash
         env:
-          ACTOR: ${{ github.actor }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
-          if [[ "$ACTOR" == 'dependabot[bot]' ]]; then
+          if [[ "$PR_AUTHOR" == 'dependabot[bot]' ]]; then
             echo "::error::Dependabot PRs are not merged into releases. Apply the update on the next version branch."
             exit 1
           fi
