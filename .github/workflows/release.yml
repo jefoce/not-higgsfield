@@ -103,6 +103,15 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: ./.github/actions/sidecar-restore
+        id: restore
+        with:
+          name: ffmpeg
+          target: ${{ matrix.target }}
+          runner: ${{ matrix.runner }}
+          profile: full
+          force: ${{ inputs.force_rebuild_sidecars }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: macOS toolchain
         if: runner.os == 'macOS'
         run: |
@@ -114,7 +123,7 @@ jobs:
           path: ~/.cache/not-higgsfield-build/ffmpeg
           key: ffmpeg-${{ matrix.target }}-${{ hashFiles('scripts/ffmpeg/**') }}
       - name: Linux packages
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && steps.restore.outputs.found != 'true'
         env:
           TARGET: ${{ matrix.target }}
         run: |
@@ -125,17 +134,8 @@ jobs:
             sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
             sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
           fi
-      - uses: ./.github/actions/sidecar-restore
-        id: pull
-        with:
-          name: ffmpeg
-          target: ${{ matrix.target }}
-          runner: ${{ matrix.runner }}
-          profile: full
-          force: ${{ inputs.force_rebuild_sidecars }}
-          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Windows buildconf tool
-        if: matrix.target == 'x86_64-pc-windows-msvc' && steps.pull.outputs.found != 'true'
+        if: matrix.target == 'x86_64-pc-windows-msvc' && steps.restore.outputs.found != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends wine64
@@ -164,7 +164,7 @@ jobs:
             cp ghcr-sources/*.tar.* "$src"/
           fi
       - name: Build ffmpeg
-        if: steps.pull.outputs.found != 'true' || (matrix.target == 'x86_64-unknown-linux-gnu' && steps.sources.outputs.found != 'true')
+        if: steps.restore.outputs.found != 'true' || (matrix.target == 'x86_64-unknown-linux-gnu' && steps.sources.outputs.found != 'true')
         shell: bash
         env:
           TARGET: ${{ matrix.target }}
@@ -181,7 +181,7 @@ jobs:
           target: ${{ matrix.target }}
           version: ${{ needs.version.outputs.version }}
           profile: full
-          key: ${{ steps.pull.outputs.key }}
+          key: ${{ steps.restore.outputs.key }}
           force: ${{ inputs.force_rebuild_sidecars }}
           token: ${{ secrets.GITHUB_TOKEN }}
           files: ffmpeg-${{ matrix.target }}${{ matrix.exe }} buildconf.txt manifest.json
@@ -233,6 +233,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - uses: ./.github/actions/sidecar-restore
+        id: restore
+        with:
+          name: node
+          target: ${{ matrix.target }}
+          runner: ${{ matrix.runner }}
+          force: ${{ inputs.force_rebuild_sidecars }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: macOS toolchain
         if: runner.os == 'macOS'
         run: |
@@ -244,26 +252,18 @@ jobs:
           path: ~/.cache/not-higgsfield-build/node
           key: node-${{ matrix.target }}-${{ hashFiles('scripts/node/**') }}
       - name: Linux packages
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && steps.restore.outputs.found != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential python3 xz-utils gcc-12 g++-12
       - name: Windows tools
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && steps.restore.outputs.found != 'true'
         shell: pwsh
         run: |
           choco install nasm --no-progress -y
           "C:\Program Files\NASM" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-      - uses: ./.github/actions/sidecar-restore
-        id: pull
-        with:
-          name: node
-          target: ${{ matrix.target }}
-          runner: ${{ matrix.runner }}
-          force: ${{ inputs.force_rebuild_sidecars }}
-          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Node (Linux)
-        if: runner.os == 'Linux' && steps.pull.outputs.found != 'true'
+        if: runner.os == 'Linux' && steps.restore.outputs.found != 'true'
         shell: bash
         env:
           CC: gcc-12
@@ -271,13 +271,13 @@ jobs:
           TARGET: ${{ matrix.target }}
         run: bash scripts/node/build-unix.sh --target "$TARGET" --out node-out
       - name: Build Node (macOS)
-        if: runner.os == 'macOS' && steps.pull.outputs.found != 'true'
+        if: runner.os == 'macOS' && steps.restore.outputs.found != 'true'
         shell: bash
         env:
           TARGET: ${{ matrix.target }}
         run: bash scripts/node/build-unix.sh --target "$TARGET" --out node-out
       - name: Build Node (Windows)
-        if: runner.os == 'Windows' && steps.pull.outputs.found != 'true'
+        if: runner.os == 'Windows' && steps.restore.outputs.found != 'true'
         shell: pwsh
         run: ./scripts/node/build-windows.ps1 -Out node-out
       - uses: ./.github/actions/sidecar-publish
@@ -285,13 +285,16 @@ jobs:
           name: node
           target: ${{ matrix.target }}
           version: ${{ needs.version.outputs.version }}
-          key: ${{ steps.pull.outputs.key }}
+          key: ${{ steps.restore.outputs.key }}
           force: ${{ inputs.force_rebuild_sidecars }}
           token: ${{ secrets.GITHUB_TOKEN }}
           files: not-higgsfield-server-${{ matrix.target }}${{ matrix.exe }} manifest.json
 
+  checks:
+    uses: ./.github/workflows/checks.yml
+
   build:
-    needs: [version, draft, ffmpeg, node]
+    needs: [version, draft, ffmpeg, node, checks]
     timeout-minutes: 60
     permissions:
       actions: read
@@ -302,6 +305,7 @@ jobs:
       !cancelled() &&
       needs.version.result == 'success' &&
       needs.draft.result == 'success' &&
+      needs.checks.result == 'success' &&
       (needs.ffmpeg.result == 'success' || (needs.ffmpeg.result == 'skipped' && (inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID) != '')) &&
       (needs.node.result == 'success' || needs.node.result == 'skipped')
     strategy:
@@ -356,7 +360,7 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/not-higgsfield-build
-          key: node-24.22.1-${{ matrix.target }}
+          key: build-${{ matrix.target }}-${{ hashFiles('scripts/node/versions.env', 'scripts/ffmpeg/versions.env') }}
       - name: Linux packages
         if: runner.os == 'Linux'
         run: |
@@ -366,16 +370,6 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf \
             gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav
       - run: pnpm install --frozen-lockfile
-      - name: Audit production dependencies
-        continue-on-error: true
-        run: pnpm audit --prod --audit-level high
-      - run: pnpm typecheck
-      - if: runner.os == 'Linux'
-        run: pnpm lint
-      - run: pnpm deps
-      - if: runner.os == 'Linux'
-        run: pnpm format:check
-      - run: pnpm knip
       - run: pnpm test
       - name: Sidecar source
         shell: bash
@@ -594,6 +588,8 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-pnpm
+        with:
+          install: prod
       - name: Download updater signatures
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
