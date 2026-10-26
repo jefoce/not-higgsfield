@@ -46,7 +46,6 @@ runs:
       run: |
         : "${TOKEN:?token required}"
         out="$NAME-out"
-        # restore copies manifest.json only when GHCR served the sidecar.
         if [[ -f "$out/manifest.json" ]]; then
           echo "sidecar already restored from GHCR"
           exit 0

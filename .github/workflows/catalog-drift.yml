@@ -1,4 +1,6 @@
 name: catalog-drift
+run-name: >-
+  Catalog drift ${{ github.ref_name }}
 
 on:
   schedule:

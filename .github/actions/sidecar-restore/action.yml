@@ -87,9 +87,8 @@ runs:
           cp ghcr-cache/buildconf.txt "$out/"
         fi
         chmod +x "$out/$bin"
-        if [[ "$NAME" == "ffmpeg" && "$TARGET" == *windows* ]]; then
-          echo "verify runs natively in the Windows build job"
-        else
+        # Windows ffmpeg cannot run on Linux, so the build job verifies it.
+        if [[ "$NAME" != "ffmpeg" || "$TARGET" != *windows* ]]; then
           bash "scripts/$NAME/verify.sh" "$out/$bin"
         fi
         echo "from GHCR $KEY"

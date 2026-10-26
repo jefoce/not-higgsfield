@@ -7,6 +7,14 @@ target=${2:?target}
 artifact_dir=${3:?artifact dir}
 out_dir=${4:?out dir}
 
+if [[ -n "${REUSE_RUN:-}" ]]; then
+  echo "sidecars from run $REUSE_RUN (workflow input)"
+elif [[ -n "${VARIABLE_RUN:-}" ]]; then
+  echo "sidecars from run $VARIABLE_RUN (repository variable)"
+else
+  echo "sidecars built in this run"
+fi
+
 binary=$(bash .github/scripts/sidecar-binary.sh "$name" "$target" "${EXE:-}")
 upper=$(printf '%s' "$name" | tr '[:lower:]' '[:upper:]')
 mkdir -p "$out_dir"

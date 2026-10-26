@@ -371,19 +371,6 @@ jobs:
             gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
-      - name: Sidecar source
-        shell: bash
-        env:
-          INPUT_RUN: ${{ inputs.reuse_sidecars_run_id }}
-          VARIABLE_RUN: ${{ vars.SIDECARS_RUN_ID }}
-        run: |
-          if [[ -n "$INPUT_RUN" ]]; then
-            echo "sidecars from run $INPUT_RUN (workflow input)"
-          elif [[ -n "$VARIABLE_RUN" ]]; then
-            echo "sidecars from run $VARIABLE_RUN (repository variable)"
-          else
-            echo "sidecars built in this run"
-          fi
       - name: Download ffmpeg sidecar
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
@@ -396,6 +383,8 @@ jobs:
         env:
           TARGET: ${{ matrix.target }}
           EXE: ${{ matrix.exe }}
+          REUSE_RUN: ${{ inputs.reuse_sidecars_run_id }}
+          VARIABLE_RUN: ${{ vars.SIDECARS_RUN_ID }}
           ARTIFACT_DIR: ${{ (inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID) != '' && 'ffmpeg-out' || 'ffmpeg-artifact' }}
         run: bash .github/scripts/stage-sidecar.sh ffmpeg "$TARGET" "$ARTIFACT_DIR" ffmpeg-out
       - name: Download Node sidecar
@@ -412,6 +401,8 @@ jobs:
         env:
           TARGET: ${{ matrix.target }}
           EXE: ${{ matrix.exe }}
+          REUSE_RUN: ${{ inputs.reuse_sidecars_run_id }}
+          VARIABLE_RUN: ${{ vars.SIDECARS_RUN_ID }}
           ARTIFACT_DIR: ${{ (inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID) != '' && 'node-out' || 'node-artifact' }}
         run: bash .github/scripts/stage-sidecar.sh node "$TARGET" "$ARTIFACT_DIR" node-out
       - name: Push reused sidecars to GHCR

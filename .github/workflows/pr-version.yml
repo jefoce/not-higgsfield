@@ -1,5 +1,7 @@
 name: pr-version
-run-name: 'Version check #${{ github.event.number }} ${{ github.event.pull_request.title }}'
+run-name: >-
+  Version check #${{ github.event.number }} ${{ github.event.pull_request.title }}
+
 on:
   pull_request:
     branches: [releases]
