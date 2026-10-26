@@ -2,6 +2,19 @@
 
 ## 0.2.1 - unreleased
 
+Looping playback, clearer pricing, reused release sources.
+
+### Added
+
+- Videos loop until you pause them.
+
+### Fixed
+
+- The Generate button shows no price, discount or spinner while it cannot run.
+- With looping playback the player controls stay in sync, and pausing stops the loop.
+- A model with no endpoint pricing block now logs a clear reason and keeps list prices.
+- Release pipeline: sidecar and ffmpeg source pulls that hit GHCR are reused instead of rebuilt.
+
 ## 0.2.0 - 2026-10-26
 
 Provider and storage layers, stricter lint, stored data validation.
