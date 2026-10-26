@@ -3,6 +3,7 @@
 import { AlertTriangle } from 'lucide-react'
 
 import { LazyVideo } from '@/features/player/LazyVideo'
+import type { SeekKeys } from '@/features/player/use-player-input'
 import { mediaUrl, thumbUrl } from '@/lib/api/media-urls'
 
 import type { PreviewItem } from './preview-store'
@@ -11,11 +12,12 @@ import { PreviewAudio } from './PreviewAudio'
 interface PreviewBodyProps {
   item: PreviewItem | undefined
   playerId: string
+  seekKeys?: SeekKeys
 }
 
 /** Full-size video, audio or image for the current preview item. */
 export function PreviewBody(props: PreviewBodyProps) {
-  const { item, playerId } = props
+  const { item, playerId, seekKeys } = props
 
   if (!item || item.missing === true) {
     return (
@@ -37,6 +39,7 @@ export function PreviewBody(props: PreviewBodyProps) {
         src={src}
         poster={thumbUrl({ ref, w: 960 })}
         alt={item.originalName}
+        seekKeys={seekKeys}
         className="size-full"
       />
     )

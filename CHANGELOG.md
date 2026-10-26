@@ -7,6 +7,7 @@ Looping playback, clearer pricing, reused release sources.
 ### Added
 
 - Videos loop until you pause them.
+- A bigger media viewer with a blurred backdrop.
 
 ### Fixed
 

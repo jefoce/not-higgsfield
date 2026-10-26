@@ -1,16 +1,42 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { isNil } from 'lodash-es'
 
 import { usePlayerSlot } from '@/features/player/use-player-slot'
+import { thumbUrl } from '@/lib/api/media-urls'
+import { preloadPosters } from '@/lib/preload-posters'
 import { useChainKeys } from '@/lib/use-chain-keys'
+import { MediaStage } from '@/ui/MediaStage'
 import { Modal } from '@/ui/Modal'
-import { StageNavButton } from '@/ui/StageNavButton'
 
-import { type ActionKey, closePreview, usePreviewStore } from './preview-store'
+import { type ActionKey, closePreview, type PreviewItem, usePreviewStore } from './preview-store'
 import { PreviewBody } from './PreviewBody'
 import { PreviewFooter } from './PreviewFooter'
 import { PreviewHeader } from './PreviewHeader'
+
+/** 64 px thumb the stage blurs behind an image or video, undefined otherwise. */
+function stagePoster(item: PreviewItem | undefined): string | undefined {
+  if (isNil(item) || item.missing === true) {
+    return undefined
+  }
+
+  if (item.kind !== 'image' && item.kind !== 'video') {
+    return undefined
+  }
+
+  const ref = item.previewRef ?? `uploads/${item.id}`
+
+  return thumbUrl({ ref, w: 64 })
+}
+
+function stageBackdrop(item: PreviewItem | undefined, poster: string | undefined) {
+  if (isNil(poster)) {
+    return { kind: 'gradient' as const, seed: item?.id ?? 'missing' }
+  }
+
+  return { kind: 'image' as const, src: poster }
+}
 
 function handleOpenChange(isOpen: boolean): void {
   if (!isOpen) {
@@ -49,6 +75,14 @@ export function MediaPreviewModal() {
     }
   }, [acquire, item, playerId, release])
 
+  useEffect(() => {
+    const list = request?.items ?? []
+
+    preloadPosters([stagePoster(list[index - 1]), stagePoster(list[index + 1])])
+  }, [index, request])
+
+  const backdropPoster = stagePoster(item)
+
   const handleRun = (key: ActionKey) => {
     const action = request?.actions?.[key]
 
@@ -84,18 +118,25 @@ export function MediaPreviewModal() {
       onOpenChange={handleOpenChange}
       label="Media preview"
       backdropClassName="bg-black/80"
-      className="flex h-[min(85vh,900px)] max-h-none w-[min(90vw,1200px)] flex-col overflow-hidden bg-page-2"
+      className="flex h-[calc(100vh-48px)] max-h-275 w-[calc(100vw-48px)] max-w-450 flex-col overflow-hidden bg-page-2 p-0"
     >
-      <PreviewHeader item={item} actions={request.actions} />
+      <div className="flex min-h-0 flex-1 flex-col gap-3 p-3">
+        <PreviewHeader item={item} actions={request.actions} />
 
-      <div className="relative flex min-h-0 flex-1 items-center justify-center bg-black/60 p-3">
-        <PreviewBody item={item} playerId={playerId} />
+        <MediaStage
+          backdrop={stageBackdrop(item, backdropPoster)}
+          nav={{
+            hasPrevious: index > 0,
+            hasNext: index < items.length - 1,
+            onPrevious: handlePrevious,
+            onNext: handleNext,
+          }}
+        >
+          <PreviewBody item={item} playerId={playerId} seekKeys="shiftArrows" />
+        </MediaStage>
 
-        <StageNavButton side="left" disabled={index <= 0} onClick={handlePrevious} />
-        <StageNavButton side="right" disabled={index >= items.length - 1} onClick={handleNext} />
+        <PreviewFooter item={item} actions={request.actions} onRun={handleRun} />
       </div>
-
-      <PreviewFooter item={item} actions={request.actions} onRun={handleRun} />
     </Modal>
   )
 }
