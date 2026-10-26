@@ -56,7 +56,7 @@ export async function addReference(record: GenerationRecord): Promise<boolean> {
  * Applies a record as input for the active generator tab.
  * @public
  */
-export async function useAsInput(record: GenerationRecord): Promise<boolean> {
+export async function applyRecordInput(record: GenerationRecord): Promise<boolean> {
   try {
     return await applyRecordToGenerator(record)
   } catch (error) {
