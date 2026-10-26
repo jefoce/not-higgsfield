@@ -315,7 +315,7 @@ Seed the packages from an older run with the `SIDECARS_RUN_ID` repository variab
 
 A push to `releases` runs the same workflow and creates `vX.Y.Z` after all jobs pass.
 
-1. Branch `X.Y.Z` from `releases`, bump `package.json`, `src-tauri/Cargo.toml` and `Cargo.lock`, and open `## X.Y.Z - unreleased` in `CHANGELOG.md`. Replace `unreleased` with the date in the last commit before the PR.
+1. Branch `X.Y.Z` from `releases`, bump `package.json`, `src-tauri/Cargo.toml` and `Cargo.lock`, and open `## X.Y.Z - unreleased` in `CHANGELOG.md`. Apply open Dependabot updates on the new version branch. Replace `unreleased` with the date in the last commit before the PR.
 2. Run `pnpm typecheck && pnpm lint && pnpm deps && pnpm format:check && pnpm knip && pnpm test && pnpm build`, then `pnpm desktop:build` and `pnpm smoke`.
 3. Manual rc runs: `workflow_dispatch` with `tag: vX.Y.Z-rc.N`, use `reuse_sidecars_run_id` or `force_rebuild_sidecars` only when needed.
 4. Install the draft assets on real machines: mock run, real cheap-model run, history, Settings Test, no secrets in logs. On macOS also check the required `xattr -dr com.apple.quarantine` install step on the downloaded dmg. Then the update test: install the previous rc, start it with `NH_UPDATE_ENDPOINT` pointing at the new rc's `latest.json`, press **Install and restart**. Check the macOS keychain prompt once, run `xattr -l` on the installed app and find no quarantine line, check the Windows relaunch and the AppImage replace.
