@@ -12,36 +12,73 @@ import { cancelGeneration } from './record-actions'
 import { plainPrompt } from './record-view'
 
 /** Grabs the first or last frame of a finished video and arms it as the start frame. */
-export async function captureFrame(record: GenerationRecord, at: 'first' | 'last'): Promise<void> {
+export async function captureFrame(
+  record: GenerationRecord,
+  at: 'first' | 'last',
+): Promise<boolean> {
   try {
     const upload = await captureGenerationFrame(record.id, at)
     const store = useGeneratorStore.getState()
 
-    store.setTab('frames')
+    if (store.tab !== 'frames') {
+      store.setTab('frames')
+    }
+
     store.setFrame('start', upload)
     toast.success('Start frame set')
+
+    return true
   } catch (error) {
     toastError(error)
+
+    return false
   }
 }
 
 /** Links the finished video as a reference when the preset allows it. */
-export async function addReference(record: GenerationRecord): Promise<void> {
+export async function addReference(record: GenerationRecord): Promise<boolean> {
   try {
     const upload = await linkGenerationFile({ generationId: record.id })
     const store = useGeneratorStore.getState()
 
-    store.setTab('references')
+    if (store.tab !== 'references') {
+      store.setTab('references')
+    }
+
     store.addReferences([upload])
 
-    if (useGeneratorStore.getState().references.includes(upload.id)) {
+    const isAdded = useGeneratorStore.getState().references.includes(upload.id)
+
+    if (isAdded) {
       toast.success('Added as reference')
     } else {
       toast.error('Reference limit reached')
     }
+
+    return isAdded
   } catch (error) {
     toastError(error)
+
+    return false
   }
+}
+
+/**
+ * Applies a record as input for the active generator tab.
+ * @public
+ */
+export async function useAsInput(record: GenerationRecord): Promise<boolean> {
+  const { tab } = useGeneratorStore.getState()
+
+  if (tab === 'frames') {
+    return captureFrame(record, 'last')
+  }
+
+  if (tab === 'references') {
+    return addReference(record)
+  }
+
+  return false
 }
 
 export async function copyPrompt(record: GenerationRecord): Promise<void> {
