@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { isString } from 'lodash-es'
 import { describe, expect, it } from 'vitest'
 
 import { isRecord } from '@/core/guards'
@@ -49,7 +50,31 @@ function findInsecureKey(value: unknown, parent = ''): string | null {
   )
 }
 
+/** Reads the bundle targets list from a config object. */
+function bundleTargets(config: unknown): string[] {
+  if (!isRecord(config)) {
+    return []
+  }
+
+  const bundle = config.bundle
+
+  if (!isRecord(bundle) || !Array.isArray(bundle.targets)) {
+    return []
+  }
+
+  return bundle.targets.filter(isString)
+}
+
 describe('updater config', () => {
+  it('builds the macOS app target for updater artifacts', () => {
+    const file = path.join(ROOT, 'src-tauri', 'tauri.conf.json')
+    const config = JSON.parse(fs.readFileSync(file, 'utf8')) as unknown
+    const targets = bundleTargets(config)
+
+    expect(targets).toEqual(expect.arrayContaining(['app', 'nsis', 'appimage']))
+    expect(targets[0]).toBe('app')
+  })
+
   it.each(CONFIGS)('%s does not allow insecure transport', (name) => {
     const file = path.join(ROOT, 'src-tauri', name)
     const config = JSON.parse(fs.readFileSync(file, 'utf8')) as unknown
