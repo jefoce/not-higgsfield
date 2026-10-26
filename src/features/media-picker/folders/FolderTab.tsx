@@ -1,31 +1,24 @@
 'use client'
 
 import { useState } from 'react'
-import { isEmpty, isNil } from 'lodash-es'
 import useSWR from 'swr'
 
-import { isNonEmptyString } from '@/core/guards'
-import { extensionAllowed, extWithDot, type KindExtensions, mimeFromExt } from '@/core/media-kinds'
+import { extensionAllowed, extWithDot, type KindExtensions } from '@/core/media-kinds'
 import type { FolderFile, MediaKind } from '@/core/media-types'
-import type { UploadItem } from '@/core/schemas/upload-item'
-import {
-  openPreview,
-  type PreviewActions,
-  type PreviewItem,
-} from '@/features/preview/preview-store'
+import type { UploadsById } from '@/core/schemas/upload-item'
+import { openPreview } from '@/features/preview/preview-store'
 import { fetchFolderFiles } from '@/lib/api/folders'
-import { thumbUrl } from '@/lib/api/media-urls'
-import { linkFolderFile } from '@/lib/api/uploads'
-import { toastError } from '@/lib/notify'
-import { useAsyncAction } from '@/lib/use-async-action'
+import { useLatest } from '@/lib/use-latest'
 
-import { closeMediaPicker, type PickerMode } from '../picker/store'
+import type { PickerMode } from '../picker/store'
+import { folderPreviewActions, folderPreviewItem } from './folder-tab-helpers'
 import { FolderBreadcrumbs } from './FolderBreadcrumbs'
-import { FolderDirTile } from './FolderDirTile'
-import { FolderFileTile } from './FolderFileTile'
+import { FolderGrid } from './FolderGrid'
+import { useFolderLink } from './use-folder-link'
 
 export interface FolderTabProps {
   folderId: string
+  folderPath: string
   folderName: string
   kinds: MediaKind[]
   extensions?: KindExtensions
@@ -34,97 +27,36 @@ export interface FolderTabProps {
   onNavigate: (sub: string) => void
 }
 
-const SKELETON = [0, 1, 2, 3, 4, 5]
+const NO_SELECTED_IDS: string[] = []
+const NO_UPLOADS_BY_ID: UploadsById = {}
 
-interface FolderPreviewItemParams {
-  folderId: string
-  file: FolderFile
+function useNoSelectedIds(): string[] {
+  return NO_SELECTED_IDS
 }
 
-/** Preview-only item for a folder file. Nothing links until selected. */
-function folderPreviewItem(params: FolderPreviewItemParams): PreviewItem {
-  const { folderId, file } = params
-  const ext = extWithDot(file.name)
-
-  return {
-    id: `folder:${folderId}:${file.rel}`,
-    source: 'link',
-    kind: file.kind,
-    mime: mimeFromExt(ext) ?? '',
-    ext,
-    originalName: file.name,
-    sizeBytes: file.sizeBytes,
-    createdAt: new Date(file.mtimeMs).toISOString(),
-    previewRef: `folders/${folderId}/${file.rel}`,
-  }
-}
-
-/** Rel path of a folder preview item, undefined for other sources. */
-function previewRel(folderId: string, item: PreviewItem): string | undefined {
-  const prefix = `folders/${folderId}/`
-  const ref = item.previewRef
-
-  if (!isNonEmptyString(ref) || !ref.startsWith(prefix)) {
-    return undefined
-  }
-
-  return ref.slice(prefix.length)
-}
-
-/** Applies a linked folder file through the request mode. */
-function applyPicked(mode: PickerMode, upload: UploadItem): void {
-  if (mode.kind === 'toggle') {
-    mode.onToggle(upload)
-
-    return
-  }
-
-  mode.onPick(upload)
-  closeMediaPicker()
-}
-
-interface FolderPreviewActionsParams {
-  folderId: string
-  mode: PickerMode
-  onLink: (rel: string) => void
-}
-
-/** Preview actions link the shown file and keep the preview open in toggle mode. */
-function folderPreviewActions(params: FolderPreviewActionsParams): PreviewActions {
-  const { folderId, mode, onLink } = params
-
-  const run = (item: PreviewItem): boolean => {
-    const rel = previewRel(folderId, item)
-
-    if (isNil(rel)) {
-      return false
-    }
-
-    onLink(rel)
-
-    return mode.kind === 'toggle'
-  }
-
-  return { select: run, deselect: run }
+function useNoUploadsById(): UploadsById {
+  return NO_UPLOADS_BY_ID
 }
 
 /** Folder browser. */
 export function FolderTab(props: FolderTabProps) {
-  const { folderId, folderName, kinds, extensions, sub, mode } = props
+  const { folderId, folderPath, folderName, kinds, extensions, sub, mode } = props
 
-  const linking = useAsyncAction(async (rel: string) => {
-    try {
-      const upload = await linkFolderFile({ folderId, relPath: rel })
+  // Mode is fixed for the mount, so the hook choice stays stable.
+  const useSelectedIds = mode.kind === 'toggle' ? mode.useSelectedIds : useNoSelectedIds
+  const useUploadsById = mode.kind === 'toggle' ? mode.useUploadsById : useNoUploadsById
+  const selectedIds = useSelectedIds()
+  const uploadsById = useUploadsById()
+  const selectedIdsRef = useLatest(selectedIds)
+  const uploadsByIdRef = useLatest(uploadsById)
 
-      applyPicked(mode, upload)
-    } catch (error) {
-      toastError(error)
-    }
+  const { linkingRel, handleSelectFile } = useFolderLink({
+    folderId,
+    folderPath,
+    mode,
+    selectedIds: selectedIdsRef,
+    uploadsById: uploadsByIdRef,
   })
-
-  const handleSelectFile = (rel: string): void => {
-    void linking.run(rel)
-  }
 
   const [broken, setBroken] = useState<string[]>([])
 
@@ -138,8 +70,6 @@ export function FolderTab(props: FolderTabProps) {
     return extensionAllowed({ kind: file.kind, ext: extWithDot(file.name), extensions })
   })
 
-  const previewActions = folderPreviewActions({ folderId, mode, onLink: handleSelectFile })
-
   const handleExpand = (file: FolderFile) => {
     const items = files.map((each) => {
       return folderPreviewItem({ folderId, file: each })
@@ -149,7 +79,16 @@ export function FolderTab(props: FolderTabProps) {
       return each.rel === file.rel
     })
 
-    openPreview({ items, index, actions: previewActions })
+    const previewActions = folderPreviewActions({
+      folderId,
+      folderPath,
+      mode,
+      onSelect: handleSelectFile,
+      selectedIds: selectedIdsRef,
+      uploadsById: uploadsByIdRef,
+    })
+
+    openPreview({ items, index, actions: previewActions, allowUse: false })
   }
 
   const handleBroken = (src: string) => {
@@ -164,45 +103,22 @@ export function FolderTab(props: FolderTabProps) {
         <FolderBreadcrumbs folderName={folderName} sub={sub} onNavigate={props.onNavigate} />
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="grid grid-cols-4 content-start gap-3 p-3">
-          {isLoading &&
-            SKELETON.map((key) => {
-              return (
-                <div key={key} className="aspect-square animate-pulse rounded-lg bg-surface-2" />
-              )
-            })}
-
-          {dirs.map((dir) => {
-            return <FolderDirTile key={dir.rel} dir={dir} onNavigate={props.onNavigate} />
-          })}
-
-          {files.map((file) => {
-            const ref = `folders/${folderId}/${file.rel}`
-            const src = thumbUrl({ ref, w: undefined, version: file.mtimeMs })
-            const isBroken = broken.includes(src)
-
-            return (
-              <FolderFileTile
-                key={file.rel}
-                file={file}
-                src={src}
-                isBroken={isBroken}
-                isSelected={false}
-                onSelect={handleSelectFile}
-                onExpand={handleExpand}
-                onBroken={handleBroken}
-              />
-            )
-          })}
-
-          {!isLoading && isEmpty(dirs) && isEmpty(files) && (
-            <p className="col-span-full py-8 text-center text-sm text-fg-2">
-              No media in this folder
-            </p>
-          )}
-        </div>
-      </div>
+      <FolderGrid
+        folderId={folderId}
+        folderPath={folderPath}
+        dirs={dirs}
+        files={files}
+        mode={mode}
+        selectedIds={selectedIds}
+        uploadsById={uploadsById}
+        linkingRel={linkingRel}
+        broken={broken}
+        isLoading={isLoading}
+        onNavigate={props.onNavigate}
+        onSelect={handleSelectFile}
+        onExpand={handleExpand}
+        onBroken={handleBroken}
+      />
     </div>
   )
 }

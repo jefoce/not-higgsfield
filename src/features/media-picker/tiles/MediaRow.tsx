@@ -28,7 +28,7 @@ export function MediaRow(props: MediaRowProps) {
   const isDisabled = !isSelected && !isNil(disabledReason)
 
   const handlePreview = () => {
-    openPreview({ items, index: previewIndex, actions })
+    openPreview({ items, index: previewIndex, actions, allowUse: false })
   }
 
   const handleDelete = () => {

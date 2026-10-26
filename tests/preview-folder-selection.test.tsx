@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { isNil } from 'lodash-es'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { FolderTab } from '@/features/media-picker/folders/FolderTab'
 import type { PickerMode } from '@/features/media-picker/picker/store'
 import { MediaPreviewModal } from '@/features/preview/MediaPreviewModal'
-import { closePreview } from '@/features/preview/preview-store'
+import { closePreview, usePreviewStore } from '@/features/preview/preview-store'
 
 import { upload } from './helpers/validation-fixtures'
 
@@ -47,7 +48,10 @@ vi.mock('swr', () => {
         data: {
           path: '',
           dirs: [],
-          files: [{ name: 'clip.mp4', rel: 'clip.mp4', kind: 'video', sizeBytes: 1, mtimeMs: 1 }],
+          files: [
+            { name: 'clip.mp4', rel: 'clip.mp4', kind: 'video', sizeBytes: 1, mtimeMs: 1 },
+            { name: 'second.mp4', rel: 'second.mp4', kind: 'video', sizeBytes: 1, mtimeMs: 1 },
+          ],
         },
         isLoading: false,
       }
@@ -106,6 +110,7 @@ function renderPreview(mode: PickerMode) {
     <>
       <FolderTab
         folderId="folder-1"
+        folderPath="/videos/root"
         folderName="Folder"
         kinds={['video']}
         sub=""
@@ -156,5 +161,47 @@ describe('FolderTab preview selection', () => {
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).toBeNull()
     })
+  })
+})
+
+describe('FolderTab preview items', () => {
+  it('opens the preview without linking and hides the Use button', () => {
+    renderPreview(toggleMode(vi.fn<(item: UploadItem) => void>()))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Preview clip.mp4' }))
+
+    expect(mocks.linkFolderFile).not.toHaveBeenCalled()
+
+    const request = usePreviewStore.getState().request
+    const item = request?.items[0]
+
+    if (isNil(request) || isNil(item)) {
+      throw new Error('preview request missing')
+    }
+
+    expect(item.id).toBe('folder:folder-1:clip.mp4')
+    expect(item.previewRef).toBe('folders/folder-1/clip.mp4')
+    expect(item.mime).toBe('video/mp4')
+    expect(request.allowUse).toBe(false)
+  })
+
+  it('chains every filtered file and opens at the clicked index', () => {
+    renderPreview(toggleMode(vi.fn<(item: UploadItem) => void>()))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Preview second.mp4' }))
+
+    const request = usePreviewStore.getState().request
+
+    if (isNil(request)) {
+      throw new Error('preview request missing')
+    }
+
+    expect(
+      request.items.map((item) => {
+        return item.id
+      }),
+    ).toEqual(['folder:folder-1:clip.mp4', 'folder:folder-1:second.mp4'])
+
+    expect(request.index).toBe(1)
   })
 })

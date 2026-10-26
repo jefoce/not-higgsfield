@@ -42,6 +42,7 @@ export function PickerContent(props: PickerContentProps) {
     <FolderTab
       key={activeFolder.id}
       folderId={activeFolder.id}
+      folderPath={activeFolder.path}
       folderName={activeFolder.name}
       kinds={request.kinds}
       extensions={request.extensions}
