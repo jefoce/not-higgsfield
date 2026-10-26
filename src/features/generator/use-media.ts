@@ -11,8 +11,8 @@ import { captureGenerationFrame } from '@/lib/api/generations'
 import { linkFolderFile, linkGenerationFile } from '@/lib/api/uploads'
 import { toastError } from '@/lib/notify'
 
+import { addBlockReason, referenceRoom } from './reference-rules'
 import { useGeneratorStore } from './store/store'
-import { slotCounts } from './store/store-helpers'
 
 interface UploadMediaTarget {
   kind: 'upload'
@@ -48,7 +48,7 @@ export interface MediaUse {
 interface UseContext {
   label: string
   preset: ModelPreset
-  counts: MediaKindCounts
+  room: MediaKindCounts
   slots: Map<string, RefSlot>
   state: MediaUseState
 }
@@ -62,28 +62,18 @@ function disabled(label: string, reason: string): MediaUse {
 }
 
 function referenceRecordUse(context: UseContext): MediaUse {
-  const { label, preset, counts } = context
-  const limit = preset.references.video
+  const { label, preset, room } = context
+  const reason = addBlockReason({ kind: 'video', room, preset })
 
-  if (limit === 0) {
-    return disabled(label, 'This model does not take video references')
-  }
-
-  if (counts.video >= limit) {
-    return disabled(label, 'Reference limit reached')
+  if (!isNil(reason)) {
+    return disabled(label, reason)
   }
 
   return enabled(label)
 }
 
 function referenceUploadUse(context: UseContext, upload: UploadItem): MediaUse {
-  const { label, preset, counts, slots, state } = context
-  const limit = preset.references[upload.kind]
-
-  if (limit === 0) {
-    return disabled(label, `This model does not take ${upload.kind} references`)
-  }
-
+  const { label, preset, room, slots, state } = context
   const slot = slots.get(upload.id)
 
   if (state.references.includes(upload.id)) {
@@ -94,8 +84,10 @@ function referenceUploadUse(context: UseContext, upload: UploadItem): MediaUse {
     return disabled(label, `Already ${slotToken(slot)}`)
   }
 
-  if (counts[upload.kind] >= limit) {
-    return disabled(label, 'Reference limit reached')
+  const reason = addBlockReason({ kind: upload.kind, room, preset })
+
+  if (!isNil(reason)) {
+    return disabled(label, reason)
   }
 
   return enabled(label)
@@ -136,13 +128,18 @@ function frameUploadUse(context: UseContext, upload: UploadItem): MediaUse {
 export function mediaUse(target: MediaTarget, state: MediaUseState): MediaUse {
   const label = state.tab === 'frames' ? 'Start frame' : 'Reference'
   const preset = getPreset(state.presetId)
-  const counts = slotCounts(state)
+
+  const room = referenceRoom({
+    preset,
+    references: state.references,
+    uploadsById: state.uploadsById,
+  })
 
   const slots = referenceSlots(state.references, (id) => {
     return state.uploadsById[id]?.kind
   }).slots
 
-  const context: UseContext = { label, preset, counts, slots, state }
+  const context: UseContext = { label, preset, room, slots, state }
 
   if (state.tab === 'references') {
     if (target.kind === 'record') {

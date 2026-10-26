@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import type { KindExtensions } from '@/core/media-kinds'
 import { MEDIA_KINDS, type MediaKind } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
-import { referenceSlots } from '@/core/prompt-tokens'
 import type { UploadItem, UploadsById } from '@/core/schemas/upload-item'
 import {
   extensionsFromLimits,
@@ -17,8 +16,8 @@ import { UploadProgressTile } from '@/features/media-picker/uploads/UploadProgre
 import { useDropUpload } from '@/features/media-picker/uploads/use-drop-upload'
 import { useUploadQueue } from '@/features/media-picker/uploads/use-upload-queue'
 
+import { addBlockReason, referenceRoom } from '../reference-rules'
 import { useGeneratorStore } from '../store/store'
-import { slotCounts } from '../store/store-helpers'
 import { ReferencesEmpty } from './ReferencesEmpty'
 import { ReferencesGrid } from './ReferencesGrid'
 
@@ -38,17 +37,14 @@ function useUploadsById(): UploadsById {
 function referenceCanAdd(item: PickerCandidate): string | null {
   const state = useGeneratorStore.getState()
   const preset = getPreset(state.presetId)
-  const limit = preset.references[item.kind]
 
-  if (limit === 0) {
-    return `This model does not take ${item.kind} references`
-  }
+  const room = referenceRoom({
+    preset,
+    references: state.references,
+    uploadsById: state.uploadsById,
+  })
 
-  if (slotCounts(state)[item.kind] >= limit) {
-    return 'Reference limit reached'
-  }
-
-  return null
+  return addBlockReason({ kind: item.kind, room, preset })
 }
 
 /** Attaches an upload, or removes it when already attached. */
@@ -116,20 +112,18 @@ export function ReferencesBox() {
     return toast.error(message)
   })
 
-  const { counts } = referenceSlots(references, (id) => {
-    return uploadsById[id]?.kind
-  })
+  const room = referenceRoom({ preset, references, uploadsById })
 
   const kinds = MEDIA_KINDS.filter((kind) => {
     return preset.references[kind] > 0
   })
 
-  const max = sumBy(kinds, (kind) => {
-    return Math.max(0, preset.references[kind] - counts[kind])
+  const max = sumBy(MEDIA_KINDS, (kind) => {
+    return room[kind]
   })
 
-  const dropKinds = kinds.filter((kind) => {
-    return counts[kind] < preset.references[kind]
+  const dropKinds = MEDIA_KINDS.filter((kind) => {
+    return room[kind] > 0
   })
 
   const handlePick = (): void => {
