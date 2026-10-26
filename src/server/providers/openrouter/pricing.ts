@@ -12,14 +12,15 @@ import type { Dict } from '@/core/utility-types'
 
 import { onSecretsChange } from '../../secrets'
 import { createTtlCache, type TtlLoadResult } from '../../sync/ttl-cache'
-import { fetchVideoModels } from './video-models'
+import { issueSummary } from './http'
+import { fetchVideoModelsResult } from './video-models'
 
 const API_URL = 'https://openrouter.ai/api/v1'
 const LIVE_TTL_MS = 3_600_000
 
 const EndpointPricingSchema = z.object({ discount: z.number() }).loose()
 
-const EndpointSchema = z.object({ pricing: EndpointPricingSchema.optional() }).loose()
+const EndpointSchema = z.object({ pricing: EndpointPricingSchema.nullish() }).loose()
 
 const EndpointsDataSchema = z.object({ endpoints: z.array(EndpointSchema) }).loose()
 
@@ -90,21 +91,40 @@ async function fetchPricing(preset: ModelPreset, isForce: boolean): Promise<Pric
 }
 
 async function fetchListSkus(preset: ModelPreset, isForce: boolean): Promise<Dict<number> | null> {
-  try {
-    const models = await fetchVideoModels(isForce)
+  const { modelId } = primaryBinding(preset)
+  const { models, reason } = await fetchVideoModelsResult(isForce)
 
-    const model = models.find((item) => {
-      return item.id === primaryBinding(preset).modelId
-    })
+  if (!isNil(reason)) {
+    warnFallback({ preset, modelId, reason, kind: 'list' })
 
-    if (isNil(model)) {
-      return null
-    }
-
-    return readSkus(model.pricing_skus)
-  } catch {
     return null
   }
+
+  const model = models.find((item) => {
+    return item.id === modelId
+  })
+
+  if (isNil(model)) {
+    warnFallback({ preset, modelId, reason: 'model missing from the list', kind: 'list' })
+
+    return null
+  }
+
+  const skus = readSkus(model.pricing_skus)
+
+  if (!isNil(skus)) {
+    return skus
+  }
+
+  const isSkusEmpty = isEmpty(model.pricing_skus)
+
+  const skusReason = isSkusEmpty
+    ? 'invalid pricing_skus (empty)'
+    : 'invalid pricing_skus (no finite numbers)'
+
+  warnFallback({ preset, modelId, reason: skusReason, kind: 'list' })
+
+  return null
 }
 
 /** Reads the live fraction. One warning per fallback, never the URL or headers. */
@@ -118,7 +138,7 @@ export async function fetchDiscount(preset: ModelPreset): Promise<number> {
     })
 
     if (!res.ok) {
-      warnDiscount({ preset, modelId, reason: `HTTP ${res.status}` })
+      warnFallback({ preset, modelId, reason: `HTTP ${res.status}`, kind: 'discount' })
 
       return 0
     }
@@ -128,7 +148,7 @@ export async function fetchDiscount(preset: ModelPreset): Promise<number> {
     if (!parsed.success) {
       const reason = `invalid response (${issueSummary(parsed.error)})`
 
-      warnDiscount({ preset, modelId, reason })
+      warnFallback({ preset, modelId, reason, kind: 'discount' })
 
       return 0
     }
@@ -137,40 +157,37 @@ export async function fetchDiscount(preset: ModelPreset): Promise<number> {
     const raw = parsed.data.data.endpoints[0]?.pricing?.discount
 
     if (isNil(raw) || raw < 0 || raw > 1) {
-      warnDiscount({ preset, modelId, reason: `discount ${String(raw)} out of range` })
+      warnFallback({
+        preset,
+        modelId,
+        reason: `discount ${String(raw)} out of range`,
+        kind: 'discount',
+      })
 
       return 0
     }
 
     return raw
   } catch (error) {
-    warnDiscount({ preset, modelId, reason: messageOf(error) })
+    warnFallback({ preset, modelId, reason: messageOf(error), kind: 'discount' })
 
     return 0
   }
 }
 
-interface DiscountWarningParams {
+type PricingFallbackKind = 'discount' | 'list'
+
+interface PricingWarningParams {
   preset: ModelPreset
   modelId: string
   reason: string
+  kind: PricingFallbackKind
 }
 
-function warnDiscount(params: DiscountWarningParams): void {
-  const { preset, modelId, reason } = params
+function warnFallback(params: PricingWarningParams): void {
+  const { preset, modelId, reason, kind } = params
 
-  console.warn(`[pricing] ${preset.id} (${modelId}) discount fallback: ${reason}`)
-}
-
-function issueSummary(error: z.ZodError): string {
-  const issues = error.issues.slice(0, 3).map((issue) => {
-    const path = issue.path.join('.')
-    const label = path === '' ? 'response' : path
-
-    return `${label}: ${issue.message}`
-  })
-
-  return issues.join('; ')
+  console.warn(`[pricing] ${preset.id} (${modelId}) ${kind} fallback: ${reason}`)
 }
 
 /** Keeps six significant digits so sub-cent token rates keep their precision. */

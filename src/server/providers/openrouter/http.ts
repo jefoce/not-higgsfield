@@ -15,34 +15,47 @@ export const BASE_URL = 'https://openrouter.ai'
 export const SubmitSchema = z
   .object({
     id: z.string(),
-    polling_url: z.string().optional(),
+    polling_url: z.string().nullish(),
     status: z.string(),
   })
   .loose()
 
 const UsageSchema = z
   .object({
-    cost: z.number().nullable().optional(),
-    is_byok: z.boolean().optional(),
+    cost: z.number().nullish(),
+    is_byok: z.boolean().nullish(),
   })
   .loose()
 
+// Unused fields arrive as null or stay omitted. Consumers treat both the same.
 export const JobSchema = z
   .object({
     id: z.string(),
     status: z.string(),
-    generation_id: z.string().optional(),
-    unsigned_urls: z.array(z.string()).optional(),
-    urls: z.array(z.string()).optional(),
-    expires_at: z.number().optional(),
-    usage: UsageSchema.optional(),
-    error: z.string().optional(),
+    generation_id: z.string().nullish(),
+    unsigned_urls: z.array(z.string()).nullish(),
+    urls: z.array(z.string()).nullish(),
+    expires_at: z.number().nullish(),
+    usage: UsageSchema.nullish(),
+    error: z.string().nullish(),
   })
   .loose()
 
 export type VideoJobResponse = z.infer<typeof JobSchema>
 
 export type VideoJobUsage = z.infer<typeof UsageSchema>
+
+/** First three zod issues as `path: message`. Never includes the response body. */
+export function issueSummary(error: z.ZodError): string {
+  const issues = error.issues.slice(0, 3).map((issue) => {
+    const path = issue.path.join('.')
+    const label = path === '' ? 'response' : path
+
+    return `${label}: ${issue.message}`
+  })
+
+  return issues.join('; ')
+}
 
 interface RequestParams {
   url: string

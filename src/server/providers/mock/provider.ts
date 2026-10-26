@@ -88,7 +88,7 @@ async function getJob(params: JobRef): Promise<JobSnapshot> {
   }
 }
 
-function toUsage(usage: VideoJobUsage | undefined): JobUsage | null {
+function toUsage(usage: VideoJobUsage | null | undefined): JobUsage | null {
   if (isNil(usage)) {
     return null
   }

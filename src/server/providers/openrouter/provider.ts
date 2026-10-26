@@ -39,7 +39,7 @@ import {
 import { listModels } from './models'
 import { getPricing as getPresetPricing } from './pricing'
 
-const KeyDataSchema = z.object({ label: z.string().optional() }).loose()
+const KeyDataSchema = z.object({ label: z.string().nullish() }).loose()
 
 const KeySchema = z.object({ data: KeyDataSchema }).loose()
 
@@ -214,7 +214,7 @@ async function testConnection(): Promise<TestResult> {
   }
 }
 
-function toUsage(usage: VideoJobUsage | undefined): JobUsage | null {
+function toUsage(usage: VideoJobUsage | null | undefined): JobUsage | null {
   if (isNil(usage)) {
     return null
   }
@@ -222,7 +222,7 @@ function toUsage(usage: VideoJobUsage | undefined): JobUsage | null {
   return { costUsd: usage.cost ?? null, isByok: usage.is_byok ?? null, usesEstimatedCost: false }
 }
 
-function toExpiresAt(value: number | undefined): number | null {
+function toExpiresAt(value: number | null | undefined): number | null {
   if (isNil(value)) {
     return null
   }

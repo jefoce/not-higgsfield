@@ -13,12 +13,13 @@ import type { AccountLookupParams, ProviderAccount } from '../types'
 const BASE_URL = 'https://openrouter.ai'
 const CACHE_MS = 30_000
 
+// `/key` sends null for an unlimited key and omits fields it does not track.
 const KeyDataSchema = z
   .object({
-    limit: z.number().nullable().optional(),
-    limit_remaining: z.number().nullable().optional(),
-    usage_daily: z.number().nullable().optional(),
-    usage_monthly: z.number().nullable().optional(),
+    limit: z.number().nullish(),
+    limit_remaining: z.number().nullish(),
+    usage_daily: z.number().nullish(),
+    usage_monthly: z.number().nullish(),
   })
   .loose()
 
