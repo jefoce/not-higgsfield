@@ -5,7 +5,7 @@ import { Trash2 } from 'lucide-react'
 
 import type { FriendlyError } from '@/core/provider-errors/types'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
-import { closeViewers } from '@/features/viewers'
+import { closeViewers } from '@/features/viewers/close-viewers'
 import { formatDate } from '@/lib/format'
 import { useAsyncAction } from '@/lib/use-async-action'
 import { useBoolean } from '@/lib/use-boolean'

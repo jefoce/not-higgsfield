@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { type ReactNode, useEffect, useMemo } from 'react'
 import { isEmpty } from 'lodash-es'
 
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { useGeneratorStore } from '@/features/generator/store/store'
+import { ViewerUseButton } from '@/features/viewers/ViewerUseButton'
 import { cn } from '@/lib/cn'
 
 import { isSelectable } from '../actions/record-view'
@@ -21,6 +22,11 @@ import { SkeletonRows } from './SkeletonRows'
 import { useHistory } from './use-history'
 import { useHistoryScroll } from './use-history-scroll'
 import { useHistoryViewStore } from './view-store'
+
+/** Use button for the completed record shown in the history viewer. */
+function renderHistoryToolbar(record: GenerationRecord): ReactNode {
+  return <ViewerUseButton target={{ kind: 'record', record }} />
+}
 
 /** Right-hand feed: toolbar, list or grid, infinite scroll and grid details modal. */
 export function HistorySection() {
@@ -111,6 +117,7 @@ export function HistorySection() {
         hasMore={hasMore}
         isLoadingMore={isValidating}
         onLoadMore={loadMore}
+        toolbar={renderHistoryToolbar}
       />
     </section>
   )

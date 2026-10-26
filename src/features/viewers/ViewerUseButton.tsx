@@ -4,14 +4,14 @@ import { ImagePlus } from 'lucide-react'
 import { useShallow } from 'zustand/react/shallow'
 
 import { focusGenerator } from '@/features/generator/focus-generator'
-import { closeViewers } from '@/features/viewers'
+import { useGeneratorStore } from '@/features/generator/store/store'
+import { applyMedia, type MediaTarget, mediaUse } from '@/features/generator/use-media'
 import { useAsyncAction } from '@/lib/use-async-action'
 import { Tooltip } from '@/ui/Tooltip'
 
-import { useGeneratorStore } from './store/store'
-import { applyMedia, type MediaTarget, mediaUse } from './use-media'
+import { closeViewers } from './close-viewers'
 
-interface UseMediaButtonProps {
+interface ViewerUseButtonProps {
   target: MediaTarget
 }
 
@@ -19,7 +19,7 @@ const BUTTON_CLASSES =
   'inline-flex h-10 items-center gap-2 rounded-full bg-black/60 px-4 text-sm font-semibold text-fg backdrop-blur-sm transition hover:bg-black/80 disabled:opacity-50'
 
 /** Adds the current media as a reference or start frame for the active generator mode. */
-export function UseMediaButton(props: UseMediaButtonProps) {
+export function ViewerUseButton(props: ViewerUseButtonProps) {
   const { target } = props
 
   const state = useGeneratorStore(

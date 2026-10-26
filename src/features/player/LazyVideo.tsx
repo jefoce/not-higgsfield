@@ -10,6 +10,7 @@ import {
 } from 'react'
 import { isEmpty } from 'lodash-es'
 
+import { AUTOPLAY_DELAY_MS } from '@/core/constants'
 import { cn } from '@/lib/cn'
 
 import { LazyVideoPlayer } from './LazyVideoPlayer'
@@ -65,13 +66,21 @@ interface UseAutoPlayParams {
   acquire: (id: string) => void
 }
 
-/** Acquires the slot on mount and starts playback once the video exists. */
+/** Acquires the slot after a short stay and starts playback once the video exists. */
 function useAutoPlay(params: UseAutoPlayParams): void {
   const { id, isEnabled, isSlotActive, videoRef, acquire } = params
 
   useEffect(() => {
-    if (isEnabled) {
+    if (!isEnabled) {
+      return
+    }
+
+    const timer = setTimeout(() => {
       acquire(id)
+    }, AUTOPLAY_DELAY_MS)
+
+    return () => {
+      clearTimeout(timer)
     }
   }, [acquire, id, isEnabled])
 
@@ -155,6 +164,7 @@ export function LazyVideo(props: LazyVideoProps) {
           video={video}
           src={src}
           poster={poster}
+          posterFit={posterFit}
           isHoverPlay={isHoverPlay}
           fit={fit}
           showControls={shouldShowControls}

@@ -3,7 +3,6 @@
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { isNil } from 'lodash-es'
 
-import { UseMediaButton } from '@/features/generator/UseMediaButton'
 import { thumbUrl } from '@/lib/api/media-urls'
 import { preloadPosters } from '@/lib/preload-posters'
 import { useChainKeys } from '@/lib/use-chain-keys'
@@ -54,13 +53,21 @@ function handleOpenChange(isOpen: boolean): void {
   }
 }
 
-/** Use button for the current item, null when the opener opts out or it is missing. */
-function previewToolbar(request: PreviewRequest, item: PreviewItem | undefined): ReactNode {
-  if (isNil(item) || item.missing === true || request.allowUse === false) {
+interface PreviewToolbarParams {
+  request: PreviewRequest
+  item: PreviewItem | undefined
+  render: ((item: PreviewItem) => ReactNode) | undefined
+}
+
+/** Toolbar node for the current item, null when the opener opts out or it is missing. */
+function previewToolbar(params: PreviewToolbarParams): ReactNode {
+  const { request, item, render } = params
+
+  if (isNil(render) || isNil(item) || item.missing === true || request.allowUse === false) {
     return null
   }
 
-  return <UseMediaButton target={{ kind: 'upload', upload: item }} />
+  return render(item)
 }
 
 interface RunPreviewActionParams {
@@ -119,8 +126,14 @@ function useSelectionRefresh(): () => void {
   return requestRefresh
 }
 
+interface MediaPreviewModalProps {
+  toolbar?: (item: PreviewItem) => ReactNode
+}
+
 /** Full-size media preview with header, navigation and opener actions. */
-export function MediaPreviewModal() {
+export function MediaPreviewModal(props: MediaPreviewModalProps) {
+  const { toolbar: renderToolbar } = props
+
   const request = usePreviewStore((state) => {
     return state.request
   })
@@ -175,7 +188,7 @@ export function MediaPreviewModal() {
     return null
   }
 
-  const toolbar = previewToolbar(request, item)
+  const toolbar = previewToolbar({ request, item, render: renderToolbar })
 
   return (
     <Modal

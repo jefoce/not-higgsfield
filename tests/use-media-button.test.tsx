@@ -1,7 +1,9 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { useGeneratorStore } from '@/features/generator/store/store'
 import { DetailsPanel } from '@/features/history/details/DetailsPanel'
@@ -14,6 +16,7 @@ import {
   type PreviewItem,
   usePreviewStore,
 } from '@/features/preview/preview-store'
+import { ViewerUseButton } from '@/features/viewers/ViewerUseButton'
 
 import { Observer, record, releaseAllSlots } from './helpers/history'
 import { required } from './helpers/required'
@@ -79,6 +82,14 @@ vi.mock('@/lib/api/generations', async (importOriginal) => {
 const selectedRecord = record('history-record')
 const image = upload('upload-image', 'image')
 
+function renderHistoryToolbar(item: GenerationRecord): ReactNode {
+  return <ViewerUseButton target={{ kind: 'record', record: item }} />
+}
+
+function renderPreviewToolbar(item: PreviewItem): ReactNode {
+  return <ViewerUseButton target={{ kind: 'upload', upload: item }} />
+}
+
 function historyModal() {
   return (
     <HistoryModal
@@ -87,8 +98,13 @@ function historyModal() {
       hasMore={false}
       isLoadingMore={false}
       onLoadMore={vi.fn()}
+      toolbar={renderHistoryToolbar}
     />
   )
+}
+
+function previewModal() {
+  return <MediaPreviewModal toolbar={renderPreviewToolbar} />
 }
 
 function resetGenerator(): void {
@@ -135,7 +151,7 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('UseMediaButton in the viewers', () => {
+describe('ViewerUseButton in the viewers', () => {
   it('adds a history record as a reference and closes the viewer', async () => {
     const linked = upload('linked-record', 'video')
 
@@ -159,7 +175,7 @@ describe('UseMediaButton in the viewers', () => {
       openPreview({ items: [image], index: 0 })
     })
 
-    render(<MediaPreviewModal />)
+    render(previewModal())
 
     fireEvent.click(screen.getByRole('button', { name: 'Reference' }))
 
@@ -176,7 +192,7 @@ describe('UseMediaButton in the viewers', () => {
     render(
       <>
         {historyModal()}
-        <MediaPreviewModal />
+        {previewModal()}
       </>,
     )
 
@@ -200,7 +216,7 @@ describe('UseMediaButton in the viewers', () => {
       openPreview({ items: [image], index: 0, allowUse: false })
     })
 
-    render(<MediaPreviewModal />)
+    render(previewModal())
 
     expect(screen.queryByRole('button', { name: 'Reference' })).toBeNull()
   })
@@ -216,7 +232,7 @@ describe('UseMediaButton in the viewers', () => {
     render(
       <>
         {historyModal()}
-        <MediaPreviewModal />
+        {previewModal()}
       </>,
     )
 

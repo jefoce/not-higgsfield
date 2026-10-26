@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { AUTOPLAY_DELAY_MS } from '@/core/constants'
 import { LazyVideo } from '@/features/player/LazyVideo'
 import { getSnapshot, release } from '@/features/player/player-slots'
 import { MediaPreviewModal } from '@/features/preview/MediaPreviewModal'
@@ -59,7 +60,14 @@ function renderModal(): void {
   render(<MediaPreviewModal />)
 }
 
+async function advance(ms: number): Promise<void> {
+  await act(async () => {
+    vi.advanceTimersByTime(ms)
+  })
+}
+
 beforeEach(() => {
+  vi.useFakeTimers()
   current = ''
   mocks.playAudio.mockReset()
 
@@ -93,39 +101,43 @@ afterEach(() => {
 
   play.mockClear()
   pause.mockClear()
+  vi.useRealTimers()
   vi.unstubAllGlobals()
 })
 
 describe('preview autoplay', () => {
-  it('plays a video item on open', async () => {
+  it('waits for the delay before playing a video item', async () => {
     renderModal()
 
     act(() => {
       openPreview({ items: [upload('clip', 'video')], index: 0 })
     })
 
-    await waitFor(() => {
-      expect(play).toHaveBeenCalled()
-    })
+    await advance(AUTOPLAY_DELAY_MS - 1)
+    expect(play).not.toHaveBeenCalled()
 
+    await advance(1)
+    expect(play).toHaveBeenCalled()
     expect(screen.getByRole('dialog').querySelector('video')).not.toBeNull()
   })
 
-  it('plays an audio item and pauses it when switching to a video', async () => {
+  it('waits for the delay before playing an audio item and pauses it on a switch', async () => {
     renderModal()
 
     act(() => {
       openPreview({ items: [upload('track', 'audio'), upload('clip', 'video')], index: 0 })
     })
 
+    expect(mocks.playAudio).not.toHaveBeenCalled()
+
+    await advance(AUTOPLAY_DELAY_MS)
     expect(mocks.playAudio).toHaveBeenCalledTimes(1)
 
     fireEvent.click(screen.getByLabelText('Next'))
+    await advance(AUTOPLAY_DELAY_MS)
 
-    await waitFor(() => {
-      expect(mocks.pauseAudio).toHaveBeenCalled()
-      expect(play).toHaveBeenCalled()
-    })
+    expect(mocks.pauseAudio).toHaveBeenCalled()
+    expect(play).toHaveBeenCalled()
   })
 
   it('pauses audio when the preview closes', async () => {
@@ -135,16 +147,14 @@ describe('preview autoplay', () => {
       openPreview({ items: [upload('track', 'audio')], index: 0 })
     })
 
+    await advance(AUTOPLAY_DELAY_MS)
     expect(mocks.playAudio).toHaveBeenCalledTimes(1)
 
     act(() => {
       closePreview()
     })
 
-    await waitFor(() => {
-      expect(screen.queryByRole('dialog')).toBeNull()
-    })
-
+    expect(screen.queryByRole('dialog')).toBeNull()
     expect(mocks.pauseAudio).toHaveBeenCalled()
   })
 
@@ -155,14 +165,43 @@ describe('preview autoplay', () => {
 
     const { container } = render(<LazyVideo id="rejected" src="/blocked.mp4" autoPlay />)
 
-    await waitFor(() => {
-      expect(play).toHaveBeenCalled()
-    })
+    await advance(AUTOPLAY_DELAY_MS)
 
-    await waitFor(() => {
-      expect(container.querySelector('button[aria-label="Play"]')).not.toBeNull()
-    })
-
+    expect(play).toHaveBeenCalled()
+    expect(container.querySelector('button[aria-label="Play"]')).not.toBeNull()
     expect(mocks.toastError).not.toHaveBeenCalled()
+  })
+})
+
+describe('autoplay delay', () => {
+  it('loads nothing when three quick switches end on the last item', async () => {
+    const { rerender } = render(<LazyVideo id="clip-1" src="/1.mp4" autoPlay />)
+
+    rerender(<LazyVideo id="clip-2" src="/2.mp4" autoPlay />)
+    rerender(<LazyVideo id="clip-3" src="/3.mp4" autoPlay />)
+
+    await advance(AUTOPLAY_DELAY_MS)
+
+    expect(play).toHaveBeenCalledTimes(1)
+    expect(getSnapshot()).toEqual(['clip-3'])
+  })
+
+  it('shows the poster overlay until the video fires playing', async () => {
+    const { container } = render(
+      <LazyVideo id="overlay" src="/clip.mp4" poster="/clip.jpg" autoPlay />,
+    )
+
+    await advance(AUTOPLAY_DELAY_MS)
+
+    const video = container.querySelector('video')
+    const poster = container.querySelector('img')
+
+    expect(video).not.toBeNull()
+    expect(poster).not.toBeNull()
+    expect(poster?.className).not.toContain('opacity-0')
+
+    fireEvent.playing(video as HTMLVideoElement)
+
+    expect(poster?.className).toContain('opacity-0')
   })
 })

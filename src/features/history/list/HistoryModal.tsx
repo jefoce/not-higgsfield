@@ -6,7 +6,6 @@ import { useShallow } from 'zustand/react/shallow'
 
 import { DETAILS_MIN_WIDTH } from '@/core/constants'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
-import { UseMediaButton } from '@/features/generator/UseMediaButton'
 import { LazyVideo } from '@/features/player/LazyVideo'
 import { preloadPosters } from '@/lib/preload-posters'
 import { useChainKeys } from '@/lib/use-chain-keys'
@@ -26,6 +25,7 @@ interface HistoryModalProps {
   hasMore: boolean
   isLoadingMore: boolean
   onLoadMore: () => void
+  toolbar?: (record: GenerationRecord) => ReactNode
 }
 
 interface HistoryNavParams {
@@ -61,13 +61,20 @@ function handleOpenChange(isNextOpen: boolean): void {
   }
 }
 
-/** Use button for a completed record, null while it is still running or failed. */
-function recordToolbar(record: GenerationRecord | null): ReactNode {
-  if (isNil(record) || record.status !== 'completed') {
+interface RecordToolbarParams {
+  record: GenerationRecord | null
+  render: ((record: GenerationRecord) => ReactNode) | undefined
+}
+
+/** Toolbar node for a completed record, null while it is still running or failed. */
+function recordToolbar(params: RecordToolbarParams): ReactNode {
+  const { record, render } = params
+
+  if (isNil(render) || isNil(record) || record.status !== 'completed') {
     return null
   }
 
-  return <UseMediaButton target={{ kind: 'record', record }} />
+  return render(record)
 }
 
 /** Record position in the view order, paging and delete recovery. */
@@ -195,7 +202,7 @@ export function HistoryModal(props: HistoryModalProps) {
     void cancelGeneration(record.id)
   }
 
-  const toolbar = recordToolbar(record)
+  const toolbar = recordToolbar({ record, render: props.toolbar })
 
   return (
     <Modal

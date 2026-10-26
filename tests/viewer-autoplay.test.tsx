@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { AUTOPLAY_DELAY_MS } from '@/core/constants'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { useHistoryViewerStore } from '@/features/history/list/history-viewer-store'
 import { HistoryModal } from '@/features/history/list/HistoryModal'
@@ -51,7 +52,14 @@ function modal(selectedRecord: GenerationRecord) {
   )
 }
 
+async function advance(ms: number): Promise<void> {
+  await act(async () => {
+    vi.advanceTimersByTime(ms)
+  })
+}
+
 beforeEach(() => {
+  vi.useFakeTimers()
   useHistoryViewerStore.getState().close()
   vi.stubGlobal('IntersectionObserver', Observer)
   vi.stubGlobal('ResizeObserver', Observer)
@@ -67,19 +75,21 @@ afterEach(() => {
   play.mockClear()
   pause.mockClear()
   document.body.replaceChildren()
+  vi.useRealTimers()
   vi.unstubAllGlobals()
 })
 
 describe('HistoryModal autoplay', () => {
-  it('plays the record on open and the next player after a switch', async () => {
+  it('plays the record after the delay and the next player after a switch', async () => {
     useHistoryViewerStore.getState().open('a')
 
     const { rerender } = render(modal(record('a')))
 
-    await waitFor(() => {
-      expect(play).toHaveBeenCalled()
-    })
+    await advance(AUTOPLAY_DELAY_MS - 1)
+    expect(play).not.toHaveBeenCalled()
 
+    await advance(1)
+    expect(play).toHaveBeenCalled()
     expect(screen.getByRole('dialog').querySelector('video')).not.toBeNull()
     expect(isActive('modal-a')).toBe(true)
 
@@ -88,10 +98,9 @@ describe('HistoryModal autoplay', () => {
 
     rerender(modal(record('b')))
 
-    await waitFor(() => {
-      expect(isActive('modal-b')).toBe(true)
-    })
+    await advance(AUTOPLAY_DELAY_MS)
 
+    expect(isActive('modal-b')).toBe(true)
     expect(isActive('modal-a')).toBe(false)
     expect(play).toHaveBeenCalled()
   })
