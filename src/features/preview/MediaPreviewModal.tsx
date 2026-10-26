@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { isNil } from 'lodash-es'
 
 import { usePlayerSlot } from '@/features/player/use-player-slot'
@@ -53,6 +53,7 @@ export function MediaPreviewModal() {
   const [lastRequest, setLastRequest] = useState(request)
   const [index, setIndex] = useState(request?.index ?? 0)
   const { acquire, release } = usePlayerSlot()
+  const scopeRef = useRef<HTMLDivElement>(null)
 
   if (request !== lastRequest) {
     setLastRequest(request)
@@ -94,7 +95,7 @@ export function MediaPreviewModal() {
     action(item)
   }
 
-  const handlePrevious = useCallback(() => {
+  const handlePrev = useCallback(() => {
     setIndex((current) => {
       return Math.max(0, current - 1)
     })
@@ -106,7 +107,7 @@ export function MediaPreviewModal() {
     })
   }, [items.length])
 
-  useChainKeys({ isEnabled: Boolean(request), onPrevious: handlePrevious, onNext: handleNext })
+  useChainKeys({ isEnabled: !isNil(request), onPrevious: handlePrev, onNext: handleNext, scopeRef })
 
   if (!request) {
     return null
@@ -120,7 +121,7 @@ export function MediaPreviewModal() {
       backdropClassName="bg-black/80"
       className="flex h-[calc(100vh-48px)] max-h-275 w-[calc(100vw-48px)] max-w-450 flex-col overflow-hidden bg-page-2 p-0"
     >
-      <div className="flex min-h-0 flex-1 flex-col gap-3 p-3">
+      <div ref={scopeRef} className="flex min-h-0 flex-1 flex-col gap-3 p-3">
         <PreviewHeader item={item} actions={request.actions} />
 
         <MediaStage
@@ -128,7 +129,7 @@ export function MediaPreviewModal() {
           nav={{
             hasPrevious: index > 0,
             hasNext: index < items.length - 1,
-            onPrevious: handlePrevious,
+            onPrevious: handlePrev,
             onNext: handleNext,
           }}
         >

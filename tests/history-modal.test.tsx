@@ -84,7 +84,7 @@ describe('HistoryModal arrow keys', () => {
       />,
     )
 
-    fireEvent.keyDown(window, { key: 'ArrowRight' })
+    fireEvent.keyDown(document.body, { key: 'ArrowRight' })
 
     expect(handleNavigate).toHaveBeenLastCalledWith('b')
   })
@@ -106,7 +106,7 @@ describe('HistoryModal arrow keys', () => {
       />,
     )
 
-    fireEvent.keyDown(window, { key: 'ArrowLeft' })
+    fireEvent.keyDown(document.body, { key: 'ArrowLeft' })
 
     expect(handleNavigate).toHaveBeenLastCalledWith('a')
   })
@@ -128,7 +128,7 @@ describe('HistoryModal arrow keys', () => {
       />,
     )
 
-    fireEvent.keyDown(window, { key: 'ArrowRight' })
+    fireEvent.keyDown(document.body, { key: 'ArrowRight' })
 
     expect(handleNavigate).not.toHaveBeenCalled()
   })

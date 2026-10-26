@@ -136,8 +136,14 @@ export function HistoryModal(props: HistoryModalProps) {
   const { record, open: isOpen } = props
   const backdropPoster = recordPoster(record)
   const nav = useHistoryNav(props)
+  const scopeRef = useRef<HTMLDivElement>(null)
 
-  useChainKeys({ isEnabled: isOpen, onPrevious: nav.onPrevious, onNext: nav.onNext })
+  useChainKeys({
+    isEnabled: isOpen,
+    onPrevious: nav.onPrevious,
+    onNext: nav.onNext,
+    scopeRef,
+  })
 
   useEffect(() => {
     preloadPosters([backdropPoster])
@@ -160,7 +166,7 @@ export function HistoryModal(props: HistoryModalProps) {
       className="h-[calc(100vh-48px)] max-h-275 w-[calc(100vw-48px)] max-w-450 overflow-hidden bg-page-2 p-3"
     >
       {!isNil(record) && (
-        <div className="flex h-full min-h-0 flex-col gap-3 compact:flex-row">
+        <div ref={scopeRef} className="flex h-full min-h-0 flex-col gap-3 compact:flex-row">
           <div className="flex min-h-[50vh] min-w-0 flex-1 compact:min-h-0">
             <MediaStage backdrop={stageBackdrop(record, backdropPoster)} nav={nav}>
               {record.status === 'completed' && (

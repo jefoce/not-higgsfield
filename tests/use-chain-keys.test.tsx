@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
-import { act, cleanup, renderHook } from '@testing-library/react'
+import { type RefObject, useRef } from 'react'
+import { act, cleanup, fireEvent, render, renderHook, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { useChainKeys } from '@/lib/use-chain-keys'
@@ -12,7 +13,7 @@ interface PressParams {
 }
 
 function press(params: PressParams): KeyboardEvent {
-  const { key, isShiftKey = false, isPrevented = false, target = window } = params
+  const { key, isShiftKey = false, isPrevented = false, target = document.body } = params
 
   const event = new KeyboardEvent('keydown', {
     key,
@@ -35,12 +36,51 @@ function press(params: PressParams): KeyboardEvent {
 function renderKeys(isEnabled = true) {
   const onPrevious = vi.fn()
   const onNext = vi.fn()
+  const scopeRef: RefObject<HTMLElement | null> = { current: null }
 
   renderHook(() => {
-    useChainKeys({ isEnabled, onPrevious, onNext })
+    useChainKeys({ isEnabled, onPrevious, onNext, scopeRef })
   })
 
   return { onPrevious, onNext }
+}
+
+interface TwoChainsProps {
+  onFirstPrevious: () => void
+  onFirstNext: () => void
+  onSecondPrevious: () => void
+  onSecondNext: () => void
+}
+
+function TwoChains(props: TwoChainsProps) {
+  const { onFirstPrevious, onFirstNext, onSecondPrevious, onSecondNext } = props
+  const firstRef = useRef<HTMLDivElement>(null)
+  const secondRef = useRef<HTMLDivElement>(null)
+
+  useChainKeys({
+    isEnabled: true,
+    onPrevious: onFirstPrevious,
+    onNext: onFirstNext,
+    scopeRef: firstRef,
+  })
+
+  useChainKeys({
+    isEnabled: true,
+    onPrevious: onSecondPrevious,
+    onNext: onSecondNext,
+    scopeRef: secondRef,
+  })
+
+  return (
+    <div>
+      <div ref={firstRef}>
+        <button type="button">First</button>
+      </div>
+      <div ref={secondRef}>
+        <button type="button">Second</button>
+      </div>
+    </div>
+  )
 }
 
 function expectIgnored(target: EventTarget): void {
@@ -111,5 +151,58 @@ describe('useChainKeys', () => {
     input.remove()
     textarea.remove()
     slider.remove()
+  })
+})
+
+describe('useChainKeys scopes', () => {
+  it('only runs the handler whose scope contains the target', () => {
+    const onFirstPrevious = vi.fn()
+    const onFirstNext = vi.fn()
+    const onSecondPrevious = vi.fn()
+    const onSecondNext = vi.fn()
+
+    render(
+      <TwoChains
+        onFirstPrevious={onFirstPrevious}
+        onFirstNext={onFirstNext}
+        onSecondPrevious={onSecondPrevious}
+        onSecondNext={onSecondNext}
+      />,
+    )
+
+    const second = screen.getByRole('button', { name: 'Second' })
+
+    second.focus()
+    fireEvent.keyDown(second, { key: 'ArrowRight' })
+
+    expect(onSecondNext).toHaveBeenCalledTimes(1)
+    expect(onFirstNext).not.toHaveBeenCalled()
+    expect(onFirstPrevious).not.toHaveBeenCalled()
+    expect(onSecondPrevious).not.toHaveBeenCalled()
+  })
+
+  it('does nothing when the target is outside every scope', () => {
+    const onFirstNext = vi.fn()
+    const onSecondNext = vi.fn()
+
+    render(
+      <TwoChains
+        onFirstPrevious={vi.fn()}
+        onFirstNext={onFirstNext}
+        onSecondPrevious={vi.fn()}
+        onSecondNext={onSecondNext}
+      />,
+    )
+
+    const outside = document.createElement('button')
+
+    document.body.append(outside)
+    outside.focus()
+    fireEvent.keyDown(outside, { key: 'ArrowRight' })
+
+    expect(onFirstNext).not.toHaveBeenCalled()
+    expect(onSecondNext).not.toHaveBeenCalled()
+
+    outside.remove()
   })
 })

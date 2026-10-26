@@ -1,18 +1,36 @@
 'use client'
 
-import { useEffect } from 'react'
+import { type RefObject, useEffect } from 'react'
+import { isNil } from 'lodash-es'
 
 interface UseChainKeysParams {
   isEnabled: boolean
   onPrevious: () => void
   onNext: () => void
+  scopeRef: RefObject<HTMLElement | null>
 }
 
 const IGNORED_TARGETS = 'input, textarea, select, [contenteditable], [role="slider"]'
 
+function isTargetInScope(scope: HTMLElement | null, target: EventTarget | null): boolean {
+  if (target === document.body) {
+    return true
+  }
+
+  if (isNil(scope) || !(target instanceof Node)) {
+    return false
+  }
+
+  return scope.contains(target)
+}
+
+function isIgnoredTarget(target: EventTarget | null): boolean {
+  return target instanceof Element && !isNil(target.closest(IGNORED_TARGETS))
+}
+
 /** Arrow key navigation for a modal item chain. */
 export function useChainKeys(params: UseChainKeysParams): void {
-  const { isEnabled, onPrevious, onNext } = params
+  const { isEnabled, onPrevious, onNext, scopeRef } = params
 
   useEffect(() => {
     if (!isEnabled) {
@@ -30,7 +48,11 @@ export function useChainKeys(params: UseChainKeysParams): void {
         return
       }
 
-      if (event.target instanceof Element && event.target.closest(IGNORED_TARGETS)) {
+      if (!isTargetInScope(scopeRef.current, event.target)) {
+        return
+      }
+
+      if (isIgnoredTarget(event.target)) {
         return
       }
 
@@ -52,5 +74,5 @@ export function useChainKeys(params: UseChainKeysParams): void {
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isEnabled, onPrevious, onNext])
+  }, [isEnabled, onNext, onPrevious, scopeRef])
 }
