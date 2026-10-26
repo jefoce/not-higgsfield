@@ -145,7 +145,7 @@ jobs:
           TARGET: ${{ matrix.target }}
         run: bash .github/scripts/ffmpeg-plan.sh
       - name: macOS toolchain
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && steps.plan.outputs.build == 'true'
         run: |
           xcodebuild -version
           clang --version
@@ -252,11 +252,12 @@ jobs:
           force: ${{ inputs.force_rebuild_sidecars }}
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: macOS toolchain
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && steps.restore.outputs.found != 'true'
         run: |
           xcodebuild -version
           clang --version
       - name: Cache Node downloads and build
+        if: steps.restore.outputs.found != 'true'
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/not-higgsfield-build/node
@@ -305,6 +306,9 @@ jobs:
 
   build:
     needs: [version, draft, ffmpeg, node, checks]
+    env:
+      # Step-level if: reads job-level env, not env set on the same step.
+      REUSE_SIDECARS_RUN_ID: ${{ inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID }}
     timeout-minutes: 60
     permissions:
       actions: read
@@ -367,6 +371,7 @@ jobs:
         with:
           workspaces: src-tauri
       - name: Cache build downloads
+        if: needs.node.result == 'skipped' && env.REUSE_SIDECARS_RUN_ID == ''
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/not-higgsfield-build
