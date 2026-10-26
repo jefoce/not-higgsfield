@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.2.1 - unreleased
+
 ## 0.2.0 - 2026-10-26
 
 Provider and storage layers, stricter lint, stored data validation.
