@@ -29,6 +29,14 @@ interface VersionCase {
   error?: string
 }
 
+interface PlanCase {
+  name: string
+  restore: string
+  sources: string
+  target: string
+  expected: Record<string, string>
+}
+
 const RENAME_CASES: RenameCase[] = [
   {
     target: 'aarch64-apple-darwin',
@@ -96,6 +104,37 @@ const VERSION_CASES: VersionCase[] = [
     subject: 'Bump deps',
     env: {},
     error: "commit title 'Bump deps' is not '0.2.0'",
+  },
+]
+
+const PLAN_CASES: PlanCase[] = [
+  {
+    name: 'keeps a restored Linux sidecar when the sources exist',
+    restore: 'true',
+    sources: 'true',
+    target: 'x86_64-unknown-linux-gnu',
+    expected: { build: 'false', out: 'ffmpeg-out' },
+  },
+  {
+    name: 'rebuilds the Linux sources without touching ffmpeg-out',
+    restore: 'true',
+    sources: 'false',
+    target: 'x86_64-unknown-linux-gnu',
+    expected: { build: 'true', out: 'ffmpeg-rebuild' },
+  },
+  {
+    name: 'builds into ffmpeg-out when the sidecar is missing',
+    restore: 'false',
+    sources: 'false',
+    target: 'x86_64-unknown-linux-gnu',
+    expected: { build: 'true', out: 'ffmpeg-out' },
+  },
+  {
+    name: 'keeps a restored macOS sidecar without sources',
+    restore: 'true',
+    sources: 'false',
+    target: 'aarch64-apple-darwin',
+    expected: { build: 'false', out: 'ffmpeg-out' },
   },
 ]
 
@@ -171,6 +210,26 @@ describe('ffmpeg-sources-tag.sh', () => {
 
     expect(result.status).toBe(0)
     expect(result.stdout.trim()).toBe(expected)
+  })
+})
+
+describe('ffmpeg-plan.sh', () => {
+  it.skipIf(process.platform === 'win32').each(PLAN_CASES)('$name', (item) => {
+    const output = path.join(tempDir(), 'output')
+
+    const result = runScript({
+      script: 'ffmpeg-plan.sh',
+      env: {
+        ...process.env,
+        GITHUB_OUTPUT: output,
+        RESTORE_FOUND: item.restore,
+        SOURCES_FOUND: item.sources,
+        TARGET: item.target,
+      },
+    })
+
+    expect(result.status).toBe(0)
+    expect(parseOutput(fs.readFileSync(output, 'utf8'))).toEqual(item.expected)
   })
 })
 

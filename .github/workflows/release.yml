@@ -112,33 +112,6 @@ jobs:
           profile: full
           force: ${{ inputs.force_rebuild_sidecars }}
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: macOS toolchain
-        if: runner.os == 'macOS'
-        run: |
-          xcodebuild -version
-          clang --version
-      - name: Cache ffmpeg downloads and build
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/not-higgsfield-build/ffmpeg
-          key: ffmpeg-${{ matrix.target }}-${{ hashFiles('scripts/ffmpeg/**') }}
-      - name: Linux packages
-        if: runner.os == 'Linux' && steps.restore.outputs.found != 'true'
-        env:
-          TARGET: ${{ matrix.target }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential nasm pkg-config mingw-w64 \
-            gcc-mingw-w64-x86-64-posix g++-mingw-w64-x86-64-posix
-          if [[ "$TARGET" == "x86_64-pc-windows-msvc" ]]; then
-            sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
-            sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
-          fi
-      - name: Windows buildconf tool
-        if: matrix.target == 'x86_64-pc-windows-msvc' && steps.restore.outputs.found != 'true'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends wine64
       - name: Pull ffmpeg sources from GHCR
         if: matrix.target == 'x86_64-unknown-linux-gnu'
         id: sources
@@ -163,14 +136,51 @@ jobs:
             mkdir -p "$src"
             cp ghcr-sources/*.tar.* "$src"/
           fi
+      - name: Plan ffmpeg build
+        id: plan
+        shell: bash
+        env:
+          RESTORE_FOUND: ${{ steps.restore.outputs.found }}
+          SOURCES_FOUND: ${{ steps.sources.outputs.found }}
+          TARGET: ${{ matrix.target }}
+        run: bash .github/scripts/ffmpeg-plan.sh
+      - name: macOS toolchain
+        if: runner.os == 'macOS'
+        run: |
+          xcodebuild -version
+          clang --version
+      - name: Cache ffmpeg downloads and build
+        if: steps.plan.outputs.build == 'true'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/not-higgsfield-build/ffmpeg
+          key: ffmpeg-${{ matrix.target }}-${{ hashFiles('scripts/ffmpeg/**') }}
+      - name: Linux packages
+        if: runner.os == 'Linux' && steps.plan.outputs.build == 'true'
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential nasm pkg-config mingw-w64 \
+            gcc-mingw-w64-x86-64-posix g++-mingw-w64-x86-64-posix
+          if [[ "$TARGET" == "x86_64-pc-windows-msvc" ]]; then
+            sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+            sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+          fi
+      - name: Windows buildconf tool
+        if: matrix.target == 'x86_64-pc-windows-msvc' && steps.plan.outputs.build == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends wine64
       - name: Build ffmpeg
-        if: steps.restore.outputs.found != 'true' || (matrix.target == 'x86_64-unknown-linux-gnu' && steps.sources.outputs.found != 'true')
+        if: steps.plan.outputs.build == 'true'
         shell: bash
         env:
           TARGET: ${{ matrix.target }}
+          OUT: ${{ steps.plan.outputs.out }}
           SCRIPT: ${{ matrix.script }}
         run: |
-          args=(--target "$TARGET" --out ffmpeg-out)
+          args=(--target "$TARGET" --out "$OUT")
           if [[ "$TARGET" == "x86_64-unknown-linux-gnu" ]]; then
             args+=(--sources ffmpeg-sources)
           fi
