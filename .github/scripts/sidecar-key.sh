@@ -27,7 +27,7 @@ sha256_stream() {
 hash=$(
   {
     while IFS= read -r file; do
-      printf '%s\n' "${file#scripts/$name/}"
+      printf '%s\n' "${file#scripts/"$name"/}"
       sha256_file "$file"
     done < <(find "scripts/$name" -type f | LC_ALL=C sort)
     printf '%s\n' "$target" "$runner" "$profile"

@@ -29,7 +29,7 @@ on:
         type: string
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
@@ -46,9 +46,10 @@ jobs:
       tag: ${{ steps.v.outputs.tag }}
       prerelease: ${{ steps.v.outputs.prerelease }}
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
       - id: v
         shell: bash
         env:
@@ -75,9 +76,11 @@ jobs:
             fi
             prerelease=false
           fi
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+          {
+            echo "version=$version"
+            echo "tag=$tag"
+            echo "prerelease=$prerelease"
+          } >> "$GITHUB_OUTPUT"
 
   draft:
     needs: version
@@ -127,24 +130,28 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: macOS toolchain
         if: runner.os == 'macOS'
         run: |
           xcodebuild -version
           clang --version
       - name: Cache ffmpeg downloads and build
-        uses: actions/cache@v6.1.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/not-higgsfield-build/ffmpeg
           key: ffmpeg-${{ matrix.target }}-${{ hashFiles('scripts/ffmpeg/**') }}
       - name: Linux packages
         if: runner.os == 'Linux'
+        env:
+          TARGET: ${{ matrix.target }}
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential nasm pkg-config mingw-w64 \
             gcc-mingw-w64-x86-64-posix g++-mingw-w64-x86-64-posix
-          if [[ "${{ matrix.target }}" == "x86_64-pc-windows-msvc" ]]; then
+          if [[ "$TARGET" == "x86_64-pc-windows-msvc" ]]; then
             sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
             sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
           fi
@@ -160,9 +167,12 @@ jobs:
       - uses: oras-project/setup-oras@005458ad77f1c8facd38a094e4af2e69e5607ff4 # v2.0.2
       - name: Log in to GHCR
         shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTOR: ${{ github.actor }}
         run: |
           oras version
-          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+          printf '%s' "$GH_TOKEN" | oras login ghcr.io -u "$ACTOR" --password-stdin
       - name: Pull sidecar from GHCR
         id: pull
         shell: bash
@@ -200,6 +210,7 @@ jobs:
         shell: bash
         env:
           FORCE: ${{ inputs.force_rebuild_sidecars }}
+          TARGET: ${{ matrix.target }}
         run: |
           source scripts/ffmpeg/versions.env
           tag="ffmpeg-$FFMPEG_VERSION-x264-${X264_COMMIT:0:8}-zlib-$ZLIB_VERSION"
@@ -215,7 +226,7 @@ jobs:
               echo "found=true" >> "$GITHUB_OUTPUT"
               mkdir -p ffmpeg-sources
               cp ghcr-sources/*.tar.* ffmpeg-sources/
-              src="$HOME/.cache/not-higgsfield-build/ffmpeg/work/$FFMPEG_VERSION-full-${{ matrix.target }}/src"
+              src="$HOME/.cache/not-higgsfield-build/ffmpeg/work/$FFMPEG_VERSION-full-$TARGET/src"
               mkdir -p "$src"
               cp ghcr-sources/*.tar.* "$src"/
             else
@@ -248,12 +259,15 @@ jobs:
       - name: Build ffmpeg
         if: steps.pull.outputs.found != 'true' || (matrix.target == 'x86_64-unknown-linux-gnu' && steps.sources.outputs.found != 'true')
         shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+          SCRIPT: ${{ matrix.script }}
         run: |
-          args=(--target "${{ matrix.target }}" --out ffmpeg-out)
-          if [[ "${{ matrix.target }}" == "x86_64-unknown-linux-gnu" ]]; then
+          args=(--target "$TARGET" --out ffmpeg-out)
+          if [[ "$TARGET" == "x86_64-unknown-linux-gnu" ]]; then
             args+=(--sources ffmpeg-sources)
           fi
-          bash "${{ matrix.script }}" "${args[@]}"
+          bash "$SCRIPT" "${args[@]}"
       - name: Publish sidecar to GHCR
         if: steps.pull.outputs.found != 'true'
         shell: bash
@@ -288,30 +302,32 @@ jobs:
             const { readdirSync, readFileSync, writeFileSync } = require("node:fs")
             const files = {}
             for (const name of readdirSync("ffmpeg-sources").sort()) {
-              files[name] = createHash("sha256").update(readFileSync(`ffmpeg-sources/${name}`)).digest("hex")
+              files[name] = createHash("sha256").update(readFileSync("ffmpeg-sources/" + name)).digest("hex")
             }
-            writeFileSync("ffmpeg-sources-manifest.json", `${JSON.stringify({ tag: process.argv[1], files }, null, 2)}\n`)
+            writeFileSync("ffmpeg-sources-manifest.json", JSON.stringify({ tag: process.argv[1], files }, null, 2) + "\n")
           ' "$tag"
           if [[ "$FORCE" != "true" ]] && oras manifest fetch "$ref" >/dev/null 2>&1; then
             echo "GHCR already has $tag"
           else
             cp ffmpeg-sources-manifest.json ffmpeg-sources/
-            (cd ffmpeg-sources && oras push --annotation "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" "$ref" *.tar.* ffmpeg-sources-manifest.json)
+            (cd ffmpeg-sources && oras push --annotation "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" "$ref" -- *.tar.* ffmpeg-sources-manifest.json)
             echo "pushed $tag"
           fi
       # tar keeps the executable bit that upload-artifact drops.
       - name: Pack ffmpeg sidecar
         shell: bash
-        run: tar -czf "ffmpeg-${{ matrix.target }}.tar.gz" -C ffmpeg-out .
+        env:
+          TARGET: ${{ matrix.target }}
+        run: tar -czf "ffmpeg-$TARGET.tar.gz" -C ffmpeg-out .
       - name: Upload ffmpeg sidecar
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ffmpeg-${{ matrix.target }}
           path: ffmpeg-${{ matrix.target }}.tar.gz
           if-no-files-found: error
       - name: Upload ffmpeg sources
         if: matrix.target == 'x86_64-unknown-linux-gnu'
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ffmpeg-sources
           path: ffmpeg-sources/*.tar.*
@@ -339,14 +355,16 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: git config --global core.autocrlf false
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: macOS toolchain
         if: runner.os == 'macOS'
         run: |
           xcodebuild -version
           clang --version
       - name: Cache Node downloads and build
-        uses: actions/cache@v6.1.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/not-higgsfield-build/node
           key: node-${{ matrix.target }}-${{ hashFiles('scripts/node/**') }}
@@ -373,9 +391,12 @@ jobs:
       - uses: oras-project/setup-oras@005458ad77f1c8facd38a094e4af2e69e5607ff4 # v2.0.2
       - name: Log in to GHCR
         shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTOR: ${{ github.actor }}
         run: |
           oras version
-          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+          printf '%s' "$GH_TOKEN" | oras login ghcr.io -u "$ACTOR" --password-stdin
       - name: Pull sidecar from GHCR
         id: pull
         shell: bash
@@ -423,11 +444,14 @@ jobs:
         env:
           CC: gcc-12
           CXX: g++-12
-        run: bash scripts/node/build-unix.sh --target "${{ matrix.target }}" --out node-out
+          TARGET: ${{ matrix.target }}
+        run: bash scripts/node/build-unix.sh --target "$TARGET" --out node-out
       - name: Build Node (macOS)
         if: runner.os == 'macOS' && steps.pull.outputs.found != 'true'
         shell: bash
-        run: bash scripts/node/build-unix.sh --target "${{ matrix.target }}" --out node-out
+        env:
+          TARGET: ${{ matrix.target }}
+        run: bash scripts/node/build-unix.sh --target "$TARGET" --out node-out
       - name: Build Node (Windows)
         if: runner.os == 'Windows' && steps.pull.outputs.found != 'true'
         shell: pwsh
@@ -454,9 +478,11 @@ jobs:
       # tar keeps the executable bit that upload-artifact drops.
       - name: Pack Node sidecar
         shell: bash
-        run: tar -czf "node-${{ matrix.target }}.tar.gz" -C node-out .
+        env:
+          TARGET: ${{ matrix.target }}
+        run: tar -czf "node-$TARGET.tar.gz" -C node-out .
       - name: Upload Node sidecar
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: node-${{ matrix.target }}
           path: node-${{ matrix.target }}.tar.gz
@@ -490,33 +516,39 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: git config --global core.autocrlf false
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: oras-project/setup-oras@005458ad77f1c8facd38a094e4af2e69e5607ff4 # v2.0.2
         if: (inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID) != ''
       - name: Log in to GHCR
         if: (inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID) != ''
         shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTOR: ${{ github.actor }}
         run: |
           oras version
-          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+          printf '%s' "$GH_TOKEN" | oras login ghcr.io -u "$ACTOR" --password-stdin
       - name: macOS toolchain
         if: runner.os == 'macOS'
         run: |
           xcodebuild -version
           clang --version
-      - uses: pnpm/action-setup@v6.1.0
-      - uses: actions/setup-node@v7.1.0
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           cache: pnpm
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
         with:
+          toolchain: stable
           targets: ${{ matrix.target }}
-      - uses: Swatinem/rust-cache@v2.9.3
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           workspaces: src-tauri
       - name: Cache build downloads
-        uses: actions/cache@v6.1.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/not-higgsfield-build
           key: node-24.22.1-${{ matrix.target }}
@@ -554,7 +586,7 @@ jobs:
             echo "sidecars built in this run"
           fi
       - name: Download ffmpeg sidecar
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: ffmpeg-${{ matrix.target }}
           path: ${{ (inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID) != '' && 'ffmpeg-out' || 'ffmpeg-artifact' }}
@@ -562,33 +594,41 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Extract ffmpeg sidecar
         shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
         run: |
           mkdir -p ffmpeg-out
-          if [[ -f "ffmpeg-artifact/ffmpeg-${{ matrix.target }}.tar.gz" ]]; then
-            tar -xzf "ffmpeg-artifact/ffmpeg-${{ matrix.target }}.tar.gz" -C ffmpeg-out
-          elif [[ -f "ffmpeg-out/ffmpeg-${{ matrix.target }}.tar.gz" ]]; then
-            tar -xzf "ffmpeg-out/ffmpeg-${{ matrix.target }}.tar.gz" -C ffmpeg-out
-            rm "ffmpeg-out/ffmpeg-${{ matrix.target }}.tar.gz"
+          if [[ -f "ffmpeg-artifact/ffmpeg-$TARGET.tar.gz" ]]; then
+            tar -xzf "ffmpeg-artifact/ffmpeg-$TARGET.tar.gz" -C ffmpeg-out
+          elif [[ -f "ffmpeg-out/ffmpeg-$TARGET.tar.gz" ]]; then
+            tar -xzf "ffmpeg-out/ffmpeg-$TARGET.tar.gz" -C ffmpeg-out
+            rm "ffmpeg-out/ffmpeg-$TARGET.tar.gz"
           fi
       - name: Restore ffmpeg executable bit
         if: runner.os != 'Windows'
         shell: bash
-        run: chmod +x "ffmpeg-out/ffmpeg-${{ matrix.target }}"
+        env:
+          TARGET: ${{ matrix.target }}
+        run: chmod +x "ffmpeg-out/ffmpeg-$TARGET"
       - name: Verify ffmpeg sidecar
         shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
         run: |
           exe=""
-          if [[ "${{ matrix.target }}" == *windows* ]]; then exe=".exe"; fi
-          bash scripts/ffmpeg/verify.sh "ffmpeg-out/ffmpeg-${{ matrix.target }}${exe}"
+          if [[ "$TARGET" == *windows* ]]; then exe=".exe"; fi
+          bash scripts/ffmpeg/verify.sh "ffmpeg-out/ffmpeg-$TARGET${exe}"
       - name: Set FFMPEG_BINARY
         shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
         run: |
           exe=""
-          if [[ "${{ matrix.target }}" == *windows* ]]; then exe=".exe"; fi
-          echo "FFMPEG_BINARY=$GITHUB_WORKSPACE/ffmpeg-out/ffmpeg-${{ matrix.target }}${exe}" >> "$GITHUB_ENV"
+          if [[ "$TARGET" == *windows* ]]; then exe=".exe"; fi
+          echo "FFMPEG_BINARY=$GITHUB_WORKSPACE/ffmpeg-out/ffmpeg-$TARGET${exe}" >> "$GITHUB_ENV"
       - name: Download Node sidecar
         if: needs.node.result == 'success' || (inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID) != ''
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: node-${{ matrix.target }}
           path: ${{ (inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID) != '' && 'node-out' || 'node-artifact' }}
@@ -597,32 +637,40 @@ jobs:
       - name: Extract Node sidecar
         if: needs.node.result == 'success' || (inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID) != ''
         shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
         run: |
           mkdir -p node-out
-          if [[ -f "node-artifact/node-${{ matrix.target }}.tar.gz" ]]; then
-            tar -xzf "node-artifact/node-${{ matrix.target }}.tar.gz" -C node-out
-          elif [[ -f "node-out/node-${{ matrix.target }}.tar.gz" ]]; then
-            tar -xzf "node-out/node-${{ matrix.target }}.tar.gz" -C node-out
-            rm "node-out/node-${{ matrix.target }}.tar.gz"
+          if [[ -f "node-artifact/node-$TARGET.tar.gz" ]]; then
+            tar -xzf "node-artifact/node-$TARGET.tar.gz" -C node-out
+          elif [[ -f "node-out/node-$TARGET.tar.gz" ]]; then
+            tar -xzf "node-out/node-$TARGET.tar.gz" -C node-out
+            rm "node-out/node-$TARGET.tar.gz"
           fi
       - name: Restore Node executable bit
         if: (needs.node.result == 'success' || (inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID) != '') && runner.os != 'Windows'
         shell: bash
-        run: chmod +x "node-out/not-higgsfield-server-${{ matrix.target }}"
+        env:
+          TARGET: ${{ matrix.target }}
+        run: chmod +x "node-out/not-higgsfield-server-$TARGET"
       - name: Set NODE_BINARY
         if: needs.node.result == 'success' || (inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID) != ''
         shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
         run: |
           exe=""
-          if [[ "${{ matrix.target }}" == *windows* ]]; then exe=".exe"; fi
-          echo "NODE_BINARY=$GITHUB_WORKSPACE/node-out/not-higgsfield-server-${{ matrix.target }}${exe}" >> "$GITHUB_ENV"
+          if [[ "$TARGET" == *windows* ]]; then exe=".exe"; fi
+          echo "NODE_BINARY=$GITHUB_WORKSPACE/node-out/not-higgsfield-server-$TARGET${exe}" >> "$GITHUB_ENV"
       - name: Verify Node sidecar
         if: needs.node.result == 'success' || (inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID) != ''
         shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
         run: |
           exe=""
-          if [[ "${{ matrix.target }}" == *windows* ]]; then exe=".exe"; fi
-          bash scripts/node/verify.sh "node-out/not-higgsfield-server-${{ matrix.target }}${exe}"
+          if [[ "$TARGET" == *windows* ]]; then exe=".exe"; fi
+          bash scripts/node/verify.sh "node-out/not-higgsfield-server-$TARGET${exe}"
       - name: Push reused sidecars to GHCR
         if: (inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID) != ''
         shell: bash
@@ -661,7 +709,7 @@ jobs:
           fi
       - name: Download reused ffmpeg sources
         if: matrix.target == 'x86_64-unknown-linux-gnu' && (inputs.reuse_sidecars_run_id || vars.SIDECARS_RUN_ID) != ''
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: ffmpeg-sources
           path: reuse-sources
@@ -682,15 +730,15 @@ jobs:
             const { readdirSync, readFileSync, writeFileSync } = require("node:fs")
             const files = {}
             for (const name of readdirSync("reuse-sources").sort()) {
-              files[name] = createHash("sha256").update(readFileSync(`reuse-sources/${name}`)).digest("hex")
+              files[name] = createHash("sha256").update(readFileSync("reuse-sources/" + name)).digest("hex")
             }
-            writeFileSync("ffmpeg-sources-manifest.json", `${JSON.stringify({ tag: process.argv[1], files }, null, 2)}\n`)
+            writeFileSync("ffmpeg-sources-manifest.json", JSON.stringify({ tag: process.argv[1], files }, null, 2) + "\n")
           ' "$tag"
           if oras manifest fetch "$ref" >/dev/null 2>&1; then
             echo "GHCR already has $tag"
           else
             cp ffmpeg-sources-manifest.json reuse-sources/
-            (cd reuse-sources && oras push --annotation "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" "$ref" *.tar.* ffmpeg-sources-manifest.json)
+            (cd reuse-sources && oras push --annotation "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" "$ref" -- *.tar.* ffmpeg-sources-manifest.json)
             echo "reused run $REUSE_RUN, pushed $tag"
           fi
       - name: Allow official Node
@@ -702,8 +750,10 @@ jobs:
         env:
           TAURI_ENV_TARGET_TRIPLE: ${{ matrix.target }}
       - name: Smoke test packaged server
-        run: node scripts/smoke-server.mjs --target ${{ matrix.target }}
-      - uses: tauri-apps/tauri-action@action-v1.0.0
+        env:
+          TARGET: ${{ matrix.target }}
+        run: node scripts/smoke-server.mjs --target "$TARGET"
+      - uses: tauri-apps/tauri-action@1deb371b0cd8bd54025b384f1cd735e725c4060f # action-v1.0.0
         env:
           NH_PREPARED: 1
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
@@ -713,9 +763,11 @@ jobs:
       - name: Verify macOS signature
         if: runner.os == 'macOS'
         shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
         run: |
           set -euo pipefail
-          bundle="src-tauri/target/${{ matrix.target }}/release/bundle"
+          bundle="src-tauri/target/$TARGET/release/bundle"
           app=$(find "$bundle/macos" -maxdepth 1 -name '*.app' -print -quit)
           mount=""
           trap 'if [[ -n "$mount" ]]; then hdiutil detach "$mount" >/dev/null 2>&1 || true; fi' EXIT
@@ -732,16 +784,17 @@ jobs:
       - name: Rename installers
         shell: bash
         env:
+          TARGET: ${{ matrix.target }}
           VERSION: ${{ needs.version.outputs.version }}
         run: |
           set -euo pipefail
-          case "${{ matrix.target }}" in
+          case "$TARGET" in
             aarch64-apple-darwin) platform=macos; arch=arm64 ;;
             x86_64-pc-windows-msvc) platform=windows; arch=x64 ;;
             x86_64-unknown-linux-gnu) platform=linux; arch=x64 ;;
-            *) echo "::error::unsupported target ${{ matrix.target }}"; exit 1 ;;
+            *) echo "::error::unsupported target $TARGET"; exit 1 ;;
           esac
-          bundle="src-tauri/target/${{ matrix.target }}/release/bundle"
+          bundle="src-tauri/target/$TARGET/release/bundle"
           mkdir -p dist
           find "$bundle" -type f \
             \( -name '*.dmg' -o -name '*-setup.exe' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' -o -name '*.app.tar.gz' \) \
@@ -770,22 +823,25 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_ID: ${{ needs.draft.outputs.id }}
         run: |
           set -euo pipefail
           if [[ -z "$(ls -A dist 2>/dev/null)" ]]; then echo "::error::no installers to upload"; exit 1; fi
-          bash .github/scripts/upload-release-assets.sh "${{ needs.draft.outputs.id }}" dist/*
+          bash .github/scripts/upload-release-assets.sh "$RELEASE_ID" dist/*
       - name: Checksums for this build
         shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
         run: |
           set -euo pipefail
-          out="sha256-${{ matrix.target }}.txt"
-          (cd dist && if command -v sha256sum >/dev/null; then sha256sum *; else shasum -a 256 *; fi) > "$out"
+          out="sha256-$TARGET.txt"
+          (cd dist && if command -v sha256sum >/dev/null; then sha256sum -- *; else shasum -a 256 -- *; fi) > "$out"
           cat "$out"
-      - uses: actions/upload-artifact@v4.6.2
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: sha256-${{ matrix.target }}
           path: sha256-${{ matrix.target }}.txt
-      - uses: actions/upload-artifact@v4.6.2
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: updater-sig-${{ matrix.target }}
           path: dist/*.sig
@@ -800,14 +856,19 @@ jobs:
       contents: write
       packages: read
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: oras-project/setup-oras@005458ad77f1c8facd38a094e4af2e69e5607ff4 # v2.0.2
       - name: Log in to GHCR
         shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTOR: ${{ github.actor }}
         run: |
           oras version
-          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
-      - uses: actions/download-artifact@v4.3.0
+          printf '%s' "$GH_TOKEN" | oras login ghcr.io -u "$ACTOR" --password-stdin
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           pattern: sha256-*
           path: dist
@@ -832,7 +893,7 @@ jobs:
           else
             echo "found=false" >> "$GITHUB_OUTPUT"
           fi
-      - uses: actions/download-artifact@v4.3.0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         if: steps.sources.outputs.found != 'true'
         with:
           name: ffmpeg-sources
@@ -842,15 +903,16 @@ jobs:
       - name: Merge and upload SHA256SUMS.txt with ffmpeg sources
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_ID: ${{ needs.draft.outputs.id }}
         run: |
           set -euo pipefail
           archive=$(find sources -maxdepth 1 -type f -name '*.tar.*' -print -quit)
           [[ -n "$archive" ]] || { echo "::error::no ffmpeg source archives found"; exit 1; }
           sort dist/*.txt > SHA256SUMS.txt
-          (cd sources && shasum -a 256 *.tar.*) >> "$GITHUB_WORKSPACE/SHA256SUMS.txt"
+          (cd sources && shasum -a 256 -- *.tar.*) >> "$GITHUB_WORKSPACE/SHA256SUMS.txt"
           sort -o SHA256SUMS.txt SHA256SUMS.txt
           cat SHA256SUMS.txt
-          bash .github/scripts/upload-release-assets.sh "${{ needs.draft.outputs.id }}" SHA256SUMS.txt sources/*.tar.*
+          bash .github/scripts/upload-release-assets.sh "$RELEASE_ID" SHA256SUMS.txt sources/*.tar.*
 
   updater-manifest:
     needs: [version, draft, build]
@@ -863,15 +925,17 @@ jobs:
       - name: Job start
         shell: bash
         run: echo "JOB_STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
-      - uses: actions/checkout@v7.0.1
-      - uses: pnpm/action-setup@v6.1.0
-      - uses: actions/setup-node@v7.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Download updater signatures
-        uses: actions/download-artifact@v4.3.0
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           pattern: updater-sig-*
           path: updater-sigs
@@ -897,14 +961,17 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bash .github/scripts/upload-release-assets.sh "${{ needs.draft.outputs.id }}" latest.json
+          RELEASE_ID: ${{ needs.draft.outputs.id }}
+        run: bash .github/scripts/upload-release-assets.sh "$RELEASE_ID" latest.json
 
   tag:
     needs: [version, build, checksums, updater-manifest]
     if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/releases' && needs.version.result == 'success' && needs.build.result == 'success' && needs.checksums.result == 'success' && needs.updater-manifest.result == 'success' }}
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
       - name: Create release tag after all jobs pass
