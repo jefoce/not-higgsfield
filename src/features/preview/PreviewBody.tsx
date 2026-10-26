@@ -15,6 +15,7 @@ interface PreviewBodyProps {
   item: PreviewItem | undefined
   playerId: string
   seekKeys?: SeekKeys
+  autoPlay?: boolean
 }
 
 /** Upload size when known, 16:9 until a size is stored. */
@@ -30,7 +31,7 @@ function itemAspect(item: PreviewItem): string {
 
 /** Full-size video, audio or image for the current preview item. */
 export function PreviewBody(props: PreviewBodyProps) {
-  const { item, playerId, seekKeys } = props
+  const { item, playerId, seekKeys, autoPlay: isAutoPlay } = props
 
   if (!item || item.missing === true) {
     return (
@@ -54,6 +55,7 @@ export function PreviewBody(props: PreviewBodyProps) {
           poster={thumbUrl({ ref, w: 960 })}
           alt={item.originalName}
           seekKeys={seekKeys}
+          autoPlay={isAutoPlay}
           className="size-full"
         />
       </MediaBox>

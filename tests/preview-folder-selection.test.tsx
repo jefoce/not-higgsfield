@@ -56,6 +56,16 @@ class Observer {
 beforeEach(() => {
   vi.stubGlobal('ResizeObserver', Observer)
   vi.stubGlobal('IntersectionObserver', Observer)
+
+  Object.defineProperty(HTMLMediaElement.prototype, 'play', {
+    configurable: true,
+    value: () => {
+      return Promise.resolve()
+    },
+  })
+
+  Object.defineProperty(HTMLMediaElement.prototype, 'pause', { configurable: true, value: vi.fn() })
+  Object.defineProperty(HTMLMediaElement.prototype, 'load', { configurable: true, value: vi.fn() })
 })
 
 afterEach(() => {

@@ -4,7 +4,6 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { isNil } from 'lodash-es'
 
 import { UseMediaButton } from '@/features/generator/UseMediaButton'
-import { usePlayerSlot } from '@/features/player/use-player-slot'
 import { thumbUrl } from '@/lib/api/media-urls'
 import { preloadPosters } from '@/lib/preload-posters'
 import { useChainKeys } from '@/lib/use-chain-keys'
@@ -23,6 +22,10 @@ import { PreviewFooter } from './PreviewFooter'
 import { PreviewHeader } from './PreviewHeader'
 
 /** 64 px thumb the stage blurs behind an image or video, undefined otherwise. */
+function previewBodyKey(item: PreviewItem | undefined): string {
+  return item?.id ?? 'none'
+}
+
 function stagePoster(item: PreviewItem | undefined): string | undefined {
   if (isNil(item) || item.missing === true) {
     return undefined
@@ -128,7 +131,6 @@ export function MediaPreviewModal() {
 
   const [lastRequest, setLastRequest] = useState(request)
   const [index, setIndex] = useState(request?.index ?? 0)
-  const { acquire, release } = usePlayerSlot()
   const scopeRef = useRef<HTMLDivElement>(null)
 
   if (request !== lastRequest) {
@@ -139,18 +141,7 @@ export function MediaPreviewModal() {
   const items = request?.items ?? []
   const item = items.at(index)
   const playerId = item ? `preview:${item.id}` : ''
-
-  useEffect(() => {
-    if (item?.kind !== 'video') {
-      return
-    }
-
-    acquire(playerId)
-
-    return () => {
-      release(playerId)
-    }
-  }, [acquire, item, playerId, release])
+  const bodyKey = previewBodyKey(item)
 
   useEffect(() => {
     const list = request?.items ?? []
@@ -207,7 +198,13 @@ export function MediaPreviewModal() {
             onNext: handleNext,
           }}
         >
-          <PreviewBody item={item} playerId={playerId} seekKeys="shiftArrows" />
+          <PreviewBody
+            key={bodyKey}
+            item={item}
+            playerId={playerId}
+            seekKeys="shiftArrows"
+            autoPlay
+          />
         </MediaStage>
 
         <PreviewFooter key={version} item={item} actions={request.actions} onRun={handleRun} />

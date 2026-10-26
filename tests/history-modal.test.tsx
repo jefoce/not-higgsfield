@@ -6,7 +6,7 @@ import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { useHistoryViewerStore } from '@/features/history/list/history-viewer-store'
 import { HistoryModal } from '@/features/history/list/HistoryModal'
 
-import { handleNoop, Observer, record } from './helpers/history'
+import { handleNoop, Observer, record, releaseAllSlots } from './helpers/history'
 import { required } from './helpers/required'
 
 vi.mock('@/lib/fetcher', () => {
@@ -67,15 +67,28 @@ function modal(params: ModalParams) {
   )
 }
 
+const play = vi.fn(() => {
+  return Promise.resolve()
+})
+
+const pause = vi.fn()
+const load = vi.fn()
+
 beforeEach(() => {
   useHistoryViewerStore.getState().close()
   vi.stubGlobal('IntersectionObserver', Observer)
   vi.stubGlobal('ResizeObserver', Observer)
+  Object.defineProperty(HTMLMediaElement.prototype, 'play', { configurable: true, value: play })
+  Object.defineProperty(HTMLMediaElement.prototype, 'pause', { configurable: true, value: pause })
+  Object.defineProperty(HTMLMediaElement.prototype, 'load', { configurable: true, value: load })
 })
 
 afterEach(() => {
   cleanup()
   useHistoryViewerStore.getState().close()
+  releaseAllSlots()
+  play.mockClear()
+  pause.mockClear()
   document.body.replaceChildren()
   vi.unstubAllGlobals()
 })

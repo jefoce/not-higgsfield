@@ -1,6 +1,13 @@
 'use client'
 
-import { type ComponentProps, type CSSProperties, type MouseEvent, useRef } from 'react'
+import {
+  type ComponentProps,
+  type CSSProperties,
+  type MouseEvent,
+  type RefObject,
+  useEffect,
+  useRef,
+} from 'react'
 import { isEmpty } from 'lodash-es'
 
 import { cn } from '@/lib/cn'
@@ -25,6 +32,9 @@ export interface LazyVideoProps {
   hoverPlay?: boolean
   seekKeys?: SeekKeys
 
+  /** Acquires the slot on mount and starts playback. */
+  autoPlay?: boolean
+
   /** False hides controls and releases the slot: selection mode owns the click. */
   interactive?: boolean
 }
@@ -47,6 +57,33 @@ function tabIndexFor(isInteractive: boolean): number {
   return -1
 }
 
+interface UseAutoPlayParams {
+  id: string
+  isEnabled: boolean
+  isSlotActive: boolean
+  videoRef: RefObject<HTMLVideoElement | null>
+  acquire: (id: string) => void
+}
+
+/** Acquires the slot on mount and starts playback once the video exists. */
+function useAutoPlay(params: UseAutoPlayParams): void {
+  const { id, isEnabled, isSlotActive, videoRef, acquire } = params
+
+  useEffect(() => {
+    if (isEnabled) {
+      acquire(id)
+    }
+  }, [acquire, id, isEnabled])
+
+  useEffect(() => {
+    if (!isEnabled || !isSlotActive) {
+      return
+    }
+
+    void videoRef.current?.play().catch(() => {})
+  }, [isEnabled, isSlotActive, videoRef])
+}
+
 /**
  * Poster-only until the user plays it and the slot is active.
  * Only two videos stay loaded across the app. Hover mode keeps the slot on leave.
@@ -63,15 +100,19 @@ export function LazyVideo(props: LazyVideoProps) {
     videoFit = 'contain',
     hoverPlay: isHoverPlay = false,
     seekKeys,
+    autoPlay: isAutoPlayProp,
     interactive: isInteractive = true,
   } = props
 
+  const isAutoPlay = Boolean(isAutoPlayProp)
   const { acquire, release, isActive } = usePlayerSlot()
   const isSlotActive = isActive(id)
   const rootRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const video = useVideoState({ videoRef, rootRef, active: isSlotActive, src })
   const inputHandlers = usePlayerInput({ isActive: isSlotActive, video, seekKeys })
+
+  useAutoPlay({ id, isEnabled: isAutoPlay, isSlotActive, videoRef, acquire })
 
   const hoverHandlers = useHoverPlay({
     id,

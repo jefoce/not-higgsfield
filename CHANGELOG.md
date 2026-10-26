@@ -10,6 +10,7 @@ Looping playback, clearer pricing, reused release sources.
 - A bigger media viewer with a blurred backdrop.
 - Previous and next in the history viewer and in every preview list.
 - Use button in every viewer: adds the media as a reference or start frame, by mode.
+- Viewers start playback right away, also after switching items.
 
 ### Fixed
 

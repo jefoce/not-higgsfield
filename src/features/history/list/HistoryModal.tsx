@@ -216,12 +216,14 @@ export function HistoryModal(props: HistoryModalProps) {
               {record.status === 'completed' && (
                 <MediaBox aspect={recordAspect(record)}>
                   <LazyVideo
+                    key={record.id}
                     id={`modal-${record.id}`}
                     src={videoSrc(record)}
                     poster={posterSrc(record, 1280)}
                     posterFit="contain"
                     videoFit="contain"
                     seekKeys="shiftArrows"
+                    autoPlay
                     className="size-full"
                   />
                 </MediaBox>

@@ -15,7 +15,7 @@ import {
   usePreviewStore,
 } from '@/features/preview/preview-store'
 
-import { Observer, record } from './helpers/history'
+import { Observer, record, releaseAllSlots } from './helpers/history'
 import { required } from './helpers/required'
 import { upload } from './helpers/validation-fixtures'
 
@@ -104,6 +104,16 @@ function resetGenerator(): void {
 beforeEach(() => {
   vi.stubGlobal('IntersectionObserver', Observer)
   vi.stubGlobal('ResizeObserver', Observer)
+
+  Object.defineProperty(HTMLMediaElement.prototype, 'play', {
+    configurable: true,
+    value: () => {
+      return Promise.resolve()
+    },
+  })
+
+  Object.defineProperty(HTMLMediaElement.prototype, 'pause', { configurable: true, value: vi.fn() })
+  Object.defineProperty(HTMLMediaElement.prototype, 'load', { configurable: true, value: vi.fn() })
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
   mocks.linkGenerationFile.mockReset()
   mocks.linkFolderFile.mockReset()
@@ -120,6 +130,7 @@ afterEach(() => {
   document.body.replaceChildren()
   useHistoryViewerStore.getState().close()
   closePreview()
+  releaseAllSlots()
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
 })
