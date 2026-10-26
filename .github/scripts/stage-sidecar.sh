@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Extracts a sidecar artifact, restores its exec bit, verifies it, and exports <NAME>_BINARY.
+set -euo pipefail
+
+name=${1:?name}
+target=${2:?target}
+artifact_dir=${3:?artifact dir}
+out_dir=${4:?out dir}
+
+case "$name" in
+  ffmpeg) binary="ffmpeg-$target"; upper=FFMPEG ;;
+  node) binary="not-higgsfield-server-$target"; upper=NODE ;;
+  *) echo "::error::unsupported sidecar $name" >&2; exit 1 ;;
+esac
+
+binary="$binary${EXE:-}"
+mkdir -p "$out_dir"
+
+artifact_tar="$artifact_dir/$name-$target.tar.gz"
+out_tar="$out_dir/$name-$target.tar.gz"
+
+if [[ -f "$artifact_tar" && "$artifact_dir" != "$out_dir" ]]; then
+  tar -xzf "$artifact_tar" -C "$out_dir"
+elif [[ -f "$out_tar" ]]; then
+  tar -xzf "$out_tar" -C "$out_dir"
+  rm "$out_tar"
+fi
+
+if [[ "$target" != *windows* ]]; then
+  chmod +x "$out_dir/$binary"
+fi
+
+bash "scripts/$name/verify.sh" "$out_dir/$binary"
+
+printf '%s_BINARY=%s/%s/%s\n' "$upper" "${GITHUB_WORKSPACE:-$PWD}" "$out_dir" "$binary" >> "${GITHUB_ENV:?GITHUB_ENV}"
