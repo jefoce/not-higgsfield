@@ -125,38 +125,15 @@ jobs:
             sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
             sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
           fi
-      - name: Compute sidecar key
-        id: key
-        shell: bash
-        env:
-          TARGET: ${{ matrix.target }}
-          RUNNER_IMAGE: ${{ matrix.runner }}
-        run: |
-          key=$(bash .github/scripts/sidecar-key.sh ffmpeg "$TARGET" "$RUNNER_IMAGE" full)
-          echo "key=$key" >> "$GITHUB_OUTPUT"
-      - uses: oras-project/setup-oras@005458ad77f1c8facd38a094e4af2e69e5607ff4 # v2.0.2
-      - name: Log in to GHCR
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ACTOR: ${{ github.actor }}
-        run: |
-          oras version
-          printf '%s' "$GH_TOKEN" | oras login ghcr.io -u "$ACTOR" --password-stdin
-      - name: Pull sidecar from GHCR
+      - uses: ./.github/actions/sidecar-restore
         id: pull
-        shell: bash
-        env:
-          FORCE: ${{ inputs.force_rebuild_sidecars }}
-          KEY: ${{ steps.key.outputs.key }}
-          TARGET: ${{ matrix.target }}
-          EXE: ${{ matrix.exe }}
-        run: |
-          if [[ "$FORCE" == "true" ]]; then
-            echo "found=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          bash .github/scripts/ghcr-pull.sh "ghcr.io/jefoce/not-higgsfield-sidecars:$KEY" ghcr-cache "ffmpeg-$TARGET$EXE" manifest.json >> "$GITHUB_OUTPUT"
+        with:
+          name: ffmpeg
+          target: ${{ matrix.target }}
+          runner: ${{ matrix.runner }}
+          profile: full
+          force: ${{ inputs.force_rebuild_sidecars }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Windows buildconf tool
         if: matrix.target == 'x86_64-pc-windows-msvc' && steps.pull.outputs.found != 'true'
         run: |
@@ -186,26 +163,6 @@ jobs:
             mkdir -p "$src"
             cp ghcr-sources/*.tar.* "$src"/
           fi
-      - name: Use sidecar from GHCR
-        if: steps.pull.outputs.found == 'true'
-        shell: bash
-        env:
-          KEY: ${{ steps.key.outputs.key }}
-          TARGET: ${{ matrix.target }}
-          EXE: ${{ matrix.exe }}
-        run: |
-          bin="ffmpeg-$TARGET$EXE"
-          node .github/scripts/sidecar-manifest.mjs verify "ghcr-cache/$bin" ghcr-cache/manifest.json
-          mkdir -p ffmpeg-out
-          cp "ghcr-cache/$bin" ghcr-cache/manifest.json ffmpeg-out/
-          if [[ -f ghcr-cache/buildconf.txt ]]; then cp ghcr-cache/buildconf.txt ffmpeg-out/; fi
-          chmod +x "ffmpeg-out/$bin"
-          if [[ "$TARGET" == "x86_64-pc-windows-msvc" ]]; then
-            echo "verify runs natively in the Windows build job"
-          else
-            bash scripts/ffmpeg/verify.sh "ffmpeg-out/$bin"
-          fi
-          echo "from GHCR $KEY"
       - name: Build ffmpeg
         if: steps.pull.outputs.found != 'true' || (matrix.target == 'x86_64-unknown-linux-gnu' && steps.sources.outputs.found != 'true')
         shell: bash
@@ -218,21 +175,16 @@ jobs:
             args+=(--sources ffmpeg-sources)
           fi
           bash "$SCRIPT" "${args[@]}"
-      - name: Publish sidecar to GHCR
-        if: steps.pull.outputs.found != 'true'
-        shell: bash
-        env:
-          FORCE: ${{ inputs.force_rebuild_sidecars }}
-          KEY: ${{ steps.key.outputs.key }}
-          TARGET: ${{ matrix.target }}
-          EXE: ${{ matrix.exe }}
-          VERSION: ${{ needs.version.outputs.version }}
-        run: |
-          bin="ffmpeg-$TARGET$EXE"
-          [[ -f ffmpeg-out/buildconf.txt ]] || { echo "::error::buildconf.txt missing"; exit 1; }
-          if [[ "$TARGET" != *windows* ]]; then chmod +x "ffmpeg-out/$bin"; fi
-          node .github/scripts/sidecar-manifest.mjs write "ffmpeg-out/$bin" ffmpeg-out/manifest.json ffmpeg "$TARGET" "$VERSION" full
-          bash .github/scripts/ghcr-push.sh "ghcr.io/jefoce/not-higgsfield-sidecars:$KEY" ffmpeg-out "$bin" buildconf.txt manifest.json
+      - uses: ./.github/actions/sidecar-publish
+        with:
+          name: ffmpeg
+          target: ${{ matrix.target }}
+          version: ${{ needs.version.outputs.version }}
+          profile: full
+          key: ${{ steps.pull.outputs.key }}
+          force: ${{ inputs.force_rebuild_sidecars }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: ffmpeg-${{ matrix.target }}${{ matrix.exe }} buildconf.txt manifest.json
       - name: Push ffmpeg sources to GHCR
         if: matrix.target == 'x86_64-unknown-linux-gnu'
         shell: bash
@@ -244,18 +196,6 @@ jobs:
           archives=(ffmpeg-sources/*.tar.*)
           node .github/scripts/sources-manifest.mjs ffmpeg-sources "$tag"
           bash .github/scripts/ghcr-push.sh "$ref" ffmpeg-sources "${archives[@]##*/}" ffmpeg-sources-manifest.json
-      # tar keeps the executable bit that upload-artifact drops.
-      - name: Pack ffmpeg sidecar
-        shell: bash
-        env:
-          TARGET: ${{ matrix.target }}
-        run: tar -czf "ffmpeg-$TARGET.tar.gz" -C ffmpeg-out .
-      - name: Upload ffmpeg sidecar
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: ffmpeg-${{ matrix.target }}
-          path: ffmpeg-${{ matrix.target }}.tar.gz
-          if-no-files-found: error
       - name: Upload ffmpeg sources
         if: matrix.target == 'x86_64-unknown-linux-gnu'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -314,53 +254,14 @@ jobs:
         run: |
           choco install nasm --no-progress -y
           "C:\Program Files\NASM" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-      - name: Compute sidecar key
-        id: key
-        shell: bash
-        env:
-          TARGET: ${{ matrix.target }}
-          RUNNER_IMAGE: ${{ matrix.runner }}
-        run: |
-          key=$(bash .github/scripts/sidecar-key.sh node "$TARGET" "$RUNNER_IMAGE")
-          echo "key=$key" >> "$GITHUB_OUTPUT"
-      - uses: oras-project/setup-oras@005458ad77f1c8facd38a094e4af2e69e5607ff4 # v2.0.2
-      - name: Log in to GHCR
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ACTOR: ${{ github.actor }}
-        run: |
-          oras version
-          printf '%s' "$GH_TOKEN" | oras login ghcr.io -u "$ACTOR" --password-stdin
-      - name: Pull sidecar from GHCR
+      - uses: ./.github/actions/sidecar-restore
         id: pull
-        shell: bash
-        env:
-          FORCE: ${{ inputs.force_rebuild_sidecars }}
-          KEY: ${{ steps.key.outputs.key }}
-          TARGET: ${{ matrix.target }}
-          EXE: ${{ matrix.exe }}
-        run: |
-          if [[ "$FORCE" == "true" ]]; then
-            echo "found=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          bash .github/scripts/ghcr-pull.sh "ghcr.io/jefoce/not-higgsfield-sidecars:$KEY" ghcr-cache "not-higgsfield-server-$TARGET$EXE" manifest.json >> "$GITHUB_OUTPUT"
-      - name: Use sidecar from GHCR
-        if: steps.pull.outputs.found == 'true'
-        shell: bash
-        env:
-          KEY: ${{ steps.key.outputs.key }}
-          TARGET: ${{ matrix.target }}
-          EXE: ${{ matrix.exe }}
-        run: |
-          bin="not-higgsfield-server-$TARGET$EXE"
-          node .github/scripts/sidecar-manifest.mjs verify "ghcr-cache/$bin" ghcr-cache/manifest.json
-          mkdir -p node-out
-          cp "ghcr-cache/$bin" ghcr-cache/manifest.json node-out/
-          chmod +x "node-out/$bin"
-          bash scripts/node/verify.sh "node-out/$bin"
-          echo "from GHCR $KEY"
+        with:
+          name: node
+          target: ${{ matrix.target }}
+          runner: ${{ matrix.runner }}
+          force: ${{ inputs.force_rebuild_sidecars }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Node (Linux)
         if: runner.os == 'Linux' && steps.pull.outputs.found != 'true'
         shell: bash
@@ -379,32 +280,15 @@ jobs:
         if: runner.os == 'Windows' && steps.pull.outputs.found != 'true'
         shell: pwsh
         run: ./scripts/node/build-windows.ps1 -Out node-out
-      - name: Publish sidecar to GHCR
-        if: steps.pull.outputs.found != 'true'
-        shell: bash
-        env:
-          FORCE: ${{ inputs.force_rebuild_sidecars }}
-          KEY: ${{ steps.key.outputs.key }}
-          TARGET: ${{ matrix.target }}
-          EXE: ${{ matrix.exe }}
-          VERSION: ${{ needs.version.outputs.version }}
-        run: |
-          bin="not-higgsfield-server-$TARGET$EXE"
-          if [[ "$TARGET" != *windows* ]]; then chmod +x "node-out/$bin"; fi
-          node .github/scripts/sidecar-manifest.mjs write "node-out/$bin" node-out/manifest.json node "$TARGET" "$VERSION"
-          bash .github/scripts/ghcr-push.sh "ghcr.io/jefoce/not-higgsfield-sidecars:$KEY" node-out "$bin" manifest.json
-      # tar keeps the executable bit that upload-artifact drops.
-      - name: Pack Node sidecar
-        shell: bash
-        env:
-          TARGET: ${{ matrix.target }}
-        run: tar -czf "node-$TARGET.tar.gz" -C node-out .
-      - name: Upload Node sidecar
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: ./.github/actions/sidecar-publish
         with:
-          name: node-${{ matrix.target }}
-          path: node-${{ matrix.target }}.tar.gz
-          if-no-files-found: error
+          name: node
+          target: ${{ matrix.target }}
+          version: ${{ needs.version.outputs.version }}
+          key: ${{ steps.pull.outputs.key }}
+          force: ${{ inputs.force_rebuild_sidecars }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: not-higgsfield-server-${{ matrix.target }}${{ matrix.exe }} manifest.json
 
   build:
     needs: [version, draft, ffmpeg, node]
@@ -458,11 +342,9 @@ jobs:
         run: |
           xcodebuild -version
           clang --version
-      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      - uses: ./.github/actions/setup-pnpm
         with:
-          node-version: 24
-          cache: pnpm
+          install: false
       - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
         with:
           toolchain: stable
@@ -547,12 +429,8 @@ jobs:
           VERSION: ${{ needs.version.outputs.version }}
         run: |
           set -euo pipefail
-          case "$TARGET" in
-            aarch64-apple-darwin) ff_runner=macos-15; node_runner=macos-15 ;;
-            x86_64-unknown-linux-gnu) ff_runner=ubuntu-22.04; node_runner=ubuntu-22.04 ;;
-            x86_64-pc-windows-msvc) ff_runner=ubuntu-22.04; node_runner=windows-latest ;;
-            *) echo "::error::unsupported target $TARGET"; exit 1 ;;
-          esac
+          runners=$(bash .github/scripts/target-runners.sh "$TARGET")
+          read -r ff_runner node_runner <<< "$runners"
           ff_key=$(bash .github/scripts/sidecar-key.sh ffmpeg "$TARGET" "$ff_runner" full)
           node_key=$(bash .github/scripts/sidecar-key.sh node "$TARGET" "$node_runner")
           if [[ ! -f ffmpeg-out/buildconf.txt ]]; then
@@ -715,12 +593,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/setup-pnpm
       - name: Download updater signatures
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
