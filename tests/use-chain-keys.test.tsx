@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { type RefObject, useRef } from 'react'
-import { act, cleanup, fireEvent, render, renderHook, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { type RefObject } from 'react'
+import { act, cleanup, renderHook } from '@testing-library/react'
+import { afterEach, describe, expect, it, type Mock, vi } from 'vitest'
 
 import { useChainKeys } from '@/lib/use-chain-keys'
 
@@ -33,10 +33,24 @@ function press(params: PressParams): KeyboardEvent {
   return event
 }
 
-function renderKeys(isEnabled = true) {
+function appendDialog(role: 'dialog' | 'alertdialog' = 'dialog'): HTMLElement {
+  const dialog = document.createElement('div')
+
+  dialog.setAttribute('role', role)
+  document.body.append(dialog)
+
+  return dialog
+}
+
+interface ChainHandlers {
+  onPrevious: Mock
+  onNext: Mock
+}
+
+function renderScopedKeys(scope: HTMLElement, isEnabled = true): ChainHandlers {
   const onPrevious = vi.fn()
   const onNext = vi.fn()
-  const scopeRef: RefObject<HTMLElement | null> = { current: null }
+  const scopeRef: RefObject<HTMLElement | null> = { current: scope }
 
   renderHook(() => {
     useChainKeys({ isEnabled, onPrevious, onNext, scopeRef })
@@ -45,46 +59,26 @@ function renderKeys(isEnabled = true) {
   return { onPrevious, onNext }
 }
 
-interface TwoChainsProps {
-  onFirstPrevious: () => void
-  onFirstNext: () => void
-  onSecondPrevious: () => void
-  onSecondNext: () => void
-}
+function renderKeys(isEnabled = true): ChainHandlers {
+  const dialog = appendDialog()
+  const scope = document.createElement('div')
 
-function TwoChains(props: TwoChainsProps) {
-  const { onFirstPrevious, onFirstNext, onSecondPrevious, onSecondNext } = props
-  const firstRef = useRef<HTMLDivElement>(null)
-  const secondRef = useRef<HTMLDivElement>(null)
+  dialog.append(scope)
 
-  useChainKeys({
-    isEnabled: true,
-    onPrevious: onFirstPrevious,
-    onNext: onFirstNext,
-    scopeRef: firstRef,
-  })
-
-  useChainKeys({
-    isEnabled: true,
-    onPrevious: onSecondPrevious,
-    onNext: onSecondNext,
-    scopeRef: secondRef,
-  })
-
-  return (
-    <div>
-      <div ref={firstRef}>
-        <button type="button">First</button>
-      </div>
-      <div ref={secondRef}>
-        <button type="button">Second</button>
-      </div>
-    </div>
-  )
+  return renderScopedKeys(scope, isEnabled)
 }
 
 function expectIgnored(target: EventTarget): void {
-  const { onPrevious, onNext } = renderKeys()
+  const dialog = appendDialog()
+  const scope = document.createElement('div')
+
+  dialog.append(scope)
+
+  if (target instanceof Node) {
+    dialog.append(target)
+  }
+
+  const { onPrevious, onNext } = renderScopedKeys(scope)
   const event = press({ key: 'ArrowLeft', target })
 
   expect(onPrevious).not.toHaveBeenCalled()
@@ -92,10 +86,12 @@ function expectIgnored(target: EventTarget): void {
   expect(event.defaultPrevented).toBe(false)
 
   cleanup()
+  document.body.replaceChildren()
 }
 
 afterEach(() => {
   cleanup()
+  document.body.replaceChildren()
 })
 
 describe('useChainKeys', () => {
@@ -142,67 +138,57 @@ describe('useChainKeys', () => {
     const slider = document.createElement('div')
 
     slider.setAttribute('role', 'slider')
-    document.body.append(input, textarea, slider)
 
     expectIgnored(input)
     expectIgnored(textarea)
     expectIgnored(slider)
-
-    input.remove()
-    textarea.remove()
-    slider.remove()
   })
 })
 
-describe('useChainKeys scopes', () => {
-  it('only runs the handler whose scope contains the target', () => {
-    const onFirstPrevious = vi.fn()
-    const onFirstNext = vi.fn()
-    const onSecondPrevious = vi.fn()
-    const onSecondNext = vi.fn()
+describe('useChainKeys topmost dialog', () => {
+  it('ignores keys while a later dialog exists and handles them after it closes', () => {
+    const first = appendDialog()
+    const second = appendDialog()
+    const scope = document.createElement('div')
 
-    render(
-      <TwoChains
-        onFirstPrevious={onFirstPrevious}
-        onFirstNext={onFirstNext}
-        onSecondPrevious={onSecondPrevious}
-        onSecondNext={onSecondNext}
-      />,
-    )
+    first.append(scope)
 
-    const second = screen.getByRole('button', { name: 'Second' })
+    const { onNext } = renderScopedKeys(scope)
 
-    second.focus()
-    fireEvent.keyDown(second, { key: 'ArrowRight' })
+    press({ key: 'ArrowRight' })
 
-    expect(onSecondNext).toHaveBeenCalledTimes(1)
-    expect(onFirstNext).not.toHaveBeenCalled()
-    expect(onFirstPrevious).not.toHaveBeenCalled()
-    expect(onSecondPrevious).not.toHaveBeenCalled()
+    expect(onNext).not.toHaveBeenCalled()
+
+    second.remove()
+    press({ key: 'ArrowRight' })
+
+    expect(onNext).toHaveBeenCalledTimes(1)
   })
 
-  it('does nothing when the target is outside every scope', () => {
-    const onFirstNext = vi.fn()
-    const onSecondNext = vi.fn()
+  it('lets a trailing alert dialog block the modal behind', () => {
+    const dialog = appendDialog()
+    const scope = document.createElement('div')
 
-    render(
-      <TwoChains
-        onFirstPrevious={vi.fn()}
-        onFirstNext={onFirstNext}
-        onSecondPrevious={vi.fn()}
-        onSecondNext={onSecondNext}
-      />,
-    )
+    dialog.append(scope)
 
-    const outside = document.createElement('button')
+    const { onNext } = renderScopedKeys(scope)
 
-    document.body.append(outside)
-    outside.focus()
-    fireEvent.keyDown(outside, { key: 'ArrowRight' })
+    appendDialog('alertdialog')
+    press({ key: 'ArrowRight' })
 
-    expect(onFirstNext).not.toHaveBeenCalled()
-    expect(onSecondNext).not.toHaveBeenCalled()
+    expect(onNext).not.toHaveBeenCalled()
+  })
 
-    outside.remove()
+  it('handles keys when the scope sits in an alert dialog', () => {
+    const dialog = appendDialog('alertdialog')
+    const scope = document.createElement('div')
+
+    dialog.append(scope)
+
+    const { onNext } = renderScopedKeys(scope)
+
+    press({ key: 'ArrowRight' })
+
+    expect(onNext).toHaveBeenCalledTimes(1)
   })
 })

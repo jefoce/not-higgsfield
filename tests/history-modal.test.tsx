@@ -6,6 +6,7 @@ import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { HistoryModal } from '@/features/history/list/HistoryModal'
 
 import { handleNoop, Observer, record } from './helpers/history'
+import { required } from './helpers/required'
 
 vi.mock('@/lib/fetcher', () => {
   return {
@@ -127,6 +128,26 @@ describe('HistoryModal arrow keys', () => {
     fireEvent.keyDown(document.body, { key: 'ArrowLeft' })
 
     expect(handleNavigate).toHaveBeenLastCalledWith('a')
+  })
+
+  it('moves with the target on the dialog content right after open', () => {
+    render(modal({ record: record('a'), selectedId: 'a', viewOrder: ['a', 'b', 'c'] }))
+
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'ArrowRight' })
+
+    expect(handleNavigate).toHaveBeenLastCalledWith('b')
+  })
+
+  it('moves after a click on the stage background', () => {
+    render(modal({ record: record('a'), selectedId: 'a', viewOrder: ['a', 'b', 'c'] }))
+
+    const dialog = screen.getByRole('dialog')
+    const stage = required(dialog.querySelector<HTMLElement>('[class*="group/stage"]'), 'stage')
+
+    fireEvent.click(stage)
+    fireEvent.keyDown(document.body, { key: 'ArrowRight' })
+
+    expect(handleNavigate).toHaveBeenLastCalledWith('b')
   })
 
   it('ignores arrow keys while closed', () => {

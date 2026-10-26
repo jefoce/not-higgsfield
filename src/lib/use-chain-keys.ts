@@ -12,16 +12,19 @@ interface UseChainKeysParams {
 
 const IGNORED_TARGETS = 'input, textarea, select, [contenteditable], [role="slider"]'
 
-function isTargetInScope(scope: HTMLElement | null, target: EventTarget | null): boolean {
-  if (target === document.body) {
-    return true
-  }
+const DIALOG_SELECTOR = '[role="dialog"], [role="alertdialog"]'
 
-  if (isNil(scope) || !(target instanceof Node)) {
+/** True when the scope sits in the last dialog of the document. */
+function isTopmostDialog(scope: HTMLElement | null): boolean {
+  const dialog = scope?.closest(DIALOG_SELECTOR)
+
+  if (isNil(dialog)) {
     return false
   }
 
-  return scope.contains(target)
+  const dialogs = document.querySelectorAll(DIALOG_SELECTOR)
+
+  return dialogs[dialogs.length - 1] === dialog
 }
 
 function isIgnoredTarget(target: EventTarget | null): boolean {
@@ -48,7 +51,7 @@ export function useChainKeys(params: UseChainKeysParams): void {
         return
       }
 
-      if (!isTargetInScope(scopeRef.current, event.target)) {
+      if (!isTopmostDialog(scopeRef.current)) {
         return
       }
 
