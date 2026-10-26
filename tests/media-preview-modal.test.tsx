@@ -4,7 +4,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { MediaPreviewModal } from '@/features/preview/MediaPreviewModal'
-import { closePreview, openPreview, type PreviewItem } from '@/features/preview/preview-store'
+import {
+  closePreview,
+  openPreview,
+  type PreviewItem,
+  usePreviewStore,
+} from '@/features/preview/preview-store'
 
 import { upload } from './helpers/validation-fixtures'
 
@@ -28,6 +33,22 @@ function renderModal(): void {
   vi.stubGlobal('IntersectionObserver', Observer)
   render(<MediaPreviewModal />)
 }
+
+describe('MediaPreviewModal close button', () => {
+  it('closes the viewer from the top-right button', async () => {
+    renderModal()
+
+    act(() => {
+      openPreview({ items, index: 0 })
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+
+    await waitFor(() => {
+      expect(usePreviewStore.getState().request).toBeNull()
+    })
+  })
+})
 
 describe('MediaPreviewModal action close rule', () => {
   it('stays open when select returns true and runs the action', () => {

@@ -202,14 +202,13 @@ export function HistoryModal(props: HistoryModalProps) {
     void cancelGeneration(record.id)
   }
 
-  const toolbar = recordToolbar({ record, render: props.toolbar })
-
   return (
     <Modal
       open={isOpen}
       onOpenChange={handleOpenChange}
       label="Video details"
       backdropClassName="bg-black/80"
+      showClose
       className="h-[calc(100vh-48px)] max-h-275 w-[calc(100vw-48px)] max-w-450 overflow-hidden bg-page-2 p-3"
     >
       {!isNil(record) && (
@@ -218,7 +217,7 @@ export function HistoryModal(props: HistoryModalProps) {
             <MediaStage
               backdrop={stageBackdrop(record, backdropPoster)}
               nav={nav}
-              toolbar={toolbar}
+              toolbar={recordToolbar({ record, render: props.toolbar })}
             >
               {record.status === 'completed' && (
                 <MediaBox aspect={recordAspect(record)}>
@@ -246,7 +245,7 @@ export function HistoryModal(props: HistoryModalProps) {
             className="group/card min-h-0 w-80 shrink-0 overflow-hidden"
             style={{ minWidth: DETAILS_MIN_WIDTH }}
           >
-            <DetailsPanel record={record} />
+            <DetailsPanel record={record} topRightInset />
           </div>
         </div>
       )}

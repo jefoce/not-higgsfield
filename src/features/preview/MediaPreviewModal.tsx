@@ -196,6 +196,7 @@ export function MediaPreviewModal(props: MediaPreviewModalProps) {
       onOpenChange={handleOpenChange}
       label="Media preview"
       backdropClassName="bg-black/80"
+      showClose
       className="flex h-[calc(100vh-48px)] max-h-275 w-[calc(100vw-48px)] max-w-450 flex-col overflow-hidden bg-page-2 p-0"
     >
       <div ref={scopeRef} className="flex min-h-0 flex-1 flex-col gap-3 p-3">

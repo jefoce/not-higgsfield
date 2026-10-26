@@ -94,7 +94,7 @@ afterEach(() => {
 })
 
 describe('HistoryModal', () => {
-  it('fills the window with a stage backdrop and wider details', () => {
+  it('fills the window, with a close button that closes the viewer', () => {
     render(modal({ record: record('v'), selectedId: 'v', viewOrder: ['v'] }))
 
     const dialog = screen.getByRole('dialog')
@@ -105,6 +105,10 @@ describe('HistoryModal', () => {
     const backdrop = dialog.querySelector('img.blur-3xl')
 
     expect(backdrop?.getAttribute('alt')).toBe('')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+
+    expect(useHistoryViewerStore.getState().selectedId).toBeNull()
   })
 })
 
