@@ -176,4 +176,27 @@ describe('generator draft persistence', () => {
     expect(state.prompts.frames).toBe('')
     expect(state.seed).toBeNull()
   })
+
+  it('restores defaults from a version 2 payload with the old shape', async () => {
+    window.localStorage.setItem(
+      DRAFT_KEY,
+      JSON.stringify({
+        state: { presetId: DEFAULT_PRESET_ID, prompt: 'old draft', tab: 'frames' },
+        version: 2,
+      }),
+    )
+
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const { useGeneratorStore } = await import('@/features/generator/store/store')
+
+    await waitForRehydrate()
+
+    const state = useGeneratorStore.getState()
+
+    expect(state.prompts.frames).toBe('')
+    expect(state.seed).toBeNull()
+    expect(consoleError).not.toHaveBeenCalled()
+    consoleError.mockRestore()
+  })
 })

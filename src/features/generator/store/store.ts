@@ -11,7 +11,7 @@ import { ASPECT_RATIOS, RESOLUTIONS } from '@/core/presets/types'
 import { FrameSlotsSchema, GENERATOR_TABS } from '@/core/schemas/generation-record'
 
 import { createGeneratorState } from './store-actions'
-import { defaults, inputFromState } from './store-draft'
+import { inputFromState } from './store-draft'
 import type { GeneratorState } from './store-state'
 
 const PromptMapSchema = z.object({ frames: z.string(), references: z.string() })
@@ -70,8 +70,8 @@ export const useGeneratorStore = create<GeneratorState>()(
 
       return { ...current, ...parsed.data }
     },
-    migrate: () => {
-      return defaults() as unknown as GeneratorState
+    migrate: (persisted) => {
+      return persisted
     },
     onRehydrateStorage: () => {
       return rehydrate
