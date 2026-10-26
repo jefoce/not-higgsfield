@@ -8,11 +8,12 @@ import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { LazyVideo } from '@/features/player/LazyVideo'
 import { preloadPosters } from '@/lib/preload-posters'
 import { useChainKeys } from '@/lib/use-chain-keys'
+import { MediaBox } from '@/ui/MediaBox'
 import { MediaStage } from '@/ui/MediaStage'
 import { Modal } from '@/ui/Modal'
 
 import { cancelGeneration } from '../actions/record-actions'
-import { posterSrc, videoSrc } from '../actions/record-view'
+import { posterSrc, recordAspect, videoSrc } from '../actions/record-view'
 import { DetailsPanel } from '../details/DetailsPanel'
 import { StatusOverlay } from '../status/StatusOverlay'
 
@@ -172,15 +173,17 @@ export function HistoryModal(props: HistoryModalProps) {
           <div className="flex min-h-[50vh] min-w-0 flex-1 compact:min-h-0">
             <MediaStage backdrop={stageBackdrop(record, backdropPoster)} nav={nav}>
               {record.status === 'completed' && (
-                <LazyVideo
-                  id={`modal-${record.id}`}
-                  src={videoSrc(record)}
-                  poster={posterSrc(record, 1280)}
-                  posterFit="contain"
-                  videoFit="contain"
-                  seekKeys="shiftArrows"
-                  className="size-full"
-                />
+                <MediaBox aspect={recordAspect(record)}>
+                  <LazyVideo
+                    id={`modal-${record.id}`}
+                    src={videoSrc(record)}
+                    poster={posterSrc(record, 1280)}
+                    posterFit="contain"
+                    videoFit="contain"
+                    seekKeys="shiftArrows"
+                    className="size-full"
+                  />
+                </MediaBox>
               )}
               {record.status !== 'completed' && (
                 <div className="w-full max-w-2xl">

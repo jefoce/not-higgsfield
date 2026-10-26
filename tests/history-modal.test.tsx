@@ -81,6 +81,37 @@ describe('HistoryModal', () => {
   })
 })
 
+describe('HistoryModal player aspect', () => {
+  it('sizes the player box from the output width and height', () => {
+    const completed: GenerationRecord = {
+      ...record('v'),
+      output: { video: 'v.mp4', width: 1920, height: 1080 },
+    }
+
+    render(modal({ record: completed, selectedId: 'v', viewOrder: ['v'] }))
+
+    const box = screen.getByRole('dialog').querySelector<HTMLElement>('[style*="aspect-ratio"]')
+
+    expect(box?.style.aspectRatio).toBe('1920/1080')
+  })
+
+  it('falls back to the selected ratio when the output has no size', () => {
+    const base = record('v')
+
+    const portrait: GenerationRecord = {
+      ...base,
+      input: { ...base.input, aspectRatio: '9:16' },
+      output: { video: 'v.mp4' },
+    }
+
+    render(modal({ record: portrait, selectedId: 'v', viewOrder: ['v'] }))
+
+    const box = screen.getByRole('dialog').querySelector<HTMLElement>('[style*="aspect-ratio"]')
+
+    expect(box?.style.aspectRatio).toBe('9/16')
+  })
+})
+
 describe('HistoryModal arrow keys', () => {
   it('moves to the next record with ArrowRight', () => {
     render(modal({ record: record('a'), selectedId: 'a', viewOrder: ['a', 'b', 'c'] }))
