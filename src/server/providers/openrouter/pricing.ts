@@ -4,6 +4,7 @@ import { isEmpty, isNil } from 'lodash-es'
 import { z } from 'zod'
 
 import { FETCH_TIMEOUTS, PRICING_FALLBACK_TTL_MS } from '@/core/constants'
+import { messageOf } from '@/core/errors'
 import { primaryBinding } from '@/core/presets/bindings'
 import type { ModelPreset } from '@/core/presets/types'
 import type { PricingInfo } from '@/core/types'
@@ -106,34 +107,70 @@ async function fetchListSkus(preset: ModelPreset, isForce: boolean): Promise<Dic
   }
 }
 
-async function fetchDiscount(preset: ModelPreset): Promise<number> {
+/** Reads the live fraction. One warning per fallback, never the URL or headers. */
+export async function fetchDiscount(preset: ModelPreset): Promise<number> {
+  const { modelId } = primaryBinding(preset)
+
   try {
-    const res = await fetch(`${API_URL}/models/${primaryBinding(preset).modelId}/endpoints`, {
+    const res = await fetch(`${API_URL}/models/${modelId}/endpoints`, {
       cache: 'no-store',
       signal: AbortSignal.timeout(FETCH_TIMEOUTS.meta),
     })
 
     if (!res.ok) {
+      warnDiscount({ preset, modelId, reason: `HTTP ${res.status}` })
+
       return 0
     }
 
     const parsed = EndpointsSchema.safeParse(await res.json())
 
     if (!parsed.success) {
+      const reason = `invalid response (${issueSummary(parsed.error)})`
+
+      warnDiscount({ preset, modelId, reason })
+
       return 0
     }
 
     // Reads the first endpoint. Each model has one provider today, add per-endpoint pricing before a second provider.
     const raw = parsed.data.data.endpoints[0]?.pricing?.discount
 
-    if (!isNil(raw) && raw >= 0 && raw <= 1) {
-      return raw
+    if (isNil(raw) || raw < 0 || raw > 1) {
+      warnDiscount({ preset, modelId, reason: `discount ${String(raw)} out of range` })
+
+      return 0
     }
 
-    return 0
-  } catch {
+    return raw
+  } catch (error) {
+    warnDiscount({ preset, modelId, reason: messageOf(error) })
+
     return 0
   }
+}
+
+interface DiscountWarningParams {
+  preset: ModelPreset
+  modelId: string
+  reason: string
+}
+
+function warnDiscount(params: DiscountWarningParams): void {
+  const { preset, modelId, reason } = params
+
+  console.warn(`[pricing] ${preset.id} (${modelId}) discount fallback: ${reason}`)
+}
+
+function issueSummary(error: z.ZodError): string {
+  const issues = error.issues.slice(0, 3).map((issue) => {
+    const path = issue.path.join('.')
+    const label = path === '' ? 'response' : path
+
+    return `${label}: ${issue.message}`
+  })
+
+  return issues.join('; ')
 }
 
 /** Keeps six significant digits so sub-cent token rates keep their precision. */

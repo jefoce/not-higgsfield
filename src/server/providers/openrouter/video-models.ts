@@ -15,12 +15,13 @@ const VideoModelSchema = z
   .object({
     id: z.string(),
     pricing_skus: z.record(z.string(), z.unknown()).optional(),
-    supported_durations: z.array(z.number()).optional(),
-    supported_resolutions: z.array(z.string()).optional(),
-    supported_aspect_ratios: z.array(z.string()).optional(),
-    supported_frame_images: z.array(z.string()).optional(),
-    generate_audio: z.boolean().optional(),
-    seed: z.boolean().optional(),
+    // The live list sends null for fields a model does not use.
+    supported_durations: z.array(z.number()).nullish(),
+    supported_resolutions: z.array(z.string()).nullish(),
+    supported_aspect_ratios: z.array(z.string()).nullish(),
+    supported_frame_images: z.array(z.string()).nullish(),
+    generate_audio: z.boolean().nullish(),
+    seed: z.boolean().nullish(),
   })
   .loose()
 
