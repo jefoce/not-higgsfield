@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import { ZOOM_DEFAULT, ZOOM_STEPS } from '@/core/constants'
+import { ZOOM_DEFAULT, ZOOM_MAX, ZOOM_MIN } from '@/core/constants'
 import { DEFAULT_FILTERS, FILTER_PARAMS } from '@/core/history-filters'
 import { ASPECT_RATIOS, RESOLUTIONS } from '@/core/presets/types'
 import { GENERATOR_TABS } from '@/core/schemas/generation-record'
@@ -34,16 +34,14 @@ const PersistedFiltersSchema = z.object({
 })
 
 const PersistedViewSchema = z.object({
-  view: z.enum(HISTORY_VIEWS),
-  zoom: z.number(),
-  filters: PersistedFiltersSchema.optional(),
+  view: z.enum(HISTORY_VIEWS).optional().catch(undefined),
+  zoom: z.number().int().min(ZOOM_MIN).max(ZOOM_MAX).optional().catch(undefined),
+  filters: PersistedFiltersSchema.optional().catch(undefined),
 })
 
 interface ViewFilters extends HistoryFilters {
   mode?: HistoryMode
 }
-
-const MAX_ZOOM = ZOOM_STEPS - 1
 
 /** Reference width the supplied slider sizes were measured at (video + details + gap). */
 const REFERENCE_ROW_WIDTH = 1518
@@ -55,7 +53,7 @@ const GRID_COLUMNS = [8, 7, 6, 5, 4, 3] as const
 const TILE_WIDTHS = [172, 200, 252, 286, 362, 486] as const
 
 const zoomStep = (zoom: number): number => {
-  return clamp(Math.round(zoom), 0, MAX_ZOOM)
+  return clamp(Math.round(zoom), ZOOM_MIN, ZOOM_MAX)
 }
 
 /** Table value at a clamped zoom step. The ranges below cover every step. */
@@ -120,7 +118,7 @@ export const useHistoryViewStore = create<ViewState>()(
           set({ view })
         },
         setZoom: (zoom) => {
-          set({ zoom: clamp(Math.round(zoom), 0, MAX_ZOOM) })
+          set({ zoom: clamp(Math.round(zoom), ZOOM_MIN, ZOOM_MAX) })
         },
         setFilters: (patch) => {
           set((state) => {
@@ -138,6 +136,9 @@ export const useHistoryViewStore = create<ViewState>()(
       partialize: (state) => {
         return { view: state.view, zoom: state.zoom, filters: state.filters }
       },
+      migrate: (persisted) => {
+        return persisted
+      },
       merge: (persisted, current) => {
         const parsed = PersistedViewSchema.safeParse(persisted)
 
@@ -145,10 +146,13 @@ export const useHistoryViewStore = create<ViewState>()(
           return current
         }
 
+        const { view, zoom, filters } = parsed.data
+
         return {
           ...current,
-          ...parsed.data,
-          filters: { ...current.filters, ...parsed.data.filters },
+          view: view ?? current.view,
+          zoom: zoom ?? current.zoom,
+          filters: { ...current.filters, ...filters },
         }
       },
     },

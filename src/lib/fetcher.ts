@@ -51,6 +51,7 @@ async function readJson<T>(response: Response): Promise<T> {
     return undefined as T
   }
 
+  // Own API, typed by the shared core shape, not validated.
   const parsed: unknown = JSON.parse(text)
 
   return parsed as T

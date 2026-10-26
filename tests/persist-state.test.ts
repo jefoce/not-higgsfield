@@ -54,6 +54,60 @@ describe('history view persistence', () => {
     expect(state.filters.favorite).toBe(true)
   })
 
+  it('migrates a version 0 payload without a console error', async () => {
+    window.localStorage.setItem(
+      VIEW_KEY,
+      JSON.stringify({
+        state: { view: 'grid', zoom: 2, filters: { favorite: true } },
+        version: 0,
+      }),
+    )
+
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const { useHistoryViewStore } = await import('@/features/history/list/view-store')
+    const state = useHistoryViewStore.getState()
+
+    expect(state.view).toBe('grid')
+    expect(state.zoom).toBe(2)
+    expect(consoleError).not.toHaveBeenCalled()
+    consoleError.mockRestore()
+  })
+
+  it('keeps a valid view when zoom is invalid', async () => {
+    window.localStorage.setItem(
+      VIEW_KEY,
+      JSON.stringify({
+        state: { view: 'grid', zoom: '3', filters: { favorite: true } },
+        version: 1,
+      }),
+    )
+
+    const { useHistoryViewStore } = await import('@/features/history/list/view-store')
+    const state = useHistoryViewStore.getState()
+
+    expect(state.view).toBe('grid')
+    expect(state.zoom).toBe(ZOOM_DEFAULT)
+    expect(state.filters.favorite).toBe(true)
+  })
+
+  it('keeps a valid view when zoom is out of range', async () => {
+    window.localStorage.setItem(
+      VIEW_KEY,
+      JSON.stringify({
+        state: { view: 'grid', zoom: 99, filters: { favorite: true } },
+        version: 1,
+      }),
+    )
+
+    const { useHistoryViewStore } = await import('@/features/history/list/view-store')
+    const state = useHistoryViewStore.getState()
+
+    expect(state.view).toBe('grid')
+    expect(state.zoom).toBe(ZOOM_DEFAULT)
+    expect(state.filters.favorite).toBe(true)
+  })
+
   it('restores defaults from corrupt JSON', async () => {
     window.localStorage.setItem(VIEW_KEY, '{not json')
 
