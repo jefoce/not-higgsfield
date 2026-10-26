@@ -65,8 +65,13 @@ export function MediaStage(props: MediaStageProps) {
 
       {nav && (
         <>
-          <StageNavButton side="left" disabled={!nav.hasPrevious} onClick={nav.onPrevious} />
-          <StageNavButton side="right" disabled={!nav.hasNext} onClick={nav.onNext} />
+          <StageNavButton
+            side="left"
+            disabled={!nav.hasPrevious}
+            onClick={nav.onPrevious}
+            revealOnHover
+          />
+          <StageNavButton side="right" disabled={!nav.hasNext} onClick={nav.onNext} revealOnHover />
         </>
       )}
     </div>
