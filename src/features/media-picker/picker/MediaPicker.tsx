@@ -1,11 +1,16 @@
 'use client'
 
 import { isNil } from 'lodash-es'
+import type { RefObject } from 'react'
 
-import { Modal } from '@/ui/Modal'
+import { DockedPanel } from '@/ui/DockedPanel'
 
 import { PickerBody } from './PickerBody'
 import { closeMediaPicker, useMediaPickerStore } from './store'
+
+interface MediaPickerProps {
+  anchorRef: RefObject<HTMLElement | null>
+}
 
 function handleOpenChange(isOpen: boolean): void {
   if (!isOpen) {
@@ -13,20 +18,21 @@ function handleOpenChange(isOpen: boolean): void {
   }
 }
 
-/** Dialog shell, the body remounts per request so its state resets. */
-export function MediaPickerModal() {
+/** Picker shell, docked beside the generator on wide screens, a dialog otherwise. */
+export function MediaPicker(props: MediaPickerProps) {
   const request = useMediaPickerStore((state) => {
     return state.request
   })
 
   return (
-    <Modal
-      open={Boolean(request)}
+    <DockedPanel
+      open={!isNil(request)}
       onOpenChange={handleOpenChange}
+      anchorRef={props.anchorRef}
+      fallback="modal"
       label="Choose media"
-      className="flex h-[min(720px,85vh)] max-h-none w-[min(900px,90vw)] flex-col bg-page-2 p-3 max-compact:w-[calc(100vw-16px)]"
     >
       {!isNil(request) && <PickerBody key={request.id} request={request} />}
-    </Modal>
+    </DockedPanel>
   )
 }

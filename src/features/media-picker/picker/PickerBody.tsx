@@ -64,7 +64,7 @@ export function PickerBody(props: PickerBodyProps) {
           onDisconnectFolder={foldersState.handleDisconnect}
         />
 
-        <div className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl bg-surface">
+        <div className="mt-2 flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl bg-surface/60">
           <PickerContent
             request={request}
             activeTab={activeTab}
