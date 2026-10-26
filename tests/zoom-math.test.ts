@@ -3,8 +3,10 @@ import { describe, expect, it } from 'vitest'
 import {
   clampOffset,
   clampScale,
+  FIT_ZOOM,
   zoomAtPoint,
   type ZoomOffset,
+  zoomTo,
   type ZoomView,
 } from '@/ui/zoom-math'
 
@@ -68,5 +70,20 @@ describe('clampScale', () => {
     expect(clampScale(0.5, 8)).toBe(1)
     expect(clampScale(3, 8)).toBe(3)
     expect(clampScale(12, 8)).toBe(8)
+  })
+})
+
+describe('zoomTo', () => {
+  it('stores the animation flag', () => {
+    const state = zoomTo({
+      view: VIEW,
+      current: FIT_ZOOM,
+      nextScale: 2,
+      point: { x: 400, y: 300 },
+      maxScale: 8,
+      isAnimated: false,
+    })
+
+    expect(state).toMatchObject({ scale: 2, isAnimated: false })
   })
 })

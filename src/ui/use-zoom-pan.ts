@@ -91,7 +91,11 @@ export function useZoomPan(params: UseZoomPanParams) {
     }
 
     setZoom((current) => {
-      return { ...current, offset: clampOffset({ view, scale: current.scale, offset: nextOffset }) }
+      return {
+        ...current,
+        isAnimated: false,
+        offset: clampOffset({ view, scale: current.scale, offset: nextOffset }),
+      }
     })
   }
 
@@ -127,7 +131,14 @@ export function useZoomControls(params: UseZoomControlsParams) {
     const point = { x: view.layerWidth / 2, y: view.layerHeight / 2 }
 
     setZoom((current) => {
-      return zoomTo({ view, current, nextScale: current.scale * step, point, maxScale })
+      return zoomTo({
+        view,
+        current,
+        nextScale: current.scale * step,
+        point,
+        maxScale,
+        isAnimated: true,
+      })
     })
   }
 
@@ -144,6 +155,12 @@ export function useZoomControls(params: UseZoomControlsParams) {
   }
 
   const handleDoubleClick = (event: MouseEvent<HTMLDivElement>) => {
+    const isControl = event.target instanceof Element && !isNil(event.target.closest('button'))
+
+    if (isControl) {
+      return
+    }
+
     if (zoom.scale > 1) {
       setZoom(FIT_ZOOM)
 
@@ -152,7 +169,7 @@ export function useZoomControls(params: UseZoomControlsParams) {
 
     const point = layerPoint(event.currentTarget, event)
 
-    setZoom(zoomTo({ view, current: FIT_ZOOM, nextScale: 2, point, maxScale }))
+    setZoom(zoomTo({ view, current: FIT_ZOOM, nextScale: 2, point, maxScale, isAnimated: true }))
   }
 
   return { handleZoomIn, handleZoomOut, handleFit, handleDoubleClick }

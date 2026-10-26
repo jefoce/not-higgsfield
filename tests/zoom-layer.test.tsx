@@ -192,6 +192,60 @@ describe('ZoomLayer controls', () => {
   })
 })
 
+describe('ZoomLayer animation and cursor', () => {
+  it('drops the transition during a drag and restores it on a button zoom', () => {
+    renderLayer()
+    const box = boxOf()
+    const root = rootOf(box)
+
+    sizeLayer(box)
+    resize()
+    stubPointerCapture(root)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }))
+
+    const wrapper = wrapperOf(box)
+
+    expect(wrapper.classList.contains('transition-transform')).toBe(true)
+
+    fireEvent.pointerDown(root, { button: 0, pointerId: 1, clientX: 400, clientY: 300 })
+    fireEvent.pointerMove(root, { pointerId: 1, clientX: 450, clientY: 330 })
+    expect(wrapper.classList.contains('transition-transform')).toBe(false)
+
+    fireEvent.pointerUp(root, { pointerId: 1, clientX: 450, clientY: 330 })
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }))
+    expect(wrapper.classList.contains('transition-transform')).toBe(true)
+  })
+
+  it('ignores a double click on the Zoom in button', () => {
+    renderLayer()
+
+    const zoomIn = screen.getByRole('button', { name: 'Zoom in' })
+
+    fireEvent.click(zoomIn)
+    fireEvent.click(zoomIn)
+
+    const before = percent()
+
+    fireEvent.doubleClick(zoomIn)
+
+    expect(before).toBe('225%')
+    expect(percent()).toBe(before)
+  })
+
+  it('shows the grab cursor only while zoomed', () => {
+    renderLayer()
+
+    const root = rootOf(boxOf())
+
+    expect(root.classList.contains('cursor-grab')).toBe(false)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }))
+
+    expect(root.classList.contains('cursor-grab')).toBe(true)
+  })
+})
+
 describe('ZoomLayer pan', () => {
   it('moves only while zoomed and clamps at the edge', () => {
     renderLayer()

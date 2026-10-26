@@ -22,13 +22,14 @@ export interface ZoomView {
   contentHeight: number
 }
 
-/** Scale plus the content translation it applies. */
+/** Scale, the content translation it applies and whether the change animates. */
 export interface ZoomState {
   scale: number
   offset: ZoomOffset
+  isAnimated: boolean
 }
 
-export const FIT_ZOOM: ZoomState = { scale: 1, offset: { x: 0, y: 0 } }
+export const FIT_ZOOM: ZoomState = { scale: 1, offset: { x: 0, y: 0 }, isAnimated: true }
 
 export const KEY_STEP = 1.5
 
@@ -61,6 +62,7 @@ interface ZoomToParams {
   nextScale: number
   point: ZoomPoint
   maxScale: number
+  isAnimated?: boolean
 }
 
 interface AxisParams {
@@ -104,7 +106,7 @@ function clampAxis(params: AxisParams): number {
 
 /** Scale, cursor zoom and clamp in one step for the next scale. */
 export function zoomTo(params: ZoomToParams): ZoomState {
-  const { view, current, nextScale, point, maxScale } = params
+  const { view, current, nextScale, point, maxScale, isAnimated = false } = params
   const scale = clampScale(nextScale, maxScale)
 
   const offset = clampOffset({
@@ -119,7 +121,7 @@ export function zoomTo(params: ZoomToParams): ZoomState {
     }),
   })
 
-  return { scale, offset }
+  return { scale, offset, isAnimated }
 }
 
 /** Centers content smaller than the layer, keeps larger content inside it. */

@@ -148,7 +148,7 @@ function useZoomInput(params: UseZoomInputParams): void {
       setZoom((current) => {
         const nextScale = current.scale * wheelFactor(event)
 
-        return zoomTo({ view, current, nextScale, point, maxScale })
+        return zoomTo({ view, current, nextScale, point, maxScale, isAnimated: false })
       })
     }
 
@@ -170,7 +170,14 @@ function useZoomInput(params: UseZoomInputParams): void {
       const point = { x: view.layerWidth / 2, y: view.layerHeight / 2 }
 
       setZoom((current) => {
-        return zoomTo({ view, current, nextScale: current.scale * step, point, maxScale })
+        return zoomTo({
+          view,
+          current,
+          nextScale: current.scale * step,
+          point,
+          maxScale,
+          isAnimated: true,
+        })
       })
     }
 
@@ -214,14 +221,18 @@ export function ZoomLayer(props: ZoomLayerProps) {
       onPointerUp={pan.handlePointerUp}
       onPointerCancel={pan.handlePointerCancel}
       className={cn(
-        'group/zoom relative flex size-full cursor-grab items-center justify-center overflow-hidden',
+        'group/zoom relative flex size-full items-center justify-center overflow-hidden',
+        zoom.scale > 1 && !pan.isDragging && 'cursor-grab',
         pan.isDragging && 'cursor-grabbing',
       )}
     >
       <div
         ref={contentRef}
         style={{ transform, transformOrigin }}
-        className="relative flex size-full items-center justify-center transition-transform duration-150 motion-reduce:transition-none"
+        className={cn(
+          'relative flex size-full items-center justify-center',
+          zoom.isAnimated && 'transition-transform duration-150 motion-reduce:transition-none',
+        )}
       >
         {children}
       </div>
