@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { GenerationRecord } from '@/core/schemas/generation-record'
+import { useHistoryViewerStore } from '@/features/history/list/history-viewer-store'
 import { HistoryModal } from '@/features/history/list/HistoryModal'
 
 import { handleNoop, Observer, record } from './helpers/history'
@@ -30,39 +31,51 @@ vi.mock('sonner', () => {
   return { toast: { success: vi.fn(), error: vi.fn() } }
 })
 
-const handleNavigate = vi.fn()
-
-const baseProps = {
-  open: true,
-  hasMore: false,
-  isLoadingMore: false,
-  onNavigate: handleNavigate,
-  onLoadMore: handleNoop,
-  onOpenChange: handleNoop,
-}
-
 interface ModalParams {
   record: GenerationRecord | null
   selectedId: string
   viewOrder: string[]
-  open?: boolean
+  isOpen?: boolean
   hasMore?: boolean
   onLoadMore?: () => void
-  onOpenChange?: (open: boolean) => void
 }
 
 function modal(params: ModalParams) {
-  return <HistoryModal {...baseProps} {...params} />
+  const {
+    record: selectedRecord,
+    selectedId,
+    viewOrder,
+    isOpen = true,
+    hasMore = false,
+    onLoadMore = handleNoop,
+  } = params
+
+  if (isOpen) {
+    useHistoryViewerStore.getState().open(selectedId)
+  } else {
+    useHistoryViewerStore.getState().close()
+  }
+
+  return (
+    <HistoryModal
+      record={selectedRecord}
+      viewOrder={viewOrder}
+      hasMore={hasMore}
+      isLoadingMore={false}
+      onLoadMore={onLoadMore}
+    />
+  )
 }
 
 beforeEach(() => {
-  handleNavigate.mockClear()
+  useHistoryViewerStore.getState().close()
   vi.stubGlobal('IntersectionObserver', Observer)
   vi.stubGlobal('ResizeObserver', Observer)
 })
 
 afterEach(() => {
   cleanup()
+  useHistoryViewerStore.getState().close()
   document.body.replaceChildren()
   vi.unstubAllGlobals()
 })
@@ -119,7 +132,7 @@ describe('HistoryModal arrow keys', () => {
 
     fireEvent.keyDown(document.body, { key: 'ArrowRight' })
 
-    expect(handleNavigate).toHaveBeenLastCalledWith('b')
+    expect(useHistoryViewerStore.getState().selectedId).toBe('b')
   })
 
   it('moves to the previous record with ArrowLeft', () => {
@@ -127,7 +140,7 @@ describe('HistoryModal arrow keys', () => {
 
     fireEvent.keyDown(document.body, { key: 'ArrowLeft' })
 
-    expect(handleNavigate).toHaveBeenLastCalledWith('a')
+    expect(useHistoryViewerStore.getState().selectedId).toBe('a')
   })
 
   it('moves with the target on the dialog content right after open', () => {
@@ -135,7 +148,7 @@ describe('HistoryModal arrow keys', () => {
 
     fireEvent.keyDown(screen.getByRole('dialog'), { key: 'ArrowRight' })
 
-    expect(handleNavigate).toHaveBeenLastCalledWith('b')
+    expect(useHistoryViewerStore.getState().selectedId).toBe('b')
   })
 
   it('moves after a click on the stage background', () => {
@@ -147,15 +160,17 @@ describe('HistoryModal arrow keys', () => {
     fireEvent.click(stage)
     fireEvent.keyDown(document.body, { key: 'ArrowRight' })
 
-    expect(handleNavigate).toHaveBeenLastCalledWith('b')
+    expect(useHistoryViewerStore.getState().selectedId).toBe('b')
   })
 
   it('ignores arrow keys while closed', () => {
-    render(modal({ record: record('b'), selectedId: 'b', viewOrder: ['a', 'b', 'c'], open: false }))
+    render(
+      modal({ record: record('b'), selectedId: 'b', viewOrder: ['a', 'b', 'c'], isOpen: false }),
+    )
 
     fireEvent.keyDown(document.body, { key: 'ArrowRight' })
 
-    expect(handleNavigate).not.toHaveBeenCalled()
+    expect(useHistoryViewerStore.getState().selectedId).toBeNull()
   })
 })
 
@@ -167,15 +182,13 @@ describe('HistoryModal navigation', () => {
 
     fireEvent.click(screen.getByLabelText('Next'))
 
-    expect(handleNavigate).toHaveBeenLastCalledWith('b')
-
-    handleNavigate.mockClear()
+    expect(useHistoryViewerStore.getState().selectedId).toBe('b')
 
     rerender(modal({ record: record('b'), selectedId: 'b', viewOrder: ['a', 'b', 'c'] }))
 
     fireEvent.click(screen.getByLabelText('Previous'))
 
-    expect(handleNavigate).toHaveBeenLastCalledWith('a')
+    expect(useHistoryViewerStore.getState().selectedId).toBe('a')
   })
 
   it('disables previous on the first record and next on the last page', () => {
@@ -227,7 +240,7 @@ describe('HistoryModal active records', () => {
     )
 
     expect(screen.getByText('Prompt b')).not.toBeNull()
-    expect(handleNavigate).not.toHaveBeenCalled()
+    expect(useHistoryViewerStore.getState().selectedId).toBe('b')
   })
 
   it('steps next and previous across completed, running and failed ids', () => {
@@ -237,9 +250,7 @@ describe('HistoryModal active records', () => {
 
     fireEvent.click(screen.getByLabelText('Next'))
 
-    expect(handleNavigate).toHaveBeenLastCalledWith('b')
-
-    handleNavigate.mockClear()
+    expect(useHistoryViewerStore.getState().selectedId).toBe('b')
 
     rerender(
       modal({
@@ -251,9 +262,7 @@ describe('HistoryModal active records', () => {
 
     fireEvent.click(screen.getByLabelText('Next'))
 
-    expect(handleNavigate).toHaveBeenLastCalledWith('c')
-
-    handleNavigate.mockClear()
+    expect(useHistoryViewerStore.getState().selectedId).toBe('c')
 
     rerender(
       modal({
@@ -265,7 +274,7 @@ describe('HistoryModal active records', () => {
 
     fireEvent.click(screen.getByLabelText('Previous'))
 
-    expect(handleNavigate).toHaveBeenLastCalledWith('b')
+    expect(useHistoryViewerStore.getState().selectedId).toBe('b')
   })
 
   it('keeps a record selected when it turns completed and does not navigate', () => {
@@ -279,7 +288,7 @@ describe('HistoryModal active records', () => {
 
     rerender(modal({ record: record('b'), selectedId: 'b', viewOrder: ['a', 'b', 'c'] }))
 
-    expect(handleNavigate).not.toHaveBeenCalled()
+    expect(useHistoryViewerStore.getState().selectedId).toBe('b')
     expect(screen.getByText('Prompt b')).not.toBeNull()
   })
 })
@@ -290,18 +299,14 @@ describe('HistoryModal recovery', () => {
       modal({ record: record('b'), selectedId: 'b', viewOrder: ['a', 'b', 'c'] }),
     )
 
-    handleNavigate.mockClear()
-
     rerender(modal({ record: null, selectedId: 'b', viewOrder: ['a', 'c'] }))
 
-    expect(handleNavigate).toHaveBeenCalledWith('c')
+    expect(useHistoryViewerStore.getState().selectedId).toBe('c')
   })
 
   it('closes when the last record is deleted', () => {
-    const handleOpenChange = vi.fn()
+    render(modal({ record: null, selectedId: 'b', viewOrder: [] }))
 
-    render(modal({ record: null, selectedId: 'b', viewOrder: [], onOpenChange: handleOpenChange }))
-
-    expect(handleOpenChange).toHaveBeenCalledWith(false)
+    expect(useHistoryViewerStore.getState().selectedId).toBeNull()
   })
 })

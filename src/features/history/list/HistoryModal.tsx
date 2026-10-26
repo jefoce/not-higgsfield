@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 import { isEmpty, isNil } from 'lodash-es'
+import { useShallow } from 'zustand/react/shallow'
 
 import { DETAILS_MIN_WIDTH } from '@/core/constants'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
@@ -16,17 +17,14 @@ import { cancelGeneration } from '../actions/record-actions'
 import { posterSrc, recordAspect, videoSrc } from '../actions/record-view'
 import { DetailsPanel } from '../details/DetailsPanel'
 import { StatusOverlay } from '../status/StatusOverlay'
+import { useHistoryViewerStore } from './history-viewer-store'
 
 interface HistoryModalProps {
   record: GenerationRecord | null
-  open: boolean
-  selectedId: string | null
   viewOrder: string[]
   hasMore: boolean
   isLoadingMore: boolean
-  onNavigate: (id: string) => void
   onLoadMore: () => void
-  onOpenChange: (open: boolean) => void
 }
 
 interface HistoryNavParams {
@@ -34,9 +32,9 @@ interface HistoryNavParams {
   viewOrder: string[]
   hasMore: boolean
   isLoadingMore: boolean
-  onNavigate: (id: string) => void
+  navigate: (id: string) => void
   onLoadMore: () => void
-  onOpenChange: (open: boolean) => void
+  close: () => void
 }
 
 function recordPoster(record: GenerationRecord | null): string | undefined {
@@ -58,8 +56,7 @@ function stageBackdrop(record: GenerationRecord, poster: string | undefined) {
 
 /** Record position in the view order, paging and delete recovery. */
 function useHistoryNav(params: HistoryNavParams) {
-  const { selectedId, viewOrder, hasMore, isLoadingMore, onNavigate, onLoadMore, onOpenChange } =
-    params
+  const { selectedId, viewOrder, hasMore, isLoadingMore, navigate, onLoadMore, close } = params
 
   let index = -1
 
@@ -82,7 +79,7 @@ function useHistoryNav(params: HistoryNavParams) {
     }
 
     if (isEmpty(viewOrder)) {
-      onOpenChange(false)
+      close()
 
       return
     }
@@ -90,9 +87,9 @@ function useHistoryNav(params: HistoryNavParams) {
     const nextId = viewOrder[Math.min(lastIndexRef.current, viewOrder.length - 1)]
 
     if (!isNil(nextId) && nextId !== selectedId) {
-      onNavigate(nextId)
+      navigate(nextId)
     }
-  }, [index, onNavigate, onOpenChange, selectedId, viewOrder])
+  }, [close, index, navigate, selectedId, viewOrder])
 
   useEffect(() => {
     if (index < 0 || !hasMore || isLoadingMore) {
@@ -108,15 +105,15 @@ function useHistoryNav(params: HistoryNavParams) {
     const previousId = viewOrder[index - 1]
 
     if (index > 0 && !isNil(previousId)) {
-      onNavigate(previousId)
+      navigate(previousId)
     }
-  }, [index, onNavigate, viewOrder])
+  }, [index, navigate, viewOrder])
 
   const handleNext = useCallback(() => {
     const nextId = viewOrder[index + 1]
 
     if (index < viewOrder.length - 1 && !isNil(nextId)) {
-      onNavigate(nextId)
+      navigate(nextId)
 
       return
     }
@@ -124,7 +121,7 @@ function useHistoryNav(params: HistoryNavParams) {
     if (hasMore) {
       onLoadMore()
     }
-  }, [hasMore, index, onLoadMore, onNavigate, viewOrder])
+  }, [hasMore, index, navigate, onLoadMore, viewOrder])
 
   return {
     hasPrevious: index > 0,
@@ -134,11 +131,33 @@ function useHistoryNav(params: HistoryNavParams) {
   }
 }
 
+/** Viewer state with stable action references. */
+function useHistoryViewer() {
+  return useHistoryViewerStore(
+    useShallow((state) => {
+      return { selectedId: state.selectedId, navigate: state.navigate, close: state.close }
+    }),
+  )
+}
+
 /** Centered grid preview: 16:9 player left, details panel right, record navigation. */
 export function HistoryModal(props: HistoryModalProps) {
-  const { record, open: isOpen } = props
+  const { record, viewOrder, hasMore, isLoadingMore } = props
+  const { selectedId, navigate, close } = useHistoryViewer()
+
+  const isOpen = !isNil(selectedId)
   const backdropPoster = recordPoster(record)
-  const nav = useHistoryNav(props)
+
+  const nav = useHistoryNav({
+    selectedId,
+    viewOrder,
+    hasMore,
+    isLoadingMore,
+    navigate,
+    onLoadMore: props.onLoadMore,
+    close,
+  })
+
   const scopeRef = useRef<HTMLDivElement>(null)
 
   useChainKeys({
@@ -160,14 +179,16 @@ export function HistoryModal(props: HistoryModalProps) {
     void cancelGeneration(record.id)
   }
 
-  const handleApplied = () => {
-    props.onOpenChange(false)
+  const handleOpenChange = (isNextOpen: boolean) => {
+    if (!isNextOpen) {
+      close()
+    }
   }
 
   return (
     <Modal
       open={isOpen}
-      onOpenChange={props.onOpenChange}
+      onOpenChange={handleOpenChange}
       label="Video details"
       backdropClassName="bg-black/80"
       className="h-[calc(100vh-48px)] max-h-275 w-[calc(100vw-48px)] max-w-450 overflow-hidden bg-page-2 p-3"
@@ -200,7 +221,7 @@ export function HistoryModal(props: HistoryModalProps) {
             className="group/card min-h-0 w-80 shrink-0 overflow-hidden"
             style={{ minWidth: DETAILS_MIN_WIDTH }}
           >
-            <DetailsPanel record={record} onApplied={handleApplied} />
+            <DetailsPanel record={record} />
           </div>
         </div>
       )}

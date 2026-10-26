@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { isEmpty, isNil } from 'lodash-es'
+import { useEffect, useMemo } from 'react'
+import { isEmpty } from 'lodash-es'
 
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { useGeneratorStore } from '@/features/generator/store/store'
@@ -12,6 +12,7 @@ import { useSelectionStore } from '../selection/selection-store'
 import { SelectionBar } from '../selection/SelectionBar'
 import { useJobNotifications } from '../status/use-job-notifications'
 import { EmptyState } from './EmptyState'
+import { useHistoryViewerStore } from './history-viewer-store'
 import { HistoryGrid } from './HistoryGrid'
 import { HistoryList } from './HistoryList'
 import { HistoryModal } from './HistoryModal'
@@ -41,7 +42,13 @@ export function HistorySection() {
     return state.setActiveCount
   })
 
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const selectedId = useHistoryViewerStore((state) => {
+    return state.selectedId
+  })
+
+  const navigate = useHistoryViewerStore((state) => {
+    return state.navigate
+  })
 
   const selected =
     records.find((record) => {
@@ -63,13 +70,7 @@ export function HistorySection() {
   const paddingClass = isSelecting ? 'pb-28' : 'pb-14'
 
   const handleOpen = (record: GenerationRecord) => {
-    setSelectedId(record.id)
-  }
-
-  const handleOpenChange = (isOpen: boolean) => {
-    if (!isOpen) {
-      setSelectedId(null)
-    }
+    navigate(record.id)
   }
 
   useJobNotifications({ records, activeCount, isLoading })
@@ -106,14 +107,10 @@ export function HistorySection() {
       <SelectionBar records={records} />
       <HistoryModal
         record={selected}
-        open={!isNil(selectedId)}
-        selectedId={selectedId}
         viewOrder={viewOrder}
         hasMore={hasMore}
         isLoadingMore={isValidating}
-        onNavigate={setSelectedId}
         onLoadMore={loadMore}
-        onOpenChange={handleOpenChange}
       />
     </section>
   )
