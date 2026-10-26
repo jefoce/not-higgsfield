@@ -125,7 +125,7 @@ Both guides are also linked in the app: gear icon → **Setup guide**.
 ## Make your first video
 
 1. Pick the cheapest model at 480p and a short length to try.
-2. Describe what should happen. Optional: add a start picture (Frames) or references (References), and call them Image 1, Video 1, Audio 1 in your text.
+2. Describe what should happen. Optional: open the picker beside the generator and click a picture or clip to attach it. Click it again to remove it. In Frames, a click picks the file and closes the picker. Call them Image 1, Video 1, Audio 1 in your text.
 3. Press **Generate**. The button shows the price. You have 10 seconds to cancel before anything is sent or paid.
 
 ## Keep the app running until your video is done
