@@ -2,6 +2,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { HistoryModal } from '@/features/history/list/HistoryModal'
 
 import { handleNoop, Observer, record } from './helpers/history'
@@ -28,7 +29,33 @@ vi.mock('sonner', () => {
   return { toast: { success: vi.fn(), error: vi.fn() } }
 })
 
+const handleNavigate = vi.fn()
+
+const baseProps = {
+  open: true,
+  hasMore: false,
+  isLoadingMore: false,
+  onNavigate: handleNavigate,
+  onLoadMore: handleNoop,
+  onOpenChange: handleNoop,
+}
+
+interface ModalParams {
+  record: GenerationRecord | null
+  selectedId: string
+  viewOrder: string[]
+  open?: boolean
+  hasMore?: boolean
+  onLoadMore?: () => void
+  onOpenChange?: (open: boolean) => void
+}
+
+function modal(params: ModalParams) {
+  return <HistoryModal {...baseProps} {...params} />
+}
+
 beforeEach(() => {
+  handleNavigate.mockClear()
   vi.stubGlobal('IntersectionObserver', Observer)
   vi.stubGlobal('ResizeObserver', Observer)
 })
@@ -41,19 +68,7 @@ afterEach(() => {
 
 describe('HistoryModal', () => {
   it('fills the window with a stage backdrop and wider details', () => {
-    render(
-      <HistoryModal
-        record={record('v')}
-        open
-        selectedId="v"
-        order={['v']}
-        hasMore={false}
-        isLoadingMore={false}
-        onNavigate={handleNoop}
-        onLoadMore={handleNoop}
-        onOpenChange={handleNoop}
-      />,
-    )
+    render(modal({ record: record('v'), selectedId: 'v', viewOrder: ['v'] }))
 
     const dialog = screen.getByRole('dialog')
 
@@ -68,21 +83,7 @@ describe('HistoryModal', () => {
 
 describe('HistoryModal arrow keys', () => {
   it('moves to the next record with ArrowRight', () => {
-    const handleNavigate = vi.fn()
-
-    render(
-      <HistoryModal
-        record={record('a')}
-        open
-        selectedId="a"
-        order={['a', 'b', 'c']}
-        hasMore={false}
-        isLoadingMore={false}
-        onNavigate={handleNavigate}
-        onLoadMore={handleNoop}
-        onOpenChange={handleNoop}
-      />,
-    )
+    render(modal({ record: record('a'), selectedId: 'a', viewOrder: ['a', 'b', 'c'] }))
 
     fireEvent.keyDown(document.body, { key: 'ArrowRight' })
 
@@ -90,21 +91,7 @@ describe('HistoryModal arrow keys', () => {
   })
 
   it('moves to the previous record with ArrowLeft', () => {
-    const handleNavigate = vi.fn()
-
-    render(
-      <HistoryModal
-        record={record('b')}
-        open
-        selectedId="b"
-        order={['a', 'b', 'c']}
-        hasMore={false}
-        isLoadingMore={false}
-        onNavigate={handleNavigate}
-        onLoadMore={handleNoop}
-        onOpenChange={handleNoop}
-      />,
-    )
+    render(modal({ record: record('b'), selectedId: 'b', viewOrder: ['a', 'b', 'c'] }))
 
     fireEvent.keyDown(document.body, { key: 'ArrowLeft' })
 
@@ -112,21 +99,7 @@ describe('HistoryModal arrow keys', () => {
   })
 
   it('ignores arrow keys while closed', () => {
-    const handleNavigate = vi.fn()
-
-    render(
-      <HistoryModal
-        record={record('b')}
-        open={false}
-        selectedId="b"
-        order={['a', 'b', 'c']}
-        hasMore={false}
-        isLoadingMore={false}
-        onNavigate={handleNavigate}
-        onLoadMore={handleNoop}
-        onOpenChange={handleNoop}
-      />,
-    )
+    render(modal({ record: record('b'), selectedId: 'b', viewOrder: ['a', 'b', 'c'], open: false }))
 
     fireEvent.keyDown(document.body, { key: 'ArrowRight' })
 
@@ -136,19 +109,8 @@ describe('HistoryModal arrow keys', () => {
 
 describe('HistoryModal navigation', () => {
   it('moves to the next and previous record in order', () => {
-    const handleNavigate = vi.fn()
-
-    const navProps = {
-      order: ['a', 'b', 'c'],
-      hasMore: false,
-      isLoadingMore: false,
-      onNavigate: handleNavigate,
-      onLoadMore: handleNoop,
-      onOpenChange: handleNoop,
-    }
-
     const { rerender } = render(
-      <HistoryModal {...navProps} record={record('a')} open selectedId="a" />,
+      modal({ record: record('a'), selectedId: 'a', viewOrder: ['a', 'b', 'c'] }),
     )
 
     fireEvent.click(screen.getByLabelText('Next'))
@@ -157,7 +119,7 @@ describe('HistoryModal navigation', () => {
 
     handleNavigate.mockClear()
 
-    rerender(<HistoryModal {...navProps} record={record('b')} open selectedId="b" />)
+    rerender(modal({ record: record('b'), selectedId: 'b', viewOrder: ['a', 'b', 'c'] }))
 
     fireEvent.click(screen.getByLabelText('Previous'))
 
@@ -165,23 +127,14 @@ describe('HistoryModal navigation', () => {
   })
 
   it('disables previous on the first record and next on the last page', () => {
-    const navProps = {
-      order: ['a', 'b'],
-      hasMore: false,
-      isLoadingMore: false,
-      onNavigate: handleNoop,
-      onLoadMore: handleNoop,
-      onOpenChange: handleNoop,
-    }
-
     const { rerender } = render(
-      <HistoryModal {...navProps} record={record('a')} open selectedId="a" />,
+      modal({ record: record('a'), selectedId: 'a', viewOrder: ['a', 'b'] }),
     )
 
     expect(screen.getByLabelText<HTMLButtonElement>('Previous').disabled).toBe(true)
     expect(screen.getByLabelText<HTMLButtonElement>('Next').disabled).toBe(false)
 
-    rerender(<HistoryModal {...navProps} record={record('b')} open selectedId="b" />)
+    rerender(modal({ record: record('b'), selectedId: 'b', viewOrder: ['a', 'b'] }))
 
     expect(screen.getByLabelText<HTMLButtonElement>('Previous').disabled).toBe(false)
     expect(screen.getByLabelText<HTMLButtonElement>('Next').disabled).toBe(true)
@@ -191,17 +144,13 @@ describe('HistoryModal navigation', () => {
     const handleLoadMore = vi.fn()
 
     render(
-      <HistoryModal
-        record={record('c')}
-        open
-        selectedId="c"
-        order={['a', 'b', 'c']}
-        hasMore
-        isLoadingMore={false}
-        onNavigate={handleNoop}
-        onLoadMore={handleLoadMore}
-        onOpenChange={handleNoop}
-      />,
+      modal({
+        record: record('c'),
+        selectedId: 'c',
+        viewOrder: ['a', 'b', 'c'],
+        hasMore: true,
+        onLoadMore: handleLoadMore,
+      }),
     )
 
     const next = screen.getByLabelText<HTMLButtonElement>('Next')
@@ -215,31 +164,83 @@ describe('HistoryModal navigation', () => {
   })
 })
 
+describe('HistoryModal active records', () => {
+  it('shows a running record present in the view order without navigating', () => {
+    render(
+      modal({
+        record: record('b', { status: 'in_progress' }),
+        selectedId: 'b',
+        viewOrder: ['a', 'b', 'c'],
+      }),
+    )
+
+    expect(screen.getByText('Prompt b')).not.toBeNull()
+    expect(handleNavigate).not.toHaveBeenCalled()
+  })
+
+  it('steps next and previous across completed, running and failed ids', () => {
+    const { rerender } = render(
+      modal({ record: record('a'), selectedId: 'a', viewOrder: ['a', 'b', 'c'] }),
+    )
+
+    fireEvent.click(screen.getByLabelText('Next'))
+
+    expect(handleNavigate).toHaveBeenLastCalledWith('b')
+
+    handleNavigate.mockClear()
+
+    rerender(
+      modal({
+        record: record('b', { status: 'in_progress' }),
+        selectedId: 'b',
+        viewOrder: ['a', 'b', 'c'],
+      }),
+    )
+
+    fireEvent.click(screen.getByLabelText('Next'))
+
+    expect(handleNavigate).toHaveBeenLastCalledWith('c')
+
+    handleNavigate.mockClear()
+
+    rerender(
+      modal({
+        record: record('c', { status: 'failed' }),
+        selectedId: 'c',
+        viewOrder: ['a', 'b', 'c'],
+      }),
+    )
+
+    fireEvent.click(screen.getByLabelText('Previous'))
+
+    expect(handleNavigate).toHaveBeenLastCalledWith('b')
+  })
+
+  it('keeps a record selected when it turns completed and does not navigate', () => {
+    const { rerender } = render(
+      modal({
+        record: record('b', { status: 'in_progress' }),
+        selectedId: 'b',
+        viewOrder: ['a', 'b', 'c'],
+      }),
+    )
+
+    rerender(modal({ record: record('b'), selectedId: 'b', viewOrder: ['a', 'b', 'c'] }))
+
+    expect(handleNavigate).not.toHaveBeenCalled()
+    expect(screen.getByText('Prompt b')).not.toBeNull()
+  })
+})
+
 describe('HistoryModal recovery', () => {
   it('moves to the neighbor when the record drops out of order', () => {
-    const handleNavigate = vi.fn()
-
-    const navProps = {
-      hasMore: false,
-      isLoadingMore: false,
-      onNavigate: handleNavigate,
-      onLoadMore: handleNoop,
-      onOpenChange: handleNoop,
-    }
-
     const { rerender } = render(
-      <HistoryModal
-        {...navProps}
-        record={record('b')}
-        open
-        selectedId="b"
-        order={['a', 'b', 'c']}
-      />,
+      modal({ record: record('b'), selectedId: 'b', viewOrder: ['a', 'b', 'c'] }),
     )
 
     handleNavigate.mockClear()
 
-    rerender(<HistoryModal {...navProps} record={null} open selectedId="b" order={['a', 'c']} />)
+    rerender(modal({ record: null, selectedId: 'b', viewOrder: ['a', 'c'] }))
 
     expect(handleNavigate).toHaveBeenCalledWith('c')
   })
@@ -247,19 +248,7 @@ describe('HistoryModal recovery', () => {
   it('closes when the last record is deleted', () => {
     const handleOpenChange = vi.fn()
 
-    render(
-      <HistoryModal
-        record={null}
-        open
-        selectedId="b"
-        order={[]}
-        hasMore={false}
-        isLoadingMore={false}
-        onNavigate={handleNoop}
-        onLoadMore={handleNoop}
-        onOpenChange={handleOpenChange}
-      />,
-    )
+    render(modal({ record: null, selectedId: 'b', viewOrder: [], onOpenChange: handleOpenChange }))
 
     expect(handleOpenChange).toHaveBeenCalledWith(false)
   })

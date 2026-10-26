@@ -54,6 +54,12 @@ export function HistorySection() {
     })
   }, [records])
 
+  const viewOrder = useMemo(() => {
+    return records.map((record) => {
+      return record.id
+    })
+  }, [records])
+
   const paddingClass = isSelecting ? 'pb-28' : 'pb-14'
 
   const handleOpen = (record: GenerationRecord) => {
@@ -82,14 +88,8 @@ export function HistorySection() {
   }, [order])
 
   useEffect(() => {
-    useSelectionStore.getState().prune(
-      new Set(
-        records.map((record) => {
-          return record.id
-        }),
-      ),
-    )
-  }, [records])
+    useSelectionStore.getState().prune(new Set(viewOrder))
+  }, [viewOrder])
 
   const sentinel = useHistoryScroll(hasMore, loadMore)
 
@@ -108,7 +108,7 @@ export function HistorySection() {
         record={selected}
         open={!isNil(selectedId)}
         selectedId={selectedId}
-        order={order}
+        viewOrder={viewOrder}
         hasMore={hasMore}
         isLoadingMore={isValidating}
         onNavigate={setSelectedId}

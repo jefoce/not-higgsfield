@@ -20,7 +20,7 @@ interface HistoryModalProps {
   record: GenerationRecord | null
   open: boolean
   selectedId: string | null
-  order: string[]
+  viewOrder: string[]
   hasMore: boolean
   isLoadingMore: boolean
   onNavigate: (id: string) => void
@@ -30,7 +30,7 @@ interface HistoryModalProps {
 
 interface HistoryNavParams {
   selectedId: string | null
-  order: string[]
+  viewOrder: string[]
   hasMore: boolean
   isLoadingMore: boolean
   onNavigate: (id: string) => void
@@ -55,13 +55,15 @@ function stageBackdrop(record: GenerationRecord, poster: string | undefined) {
   return { kind: 'image' as const, src: poster }
 }
 
-/** Record position in the loaded order, paging and delete recovery. */
+/** Record position in the view order, paging and delete recovery. */
 function useHistoryNav(params: HistoryNavParams) {
-  const { selectedId, order, hasMore, isLoadingMore, onNavigate, onLoadMore, onOpenChange } = params
+  const { selectedId, viewOrder, hasMore, isLoadingMore, onNavigate, onLoadMore, onOpenChange } =
+    params
+
   let index = -1
 
   if (!isNil(selectedId)) {
-    index = order.indexOf(selectedId)
+    index = viewOrder.indexOf(selectedId)
   }
 
   const lastIndexRef = useRef(0)
@@ -72,47 +74,47 @@ function useHistoryNav(params: HistoryNavParams) {
     }
   }, [index])
 
-  // A delete removes the record from order. Pick the id now at its old slot.
+  // A delete removes the record from viewOrder. Pick the id now at its old slot.
   useEffect(() => {
     if (isNil(selectedId) || index !== -1) {
       return
     }
 
-    if (isEmpty(order)) {
+    if (isEmpty(viewOrder)) {
       onOpenChange(false)
 
       return
     }
 
-    const nextId = order[Math.min(lastIndexRef.current, order.length - 1)]
+    const nextId = viewOrder[Math.min(lastIndexRef.current, viewOrder.length - 1)]
 
     if (!isNil(nextId) && nextId !== selectedId) {
       onNavigate(nextId)
     }
-  }, [index, onNavigate, onOpenChange, order, selectedId])
+  }, [index, onNavigate, onOpenChange, selectedId, viewOrder])
 
   useEffect(() => {
     if (index < 0 || !hasMore || isLoadingMore) {
       return
     }
 
-    if (index >= order.length - 3) {
+    if (index >= viewOrder.length - 3) {
       onLoadMore()
     }
-  }, [hasMore, index, isLoadingMore, onLoadMore, order.length])
+  }, [hasMore, index, isLoadingMore, onLoadMore, viewOrder.length])
 
   const handlePrevious = useCallback(() => {
-    const previousId = order[index - 1]
+    const previousId = viewOrder[index - 1]
 
     if (index > 0 && !isNil(previousId)) {
       onNavigate(previousId)
     }
-  }, [index, onNavigate, order])
+  }, [index, onNavigate, viewOrder])
 
   const handleNext = useCallback(() => {
-    const nextId = order[index + 1]
+    const nextId = viewOrder[index + 1]
 
-    if (index < order.length - 1 && !isNil(nextId)) {
+    if (index < viewOrder.length - 1 && !isNil(nextId)) {
       onNavigate(nextId)
 
       return
@@ -121,11 +123,11 @@ function useHistoryNav(params: HistoryNavParams) {
     if (hasMore) {
       onLoadMore()
     }
-  }, [hasMore, index, onLoadMore, onNavigate, order])
+  }, [hasMore, index, onLoadMore, onNavigate, viewOrder])
 
   return {
     hasPrevious: index > 0,
-    hasNext: index >= 0 && (index < order.length - 1 || hasMore),
+    hasNext: index >= 0 && (index < viewOrder.length - 1 || hasMore),
     onPrevious: handlePrevious,
     onNext: handleNext,
   }
