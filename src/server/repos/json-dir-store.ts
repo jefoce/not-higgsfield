@@ -9,6 +9,7 @@ import type { ZodType } from 'zod'
 import type { HasId } from '@/core/utility-types'
 
 import { listJsonFileNames, readJson } from '../fs/json-file'
+import { isUuid } from '../fs/media-ref'
 import { globalState } from '../global-state'
 
 interface IndexState<T> {
@@ -61,7 +62,9 @@ export function jsonDirStore<T extends HasId>(params: JsonDirStoreParams<T>): Js
       return state.map
     }
 
-    const names = await listJsonFileNames(dir)
+    const names = (await listJsonFileNames(dir)).filter((name) => {
+      return isUuid(path.basename(name, '.json'))
+    })
 
     const records: (T | null)[] = await Promise.all(
       names.map((name) => {
