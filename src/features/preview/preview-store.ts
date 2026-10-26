@@ -7,6 +7,9 @@ import type { UploadItem } from '@/core/schemas/upload-item'
 /** Upload item plus a read-only ref for files not linked yet. */
 export interface PreviewItem extends UploadItem {
   previewRef?: string
+
+  /** Connected folder root, set only on unlinked folder previews. */
+  folderPath?: string
 }
 
 export type ActionKey = keyof Omit<PreviewActions, 'available' | 'label' | 'isSelected'>

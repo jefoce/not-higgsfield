@@ -72,7 +72,7 @@ export function FolderTab(props: FolderTabProps) {
 
   const handleExpand = (file: FolderFile) => {
     const items = files.map((each) => {
-      return folderPreviewItem({ folderId, file: each })
+      return folderPreviewItem({ folderId, folderPath, file: each })
     })
 
     const index = files.findIndex((each) => {

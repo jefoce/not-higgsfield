@@ -12,12 +12,13 @@ import { closeMediaPicker, type PickerMode } from '../picker/store'
 
 interface FolderPreviewItemParams {
   folderId: string
+  folderPath: string
   file: FolderFile
 }
 
 /** Preview-only item for a folder file. Nothing links until selected. */
 export function folderPreviewItem(params: FolderPreviewItemParams): PreviewItem {
-  const { folderId, file } = params
+  const { folderId, folderPath, file } = params
   const ext = extWithDot(file.name)
 
   return {
@@ -30,6 +31,7 @@ export function folderPreviewItem(params: FolderPreviewItemParams): PreviewItem 
     sizeBytes: file.sizeBytes,
     createdAt: new Date(file.mtimeMs).toISOString(),
     previewRef: `folders/${folderId}/${file.rel}`,
+    folderPath,
   }
 }
 

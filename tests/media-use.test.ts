@@ -10,6 +10,7 @@ import {
   mediaUse,
   type MediaUseState,
 } from '@/features/generator/use-media'
+import type { PreviewItem } from '@/features/preview/preview-store'
 
 import { record as makeRecord } from './helpers/history'
 import { upload } from './helpers/validation-fixtures'
@@ -79,6 +80,16 @@ const imageTwo = upload('image-2', 'image')
 const imageThree = upload('image-3', 'image')
 const audio = upload('audio-1', 'audio')
 const recordTarget: MediaTarget = { kind: 'record', record: makeRecord('history-record') }
+
+const FOLDER_PATH = '/photos'
+
+const folderPreview: PreviewItem = {
+  ...upload('folder:7:clip.png', 'image'),
+  previewRef: 'folders/7/clip.png',
+  folderPath: FOLDER_PATH,
+}
+
+const folderLinked = upload('linked-folder', 'image', { target: `${FOLDER_PATH}/clip.png` })
 
 const videoRefs = Array.from({ length: 10 }, (_, index) => {
   return upload(`video-${index}`, 'video')
@@ -165,6 +176,31 @@ const cases: UseCase[] = [
       uploadsById: uploads(imageOne),
     }),
     expected: { label: 'Reference', isDisabled: true, reason: 'Reference limit reached' },
+  },
+  {
+    name: 'references folder preview already attached',
+    target: { kind: 'upload', upload: folderPreview },
+    state: state({
+      references: [folderLinked.id],
+      uploadsById: uploads(folderLinked),
+    }),
+    expected: { label: 'Reference', isDisabled: true, reason: 'Already @Image 1' },
+  },
+  {
+    name: 'references folder preview not attached',
+    target: { kind: 'upload', upload: folderPreview },
+    state: state({ uploadsById: uploads(folderLinked) }),
+    expected: { label: 'Reference', isDisabled: false, reason: 'Reference' },
+  },
+  {
+    name: 'frames folder preview linked to the start frame',
+    target: { kind: 'upload', upload: folderPreview },
+    state: state({
+      tab: 'frames',
+      frames: { start: folderLinked.id, end: null },
+      uploadsById: uploads(folderLinked),
+    }),
+    expected: { label: 'Start frame', isDisabled: true, reason: 'Already the start frame' },
   },
   {
     name: 'frames record enabled',

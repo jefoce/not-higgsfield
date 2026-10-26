@@ -1,6 +1,7 @@
 import { isNil, isString } from 'lodash-es'
 import { toast } from 'sonner'
 
+import { folderFileUpload } from '@/core/folder-match'
 import type { MediaKindCounts } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
@@ -141,19 +142,21 @@ export function mediaUse(target: MediaTarget, state: MediaUseState): MediaUse {
 
   const context: UseContext = { label, preset, room, slots, state }
 
-  if (state.tab === 'references') {
-    if (target.kind === 'record') {
+  if (target.kind === 'record') {
+    if (state.tab === 'references') {
       return referenceRecordUse(context)
     }
 
-    return referenceUploadUse(context, target.upload)
-  }
-
-  if (target.kind === 'record') {
     return frameRecordUse(context)
   }
 
-  return frameUploadUse(context, target.upload)
+  const upload = attachedFolderUpload(target.upload, state) ?? target.upload
+
+  if (state.tab === 'references') {
+    return referenceUploadUse(context, upload)
+  }
+
+  return frameUploadUse(context, upload)
 }
 
 interface FolderRef {
@@ -188,14 +191,48 @@ function folderRef(ref: string): FolderRef | null {
   return { folderId: rest.slice(0, slash), relPath: rest.slice(slash + 1) }
 }
 
-async function linkedUpload(upload: UploadItem): Promise<UploadItem | null> {
+/** Folder ref of an unlinked folder preview, null for any other upload. */
+function folderTargetFromUpload(upload: UploadItem): FolderRef | null {
   const ref = folderPreviewRef(upload)
 
   if (isNil(ref) || !ref.startsWith('folders/')) {
-    return upload
+    return null
   }
 
-  const folder = folderRef(ref)
+  return folderRef(ref)
+}
+
+interface FolderAttachmentState {
+  references: string[]
+  frames: MediaFrames
+  uploadsById: UploadsById
+}
+
+/** Attached upload already linked to the folder preview target, null when none. */
+function attachedFolderUpload(upload: UploadItem, state: FolderAttachmentState): UploadItem | null {
+  const folder = folderTargetFromUpload(upload)
+
+  if (isNil(folder) || !('folderPath' in upload) || !isString(upload.folderPath)) {
+    return null
+  }
+
+  let selectedIds = state.references
+  const startFrame = state.frames.start
+
+  if (!isNil(startFrame)) {
+    selectedIds = [...selectedIds, startFrame]
+  }
+
+  return folderFileUpload({
+    folderPath: upload.folderPath,
+    rel: folder.relPath,
+    selectedIds,
+    uploadsById: state.uploadsById,
+  })
+}
+
+async function linkedUpload(upload: UploadItem): Promise<UploadItem | null> {
+  const folder = folderTargetFromUpload(upload)
 
   if (isNil(folder)) {
     return upload
@@ -278,7 +315,8 @@ export async function applyMedia(target: MediaTarget): Promise<boolean> {
     return applyRecord(target.record)
   }
 
-  const upload = await linkedUpload(target.upload)
+  const attached = attachedFolderUpload(target.upload, useGeneratorStore.getState())
+  const upload = attached ?? (await linkedUpload(target.upload))
 
   if (isNil(upload)) {
     return false
