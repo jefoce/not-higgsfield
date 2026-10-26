@@ -1,3 +1,5 @@
+/* eslint-disable max-lines -- CI script and workflow checks stay in one suite */
+
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -9,6 +11,7 @@ import {
   cleanupTempDirs,
   fakeOrasEnv,
   gitRepo,
+  jobsMissingCheckout,
   parseOutput,
   runScript,
   tempDir,
@@ -230,6 +233,16 @@ describe('ffmpeg-plan.sh', () => {
 
     expect(result.status).toBe(0)
     expect(parseOutput(fs.readFileSync(output, 'utf8'))).toEqual(item.expected)
+  })
+})
+
+const WORKFLOW_FILES = ['.github/workflows/checks.yml', '.github/workflows/release.yml']
+
+describe('workflow checkouts', () => {
+  it.each(WORKFLOW_FILES)('%s checks out before using repo files', (file) => {
+    const text = fs.readFileSync(path.resolve(file), 'utf8')
+
+    expect(jobsMissingCheckout(text)).toEqual([])
   })
 })
 

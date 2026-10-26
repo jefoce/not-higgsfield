@@ -3,6 +3,13 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
+import { isNil } from 'lodash-es'
+
+const CHECKOUT_REFERENCE = /uses:\s*actions\/checkout@/
+const REPO_REFERENCE = /\.github\/(?:scripts|actions)\/|(?<!\.github\/)scripts\//
+const JOB_START = /^ {2}([A-Za-z0-9_-]+):\s*$/gm
+const STEPS_KEY = /^ {4}steps:\s*$/
+
 const SCRIPTS = path.resolve('.github/scripts')
 const tempDirs: string[] = []
 
@@ -95,4 +102,62 @@ export function fakeOrasEnv() {
   const basePath = execFileSync('printenv', ['PATH'], { encoding: 'utf8' })
 
   return { root, env: { ...process.env, PATH: `${bin}:${basePath.trim()}` } }
+}
+
+/**
+ * True when a job uses a repo script or action before checking out the repo.
+ * Job keys sit at two spaces, the steps key at four, and step lines below it.
+ */
+function jobMissingCheckout(block: string) {
+  const lines = block.split('\n')
+
+  const steps = lines.findIndex((line) => {
+    return STEPS_KEY.test(line)
+  })
+
+  if (steps === -1) {
+    return false
+  }
+
+  const stepLines = lines.slice(steps)
+
+  const checkout = stepLines.findIndex((line) => {
+    return CHECKOUT_REFERENCE.test(line)
+  })
+
+  const reference = stepLines.findIndex((line) => {
+    return REPO_REFERENCE.test(line)
+  })
+
+  return reference !== -1 && (checkout === -1 || checkout > reference)
+}
+
+export function jobsMissingCheckout(text: string) {
+  const start = text.search(/^jobs:\s*$/m)
+  const missing: string[] = []
+
+  if (start === -1) {
+    return missing
+  }
+
+  const section = text.slice(start)
+  const end = section.search(/\n[^\s#]/)
+  const body = section.slice(0, end === -1 ? section.length : end)
+  const jobs = [...body.matchAll(JOB_START)]
+
+  for (const [index, job] of jobs.entries()) {
+    const name = job[1]
+
+    if (isNil(name)) {
+      continue
+    }
+
+    const block = body.slice(job.index ?? 0, jobs[index + 1]?.index ?? body.length)
+
+    if (jobMissingCheckout(block)) {
+      missing.push(name)
+    }
+  }
+
+  return missing
 }
