@@ -3,9 +3,13 @@ import { toast } from 'sonner'
 
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { canCancelInGrace } from '@/core/submit-state'
+import {
+  applyRecordToGenerator,
+  captureFrameAt,
+  linkRecordReference,
+} from '@/features/generator/record-input'
 import { useGeneratorStore } from '@/features/generator/store/store'
-import { captureGenerationFrame, revealGeneration } from '@/lib/api/generations'
-import { linkGenerationFile } from '@/lib/api/uploads'
+import { revealGeneration } from '@/lib/api/generations'
 import { copyText, toastError } from '@/lib/notify'
 
 import { cancelGeneration } from './record-actions'
@@ -17,14 +21,7 @@ export async function captureFrame(
   at: 'first' | 'last',
 ): Promise<boolean> {
   try {
-    const upload = await captureGenerationFrame(record.id, at)
-    const store = useGeneratorStore.getState()
-
-    if (store.tab !== 'frames') {
-      store.setTab('frames')
-    }
-
-    store.setFrame('start', upload)
+    await captureFrameAt(record, at)
     toast.success('Start frame set')
 
     return true
@@ -38,15 +35,7 @@ export async function captureFrame(
 /** Links the finished video as a reference when the preset allows it. */
 export async function addReference(record: GenerationRecord): Promise<boolean> {
   try {
-    const upload = await linkGenerationFile({ generationId: record.id })
-    const store = useGeneratorStore.getState()
-
-    if (store.tab !== 'references') {
-      store.setTab('references')
-    }
-
-    store.addReferences([upload])
-
+    const upload = await linkRecordReference(record)
     const isAdded = useGeneratorStore.getState().references.includes(upload.id)
 
     if (isAdded) {
@@ -68,17 +57,13 @@ export async function addReference(record: GenerationRecord): Promise<boolean> {
  * @public
  */
 export async function useAsInput(record: GenerationRecord): Promise<boolean> {
-  const { tab } = useGeneratorStore.getState()
+  try {
+    return await applyRecordToGenerator(record)
+  } catch (error) {
+    toastError(error)
 
-  if (tab === 'frames') {
-    return captureFrame(record, 'last')
+    return false
   }
-
-  if (tab === 'references') {
-    return addReference(record)
-  }
-
-  return false
 }
 
 export async function copyPrompt(record: GenerationRecord): Promise<void> {

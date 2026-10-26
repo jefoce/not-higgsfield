@@ -7,10 +7,10 @@ import type { ModelPreset } from '@/core/presets/types'
 import { referenceSlots, type RefSlot, slotToken } from '@/core/prompt-tokens'
 import type { GenerationRecord, GeneratorTab } from '@/core/schemas/generation-record'
 import type { UploadItem, UploadsById } from '@/core/schemas/upload-item'
-import { captureGenerationFrame } from '@/lib/api/generations'
-import { linkFolderFile, linkGenerationFile } from '@/lib/api/uploads'
+import { linkFolderFile } from '@/lib/api/uploads'
 import { toastError } from '@/lib/notify'
 
+import { applyRecordToGenerator } from './record-input'
 import { addBlockReason, referenceRoom } from './reference-rules'
 import { useGeneratorStore } from './store/store'
 
@@ -210,46 +210,23 @@ async function linkedUpload(upload: UploadItem): Promise<UploadItem | null> {
   }
 }
 
-async function applyRecordFrame(record: GenerationRecord): Promise<boolean> {
-  try {
-    const upload = await captureGenerationFrame(record.id, 'last')
-    const store = useGeneratorStore.getState()
+async function applyRecord(record: GenerationRecord): Promise<boolean> {
+  const isFrames = useGeneratorStore.getState().tab === 'frames'
 
-    if (store.tab !== 'frames') {
-      store.setTab('frames')
+  try {
+    const isApplied = await applyRecordToGenerator(record)
+
+    if (!isApplied) {
+      toast.error('Reference limit reached')
+
+      return false
     }
 
-    store.setFrame('start', upload)
-    toast.success('Start frame set')
+    const message = isFrames ? 'Start frame set' : 'Added as reference'
+
+    toast.success(message)
 
     return true
-  } catch (error) {
-    toastError(error)
-
-    return false
-  }
-}
-
-async function applyRecordReference(record: GenerationRecord): Promise<boolean> {
-  try {
-    const upload = await linkGenerationFile({ generationId: record.id })
-    const store = useGeneratorStore.getState()
-
-    if (store.tab !== 'references') {
-      store.setTab('references')
-    }
-
-    store.addReferences([upload])
-
-    const isAdded = useGeneratorStore.getState().references.includes(upload.id)
-
-    if (isAdded) {
-      toast.success('Added as reference')
-    } else {
-      toast.error('Reference limit reached')
-    }
-
-    return isAdded
   } catch (error) {
     toastError(error)
 
@@ -298,11 +275,7 @@ function applyUploadReference(upload: UploadItem): boolean {
  */
 export async function applyMedia(target: MediaTarget): Promise<boolean> {
   if (target.kind === 'record') {
-    if (useGeneratorStore.getState().tab === 'frames') {
-      return applyRecordFrame(target.record)
-    }
-
-    return applyRecordReference(target.record)
+    return applyRecord(target.record)
   }
 
   const upload = await linkedUpload(target.upload)
