@@ -1,4 +1,4 @@
-import { isNil } from 'lodash-es'
+import { isNil, keyBy } from 'lodash-es'
 import { toast } from 'sonner'
 
 import { isNonEmptyString } from '@/core/guards'
@@ -136,18 +136,56 @@ const THUMB_ACTIONS: PreviewActions = {
   available: availableActions,
 }
 
-/** Opens the upload behind a thumb, toasting when the file is gone. */
-export async function openThumb(item: ThumbItem): Promise<void> {
-  try {
-    const [upload] = await fetchUploads({ ids: [item.id] })
+export interface OpenThumbParams {
+  item: ThumbItem
+  items: ThumbItem[]
+  index: number
+}
 
-    if (isNil(upload) || upload.missing === true) {
+/** Opens the uploads behind a thumb chain, toasting when the clicked file is gone. */
+export async function openThumb(params: OpenThumbParams): Promise<void> {
+  const { item, items, index } = params
+
+  if (item.missing) {
+    toast.error('File no longer exists')
+
+    return
+  }
+
+  try {
+    const uploads = await fetchUploads({
+      ids: items.map((entry) => {
+        return entry.id
+      }),
+    })
+
+    const byId = keyBy(uploads, 'id')
+    const current = byId[item.id]
+
+    if (isNil(current) || current.missing === true) {
       toast.error('File no longer exists')
 
       return
     }
 
-    openPreview({ items: [upload], index: 0, actions: THUMB_ACTIONS })
+    const chain: UploadItem[] = []
+    let chainIndex = -1
+
+    for (const [position, entry] of items.entries()) {
+      const upload = byId[entry.id]
+
+      if (isNil(upload) || upload.missing === true) {
+        continue
+      }
+
+      if (position === index) {
+        chainIndex = chain.length
+      }
+
+      chain.push(upload)
+    }
+
+    openPreview({ items: chain, index: chainIndex, actions: THUMB_ACTIONS })
   } catch (error) {
     toastError(error)
   }

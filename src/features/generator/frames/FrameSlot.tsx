@@ -4,11 +4,12 @@ import { type MouseEvent } from 'react'
 import { isNil } from 'lodash-es'
 
 import { isNonEmptyString } from '@/core/guards'
+import type { KindExtensions } from '@/core/media-kinds'
 import { getPreset } from '@/core/presets'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { extensionsFromLimits, openMediaPicker } from '@/features/media-picker/picker/store'
 import { useDropUpload } from '@/features/media-picker/uploads/use-drop-upload'
-import { openPreview } from '@/features/preview/preview-store'
+import { openPreview, type PreviewActions } from '@/features/preview/preview-store'
 import { cn } from '@/lib/cn'
 import { Tooltip } from '@/ui/Tooltip'
 
@@ -34,6 +35,9 @@ interface SlotTooltipParams {
 
 const TARGETS = { start: 'frame-start', end: 'frame-end' } as const
 const LABELS = { start: 'Start frame', end: 'End frame' } as const
+const FRAME_SLOTS = ['start', 'end'] as const
+
+type FrameSlotName = (typeof FRAME_SLOTS)[number]
 
 interface FrameState {
   isBroken: boolean
@@ -68,20 +72,117 @@ function slotTooltip(params: SlotTooltipParams): string | undefined {
   return undefined
 }
 
-interface PreviewUploadParams {
-  upload?: UploadItem
-  replace: () => void
-  remove: () => void
+interface OpenFramePickerParams {
+  slot: FrameSlotName
+  extensions?: KindExtensions
+  onPick: (items: UploadItem[]) => void
 }
 
-function previewUpload(params: PreviewUploadParams): void {
-  const { upload, replace, remove } = params
+/** Opens the image picker for one frame slot. */
+function openFramePicker(params: OpenFramePickerParams): void {
+  const { slot, extensions, onPick } = params
 
-  if (!upload) {
+  openMediaPicker({
+    target: TARGETS[slot],
+    kinds: ['image'],
+    max: 1,
+    extensions,
+    onPick,
+  })
+}
+
+/** Frame uploads in slot order, without missing files. */
+function frameChain(): UploadItem[] {
+  const { frames, uploadsById } = useGeneratorStore.getState()
+
+  return FRAME_SLOTS.flatMap((each) => {
+    const id = frames[each]
+
+    if (!isNonEmptyString(id)) {
+      return []
+    }
+
+    const item = uploadsById[id]
+
+    if (isNil(item) || item.missing === true) {
+      return []
+    }
+
+    return [item]
+  })
+}
+
+/** Slot holding the upload, if it is still attached. */
+function slotForUpload(upload: UploadItem): FrameSlotName | undefined {
+  const { frames } = useGeneratorStore.getState()
+
+  return FRAME_SLOTS.find((each) => {
+    return frames[each] === upload.id
+  })
+}
+
+interface ReplaceFrameParams {
+  current: UploadItem
+  extensions?: KindExtensions
+  setFrame: (slot: FrameSlotName, upload: UploadItem | null) => void
+}
+
+/** Opens the picker for the slot holding the shown frame. */
+function replaceFrame(params: ReplaceFrameParams): void {
+  const { current, extensions, setFrame } = params
+  const target = slotForUpload(current)
+
+  if (isNil(target)) {
     return
   }
 
-  openPreview({ items: [upload], index: 0, actions: { replace, remove } })
+  const handlePick = (items: UploadItem[]): void => {
+    const [next] = items
+
+    if (!isNil(next)) {
+      setFrame(target, next)
+    }
+  }
+
+  openFramePicker({ slot: target, extensions, onPick: handlePick })
+}
+
+interface RemoveFrameParams {
+  current: UploadItem
+  setFrame: (slot: FrameSlotName, upload: UploadItem | null) => void
+}
+
+/** Clears the slot holding the shown frame. */
+function removeFrame(params: RemoveFrameParams): void {
+  const { current, setFrame } = params
+  const target = slotForUpload(current)
+
+  if (isNil(target)) {
+    return
+  }
+
+  setFrame(target, null)
+}
+
+interface OpenFramePreviewParams {
+  upload: UploadItem
+  actions: PreviewActions
+}
+
+/** Opens the frame chain at the shown upload. */
+function openFramePreview(params: OpenFramePreviewParams): void {
+  const { upload, actions } = params
+  const items = frameChain()
+
+  const index = items.findIndex((item) => {
+    return item.id === upload.id
+  })
+
+  if (index < 0) {
+    return
+  }
+
+  openPreview({ items, index, actions })
 }
 
 /** One frame drop slot with preview, replace and remove actions. */
@@ -132,21 +233,30 @@ export function FrameSlot(props: FrameSlotProps) {
   const { isBroken, isPreviewable } = frameState({ hasFrame, upload })
 
   const handlePick = (): void => {
-    openMediaPicker({
-      target: TARGETS[slot],
-      kinds: ['image'],
-      max: 1,
-      extensions,
-      onPick: handleUploaded,
-    })
+    openFramePicker({ slot, extensions, onPick: handleUploaded })
   }
 
   const handleRemove = (): void => {
     setFrame(slot, null)
   }
 
+  const handleReplace = (current: UploadItem): void => {
+    replaceFrame({ current, extensions, setFrame })
+  }
+
+  const handleRemoveAction = (current: UploadItem): void => {
+    removeFrame({ current, setFrame })
+  }
+
   const handlePreview = (): void => {
-    previewUpload({ upload, replace: handlePick, remove: handleRemove })
+    if (isNil(upload)) {
+      return
+    }
+
+    openFramePreview({
+      upload,
+      actions: { replace: handleReplace, remove: handleRemoveAction },
+    })
   }
 
   const handleSlotPress = isPreviewable ? handlePreview : handlePick

@@ -35,7 +35,10 @@ vi.mock('swr', () => {
         data: {
           path: '',
           dirs: [],
-          files: [{ name: 'clip.mp4', rel: 'clip.mp4', kind: 'video', sizeBytes: 1, mtimeMs: 1 }],
+          files: [
+            { name: 'clip.mp4', rel: 'clip.mp4', kind: 'video', sizeBytes: 1, mtimeMs: 1 },
+            { name: 'second.mp4', rel: 'second.mp4', kind: 'video', sizeBytes: 1, mtimeMs: 1 },
+          ],
         },
         isLoading: false,
       }
@@ -130,6 +133,26 @@ describe('FolderTab selection', () => {
     expect(item.id).toBe('folder:folder-1:clip.mp4')
     expect(item.previewRef).toBe('folders/folder-1/clip.mp4')
     expect(item.mime).toBe('video/mp4')
+  })
+
+  it('chains every filtered file and opens at the clicked index', () => {
+    renderTab({ max: 3, onPickFile: vi.fn<(rel: string) => void>() })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Preview second.mp4' }))
+
+    const request = usePreviewStore.getState().request
+
+    if (isNil(request)) {
+      throw new Error('preview request missing')
+    }
+
+    expect(
+      request.items.map((item) => {
+        return item.id
+      }),
+    ).toEqual(['folder:folder-1:clip.mp4', 'folder:folder-1:second.mp4'])
+
+    expect(request.index).toBe(1)
   })
 
   it('selects from the preview without linking when multiple files are allowed', () => {

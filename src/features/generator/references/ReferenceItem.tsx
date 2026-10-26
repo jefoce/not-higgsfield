@@ -95,7 +95,7 @@ export function ReferenceItem(props: ReferenceItemProps) {
     })
   }
 
-  const canPreview = !isNil(upload) && upload.kind !== 'audio'
+  const canPreview = !isNil(upload)
   const handleOpenPreview = canPreview ? handlePreview : undefined
 
   if (isLifted === true) {

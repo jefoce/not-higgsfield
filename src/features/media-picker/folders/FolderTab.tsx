@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { isEmpty } from 'lodash-es'
 import useSWR from 'swr'
 
+import { isNonEmptyString } from '@/core/guards'
 import { extensionAllowed, extWithDot, type KindExtensions, mimeFromExt } from '@/core/media-kinds'
 import type { FolderFile, MediaKind } from '@/core/media-types'
 import { openPreview, type PreviewItem } from '@/features/preview/preview-store'
@@ -52,18 +53,32 @@ function folderPreviewItem(params: FolderPreviewItemParams): PreviewItem {
   }
 }
 
+interface SelectFileParams {
+  rel: string
+  max: number
+  onPickFile: (rel: string) => void
+  onToggleFile: (rel: string) => void
+}
+
+/** Routes a file to pick or toggle based on the selection limit. */
+function selectFile(params: SelectFileParams): void {
+  const { rel, max, onPickFile, onToggleFile } = params
+
+  if (max === 1) {
+    onPickFile(rel)
+
+    return
+  }
+
+  onToggleFile(rel)
+}
+
 /** Folder browser. */
 export function FolderTab(props: FolderTabProps) {
   const { folderId, folderName, kinds, max, extensions, sub, selectedRels } = props
 
-  const handleSelectFile = (rel: string) => {
-    if (max === 1) {
-      props.onPickFile(rel)
-
-      return
-    }
-
-    props.onToggleFile(rel)
+  const handleSelectFile = (rel: string): void => {
+    selectFile({ rel, max, onPickFile: props.onPickFile, onToggleFile: props.onToggleFile })
   }
 
   const [broken, setBroken] = useState<string[]>([])
@@ -78,16 +93,27 @@ export function FolderTab(props: FolderTabProps) {
     return extensionAllowed({ kind: file.kind, ext: extWithDot(file.name), extensions })
   })
 
-  const handleExpand = (file: FolderFile) => {
-    const handleSelect = () => {
-      handleSelectFile(file.rel)
+  const handleSelectPreview = (item: PreviewItem): void => {
+    const prefix = `folders/${folderId}/`
+    const ref = item.previewRef
+
+    if (!isNonEmptyString(ref) || !ref.startsWith(prefix)) {
+      return
     }
 
-    openPreview({
-      items: [folderPreviewItem({ folderId, file })],
-      index: 0,
-      actions: { select: handleSelect },
+    handleSelectFile(ref.slice(prefix.length))
+  }
+
+  const handleExpand = (file: FolderFile) => {
+    const items = files.map((each) => {
+      return folderPreviewItem({ folderId, file: each })
     })
+
+    const index = files.findIndex((each) => {
+      return each.rel === file.rel
+    })
+
+    openPreview({ items, index, actions: { select: handleSelectPreview } })
   }
 
   const handleBroken = (src: string) => {

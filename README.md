@@ -168,6 +168,14 @@ To back up or move to a new computer, copy the whole folder, then enter your key
 - Your text and pictures go to OpenRouter and the model's provider. Video and sound references go to your own R2 bucket as private links that expire after 2 hours.
 - R2 stays inside Cloudflare's free tier, see [the R2 guide](docs/user/CLOUDFLARE-R2.md).
 
+## Keyboard shortcuts
+
+- `Left` and `Right`: previous or next item in the viewer or a preview list.
+- `Shift+Left` and `Shift+Right`: seek 5 seconds inside the viewer.
+- `Space`: play or pause a focused player.
+- `F`: fullscreen for a focused player.
+- `Escape`: close a dialog or clear the selection.
+
 ## Something went wrong?
 
 | What you see                                                                 | What to do                                                                                                                                                                |
