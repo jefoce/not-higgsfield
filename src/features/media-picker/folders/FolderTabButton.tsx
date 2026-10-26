@@ -28,6 +28,10 @@ export function FolderTabButton(props: FolderTabButtonProps) {
     props.onDisconnectFolder(folder.id)
   }
 
+  const iconClass = isActive
+    ? 'text-page/70 hover:bg-black/10 hover:text-page'
+    : 'text-fg-2 hover:bg-white/10 hover:text-fg'
+
   return (
     <div className="group relative shrink-0">
       <button
@@ -41,7 +45,10 @@ export function FolderTabButton(props: FolderTabButtonProps) {
         type="button"
         aria-label={`Disconnect ${folder.name}`}
         onClick={handleDisconnect}
-        className="absolute top-1/2 right-1 -translate-y-1/2 rounded-sm p-1 text-fg-2 opacity-0 transition group-hover:opacity-100 hover:bg-white/10 hover:text-fg"
+        className={cn(
+          'absolute top-1/2 right-1 -translate-y-1/2 rounded-sm p-1 opacity-0 transition group-hover:opacity-100',
+          iconClass,
+        )}
       >
         <X className="size-4" />
       </button>
