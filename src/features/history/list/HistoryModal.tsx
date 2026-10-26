@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { isEmpty, isNil } from 'lodash-es'
 
 import { DETAILS_MIN_WIDTH } from '@/core/constants'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { LazyVideo } from '@/features/player/LazyVideo'
 import { preloadPosters } from '@/lib/preload-posters'
+import { useChainKeys } from '@/lib/use-chain-keys'
 import { MediaStage } from '@/ui/MediaStage'
 import { Modal } from '@/ui/Modal'
 
@@ -100,15 +101,15 @@ function useHistoryNav(params: HistoryNavParams) {
     }
   }, [hasMore, index, isLoadingMore, onLoadMore, order.length])
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     const previousId = order[index - 1]
 
     if (index > 0 && !isNil(previousId)) {
       onNavigate(previousId)
     }
-  }
+  }, [index, onNavigate, order])
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     const nextId = order[index + 1]
 
     if (index < order.length - 1 && !isNil(nextId)) {
@@ -120,7 +121,7 @@ function useHistoryNav(params: HistoryNavParams) {
     if (hasMore) {
       onLoadMore()
     }
-  }
+  }, [hasMore, index, onLoadMore, onNavigate, order])
 
   return {
     hasPrevious: index > 0,
@@ -135,6 +136,8 @@ export function HistoryModal(props: HistoryModalProps) {
   const { record, open: isOpen } = props
   const backdropPoster = recordPoster(record)
   const nav = useHistoryNav(props)
+
+  useChainKeys({ isEnabled: isOpen, onPrevious: nav.onPrevious, onNext: nav.onNext })
 
   useEffect(() => {
     preloadPosters([backdropPoster])

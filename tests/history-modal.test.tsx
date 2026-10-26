@@ -66,6 +66,74 @@ describe('HistoryModal', () => {
   })
 })
 
+describe('HistoryModal arrow keys', () => {
+  it('moves to the next record with ArrowRight', () => {
+    const handleNavigate = vi.fn()
+
+    render(
+      <HistoryModal
+        record={record('a')}
+        open
+        selectedId="a"
+        order={['a', 'b', 'c']}
+        hasMore={false}
+        isLoadingMore={false}
+        onNavigate={handleNavigate}
+        onLoadMore={handleNoop}
+        onOpenChange={handleNoop}
+      />,
+    )
+
+    fireEvent.keyDown(window, { key: 'ArrowRight' })
+
+    expect(handleNavigate).toHaveBeenLastCalledWith('b')
+  })
+
+  it('moves to the previous record with ArrowLeft', () => {
+    const handleNavigate = vi.fn()
+
+    render(
+      <HistoryModal
+        record={record('b')}
+        open
+        selectedId="b"
+        order={['a', 'b', 'c']}
+        hasMore={false}
+        isLoadingMore={false}
+        onNavigate={handleNavigate}
+        onLoadMore={handleNoop}
+        onOpenChange={handleNoop}
+      />,
+    )
+
+    fireEvent.keyDown(window, { key: 'ArrowLeft' })
+
+    expect(handleNavigate).toHaveBeenLastCalledWith('a')
+  })
+
+  it('ignores arrow keys while closed', () => {
+    const handleNavigate = vi.fn()
+
+    render(
+      <HistoryModal
+        record={record('b')}
+        open={false}
+        selectedId="b"
+        order={['a', 'b', 'c']}
+        hasMore={false}
+        isLoadingMore={false}
+        onNavigate={handleNavigate}
+        onLoadMore={handleNoop}
+        onOpenChange={handleNoop}
+      />,
+    )
+
+    fireEvent.keyDown(window, { key: 'ArrowRight' })
+
+    expect(handleNavigate).not.toHaveBeenCalled()
+  })
+})
+
 describe('HistoryModal navigation', () => {
   it('moves to the next and previous record in order', () => {
     const handleNavigate = vi.fn()
