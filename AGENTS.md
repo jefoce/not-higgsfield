@@ -305,4 +305,5 @@ const deletion = useAsyncAction(async () => {
 - Updates: `src-tauri/src/updater.rs`, `src/features/updates`
 - ffmpeg build: `scripts/ffmpeg`
 - Node build: `scripts/node`
-- Workflow helpers: `.github/scripts`
+- Workflow helpers: `.github/scripts` (`checksums`, `ffmpeg-sources-tag`, `ghcr-pull`, `ghcr-push`, `release-draft`, `release-version`, `rename-installers`, `sidecar-binary`, `sidecar-key`, `sources-manifest`, `stage-sidecar`, `target-runners`, `updater-manifest`, `upload-release-assets`)
+- Composite actions: `.github/actions` (`setup-pnpm`, `sidecar-restore`, `sidecar-publish`)

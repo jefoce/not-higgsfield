@@ -1,5 +1,13 @@
 # Decisions
 
+## 2026-10-26 - Workflow logic lives in scripts and composite actions
+
+Decision: `.github/scripts` holds the bash and Node logic, each script taking arguments instead of `${{ }}`. `.github/actions` holds the three repeated step groups: setup-pnpm, sidecar-restore and sidecar-publish. Workflow files keep the job graph and pass inputs.
+
+Why: the logic is testable (`tests/ci-scripts.test.ts`), linted by shellcheck and actionlint, and exists once. The GHCR pull, push, sources tag and setup steps had four or five copies each.
+
+Rejected: a reusable workflow per sidecar. The matrix plus the build differences (ffmpeg, Node Unix, Node Windows) made a shared workflow harder to read than a composite action plus the job step.
+
 ## 2026-10-25 - Every arrow function has a block body
 
 Decision: `arrow-body-style` is `['error', 'always']` in `src` and `tests`. Every arrow uses braces and an explicit `return`, including one-line `map`, `filter` and `catch` callbacks.

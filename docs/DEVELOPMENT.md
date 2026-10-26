@@ -159,7 +159,11 @@ pnpm vitest
 
 `pnpm lint` runs ESLint. `pnpm knip` reports unused files, exports and dependencies, and is part of the gate and CI.
 
-`.github/workflows/ci.yml` runs typecheck, lint, deps, format, knip, tests and build on pushes to any branch and on pull requests, tag pushes are left to the release workflow, which runs the same checks for `v*-rc.*`. Dependabot opens one grouped monthly pull request for npm, cargo and GitHub Actions against `releases`, semver-major updates are ignored. CodeQL default setup runs weekly on actions, JavaScript/TypeScript and Rust.
+`.github/workflows/ci.yml` runs on pushes to `releases`, on pushes to version branches (`[0-9]*.[0-9]*.[0-9]*`) and on pull requests. Concurrency group `ci-<ref>` cancels a superseded run. It calls `.github/workflows/checks.yml` (typecheck, lint, deps, format, knip, test, build, then a non-blocking `pnpm audit --prod --audit-level high`) and runs a `workflows` job that lints the pipeline itself. Tag pushes go to the release workflow, which runs the same checks once for `v*-rc.*`.
+
+The `workflows` job runs actionlint through its pinned Docker image, shellcheck over `.github/scripts/*.sh`, and zizmor 1.31.1 at `--min-severity medium --min-confidence high`. actionlint also shellchecks every `run:` block. `.github/workflows/catalog-drift.yml` runs the live catalog test weekly.
+
+Dependabot opens one grouped monthly pull request for npm, cargo and GitHub Actions against `releases`, with `open-pull-requests-limit: 1` and the `dependencies` label. Semver-major updates are ignored. `pr-version` rejects every Dependabot pull request, so apply those updates on the next version branch instead of merging into `releases`. CodeQL default setup runs weekly on actions, JavaScript/TypeScript and Rust.
 
 ## 11. Code shape rules
 
@@ -303,7 +307,56 @@ Then open `http://127.0.0.1:47821/api/session?t=test`.
 
 ## 16. Release checklist
 
-`.github/workflows/release.yml` runs on pushes to `releases`, on `v*-rc.*` tags and on manual `workflow_dispatch` with a `tag` input. A `draft` job creates one draft release before any build. The `ffmpeg` and `node` jobs pull their sidecar from GHCR or build and push it, build jobs download artifacts (or a reused run), verify sidecars, stage the server, run the smoke test, build installers, rename them `not-higgsfield-<version>-<platform>-<arch><suffix>` and upload them by release id. The checksums job reads ffmpeg sources from GHCR first and from the run artifact second, then uploads `SHA256SUMS.txt` and the archives by release id. On a push to `releases`, the `tag` job creates and pushes `vX.Y.Z` only after every job passed. Every oras push carries `org.opencontainers.image.source` linking the package to this repo.
+`.github/workflows/release.yml` runs on pushes to `releases`, on `v*-rc.*` tags and on manual `workflow_dispatch` with a `tag` input. A `draft` job creates one draft release before any build. The `ffmpeg` and `node` jobs pull their sidecar from GHCR or build and push it. A `checks` job calls `checks.yml` once in parallel with the sidecar jobs. Build jobs download artifacts (or a reused run), verify sidecars, stage the server, run the smoke test, build installers, rename them `not-higgsfield-<version>-<platform>-<arch><suffix>` and upload them by release id. The checksums job reads ffmpeg sources from GHCR first and from the run artifact second, then uploads `SHA256SUMS.txt` and the archives by release id. On a push to `releases`, the `tag` job creates and pushes `vX.Y.Z` only after every job passed. Every oras push carries `org.opencontainers.image.source` linking the package to this repo.
+
+### Job graph
+
+```text
+version -> draft
+        -> ffmpeg
+        -> node
+checks (parallel, checks.yml)
+version + draft + ffmpeg + node + checks -> build
+build -> checksums
+      -> updater-manifest
+checksums + updater-manifest -> tag (releases push only)
+```
+
+`ffmpeg` and `node` skip when `reuse_sidecars_run_id` or `SIDECARS_RUN_ID` is set. `build` runs only when `checks` passed. It keeps `pnpm test` on each runner because the tests cover Windows paths and secrets backends, and drops the other checks.
+
+### Composite actions
+
+| Action | Inputs | Does |
+| --- | --- | --- |
+| `.github/actions/setup-pnpm` | `install` (`true`, `prod`, `false`) | pnpm, Node 24 with the pnpm cache, then a frozen install |
+| `.github/actions/sidecar-restore` | `name`, `target`, `runner`, `profile`, `force`, `token` | setup-oras, GHCR login, key, guarded pull, manifest check, `<name>-out`. Outputs `key` and `found` |
+| `.github/actions/sidecar-publish` | `name`, `target`, `version`, `profile`, `key`, `force`, `token`, `files` | manifest, guarded push, tar, artifact upload |
+
+Composite actions cannot read secrets, so the token is an input. The build step stays in the job because ffmpeg, Node Unix and Node Windows differ.
+
+### Workflow scripts
+
+Each script takes arguments and runs with `set -euo pipefail`. Expressions reach it through `env:`.
+
+| Script | Arguments |
+| --- | --- |
+| `checksums.sh` | `build <target> <dist>` or `merge <dist> <sources>` |
+| `ffmpeg-sources-tag.sh` | none |
+| `ghcr-pull.sh` | `<ref> <dir> <required-file>...` |
+| `ghcr-push.sh` | `<ref> <dir> <file>...` (`FORCE` in the environment) |
+| `release-draft.sh` | `TAG` and `PRERELEASE` in the environment |
+| `release-version.sh` | `TAG_INPUT` and the `GITHUB_*` environment |
+| `rename-installers.sh` | `<bundle> <version> <target> <dist>` |
+| `sidecar-binary.sh` | `<name> <target> [exe]` |
+| `sidecar-key.sh` | `<name> <target> <runner> [profile]` |
+| `sidecar-manifest.mjs` | `write <binary> <out> <name> <target> <version> [profile]` or `verify <binary> <manifest>` |
+| `sources-manifest.mjs` | `<dir> <tag>` |
+| `stage-sidecar.sh` | `<name> <target> <artifact-dir> <out-dir>` |
+| `target-runners.sh` | `<target>` |
+| `updater-manifest.mjs` | `--version --tag --repo --changelog --pub-date --signatures --out` |
+| `upload-release-assets.sh` | `<release-id> <file>...` |
+
+`tests/ci-scripts.test.ts` covers the rename, version and sources tag scripts, plus the GHCR pull flattening, with a fake `oras`. The ffmpeg and Node builds under `scripts/ffmpeg` and `scripts/node` do not change. Any byte there changes a GHCR key.
 
 ### Sidecar artifacts (GHCR)
 
