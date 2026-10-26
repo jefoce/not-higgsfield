@@ -18,6 +18,10 @@ Looping playback, clearer pricing, reused release sources.
 - Frames and input thumbnails open the preview with previous and next.
 - Reuse closes the viewer so the loaded settings are visible.
 
+### Changed
+
+- The media picker opens beside the generator. Clicking a file attaches or removes it right away, no Add button.
+
 ### Fixed
 
 - The Generate button shows no price, discount or spinner while it cannot run.
@@ -27,6 +31,7 @@ Looping playback, clearer pricing, reused release sources.
 - The preview shows Deselect for a selected file and keeps the list open while you pick.
 - List rows toggle selection with a click, the same as the grid.
 - Only the front dialog reacts to arrow keys.
+- Dragging a zoomed photo follows the cursor without lag, and the zoom buttons no longer toggle the zoom.
 
 ## 0.2.0 - 2026-10-26
 
