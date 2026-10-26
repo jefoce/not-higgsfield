@@ -12,6 +12,11 @@ Looping playback, clearer pricing, reused release sources.
 - Use button in every viewer: adds the media as a reference or start frame, by mode.
 - Viewers start playback right away, also after switching items.
 - Zoom photos in the viewer: wheel or pinch, drag to move, buttons to zoom and fit.
+- Photos in the viewer are never cropped, whatever their orientation.
+- The media viewer has a close button in the corner.
+- Photos and videos sit rounded on the blurred backdrop.
+- Frames and input thumbnails open the preview with previous and next.
+- Reuse closes the viewer so the loaded settings are visible.
 
 ### Fixed
 
@@ -21,6 +26,7 @@ Looping playback, clearer pricing, reused release sources.
 - Release pipeline: sidecar and ffmpeg source pulls that hit GHCR are reused instead of rebuilt.
 - The preview shows Deselect for a selected file and keeps the list open while you pick.
 - List rows toggle selection with a click, the same as the grid.
+- Only the front dialog reacts to arrow keys.
 
 ## 0.2.0 - 2026-10-26
 

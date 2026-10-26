@@ -381,6 +381,8 @@ Each script takes arguments and runs with `set -euo pipefail`. Expressions reach
 
 `tests/ci-scripts.test.ts` covers the rename, version, sources tag and ffmpeg plan scripts, plus the GHCR pull flattening, with a fake `oras`. The ffmpeg and Node builds under `scripts/ffmpeg` and `scripts/node` do not change. Any byte there changes a GHCR key.
 
+`ghcr-pull.sh` prints a bare `true` or `false` on stdout, and diagnostics go to stderr. Callers capture it with `found=$(...)` and write `found=$found` to `GITHUB_OUTPUT`, so a hit is never written as `found=found=true`.
+
 ### Sidecar artifacts (GHCR)
 
 Release builds pull prebuilt sidecars from the public packages `ghcr.io/jefoce/not-higgsfield-sidecars` and `ghcr.io/jefoce/not-higgsfield-sources` before compiling. Sidecar tags look like `<name>-<target>-<hash16>`, where the hash covers every file under `scripts/<name>` (sorted relative path plus sha256), the target triple, the runner image and the ffmpeg profile (`full`, empty for Node). `.github/scripts/sidecar-key.sh <name> <target> <runner> [profile]` prints the key. Sources use `ffmpeg-<FFMPEG_VERSION>-x264-<first8>-zlib-<ZLIB_VERSION>`. Actions cache is ref-scoped and only warms build work dirs.
