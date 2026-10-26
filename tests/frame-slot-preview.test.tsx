@@ -63,12 +63,16 @@ describe('FrameSlot preview chain', () => {
       throw new Error('picker request missing')
     }
 
-    expect(picker.target).toBe('frame-end')
+    const { mode } = picker
+
+    if (mode.kind !== 'pick') {
+      throw new Error('picker is not in pick mode')
+    }
 
     const nextFrame = upload('next-end', 'image')
 
     act(() => {
-      picker.onPick([nextFrame])
+      mode.onPick(nextFrame)
     })
 
     expect(useGeneratorStore.getState().frames.end).toBe('next-end')

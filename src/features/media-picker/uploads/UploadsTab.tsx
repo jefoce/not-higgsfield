@@ -11,6 +11,7 @@ import { fetchUploads } from '@/lib/api/uploads'
 import { getPlatform } from '@/lib/platform'
 import { useLatest } from '@/lib/use-latest'
 
+import { closeMediaPicker, type PickerMode } from '../picker/store'
 import { DeleteUploadDialog } from './DeleteUploadDialog'
 import type { UploadProgressItem } from './UploadProgressTile'
 import { UploadsGrid } from './UploadsGrid'
@@ -18,10 +19,8 @@ import { useDeleteUpload } from './use-delete-upload'
 
 export interface UploadsTabProps {
   kinds: MediaKind[]
-  max: number
   extensions?: KindExtensions
-  selected: UploadItem[]
-  onSelect: (item: UploadItem) => void
+  mode: PickerMode
   onUploaded: (items: UploadItem[]) => void
   onDeleted?: (id: string) => void
   uploading?: UploadProgressItem[]
@@ -29,9 +28,62 @@ export interface UploadsTabProps {
   onDismiss?: (id: string) => void
 }
 
-/** Uploads grid host with selection and delete confirmation. */
+/** Pick mode has no local selection, toggle mode supplies its own ids. */
+function useNoSelectedIds(): string[] {
+  return []
+}
+
+function isUploadSelected(item: UploadItem, selectedIds: string[]): boolean {
+  return selectedIds.includes(item.id)
+}
+
+interface UploadActionParams {
+  mode: PickerMode
+  item: UploadItem
+  selectedIds: string[]
+}
+
+function uploadDisabledReason(params: UploadActionParams): string | undefined {
+  const { mode, item, selectedIds } = params
+
+  if (mode.kind !== 'toggle' || isUploadSelected(item, selectedIds)) {
+    return undefined
+  }
+
+  return mode.canAdd(item) ?? undefined
+}
+
+function uploadAvailableActions(params: UploadActionParams): ActionKey[] {
+  const { mode, item, selectedIds } = params
+
+  if (mode.kind !== 'toggle') {
+    return []
+  }
+
+  if (isUploadSelected(item, selectedIds)) {
+    return ['deselect']
+  }
+
+  if (!isNil(mode.canAdd(item))) {
+    return []
+  }
+
+  return ['select']
+}
+
+function toggleFromPreview(mode: PickerMode, item: UploadItem): boolean {
+  if (mode.kind !== 'toggle') {
+    return false
+  }
+
+  mode.onToggle(item)
+
+  return true
+}
+
+/** Uploads grid host with mode-driven selection and delete confirmation. */
 export function UploadsTab(props: UploadsTabProps) {
-  const { kinds, max, extensions, selected, uploading = [] } = props
+  const { kinds, extensions, mode, uploading = [] } = props
 
   const { data, isLoading, mutate } = useSWR(['uploads', kinds], () => {
     return fetchUploads({ kinds })
@@ -45,41 +97,51 @@ export function UploadsTab(props: UploadsTabProps) {
     return extensionAllowed({ kind: item.kind, ext: item.ext, extensions })
   })
 
-  const selectedIds = selected.map((item) => {
-    return item.id
-  })
-
-  const isMaxReached = selected.length >= max
+  // Mode is fixed for the mount, so the hook choice stays stable.
+  const useSelectedIds = mode.kind === 'toggle' ? mode.useSelectedIds : useNoSelectedIds
+  const selectedIds = useSelectedIds()
   const selectedIdsRef = useLatest(selectedIds)
-  const isMaxReachedRef = useLatest(isMaxReached)
+  // Upload tiles only compare max with 1 to enable multiple files.
+  const uploadMax = mode.kind === 'toggle' ? 2 : 1
 
   const handleIsSelected = (item: UploadItem): boolean => {
-    return selectedIdsRef.current.includes(item.id)
+    return isUploadSelected(item, selectedIds)
+  }
+
+  const handlePreviewSelected = (item: UploadItem): boolean => {
+    return isUploadSelected(item, selectedIdsRef.current)
+  }
+
+  const handleDisabledReason = (item: UploadItem): string | undefined => {
+    return uploadDisabledReason({ mode, item, selectedIds })
   }
 
   const handleAvailable = (item: UploadItem): ActionKey[] => {
-    if (handleIsSelected(item)) {
-      return ['deselect']
-    }
-
-    if (isMaxReachedRef.current) {
-      return []
-    }
-
-    return ['select']
+    return uploadAvailableActions({ mode, item, selectedIds: selectedIdsRef.current })
   }
 
-  const handleSelect = (item: UploadItem): boolean => {
-    props.onSelect(item)
-
-    return max > 1
+  const handleTogglePreview = (item: UploadItem): boolean => {
+    return toggleFromPreview(mode, item)
   }
 
-  const actions: PreviewActions = {
-    select: handleSelect,
-    deselect: handleSelect,
-    available: handleAvailable,
-    isSelected: handleIsSelected,
+  const handleSelect = (item: UploadItem): void => {
+    if (mode.kind === 'toggle') {
+      mode.onToggle(item)
+
+      return
+    }
+
+    mode.onPick(item)
+    closeMediaPicker()
+  }
+
+  const actions: PreviewActions = {}
+
+  if (mode.kind === 'toggle') {
+    actions.select = handleTogglePreview
+    actions.deselect = handleTogglePreview
+    actions.available = handleAvailable
+    actions.isSelected = handlePreviewSelected
   }
 
   const deletion = useDeleteUpload({ mutate, onDeleted: props.onDeleted })
@@ -93,18 +155,18 @@ export function UploadsTab(props: UploadsTabProps) {
       <UploadsGrid
         items={items}
         uploading={uploading}
-        selectedIds={selectedIds}
-        isMaxReached={isMaxReached}
         isLoading={isLoading}
         canChooseFiles={canChooseFiles === true}
         kinds={kinds}
-        max={max}
+        max={uploadMax}
         extensions={extensions}
         actions={actions}
+        isSelected={handleIsSelected}
+        disabledReason={handleDisabledReason}
         onUploaded={props.onUploaded}
         onRetry={props.onRetry}
         onDismiss={props.onDismiss}
-        onSelect={props.onSelect}
+        onSelect={handleSelect}
         onDelete={deletion.handleDeleteRequest}
       />
 

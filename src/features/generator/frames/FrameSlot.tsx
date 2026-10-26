@@ -33,7 +33,6 @@ interface SlotTooltipParams {
   disabledReason?: string
 }
 
-const TARGETS = { start: 'frame-start', end: 'frame-end' } as const
 const LABELS = { start: 'Start frame', end: 'End frame' } as const
 const FRAME_SLOTS = ['start', 'end'] as const
 
@@ -73,21 +72,18 @@ function slotTooltip(params: SlotTooltipParams): string | undefined {
 }
 
 interface OpenFramePickerParams {
-  slot: FrameSlotName
   extensions?: KindExtensions
-  onPick: (items: UploadItem[]) => void
+  onPick: (item: UploadItem) => void
 }
 
 /** Opens the image picker for one frame slot. */
 function openFramePicker(params: OpenFramePickerParams): void {
-  const { slot, extensions, onPick } = params
+  const { extensions, onPick } = params
 
   openMediaPicker({
-    target: TARGETS[slot],
     kinds: ['image'],
-    max: 1,
     extensions,
-    onPick,
+    mode: { kind: 'pick', onPick },
   })
 }
 
@@ -136,15 +132,11 @@ function replaceFrame(params: ReplaceFrameParams): void {
     return
   }
 
-  const handlePick = (items: UploadItem[]): void => {
-    const [next] = items
-
-    if (!isNil(next)) {
-      setFrame(target, next)
-    }
+  const handlePick = (next: UploadItem): void => {
+    setFrame(target, next)
   }
 
-  openFramePicker({ slot: target, extensions, onPick: handlePick })
+  openFramePicker({ extensions, onPick: handlePick })
 }
 
 interface RemoveFrameParams {
@@ -185,6 +177,15 @@ function openFramePreview(params: OpenFramePreviewParams): void {
   openPreview({ items, index, actions })
 }
 
+/** Sets the slot from the first uploaded file. */
+function setFrameFromUploads(slot: FrameSlotName, items: UploadItem[]): void {
+  const [item] = items
+
+  if (!isNil(item)) {
+    useGeneratorStore.getState().setFrame(slot, item)
+  }
+}
+
 /** One frame drop slot with preview, replace and remove actions. */
 export function FrameSlot(props: FrameSlotProps) {
   const { slot, disabled: isDisabled = false, disabledReason } = props
@@ -214,11 +215,7 @@ export function FrameSlot(props: FrameSlotProps) {
   const extensions = extensionsFromLimits(preset.referenceLimits)
 
   const handleUploaded = (items: UploadItem[]): void => {
-    const [item] = items
-
-    if (!isNil(item)) {
-      setFrame(slot, item)
-    }
+    setFrameFromUploads(slot, items)
   }
 
   const { dragging: isDragging, dropProps } = useDropUpload({
@@ -232,8 +229,12 @@ export function FrameSlot(props: FrameSlotProps) {
   const hasFrame = Boolean(frameId)
   const { isBroken, isPreviewable } = frameState({ hasFrame, upload })
 
+  const handlePickFrame = (item: UploadItem): void => {
+    setFrame(slot, item)
+  }
+
   const handlePick = (): void => {
-    openFramePicker({ slot, extensions, onPick: handleUploaded })
+    openFramePicker({ extensions, onPick: handlePickFrame })
   }
 
   const handleRemove = (): void => {

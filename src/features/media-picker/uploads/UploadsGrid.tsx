@@ -16,14 +16,14 @@ import { UploadTile } from './UploadTile'
 interface UploadsGridProps {
   items: UploadItem[]
   uploading: UploadProgressItem[]
-  selectedIds: string[]
-  isMaxReached: boolean
   isLoading: boolean
   canChooseFiles: boolean
   kinds: MediaKind[]
   max: number
   extensions?: KindExtensions
   actions: PreviewActions
+  isSelected: (item: UploadItem) => boolean
+  disabledReason: (item: UploadItem) => string | undefined
   onUploaded: (items: UploadItem[]) => void
   onRetry?: (id: string) => void
   onDismiss?: (id: string) => void
@@ -35,18 +35,7 @@ const SKELETON = [0, 1, 2, 3]
 
 /** Uploads grid with the upload tile first. */
 export function UploadsGrid(props: UploadsGridProps) {
-  const {
-    items,
-    uploading,
-    selectedIds,
-    isMaxReached,
-    isLoading,
-    canChooseFiles,
-    kinds,
-    max,
-    extensions,
-    actions,
-  } = props
+  const { items, uploading, isLoading, canChooseFiles, kinds, max, extensions, actions } = props
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
@@ -90,8 +79,8 @@ export function UploadsGrid(props: UploadsGridProps) {
                 items={items}
                 previewIndex={previewIndex}
                 actions={actions}
-                selectedIndex={selectedIds.indexOf(item.id)}
-                isAtMax={isMaxReached}
+                isSelected={props.isSelected(item)}
+                disabledReason={props.disabledReason(item)}
                 onSelect={props.onSelect}
                 onDelete={props.onDelete}
               />

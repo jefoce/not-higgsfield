@@ -13,7 +13,7 @@ interface FolderFileTileProps {
   src: string
   isBroken: boolean
   isSelected: boolean
-  onPickFile: (rel: string) => void
+  onSelect: (rel: string) => void
   onExpand: (file: FolderFile) => void
   onBroken: (src: string) => void
 }
@@ -24,7 +24,7 @@ export function FolderFileTile(props: FolderFileTileProps) {
   const isAudio = file.kind === 'audio'
 
   const handleSelect = () => {
-    props.onPickFile(file.rel)
+    props.onSelect(file.rel)
   }
 
   const handleImageError = () => {

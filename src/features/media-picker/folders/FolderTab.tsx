@@ -7,6 +7,7 @@ import useSWR from 'swr'
 import { isNonEmptyString } from '@/core/guards'
 import { extensionAllowed, extWithDot, type KindExtensions, mimeFromExt } from '@/core/media-kinds'
 import type { FolderFile, MediaKind } from '@/core/media-types'
+import type { UploadItem } from '@/core/schemas/upload-item'
 import {
   openPreview,
   type PreviewActions,
@@ -14,8 +15,11 @@ import {
 } from '@/features/preview/preview-store'
 import { fetchFolderFiles } from '@/lib/api/folders'
 import { thumbUrl } from '@/lib/api/media-urls'
-import { type LatestRef, useLatest } from '@/lib/use-latest'
+import { linkFolderFile } from '@/lib/api/uploads'
+import { toastError } from '@/lib/notify'
+import { useAsyncAction } from '@/lib/use-async-action'
 
+import { closeMediaPicker, type PickerMode } from '../picker/store'
 import { FolderBreadcrumbs } from './FolderBreadcrumbs'
 import { FolderDirTile } from './FolderDirTile'
 import { FolderFileTile } from './FolderFileTile'
@@ -24,13 +28,10 @@ export interface FolderTabProps {
   folderId: string
   folderName: string
   kinds: MediaKind[]
-  max: number
   extensions?: KindExtensions
   sub: string
-  selectedRels: string[]
-  onPickFile: (rel: string) => void
+  mode: PickerMode
   onNavigate: (sub: string) => void
-  onToggleFile: (rel: string) => void
 }
 
 const SKELETON = [0, 1, 2, 3, 4, 5]
@@ -40,7 +41,7 @@ interface FolderPreviewItemParams {
   file: FolderFile
 }
 
-/** Preview-only item for a folder file. Nothing links until Add. */
+/** Preview-only item for a folder file. Nothing links until selected. */
 function folderPreviewItem(params: FolderPreviewItemParams): PreviewItem {
   const { folderId, file } = params
   const ext = extWithDot(file.name)
@@ -70,37 +71,27 @@ function previewRel(folderId: string, item: PreviewItem): string | undefined {
   return ref.slice(prefix.length)
 }
 
-interface SelectFileParams {
-  rel: string
-  max: number
-  onPickFile: (rel: string) => void
-  onToggleFile: (rel: string) => void
-}
-
-/** Routes a file to pick or toggle based on the selection limit. */
-function selectFile(params: SelectFileParams): void {
-  const { rel, max, onPickFile, onToggleFile } = params
-
-  if (max === 1) {
-    onPickFile(rel)
+/** Applies a linked folder file through the request mode. */
+function applyPicked(mode: PickerMode, upload: UploadItem): void {
+  if (mode.kind === 'toggle') {
+    mode.onToggle(upload)
 
     return
   }
 
-  onToggleFile(rel)
+  mode.onPick(upload)
+  closeMediaPicker()
 }
 
 interface FolderPreviewActionsParams {
   folderId: string
-  max: number
-  selectedRelsRef: LatestRef<string[]>
-  onPickFile: (rel: string) => void
-  onToggleFile: (rel: string) => void
+  mode: PickerMode
+  onLink: (rel: string) => void
 }
 
-/** Preview actions that read the live selection and keep the list open for multi-select. */
+/** Preview actions link the shown file and keep the preview open in toggle mode. */
 function folderPreviewActions(params: FolderPreviewActionsParams): PreviewActions {
-  const { folderId, max, selectedRelsRef, onPickFile, onToggleFile } = params
+  const { folderId, mode, onLink } = params
 
   const run = (item: PreviewItem): boolean => {
     const rel = previewRel(folderId, item)
@@ -109,30 +100,30 @@ function folderPreviewActions(params: FolderPreviewActionsParams): PreviewAction
       return false
     }
 
-    selectFile({ rel, max, onPickFile, onToggleFile })
+    onLink(rel)
 
-    return max > 1
+    return mode.kind === 'toggle'
   }
 
-  const isSelected = (item: PreviewItem): boolean => {
-    const rel = previewRel(folderId, item)
-
-    if (isNil(rel)) {
-      return false
-    }
-
-    return selectedRelsRef.current.includes(rel)
-  }
-
-  return { select: run, deselect: run, isSelected }
+  return { select: run, deselect: run }
 }
 
 /** Folder browser. */
 export function FolderTab(props: FolderTabProps) {
-  const { folderId, folderName, kinds, max, extensions, sub, selectedRels } = props
+  const { folderId, folderName, kinds, extensions, sub, mode } = props
+
+  const linking = useAsyncAction(async (rel: string) => {
+    try {
+      const upload = await linkFolderFile({ folderId, relPath: rel })
+
+      applyPicked(mode, upload)
+    } catch (error) {
+      toastError(error)
+    }
+  })
 
   const handleSelectFile = (rel: string): void => {
-    selectFile({ rel, max, onPickFile: props.onPickFile, onToggleFile: props.onToggleFile })
+    void linking.run(rel)
   }
 
   const [broken, setBroken] = useState<string[]>([])
@@ -147,15 +138,7 @@ export function FolderTab(props: FolderTabProps) {
     return extensionAllowed({ kind: file.kind, ext: extWithDot(file.name), extensions })
   })
 
-  const selectedRelsRef = useLatest(selectedRels)
-
-  const previewActions = folderPreviewActions({
-    folderId,
-    max,
-    selectedRelsRef,
-    onPickFile: props.onPickFile,
-    onToggleFile: props.onToggleFile,
-  })
+  const previewActions = folderPreviewActions({ folderId, mode, onLink: handleSelectFile })
 
   const handleExpand = (file: FolderFile) => {
     const items = files.map((each) => {
@@ -205,8 +188,8 @@ export function FolderTab(props: FolderTabProps) {
                 file={file}
                 src={src}
                 isBroken={isBroken}
-                isSelected={selectedRels.includes(file.rel)}
-                onPickFile={handleSelectFile}
+                isSelected={false}
+                onSelect={handleSelectFile}
                 onExpand={handleExpand}
                 onBroken={handleBroken}
               />

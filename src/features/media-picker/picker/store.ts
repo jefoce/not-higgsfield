@@ -6,17 +6,30 @@ import { create } from 'zustand'
 import { type KindExtensions } from '@/core/media-kinds'
 import { MEDIA_KINDS, type MediaKind } from '@/core/media-types'
 import type { PresetReferenceLimits } from '@/core/presets/types'
-import type { UploadItem } from '@/core/schemas/upload-item'
+import type { UploadItem, UploadsById } from '@/core/schemas/upload-item'
 
-type PickerTarget = 'frame-start' | 'frame-end' | 'references'
+export type PickerCandidate = Pick<UploadItem, 'id' | 'kind'>
+
+export interface PickerToggleMode {
+  kind: 'toggle'
+  useSelectedIds: () => string[]
+  useUploadsById: () => UploadsById
+  canAdd: (item: PickerCandidate) => string | null
+  onToggle: (item: UploadItem) => void
+}
+
+export interface PickerPickMode {
+  kind: 'pick'
+  onPick: (item: UploadItem) => void
+}
+
+export type PickerMode = PickerToggleMode | PickerPickMode
 
 export interface PickerRequest {
   id: number
-  target: PickerTarget
   kinds: MediaKind[]
-  max: number
   extensions?: KindExtensions
-  onPick: (items: UploadItem[]) => void
+  mode: PickerMode
 }
 
 /** Picker extensions from preset reference formats, ignoring kinds without a list. */

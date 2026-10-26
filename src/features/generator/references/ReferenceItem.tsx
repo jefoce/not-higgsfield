@@ -49,20 +49,14 @@ export function ReferenceItem(props: ReferenceItemProps) {
   }
 
   const handleReplace = (item: UploadItem): void => {
-    const handleReplacePick = (items: UploadItem[]): void => {
-      const [next] = items
-
-      if (!isNil(next)) {
-        props.onReplace(item.id, next)
-      }
+    const handleReplacePick = (next: UploadItem): void => {
+      props.onReplace(item.id, next)
     }
 
     openMediaPicker({
-      target: 'references',
       kinds: [item.kind],
-      max: 1,
       extensions,
-      onPick: handleReplacePick,
+      mode: { kind: 'pick', onPick: handleReplacePick },
     })
   }
 
