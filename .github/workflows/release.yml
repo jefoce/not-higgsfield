@@ -41,6 +41,7 @@ concurrency:
 jobs:
   version:
     runs-on: ubuntu-22.04
+    timeout-minutes: 5
     outputs:
       version: ${{ steps.v.outputs.version }}
       tag: ${{ steps.v.outputs.tag }}
@@ -85,6 +86,7 @@ jobs:
   draft:
     needs: version
     runs-on: ubuntu-22.04
+    timeout-minutes: 5
     permissions:
       contents: write
     outputs:
@@ -126,6 +128,7 @@ jobs:
             target: x86_64-pc-windows-msvc
             script: scripts/ffmpeg/build-windows.sh
     runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
     permissions:
       contents: read
       packages: write
@@ -347,6 +350,7 @@ jobs:
           - runner: windows-latest
             target: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.runner }}
+    timeout-minutes: 150
     permissions:
       contents: read
       packages: write
@@ -490,9 +494,11 @@ jobs:
 
   build:
     needs: [version, draft, ffmpeg, node]
+    timeout-minutes: 60
     permissions:
       actions: read
       contents: write
+      # Only the reuse path pushes sidecars. Job permissions cannot be conditional.
       packages: write
     if: |
       !cancelled() &&
@@ -851,6 +857,7 @@ jobs:
     needs: [version, draft, build]
     if: ${{ !cancelled() && needs.version.result == 'success' && needs.draft.result == 'success' && needs.build.result == 'success' }}
     runs-on: ubuntu-22.04
+    timeout-minutes: 10
     permissions:
       actions: read
       contents: write
@@ -918,6 +925,7 @@ jobs:
     needs: [version, draft, build]
     if: ${{ !cancelled() && needs.version.result == 'success' && needs.draft.result == 'success' && needs.build.result == 'success' }}
     runs-on: ubuntu-22.04
+    timeout-minutes: 10
     permissions:
       actions: read
       contents: write
@@ -968,6 +976,7 @@ jobs:
     needs: [version, build, checksums, updater-manifest]
     if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/releases' && needs.version.result == 'success' && needs.build.result == 'success' && needs.checksums.result == 'success' && needs.updater-manifest.result == 'success' }}
     runs-on: ubuntu-22.04
+    timeout-minutes: 5
     permissions:
       contents: write
     steps:
