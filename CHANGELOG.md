@@ -1,6 +1,8 @@
 # Changelog
 
-## 0.2.0 - unreleased
+## 0.2.0 - 2026-10-26
+
+Provider and storage layers, stricter lint, stored data validation.
 
 ### Added
 
@@ -26,8 +28,6 @@
 - The Linux AppImage steps name the correct FUSE package for Ubuntu 22.04 and 24.04.
 - The app keeps R2 storage under 8 GB, inside Cloudflare's free tier, and removes the oldest unused references first.
 - The Generate button no longer spins while it is disabled.
-
-Internal: provider and storage layers, stricter lint, stored data validation.
 
 ## 0.1.0 - 2026-10-22
 
