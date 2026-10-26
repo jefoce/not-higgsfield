@@ -17,6 +17,7 @@ Looping playback, clearer pricing, reused release sources.
 - A model with no endpoint pricing block now logs a clear reason and keeps list prices.
 - Release pipeline: sidecar and ffmpeg source pulls that hit GHCR are reused instead of rebuilt.
 - The preview shows Deselect for a selected file and keeps the list open while you pick.
+- List rows toggle selection with a click, the same as the grid.
 
 ## 0.2.0 - 2026-10-26
 
