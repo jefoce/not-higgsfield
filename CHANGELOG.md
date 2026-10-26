@@ -32,6 +32,7 @@ Looping playback, clearer pricing, reused release sources.
 - List rows toggle selection with a click, the same as the grid.
 - Only the front dialog reacts to arrow keys.
 - Dragging a zoomed photo follows the cursor without lag, and the zoom buttons no longer toggle the zoom.
+- Videos and photos fill the viewer without black bars, whatever their shape.
 
 ## 0.2.0 - 2026-10-26
 
