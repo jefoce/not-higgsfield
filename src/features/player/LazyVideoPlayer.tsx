@@ -32,7 +32,7 @@ export function LazyVideoPlayer(props: LazyVideoPlayerProps) {
         autoPlay
         playsInline
         muted={isHoverPlay}
-        loop={isHoverPlay}
+        loop
         preload="metadata"
         className={cn('size-full bg-black', fit)}
       />
