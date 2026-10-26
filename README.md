@@ -51,6 +51,7 @@ Download the file for your computer from the [Releases page](https://github.com/
 2. Before the first launch, run this in Terminal: `xattr -dr com.apple.quarantine "/Applications/Not Higgsfield.app"`
 3. If macOS still blocks it, go to System Settings > Privacy & Security, press **Open Anyway** next to Not Higgsfield, and confirm.
 
+> [!WARNING]
 > The command is only for the file downloaded from this repo. It removes Apple's quarantine flag from that copy. Do not run it on an app you got from anywhere else.
 
 ### Windows
