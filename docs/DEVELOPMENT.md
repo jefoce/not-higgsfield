@@ -382,11 +382,11 @@ Prebuilt ffmpeg and Node sidecars and the ffmpeg source archives are public on G
 
 ### Updates
 
-Release builds pass `--config src-tauri/tauri.updater.conf.json`, which turns on `createUpdaterArtifacts`. Only `.github/workflows/release.yml` passes it. `ci.yml` and local builds keep `createUpdaterArtifacts: false` and need no key. The build job reads `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` from repository secrets and uploads one `.sig` per installer. The `updater-manifest` job then writes `latest.json` from those signatures and the notes for the version in `CHANGELOG.md`.
+Release builds pass `--config src-tauri/tauri.release.conf.json`, which turns on `createUpdaterArtifacts` and clears `beforeBuildCommand`. Only `.github/workflows/release.yml` passes it. `ci.yml` and local builds keep `createUpdaterArtifacts: false` and need no key. The build job reads `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` from repository secrets and uploads one `.sig` per installer. The `updater-manifest` job then writes `latest.json` from those signatures and the notes for the version in `CHANGELOG.md`.
 
 Test the update path against an rc manifest by setting `NH_UPDATE_ENDPOINT` before launch, for example `https://github.com/jefoce/not-higgsfield/releases/download/v0.2.0-rc.2/latest.json`, then run the packaged app.
 
-A local test against `http://127.0.0.1` needs `dangerousInsecureTransportProtocol` passed inline with `--config`, for example `pnpm desktop:build -- --config '{"plugins":{"updater":{"dangerousInsecureTransportProtocol":true}}}'`. Never commit the flag to `tauri.conf.json` or `tauri.updater.conf.json`.
+A local test against `http://127.0.0.1` needs `dangerousInsecureTransportProtocol` passed inline with `--config`, for example `pnpm desktop:build -- --config '{"plugins":{"updater":{"dangerousInsecureTransportProtocol":true}}}'`. Never commit the flag to `tauri.conf.json` or `tauri.release.conf.json`.
 
 To roll back a bad release, edit it and mark it as a pre-release, or delete it. GitHub then marks the previous release as Latest, whose `latest.json` offers nothing newer. Apps already on the bad version need a fixed patch release.
 

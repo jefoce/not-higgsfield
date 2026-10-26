@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest'
 import { isRecord } from '@/core/guards'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const CONFIGS = ['tauri.conf.json', 'tauri.updater.conf.json']
+const CONFIGS = ['tauri.conf.json', 'tauri.release.conf.json']
 
 const INSECURE_KEYS = new Set([
   'dangerousInsecureTransportProtocol',
