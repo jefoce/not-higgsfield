@@ -8,13 +8,27 @@ import type { MediaKind, MediaKindCounts } from '@/core/media-types'
 import { minDuration } from '@/core/presets'
 import type { ModelPreset } from '@/core/presets/types'
 import { idForSlot, referenceSlots, type RefSlot } from '@/core/prompt-tokens'
-import type { GenerationInput } from '@/core/schemas/generation-record'
+import type { GenerationInput, GeneratorTab } from '@/core/schemas/generation-record'
 import type { UploadItem, UploadsById } from '@/core/schemas/upload-item'
 import { formatSecondsExact } from '@/lib/format'
 
 interface ReferenceState {
   references: string[]
   uploadsById: UploadsById
+}
+
+interface TabReferenceState extends ReferenceState {
+  tab: GeneratorTab
+}
+
+/** True when the references tab holds at least one video upload. */
+export function hasVideoReference(state: TabReferenceState): boolean {
+  return (
+    state.tab === 'references' &&
+    state.references.some((id) => {
+      return state.uploadsById[id]?.kind === 'video'
+    })
+  )
 }
 
 export const randomSeed = (): number => {

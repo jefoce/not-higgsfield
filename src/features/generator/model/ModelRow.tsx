@@ -78,10 +78,15 @@ function listRate(params: ListRateParams): number | null {
   return fromRate(preset, skus)
 }
 
-interface RowData {
+interface RowPrice {
+  current: number
+  list: number | null
   discount: number
-  from: number | null
-  listFrom: number | null
+  showDiscountLabel: boolean
+}
+
+interface RowData {
+  price: RowPrice | null
   reason: string | null
 }
 
@@ -89,13 +94,29 @@ function isBlockedEntry(entry: CatalogEntry | null): boolean {
   return entry?.status === 'missing' || entry?.status === 'no_provider'
 }
 
-function rowData(preset: ModelPreset, entry: CatalogEntry | null): RowData {
+function rowPrice(preset: ModelPreset, entry: CatalogEntry | null): RowPrice | null {
   const pricing = entry?.pricing
-  const discount = pricing?.discount ?? 0
-  const from = fromRate(preset, pricing?.skus)
-  const listFrom = listRate({ preset, skus: pricing?.listSkus, discount })
+  const status = entry?.status
+  const current = fromRate(preset, pricing?.skus)
 
-  return { discount, from, listFrom, reason: entry?.reason ?? null }
+  if (status === 'missing' || isNil(current)) {
+    return null
+  }
+
+  const discount = pricing?.discount ?? 0
+
+  return {
+    current,
+    list: listRate({ preset, skus: pricing?.listSkus, discount }),
+    discount,
+    showDiscountLabel: status === 'no_provider',
+  }
+}
+
+function rowData(preset: ModelPreset, entry: CatalogEntry | null): RowData {
+  const price = rowPrice(preset, entry)
+
+  return { price, reason: entry?.reason ?? null }
 }
 
 interface ModelRowProps {
@@ -108,7 +129,7 @@ interface ModelRowProps {
 export function ModelRow(props: ModelRowProps) {
   const { option, selected: isSelected } = props
   const entry = useModelEntry(option.id)
-  const { discount, from, listFrom, reason } = rowData(option, entry)
+  const { price, reason } = rowData(option, entry)
   const isBlocked = isBlockedEntry(entry)
 
   const Icon = PRESET_ICONS[option.icon]
@@ -138,9 +159,16 @@ export function ModelRow(props: ModelRowProps) {
       <span className="min-w-0 flex-1">
         <span className="flex w-full items-baseline gap-2">
           <span className="shrink-0 text-sm font-medium">{option.title}</span>
-          {!isBlocked && !isNil(from) && (
+          {!isNil(price) && (
             <span className={cn('ml-auto shrink-0 text-xs whitespace-nowrap text-fg-2')}>
-              from <Price current={from} list={listFrom} discount={discount} format={formatRate} />
+              from{' '}
+              <Price
+                current={price.current}
+                list={price.list}
+                discount={price.discount}
+                format={formatRate}
+                showDiscountLabel={price.showDiscountLabel}
+              />
             </span>
           )}
         </span>

@@ -115,18 +115,18 @@ describe('ModelPicker rows', () => {
 })
 
 describe('ModelPicker unavailable rows', () => {
-  it.each([
-    ['missing', 'Not available on OpenRouter right now.'],
-    ['no_provider', 'Add your OpenRouter key in Settings.'],
-  ] as const)('disables a %s row with the reason and no price', (status, reason) => {
-    mockUseModelEntry.mockReturnValue(unavailable(status, reason))
+  it('disables a missing row with the reason and no price', () => {
+    mockUseModelEntry.mockReturnValue(
+      unavailable('missing', 'Not available on OpenRouter right now.'),
+    )
+
     render(<ModelPicker />)
     fireEvent.click(screen.getByRole('button', { name: /Model/ }))
     const dialog = screen.getByRole('dialog')
     const row = within(dialog).getByText('Wan 3.0').closest('button') as HTMLButtonElement
 
     expect(row.disabled).toBe(true)
-    expect(within(row).getByText(reason)).toBeTruthy()
+    expect(within(row).getByText('Not available on OpenRouter right now.')).toBeTruthy()
     expect(within(row).queryByText('$0.05/s')).toBeNull()
     expect(within(row).queryByText('$0.043/s')).toBeNull()
   })

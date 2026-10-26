@@ -9,6 +9,7 @@ import { useModelEntry } from '@/lib/api/models'
 import { Popover, PopoverContent, PopoverTrigger } from '@/ui/Popover'
 
 import { useGeneratorStore } from '../store/store'
+import { hasVideoReference } from '../store/store-helpers'
 import { ResolutionOption } from './ResolutionOption'
 
 /** Resolution button and preset list with list and discounted per-second rates. */
@@ -29,14 +30,7 @@ export function ResolutionPopover() {
     return state.aspectRatio
   })
 
-  const hasVideoInput = useGeneratorStore((state) => {
-    return (
-      state.tab === 'references' &&
-      state.references.some((id) => {
-        return state.uploadsById[id]?.kind === 'video'
-      })
-    )
-  })
+  const hasVideoInput = useGeneratorStore(hasVideoReference)
 
   const preset = getPreset(
     useGeneratorStore((state) => {

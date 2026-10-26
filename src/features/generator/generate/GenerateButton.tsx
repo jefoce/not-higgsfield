@@ -3,7 +3,7 @@
 import { isNil } from 'lodash-es'
 import { Sparkles } from 'lucide-react'
 
-import { formatUsd } from '@/core/pricing'
+import { formatRate, formatUsd } from '@/core/pricing'
 import { cn } from '@/lib/cn'
 import { Price } from '@/ui/Price'
 import { Spinner } from '@/ui/Spinner'
@@ -63,6 +63,8 @@ export function GenerateButton(props: GenerateButtonProps) {
 
   const isBusy = isSpinning({ isGenerating, isPriceLoading, isDisabled })
   const spinnerTone = isDisabled ? 'muted' : 'onAccent'
+  const priceTone = isDisabled ? 'muted' : 'onAccent'
+  const priceFormat = isDisabled ? formatRate : formatUsd
   const tooltip = disabledTooltip(isDisabled, error)
 
   return (
@@ -82,13 +84,14 @@ export function GenerateButton(props: GenerateButtonProps) {
           Generate
           {isBusy && <Spinner size={16} tone={spinnerTone} />}
           {!isBusy && <Sparkles size={20} />}
-          {!isNil(price) && !isDisabled && !isBusy && (
+          {!isNil(price) && !isBusy && (
             <Price
               current={price}
               list={listPrice}
               discount={discount}
-              format={formatUsd}
-              tone="onAccent"
+              format={priceFormat}
+              tone={priceTone}
+              showDiscountLabel={isDisabled}
             />
           )}
         </button>

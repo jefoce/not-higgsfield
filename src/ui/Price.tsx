@@ -5,7 +5,7 @@ export function discountLabel(discount: number): string {
   return `${Math.round(discount * 100)}% off`
 }
 
-type PriceTone = 'default' | 'onAccent'
+type PriceTone = 'default' | 'onAccent' | 'muted'
 
 interface ToneClasses {
   current: string
@@ -26,6 +26,12 @@ const TONE_CLASSES: Record<PriceTone, ToneClasses> = {
     currentFlat: 'text-on-lime',
     list: 'text-on-lime/50 line-through',
     discount: 'text-on-lime/70',
+  },
+  muted: {
+    current: 'text-disabled',
+    currentFlat: 'text-disabled',
+    list: 'text-disabled/50 line-through',
+    discount: 'text-disabled/70',
   },
 }
 
