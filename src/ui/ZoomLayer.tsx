@@ -14,6 +14,7 @@ import { Maximize2, Minus, Plus } from 'lucide-react'
 
 import type { Dict } from '@/core/utility-types'
 import { cn } from '@/lib/cn'
+import { canHandleDialogKey } from '@/lib/dialog-keys'
 
 import { useZoomControls, useZoomPan } from './use-zoom-pan'
 import { EMPTY_VIEW, FIT_ZOOM, KEY_STEP, type ZoomState, zoomTo, type ZoomView } from './zoom-math'
@@ -34,9 +35,6 @@ interface UseZoomInputParams {
 const WHEEL_STEP = 1.1
 const PINCH_FACTOR = 0.01
 
-const DIALOG_SELECTOR = '[role="dialog"], [role="alertdialog"]'
-const IGNORED_TARGETS = 'input, textarea, select, [contenteditable], [role="slider"]'
-
 const KEY_STEPS: Dict<number> = {
   '0': 0,
   '+': KEY_STEP,
@@ -49,31 +47,6 @@ const CONTROLS_CLASSES =
 
 const CONTROL_CLASSES =
   'flex size-8 items-center justify-center rounded-full text-fg tabular-nums transition hover:bg-white/10 focus-visible:bg-white/10'
-
-/** True when the layer sits in the last dialog of the document. */
-function isTopmostDialog(scope: HTMLElement | null): boolean {
-  const dialog = scope?.closest(DIALOG_SELECTOR)
-
-  if (isNil(dialog)) {
-    return false
-  }
-
-  const dialogs = document.querySelectorAll(DIALOG_SELECTOR)
-
-  return dialogs[dialogs.length - 1] === dialog
-}
-
-function isIgnoredTarget(target: EventTarget | null): boolean {
-  return target instanceof Element && !isNil(target.closest(IGNORED_TARGETS))
-}
-
-function canHandleZoomKey(event: KeyboardEvent, layer: HTMLElement): boolean {
-  if (event.defaultPrevented || event.ctrlKey || event.altKey || event.metaKey) {
-    return false
-  }
-
-  return isTopmostDialog(layer) && !isIgnoredTarget(event.target)
-}
 
 function wheelFactor(event: WheelEvent): number {
   if (event.ctrlKey) {
@@ -155,7 +128,7 @@ function useZoomInput(params: UseZoomInputParams): void {
     const handleKeyDown = (event: KeyboardEvent) => {
       const step = KEY_STEPS[event.key]
 
-      if (!canHandleZoomKey(event, layer) || isNil(step)) {
+      if (!canHandleDialogKey(event, layer) || isNil(step)) {
         return
       }
 
