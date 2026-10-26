@@ -4,18 +4,22 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 import { cn } from '@/lib/cn'
 
-interface PreviewNavButtonProps {
+interface StageNavButtonProps {
   side: 'left' | 'right'
   disabled: boolean
   onClick: () => void
+  revealOnHover?: boolean
 }
 
-/** Round previous/next control on the preview stage. */
-export function PreviewNavButton(props: PreviewNavButtonProps) {
-  const { side, disabled: isDisabled } = props
-  const Icon = side === 'left' ? ChevronLeft : ChevronRight
+const REVEAL_CLASSES =
+  'pointer-events-none opacity-0 group-hover/stage:pointer-events-auto group-hover/stage:opacity-100 focus-visible:opacity-100 pointer-coarse:opacity-100'
+
+/** Round previous/next control on a media stage. */
+export function StageNavButton(props: StageNavButtonProps) {
+  const { side, disabled: isDisabled, revealOnHover: isRevealOnHover = false } = props
   const isLeft = side === 'left'
-  const label = isLeft ? 'Previous media' : 'Next media'
+  const Icon = isLeft ? ChevronLeft : ChevronRight
+  const label = isLeft ? 'Previous' : 'Next'
 
   return (
     <button
@@ -27,6 +31,7 @@ export function PreviewNavButton(props: PreviewNavButtonProps) {
         'absolute top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-fg backdrop-blur-sm transition hover:bg-black/80 disabled:opacity-30',
         isLeft && 'left-4',
         !isLeft && 'right-4',
+        isRevealOnHover && REVEAL_CLASSES,
       )}
     >
       <Icon size={20} aria-hidden />

@@ -8,7 +8,7 @@ import { cn } from '@/lib/cn'
 import { LazyVideoPlayer } from './LazyVideoPlayer'
 import { LazyVideoPoster } from './LazyVideoPoster'
 import { useHoverPlay } from './use-hover-play'
-import { usePlayerInput } from './use-player-input'
+import { type SeekKeys, usePlayerInput } from './use-player-input'
 import { usePlayerSlot } from './use-player-slot'
 import { useSlotLifecycle } from './use-slot-lifecycle'
 import { useVideoState } from './use-video-state'
@@ -23,6 +23,7 @@ export interface LazyVideoProps {
   posterFit?: 'cover' | 'contain'
   videoFit?: 'cover' | 'contain'
   hoverPlay?: boolean
+  seekKeys?: SeekKeys
 
   /** False hides controls and releases the slot: selection mode owns the click. */
   interactive?: boolean
@@ -61,6 +62,7 @@ export function LazyVideo(props: LazyVideoProps) {
     posterFit = 'contain',
     videoFit = 'contain',
     hoverPlay: isHoverPlay = false,
+    seekKeys,
     interactive: isInteractive = true,
   } = props
 
@@ -69,7 +71,7 @@ export function LazyVideo(props: LazyVideoProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const video = useVideoState({ videoRef, rootRef, active: isSlotActive, src })
-  const inputHandlers = usePlayerInput({ isActive: isSlotActive, video })
+  const inputHandlers = usePlayerInput({ isActive: isSlotActive, video, seekKeys })
 
   const hoverHandlers = useHoverPlay({
     id,

@@ -26,6 +26,9 @@
   --color-toolbar-mid: #ffffff0f;
   --color-toolbar-end: #ffffff05;
   --color-info: #5cc8ff; /* cool cyan: downscaled references */
+  --color-teal: #2dd4bf; /* stage gradient accent */
+  --color-violet: #8b5cf6; /* stage gradient purple */
+  --color-indigo: #6366f1; /* stage gradient deep blue */
   --color-disabled: #737475;
   --color-disabled-surface: #292b2c;
   --color-glass: #23262abf;
