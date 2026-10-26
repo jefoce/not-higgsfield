@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { isEmpty } from 'lodash-es'
+import { isEmpty, isNil } from 'lodash-es'
 
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { useGeneratorStore } from '@/features/generator/store/store'
@@ -23,7 +23,7 @@ import { useHistoryViewStore } from './view-store'
 
 /** Right-hand feed: toolbar, list or grid, infinite scroll and grid details modal. */
 export function HistorySection() {
-  const { records, activeCount, isLoading, hasMore, loadMore } = useHistory()
+  const { records, activeCount, isLoading, isValidating, hasMore, loadMore } = useHistory()
 
   const view = useHistoryViewStore((state) => {
     return state.view
@@ -58,10 +58,6 @@ export function HistorySection() {
 
   const handleOpen = (record: GenerationRecord) => {
     setSelectedId(record.id)
-  }
-
-  const handleDeleted = () => {
-    setSelectedId(null)
   }
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -110,9 +106,14 @@ export function HistorySection() {
       <SelectionBar records={records} />
       <HistoryModal
         record={selected}
-        open={Boolean(selected)}
+        open={!isNil(selectedId)}
+        selectedId={selectedId}
+        order={order}
+        hasMore={hasMore}
+        isLoadingMore={isValidating}
+        onNavigate={setSelectedId}
+        onLoadMore={loadMore}
         onOpenChange={handleOpenChange}
-        onDeleted={handleDeleted}
       />
     </section>
   )
