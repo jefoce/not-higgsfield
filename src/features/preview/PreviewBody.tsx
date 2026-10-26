@@ -1,5 +1,6 @@
 'use client'
 
+import { type SyntheticEvent, useState } from 'react'
 import { isNil } from 'lodash-es'
 import { AlertTriangle } from 'lucide-react'
 
@@ -18,27 +19,38 @@ interface PreviewBodyProps {
   autoPlay?: boolean
 }
 
-/** Upload size when known, 16:9 until a size is stored. */
-function itemAspect(item: PreviewItem): string {
+/** Upload size when both sides are positive, else `fallback`. */
+function itemAspect(item: PreviewItem, fallback = '16/9'): string {
   const { width, height } = item
 
   if (!isNil(width) && !isNil(height) && width > 0 && height > 0) {
     return `${width}/${height}`
   }
 
-  return '16/9'
+  return fallback
 }
 
 /** Full-size video, audio or image for the current preview item. */
 export function PreviewBody(props: PreviewBodyProps) {
   const { item, playerId, seekKeys, autoPlay: isAutoPlay } = props
+  const [naturalAspect, setNaturalAspect] = useState<string>()
+
+  const handleImageLoad = (event: SyntheticEvent<HTMLImageElement>) => {
+    const { naturalWidth, naturalHeight } = event.currentTarget
+
+    if (naturalWidth > 0 && naturalHeight > 0) {
+      setNaturalAspect(`${naturalWidth}/${naturalHeight}`)
+    }
+  }
 
   if (!item || item.missing === true) {
     return (
-      <div className="flex flex-col items-center gap-2 text-sm text-danger">
-        <AlertTriangle size={24} aria-hidden />
-        File missing
-      </div>
+      <MediaBox aspect="16/9">
+        <div className="flex size-full flex-col items-center justify-center gap-2 text-sm text-danger">
+          <AlertTriangle size={24} aria-hidden />
+          File missing
+        </div>
+      </MediaBox>
     )
   }
 
@@ -67,9 +79,14 @@ export function PreviewBody(props: PreviewBodyProps) {
   }
 
   return (
-    <MediaBox aspect={itemAspect(item)}>
+    <MediaBox aspect={itemAspect(item, naturalAspect)}>
       {/* eslint-disable-next-line @next/next/no-img-element -- full original, not a thumb */}
-      <img src={src} alt={item.originalName} className="size-full object-contain" />
+      <img
+        src={src}
+        alt={item.originalName}
+        className="size-full object-cover"
+        onLoad={handleImageLoad}
+      />
     </MediaBox>
   )
 }
