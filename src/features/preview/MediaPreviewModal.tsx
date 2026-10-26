@@ -10,7 +10,13 @@ import { useChainKeys } from '@/lib/use-chain-keys'
 import { MediaStage } from '@/ui/MediaStage'
 import { Modal } from '@/ui/Modal'
 
-import { type ActionKey, closePreview, type PreviewItem, usePreviewStore } from './preview-store'
+import {
+  type ActionKey,
+  closePreview,
+  type PreviewItem,
+  type PreviewRequest,
+  usePreviewStore,
+} from './preview-store'
 import { PreviewBody } from './PreviewBody'
 import { PreviewFooter } from './PreviewFooter'
 import { PreviewHeader } from './PreviewHeader'
@@ -44,10 +50,70 @@ function handleOpenChange(isOpen: boolean): void {
   }
 }
 
+interface RunPreviewActionParams {
+  request: PreviewRequest | null
+  item: PreviewItem | undefined
+  key: ActionKey
+  onRefresh: () => void
+}
+
+/**
+ * Select and deselect refresh after the opener commits its selection.
+ * They close only without a true return, every other action closes before it runs.
+ */
+function runPreviewAction(params: RunPreviewActionParams): void {
+  const { request, item, key, onRefresh } = params
+  const action = request?.actions?.[key]
+
+  if (!action || !item) {
+    return
+  }
+
+  if (key === 'select' || key === 'deselect') {
+    const isKeepOpen = action(item) === true
+
+    onRefresh()
+
+    if (!isKeepOpen) {
+      closePreview()
+    }
+
+    return
+  }
+
+  closePreview()
+  action(item)
+}
+
+/** Refreshes after the opener effect commits its latest selection. */
+function useSelectionRefresh(): () => void {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    if (count === 0) {
+      return
+    }
+
+    usePreviewStore.getState().refresh()
+  }, [count])
+
+  const requestRefresh = () => {
+    setCount((current) => {
+      return current + 1
+    })
+  }
+
+  return requestRefresh
+}
+
 /** Full-size media preview with header, navigation and opener actions. */
 export function MediaPreviewModal() {
   const request = usePreviewStore((state) => {
     return state.request
+  })
+
+  const version = usePreviewStore((state) => {
+    return state.version
   })
 
   const [lastRequest, setLastRequest] = useState(request)
@@ -84,15 +150,10 @@ export function MediaPreviewModal() {
 
   const backdropPoster = stagePoster(item)
 
+  const requestRefresh = useSelectionRefresh()
+
   const handleRun = (key: ActionKey) => {
-    const action = request?.actions?.[key]
-
-    if (!action || !item) {
-      return
-    }
-
-    closePreview() // close first so an opener action cannot stack modals
-    action(item)
+    runPreviewAction({ request, item, key, onRefresh: requestRefresh })
   }
 
   const handlePrev = useCallback(() => {
@@ -136,7 +197,7 @@ export function MediaPreviewModal() {
           <PreviewBody item={item} playerId={playerId} seekKeys="shiftArrows" />
         </MediaStage>
 
-        <PreviewFooter item={item} actions={request.actions} onRun={handleRun} />
+        <PreviewFooter key={version} item={item} actions={request.actions} onRun={handleRun} />
       </div>
     </Modal>
   )

@@ -1,15 +1,20 @@
 'use client'
 
 import { useState } from 'react'
-import { isEmpty } from 'lodash-es'
+import { isEmpty, isNil } from 'lodash-es'
 import useSWR from 'swr'
 
 import { isNonEmptyString } from '@/core/guards'
 import { extensionAllowed, extWithDot, type KindExtensions, mimeFromExt } from '@/core/media-kinds'
 import type { FolderFile, MediaKind } from '@/core/media-types'
-import { openPreview, type PreviewItem } from '@/features/preview/preview-store'
+import {
+  openPreview,
+  type PreviewActions,
+  type PreviewItem,
+} from '@/features/preview/preview-store'
 import { fetchFolderFiles } from '@/lib/api/folders'
 import { thumbUrl } from '@/lib/api/media-urls'
+import { type LatestRef, useLatest } from '@/lib/use-latest'
 
 import { FolderBreadcrumbs } from './FolderBreadcrumbs'
 import { FolderDirTile } from './FolderDirTile'
@@ -53,6 +58,18 @@ function folderPreviewItem(params: FolderPreviewItemParams): PreviewItem {
   }
 }
 
+/** Rel path of a folder preview item, undefined for other sources. */
+function previewRel(folderId: string, item: PreviewItem): string | undefined {
+  const prefix = `folders/${folderId}/`
+  const ref = item.previewRef
+
+  if (!isNonEmptyString(ref) || !ref.startsWith(prefix)) {
+    return undefined
+  }
+
+  return ref.slice(prefix.length)
+}
+
 interface SelectFileParams {
   rel: string
   max: number
@@ -71,6 +88,43 @@ function selectFile(params: SelectFileParams): void {
   }
 
   onToggleFile(rel)
+}
+
+interface FolderPreviewActionsParams {
+  folderId: string
+  max: number
+  selectedRelsRef: LatestRef<string[]>
+  onPickFile: (rel: string) => void
+  onToggleFile: (rel: string) => void
+}
+
+/** Preview actions that read the live selection and keep the list open for multi-select. */
+function folderPreviewActions(params: FolderPreviewActionsParams): PreviewActions {
+  const { folderId, max, selectedRelsRef, onPickFile, onToggleFile } = params
+
+  const run = (item: PreviewItem): boolean => {
+    const rel = previewRel(folderId, item)
+
+    if (isNil(rel)) {
+      return false
+    }
+
+    selectFile({ rel, max, onPickFile, onToggleFile })
+
+    return max > 1
+  }
+
+  const isSelected = (item: PreviewItem): boolean => {
+    const rel = previewRel(folderId, item)
+
+    if (isNil(rel)) {
+      return false
+    }
+
+    return selectedRelsRef.current.includes(rel)
+  }
+
+  return { select: run, deselect: run, isSelected }
 }
 
 /** Folder browser. */
@@ -93,16 +147,15 @@ export function FolderTab(props: FolderTabProps) {
     return extensionAllowed({ kind: file.kind, ext: extWithDot(file.name), extensions })
   })
 
-  const handleSelectPreview = (item: PreviewItem): void => {
-    const prefix = `folders/${folderId}/`
-    const ref = item.previewRef
+  const selectedRelsRef = useLatest(selectedRels)
 
-    if (!isNonEmptyString(ref) || !ref.startsWith(prefix)) {
-      return
-    }
-
-    handleSelectFile(ref.slice(prefix.length))
-  }
+  const previewActions = folderPreviewActions({
+    folderId,
+    max,
+    selectedRelsRef,
+    onPickFile: props.onPickFile,
+    onToggleFile: props.onToggleFile,
+  })
 
   const handleExpand = (file: FolderFile) => {
     const items = files.map((each) => {
@@ -113,7 +166,7 @@ export function FolderTab(props: FolderTabProps) {
       return each.rel === file.rel
     })
 
-    openPreview({ items, index, actions: { select: handleSelectPreview } })
+    openPreview({ items, index, actions: previewActions })
   }
 
   const handleBroken = (src: string) => {

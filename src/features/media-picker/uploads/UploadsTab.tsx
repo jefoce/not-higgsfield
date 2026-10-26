@@ -6,9 +6,10 @@ import useSWR from 'swr'
 import { extensionAllowed, type KindExtensions } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
 import type { UploadItem } from '@/core/schemas/upload-item'
-import type { PreviewActions } from '@/features/preview/preview-store'
+import type { ActionKey, PreviewActions } from '@/features/preview/preview-store'
 import { fetchUploads } from '@/lib/api/uploads'
 import { getPlatform } from '@/lib/platform'
+import { useLatest } from '@/lib/use-latest'
 
 import { DeleteUploadDialog } from './DeleteUploadDialog'
 import type { UploadProgressItem } from './UploadProgressTile'
@@ -49,23 +50,36 @@ export function UploadsTab(props: UploadsTabProps) {
   })
 
   const isMaxReached = selected.length >= max
+  const selectedIdsRef = useLatest(selectedIds)
+  const isMaxReachedRef = useLatest(isMaxReached)
 
-  const handleAvailable = (item: UploadItem) => {
-    if (selectedIds.includes(item.id)) {
-      return ['deselect' as const]
+  const handleIsSelected = (item: UploadItem): boolean => {
+    return selectedIdsRef.current.includes(item.id)
+  }
+
+  const handleAvailable = (item: UploadItem): ActionKey[] => {
+    if (handleIsSelected(item)) {
+      return ['deselect']
     }
 
-    if (isMaxReached) {
+    if (isMaxReachedRef.current) {
       return []
     }
 
-    return ['select' as const]
+    return ['select']
+  }
+
+  const handleSelect = (item: UploadItem): boolean => {
+    props.onSelect(item)
+
+    return max > 1
   }
 
   const actions: PreviewActions = {
-    select: props.onSelect,
-    deselect: props.onSelect,
+    select: handleSelect,
+    deselect: handleSelect,
     available: handleAvailable,
+    isSelected: handleIsSelected,
   }
 
   const deletion = useDeleteUpload({ mutate, onDeleted: props.onDeleted })

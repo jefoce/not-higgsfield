@@ -16,6 +16,7 @@ Looping playback, clearer pricing, reused release sources.
 - With looping playback the player controls stay in sync, and pausing stops the loop.
 - A model with no endpoint pricing block now logs a clear reason and keeps list prices.
 - Release pipeline: sidecar and ffmpeg source pulls that hit GHCR are reused instead of rebuilt.
+- The preview shows Deselect for a selected file and keeps the list open while you pick.
 
 ## 0.2.0 - 2026-10-26
 
