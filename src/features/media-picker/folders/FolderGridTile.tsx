@@ -2,8 +2,9 @@
 
 import { isNil } from 'lodash-es'
 
-import { isFolderFileAttached } from '@/core/folder-match'
+import { folderFileUpload } from '@/core/folder-match'
 import type { FolderFile } from '@/core/media-types'
+import type { RefSlot } from '@/core/prompt-tokens'
 import type { UploadsById } from '@/core/schemas/upload-item'
 
 import type { PickerMode } from '../picker/store'
@@ -18,6 +19,7 @@ interface FolderGridTileProps {
   mode: PickerMode
   selectedIds: string[]
   uploadsById: UploadsById
+  slots: Map<string, RefSlot>
   linkingRel: string | null
   isBroken: boolean
   onSelect: (rel: string) => void
@@ -27,9 +29,17 @@ interface FolderGridTileProps {
 
 /** Folder grid tile with its live attachment and busy state. */
 export function FolderGridTile(props: FolderGridTileProps) {
-  const { folderId, folderPath, file, src, mode, selectedIds, uploadsById, linkingRel } = props
+  const { folderId, folderPath, file, src, mode, selectedIds, uploadsById, slots, linkingRel } =
+    props
 
-  const isSelected = isFolderFileAttached({ folderPath, rel: file.rel, selectedIds, uploadsById })
+  const upload = folderFileUpload({ folderPath, rel: file.rel, selectedIds, uploadsById })
+  const isSelected = !isNil(upload)
+
+  let slotNumber: number | undefined
+
+  if (!isNil(upload)) {
+    slotNumber = slots.get(upload.id)?.n
+  }
 
   const disabledReason = folderFileReason({
     mode,
@@ -44,6 +54,7 @@ export function FolderGridTile(props: FolderGridTileProps) {
       src={src}
       isBroken={props.isBroken}
       isSelected={isSelected}
+      slotNumber={slotNumber}
       isDisabled={!isNil(disabledReason)}
       disabledReason={disabledReason}
       isBusy={linkingRel === file.rel}

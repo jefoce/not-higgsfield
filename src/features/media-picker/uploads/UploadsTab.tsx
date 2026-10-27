@@ -5,7 +5,8 @@ import useSWR from 'swr'
 
 import { extensionAllowed, type KindExtensions } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
-import type { UploadItem } from '@/core/schemas/upload-item'
+import { referenceSlots, type RefSlot } from '@/core/prompt-tokens'
+import type { UploadItem, UploadsById } from '@/core/schemas/upload-item'
 import type { ActionKey, PreviewActions } from '@/features/preview/preview-store'
 import { fetchUploads } from '@/lib/api/uploads'
 import { getPlatform } from '@/lib/platform'
@@ -28,9 +29,22 @@ export interface UploadsTabProps {
   onDismiss?: (id: string) => void
 }
 
+const NO_UPLOADS_BY_ID: UploadsById = {}
+
 /** Pick mode has no local selection, toggle mode supplies its own ids. */
 function useNoSelectedIds(): string[] {
   return []
+}
+
+function useNoUploadsById(): UploadsById {
+  return NO_UPLOADS_BY_ID
+}
+
+/** Slot per selected upload id, numbered per kind. */
+function uploadSlots(selectedIds: string[], uploadsById: UploadsById): Map<string, RefSlot> {
+  return referenceSlots(selectedIds, (id) => {
+    return uploadsById[id]?.kind
+  }).slots
 }
 
 function isUploadSelected(item: UploadItem, selectedIds: string[]): boolean {
@@ -81,6 +95,18 @@ function toggleFromPreview(mode: PickerMode, item: UploadItem): boolean {
   return true
 }
 
+/** Toggles in toggle mode, picks and closes the picker in pick mode. */
+function selectUpload(mode: PickerMode, item: UploadItem): void {
+  if (mode.kind === 'toggle') {
+    mode.onToggle(item)
+
+    return
+  }
+
+  mode.onPick(item)
+  closeMediaPicker()
+}
+
 /** Uploads for a kinds key, keeping previous data during revalidation. */
 function fetchKindsUploads(key: [string, MediaKind[]]): Promise<UploadItem[]> {
   const [, kinds] = key
@@ -106,8 +132,17 @@ export function UploadsTab(props: UploadsTabProps) {
 
   // Mode is fixed for the mount, so the hook choice stays stable.
   const useSelectedIds = mode.kind === 'toggle' ? mode.useSelectedIds : useNoSelectedIds
+  const useUploadsById = mode.kind === 'toggle' ? mode.useUploadsById : useNoUploadsById
   const selectedIds = useSelectedIds()
+  const uploadsById = useUploadsById()
   const selectedIdsRef = useLatest(selectedIds)
+
+  let slots: Map<string, RefSlot> | undefined
+
+  if (mode.kind === 'toggle') {
+    slots = uploadSlots(selectedIds, uploadsById)
+  }
+
   // Upload tiles only compare max with 1 to enable multiple files.
   const uploadMax = mode.kind === 'toggle' ? 2 : 1
 
@@ -132,14 +167,7 @@ export function UploadsTab(props: UploadsTabProps) {
   }
 
   const handleSelect = (item: UploadItem): void => {
-    if (mode.kind === 'toggle') {
-      mode.onToggle(item)
-
-      return
-    }
-
-    mode.onPick(item)
-    closeMediaPicker()
+    selectUpload(mode, item)
   }
 
   const actions: PreviewActions = {}
@@ -168,6 +196,7 @@ export function UploadsTab(props: UploadsTabProps) {
         max={uploadMax}
         extensions={extensions}
         actions={actions}
+        slots={slots}
         isSelected={handleIsSelected}
         disabledReason={handleDisabledReason}
         onUploaded={props.onUploaded}

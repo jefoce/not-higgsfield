@@ -4,6 +4,7 @@ import { isEmpty } from 'lodash-es'
 
 import type { KindExtensions } from '@/core/media-kinds'
 import type { MediaKind } from '@/core/media-types'
+import type { RefSlot } from '@/core/prompt-tokens'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import type { PreviewActions } from '@/features/preview/preview-store'
 
@@ -22,6 +23,7 @@ interface UploadsGridProps {
   max: number
   extensions?: KindExtensions
   actions: PreviewActions
+  slots?: Map<string, RefSlot>
   isSelected: (item: UploadItem) => boolean
   disabledReason: (item: UploadItem) => string | undefined
   onUploaded: (items: UploadItem[]) => void
@@ -76,6 +78,7 @@ export function UploadsGrid(props: UploadsGridProps) {
               items={items}
               previewIndex={previewIndex}
               actions={actions}
+              slotNumber={props.slots?.get(item.id)?.n}
               isSelected={props.isSelected(item)}
               disabledReason={props.disabledReason(item)}
               onSelect={props.onSelect}

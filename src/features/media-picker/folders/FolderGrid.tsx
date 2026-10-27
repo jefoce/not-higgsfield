@@ -2,7 +2,8 @@
 
 import { isEmpty } from 'lodash-es'
 
-import type { FolderDir, FolderFile } from '@/core/media-types'
+import type { FolderDir, FolderFile, MediaKind } from '@/core/media-types'
+import { referenceSlots } from '@/core/prompt-tokens'
 import type { UploadsById } from '@/core/schemas/upload-item'
 import { thumbUrl } from '@/lib/api/media-urls'
 
@@ -35,6 +36,12 @@ export function FolderGrid(props: FolderGridProps) {
   const isEmptyList = isEmpty(dirs) && isEmpty(files)
   const isInitialLoading = props.isLoading && isEmptyList
 
+  const kindOfUpload = (id: string): MediaKind | undefined => {
+    return uploadsById[id]?.kind
+  }
+
+  const slots = referenceSlots(selectedIds, kindOfUpload).slots
+
   return (
     <div className="min-h-0 flex-1 scrollbar-gutter-stable overflow-y-auto overscroll-contain">
       <div className="grid grid-cols-4 content-start gap-3 p-3">
@@ -59,6 +66,7 @@ export function FolderGrid(props: FolderGridProps) {
               mode={mode}
               selectedIds={selectedIds}
               uploadsById={uploadsById}
+              slots={slots}
               linkingRel={linkingRel}
               isBroken={props.broken.includes(src)}
               onSelect={props.onSelect}

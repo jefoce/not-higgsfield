@@ -16,6 +16,7 @@ interface FolderFileTileProps {
   src: string
   isBroken: boolean
   isSelected: boolean
+  slotNumber?: number
   isDisabled: boolean
   isBusy: boolean
   disabledReason?: string
@@ -82,7 +83,7 @@ function folderFileBody(params: FolderFileBodyParams): ReactNode {
 
 /** File tile in the read-only folder grid. */
 export function FolderFileTile(props: FolderFileTileProps) {
-  const { file, src, isBroken, isSelected, isDisabled, isBusy, disabledReason } = props
+  const { file, src, isBroken, isSelected, slotNumber, isDisabled, isBusy, disabledReason } = props
   const isBlocked = isDisabled || isBusy
 
   const handleSelect = () => {
@@ -118,7 +119,7 @@ export function FolderFileTile(props: FolderFileTileProps) {
 
         {folderFileBody({ file, src, isBroken, onBroken: props.onBroken })}
 
-        <MediaTileBadges isMissing={false} isLink isSelected={isSelected} />
+        <MediaTileBadges isMissing={false} isLink isSelected={isSelected} slotNumber={slotNumber} />
 
         {isBusy && (
           <span className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-black/40">

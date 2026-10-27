@@ -17,7 +17,7 @@ export interface MediaTileProps {
   item: UploadItem
   mediaRef: string
   selected?: boolean
-  selectIndex?: number
+  slotNumber?: number
   disabled?: boolean
   disabledReason?: string
   missing?: boolean
@@ -33,7 +33,7 @@ export function MediaTile(props: MediaTileProps) {
     item,
     mediaRef,
     selected: isSelected,
-    selectIndex,
+    slotNumber,
     disabled: isDisabled,
     disabledReason,
     missing: isMissing,
@@ -90,7 +90,7 @@ export function MediaTile(props: MediaTileProps) {
           isMissing={isMissing === true}
           isLink={item.source === 'link'}
           isSelected={isSelected === true}
-          selectIndex={selectIndex}
+          slotNumber={slotNumber}
         />
       </div>
     </Tooltip>
