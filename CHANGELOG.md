@@ -26,6 +26,7 @@ A roomier viewer with zoom, a live docked picker, paste and drop anywhere, and o
 - The preview shows Deselect for a selected file.
 - List rows toggle selection with a click, the same as the grid.
 - Release pipeline: sidecar and ffmpeg pulls that hit GHCR are reused instead of rebuilt.
+- Dropping more files than fit says how many were skipped.
 
 ## 0.2.0 - 2026-10-26
 
