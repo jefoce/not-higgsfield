@@ -17,6 +17,7 @@ Looping playback, clearer pricing, reused release sources.
 - Photos and videos sit rounded on the blurred backdrop.
 - Frames and input thumbnails open the preview with previous and next.
 - Reuse closes the viewer so the loaded settings are visible.
+- Paste or drop files anywhere in the app. They go to the open picker or to the active mode.
 
 ### Changed
 
@@ -33,6 +34,10 @@ Looping playback, clearer pricing, reused release sources.
 - Only the front dialog reacts to arrow keys.
 - Dragging a zoomed photo follows the cursor without lag, and the zoom buttons no longer toggle the zoom.
 - Videos and photos fill the viewer without black bars, whatever their shape.
+- Dragging a zoomed photo moves it instead of starting a file drag.
+- Every photo and video shows rounded corners on the media itself, whatever its shape.
+- Long folder and uploads lists scroll without jumps.
+- Picker tiles show the reference number, matching Image 2 and the other prompt tokens.
 
 ## 0.2.0 - 2026-10-26
 
