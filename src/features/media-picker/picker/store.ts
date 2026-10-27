@@ -68,10 +68,15 @@ interface MediaPickerState {
 
 let nextId = 0
 
-export const useMediaPickerStore = create<MediaPickerState>((set) => {
+export const useMediaPickerStore = create<MediaPickerState>((set, get) => {
   return {
     request: null,
     open: (request) => {
+      // An open picker keeps its request until it closes, so repeated openers are no-ops.
+      if (!isNil(get().request)) {
+        return
+      }
+
       set({ request: { ...request, anchor: request.anchor ?? null, id: (nextId += 1) } })
     },
     close: () => {
@@ -80,7 +85,7 @@ export const useMediaPickerStore = create<MediaPickerState>((set) => {
   }
 })
 
-/** Opens the shared picker, replacing any current request. */
+/** Opens the shared picker, keeping the current request when one is already open. */
 export function openMediaPicker(request: PickerInput): void {
   useMediaPickerStore.getState().open(request)
 }

@@ -270,6 +270,7 @@ describe('useWindowFileInput hint', () => {
     expect(hint()).toBe('as references')
 
     act(() => {
+      closeMediaPicker()
       openMediaPicker(pickRequest())
     })
 
