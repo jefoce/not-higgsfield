@@ -1,4 +1,4 @@
-import { isEmpty, isNil } from 'lodash-es'
+import { isEmpty, isNil, uniqBy } from 'lodash-es'
 import { toast } from 'sonner'
 import { mutate } from 'swr'
 
@@ -101,17 +101,23 @@ function revalidateUploads(): void {
   )
 }
 
-interface ToggleResult {
+interface AddResult {
   skipped: number
   reason: string | null
 }
 
-/** Toggles every upload the mode still accepts, counting the rest. */
-function applyToggle(mode: PickerToggleMode, items: UploadItem[]): ToggleResult {
+/** Adds each new upload once, leaving attached ids alone without counting them. */
+function applyAdd(mode: PickerToggleMode, items: UploadItem[]): AddResult {
+  const unique = uniqBy(items, 'id')
+  const selected = mode.useSelectedIds()
   let skipped = 0
   let reason: string | null = null
 
-  for (const item of items) {
+  for (const item of unique) {
+    if (selected.includes(item.id)) {
+      continue
+    }
+
     const blocked = mode.canAdd(item)
 
     if (!isNil(blocked)) {
@@ -121,7 +127,7 @@ function applyToggle(mode: PickerToggleMode, items: UploadItem[]): ToggleResult 
       continue
     }
 
-    mode.onToggle(item)
+    mode.onAdd(item)
   }
 
   return { skipped, reason }
@@ -154,12 +160,12 @@ export function routeUploads(items: UploadItem[]): void {
     return
   }
 
-  const toggled = applyToggle(request.mode, items)
+  const added = applyAdd(request.mode, items)
 
   revalidateUploads()
 
-  if (toggled.skipped > 0) {
-    reportSkipped({ count: toggled.skipped, reason: toggled.reason ?? 'unsupported file' })
+  if (added.skipped > 0) {
+    reportSkipped({ count: added.skipped, reason: added.reason ?? 'unsupported file' })
   }
 }
 

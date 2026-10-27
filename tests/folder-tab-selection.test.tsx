@@ -136,6 +136,7 @@ function ToggleHarness(props: ToggleHarnessProps) {
       return null
     },
     onToggle: handleToggle,
+    onAdd: vi.fn(),
   }
 
   return (

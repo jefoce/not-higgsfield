@@ -100,6 +100,7 @@ function toggleMode(): PickerToggleMode {
       return null
     },
     onToggle: vi.fn(),
+    onAdd: vi.fn(),
   }
 }
 

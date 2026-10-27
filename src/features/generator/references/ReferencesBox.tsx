@@ -58,6 +58,11 @@ function toggleReference(item: UploadItem): void {
   state.addReferences([item])
 }
 
+/** Attaches an upload once, leaving an attached one in place. */
+function addReference(item: UploadItem): void {
+  useGeneratorStore.getState().addReferences([item])
+}
+
 interface OpenReferencesPickerParams {
   kinds: MediaKind[]
   extensions?: KindExtensions
@@ -82,6 +87,7 @@ function openReferencesPicker(params: OpenReferencesPickerParams): void {
       useUploadsById,
       canAdd: referenceCanAdd,
       onToggle: toggleReference,
+      onAdd: addReference,
     },
   })
 }

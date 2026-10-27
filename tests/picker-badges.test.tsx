@@ -112,6 +112,7 @@ function ReferenceHarness(props: ReferenceHarnessProps) {
       return null
     },
     onToggle: handleToggle,
+    onAdd: vi.fn(),
   }
 
   return <UploadsTab kinds={props.kinds} mode={mode} onUploaded={vi.fn()} />
@@ -207,6 +208,7 @@ describe('picker slot badges', () => {
         return null
       },
       onToggle: vi.fn(),
+      onAdd: vi.fn(),
     }
 
     render(

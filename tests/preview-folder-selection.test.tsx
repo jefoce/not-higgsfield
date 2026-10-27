@@ -102,6 +102,7 @@ function toggleMode(onToggle: (item: UploadItem) => void): PickerMode {
       return null
     },
     onToggle,
+    onAdd: vi.fn(),
   }
 }
 

@@ -92,6 +92,7 @@ function toggleMode(params: {
     },
     canAdd: params.canAdd,
     onToggle: params.onToggle,
+    onAdd: vi.fn(),
   }
 }
 
@@ -139,6 +140,7 @@ function ToggleHarness(props: ToggleHarnessProps) {
       return null
     },
     onToggle: handleToggle,
+    onAdd: vi.fn(),
   }
 
   return (
@@ -259,5 +261,25 @@ describe('picker request modes', () => {
     openMediaPicker({ openerKey: 'test', kinds: ['image'], mode, anchor })
 
     expect(useMediaPickerStore.getState().request?.anchor).toBe(anchor)
+  })
+})
+
+describe('picker tile clicks', () => {
+  it('removes an attached upload when its tile is clicked', () => {
+    const onToggle = vi.fn<(item: UploadItem) => void>()
+
+    render(<ToggleHarness onToggle={onToggle} />)
+
+    const tile = screen.getByRole('button', { name: 'a.png' })
+
+    fireEvent.click(tile)
+
+    expect(tile.getAttribute('aria-pressed')).toBe('true')
+
+    fireEvent.click(tile)
+
+    expect(onToggle).toHaveBeenCalledTimes(2)
+    expect(onToggle).toHaveBeenLastCalledWith(items[0])
+    expect(tile.getAttribute('aria-pressed')).toBe('false')
   })
 })

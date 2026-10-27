@@ -51,7 +51,14 @@ function canAdd(item: PickerCandidate): string | null {
   return addBlockReason({ kind: item.kind, room, preset })
 }
 
-function toggleMode(onToggle: PickerToggleMode['onToggle']): PickerToggleMode {
+interface ToggleModeParams {
+  onToggle: PickerToggleMode['onToggle']
+  onAdd: PickerToggleMode['onAdd']
+}
+
+function toggleMode(params: ToggleModeParams): PickerToggleMode {
+  const { onToggle, onAdd } = params
+
   return {
     kind: 'toggle',
     useSelectedIds: () => {
@@ -62,6 +69,7 @@ function toggleMode(onToggle: PickerToggleMode['onToggle']): PickerToggleMode {
     },
     canAdd,
     onToggle,
+    onAdd,
   }
 }
 
@@ -129,12 +137,13 @@ describe('routeFiles', () => {
 })
 
 describe('routeFiles with a picker request', () => {
-  it('toggles each new upload, keeps the picker open and skips over-limit files', async () => {
+  it('adds each new upload, keeps the picker open and skips over-limit files', async () => {
     const existing = images(8)
     const first = upload('image-9', 'image')
     const second = upload('image-10', 'image')
     const added = [first, second]
-    const onToggle = vi.fn(addReferences)
+    const onAdd = vi.fn(addReferences)
+    const onToggle = vi.fn()
 
     useGeneratorStore.setState({
       references: existing.map((item) => {
@@ -145,12 +154,17 @@ describe('routeFiles with a picker request', () => {
 
     vi.mocked(uploadFiles).mockResolvedValue(added)
 
-    openMediaPicker({ openerKey: 'test', kinds: ['image'], mode: toggleMode(onToggle) })
+    openMediaPicker({
+      openerKey: 'test',
+      kinds: ['image'],
+      mode: toggleMode({ onToggle, onAdd }),
+    })
 
     await routeFiles([png, png])
 
-    expect(onToggle).toHaveBeenCalledTimes(1)
-    expect(onToggle).toHaveBeenCalledWith(first)
+    expect(onAdd).toHaveBeenCalledTimes(1)
+    expect(onAdd).toHaveBeenCalledWith(first)
+    expect(onToggle).not.toHaveBeenCalled()
     expect(useGeneratorStore.getState().references).toContain(first.id)
     expect(useGeneratorStore.getState().references).not.toContain(second.id)
     expect(useMediaPickerStore.getState().request).not.toBeNull()
@@ -187,6 +201,64 @@ describe('routeFiles with a picker request', () => {
     expect(useMediaPickerStore.getState().request).not.toBeNull()
     expect(toast.skipped).toHaveBeenCalledTimes(1)
     expect(toast.skipped).toHaveBeenCalledWith('Skipped 1 file (unsupported file)')
+  })
+})
+
+describe('routeFiles with an attached upload', () => {
+  it('keeps an attached upload when pasting the same id again', async () => {
+    const attached = upload('image-attached', 'image')
+    const existing = [attached, ...images(7)]
+    const onAdd = vi.fn(addReferences)
+    const onToggle = vi.fn()
+
+    useGeneratorStore.setState({
+      references: existing.map((item) => {
+        return item.id
+      }),
+      uploadsById: uploadsOf(...existing),
+    })
+
+    vi.mocked(uploadFiles).mockResolvedValue([attached])
+
+    openMediaPicker({
+      openerKey: 'test',
+      kinds: ['image'],
+      mode: toggleMode({ onToggle, onAdd }),
+    })
+
+    await routeFiles([png])
+
+    expect(onAdd).not.toHaveBeenCalled()
+    expect(onToggle).not.toHaveBeenCalled()
+
+    expect(useGeneratorStore.getState().references).toEqual(
+      existing.map((item) => {
+        return item.id
+      }),
+    )
+
+    expect(toast.skipped).not.toHaveBeenCalled()
+  })
+
+  it('adds the same upload id once for a batch', async () => {
+    const duplicated = upload('image-1', 'image')
+    const onAdd = vi.fn(addReferences)
+    const onToggle = vi.fn()
+
+    vi.mocked(uploadFiles).mockResolvedValue([duplicated, duplicated])
+
+    openMediaPicker({
+      openerKey: 'test',
+      kinds: ['image'],
+      mode: toggleMode({ onToggle, onAdd }),
+    })
+
+    await routeFiles([png, png])
+
+    expect(onAdd).toHaveBeenCalledTimes(1)
+    expect(onAdd).toHaveBeenCalledWith(duplicated)
+    expect(useGeneratorStore.getState().references).toEqual([duplicated.id])
+    expect(toast.skipped).not.toHaveBeenCalled()
   })
 })
 

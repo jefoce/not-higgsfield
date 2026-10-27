@@ -16,6 +16,7 @@ export interface PickerToggleMode {
   useUploadsById: () => UploadsById
   canAdd: (item: PickerCandidate) => string | null
   onToggle: (item: UploadItem) => void
+  onAdd: (item: UploadItem) => void
 }
 
 export interface PickerPickMode {
