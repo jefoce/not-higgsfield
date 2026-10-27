@@ -26,10 +26,11 @@ import { deleteUploadFiles, getUpload, saveFileUpload } from '../repos/uploads'
 import { getObjectStore } from '../storage/registry'
 import { withLock } from '../sync/lock'
 import {
-  findUploadByHash,
-  forgetUploadHash,
+  forgetUpload,
   hashPathCached,
-  rememberUploadHash,
+  hasSizeCandidate,
+  matchByHash,
+  rememberUpload as rememberUploadSize,
   runWithHashLock,
 } from './upload-hash'
 import { assertSupported, probe } from './upload-probe'
@@ -51,9 +52,10 @@ export async function createFileUpload(params: CreateFileUploadParams): Promise<
   const ext = extWithDot(originalName)
   const kind = assertSupported(ext)
   const sha256 = createHash('sha256').update(bytes).digest('hex')
+  const size = bytes.length
 
-  return runWithHashLock(sha256, async () => {
-    const existing = await findUploadByHash(sha256)
+  return runWithHashLock(size, async () => {
+    const existing = await matchByHash({ sha256, size })
 
     if (existing) {
       return existing
@@ -67,7 +69,7 @@ export async function createFileUpload(params: CreateFileUploadParams): Promise<
       const meta = await probe(temp, kind)
       const item = await saveFileUpload({ bytes, originalName, sha256, ...meta })
 
-      rememberUploadHash(sha256, item.id)
+      rememberUploadSize({ id: item.id, size })
 
       return item
     } finally {
@@ -107,38 +109,49 @@ export async function createLinkUpload(params: LinkUploadParams): Promise<Upload
     return { ...existing, missing: false }
   }
 
-  const sha256 = await hashPathCached(target)
-  const id = randomUUID()
-  const paths = uploadPaths(id, ext)
-  const linkMode = await linkOrCopy(target, paths.media)
+  const size = stats.size
 
-  const item: UploadItem = {
-    id,
-    source: 'link',
-    kind,
-    mime,
-    ext,
-    originalName: path.basename(requested),
-    target,
-    linkMode,
-    sizeBytes: stats.size,
-    sha256,
-    createdAt: new Date().toISOString(),
-    ...(await probe(paths.media, kind)),
-  }
+  return runWithHashLock(size, async () => {
+    if (await hasSizeCandidate(size)) {
+      const sha256 = await hashPathCached(target)
+      const match = await matchByHash({ sha256, size })
 
-  try {
-    await writeJsonAtomic({ file: paths.json, data: item })
-  } catch (error) {
-    await removeFile(paths.media)
+      if (match) {
+        return match
+      }
+    }
 
-    throw error
-  }
+    const id = randomUUID()
+    const paths = uploadPaths(id, ext)
+    const linkMode = await linkOrCopy(target, paths.media)
 
-  await rememberUpload(item)
-  rememberUploadHash(sha256, id)
+    const item: UploadItem = {
+      id,
+      source: 'link',
+      kind,
+      mime,
+      ext,
+      originalName: path.basename(requested),
+      target,
+      linkMode,
+      sizeBytes: size,
+      createdAt: new Date().toISOString(),
+      ...(await probe(paths.media, kind)),
+    }
 
-  return item
+    try {
+      await writeJsonAtomic({ file: paths.json, data: item })
+    } catch (error) {
+      await removeFile(paths.media)
+
+      throw error
+    }
+
+    await rememberUpload(item)
+    rememberUploadSize({ id, size })
+
+    return item
+  })
 }
 
 /** Loads only uploads referenced by the normalized input. */
@@ -189,7 +202,6 @@ export async function removeUpload(id: string): Promise<void> {
 
   await withLock(`upload:${id}`, async () => {
     const record = await loadUploadRecord(id)
-    const sha256 = record?.sha256
     let isShared = true
 
     if (record?.remote) {
@@ -199,8 +211,8 @@ export async function removeUpload(id: string): Promise<void> {
     await deleteUploadFiles({ id, ext: record?.ext ?? '' })
     await removeEncoded(id)
 
-    if (isNonEmptyString(sha256)) {
-      forgetUploadHash(sha256)
+    if (record) {
+      forgetUpload({ id, size: record.sizeBytes })
     }
 
     if (record?.remote && !isShared) {

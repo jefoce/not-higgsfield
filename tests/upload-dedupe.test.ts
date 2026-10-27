@@ -8,18 +8,29 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import type { UploadItem } from '@/core/schemas/upload-item'
 import type * as UploadRecord from '@/server/repos/upload-record'
 import type * as Uploads from '@/server/services/uploads'
+import { hashFile } from '@/server/storage/hash'
 
 import { required } from './helpers/required'
+
+interface HashModule {
+  hashFile: typeof hashFile
+}
 
 vi.mock('server-only', () => {
   return {}
 })
 
+vi.mock('@/server/storage/hash', async (importOriginal) => {
+  const actual = await importOriginal<HashModule>()
+
+  return { ...actual, hashFile: vi.fn(actual.hashFile) }
+})
+
 const ROOT = path.join(process.cwd(), '.cache', `upload-dedupe-test-${process.pid}`)
 const UPLOADS = path.join(ROOT, 'uploads')
-const SOURCE = path.join(ROOT, 'source.png')
 const BYTES = 'identical upload bytes'
 const PREVIOUS_ROOT = process.env.STORAGE_ROOT
+const hashSpy = vi.mocked(hashFile)
 
 process.env.STORAGE_ROOT = ROOT
 
@@ -32,12 +43,18 @@ beforeAll(async () => {
 
   uploads = await import('@/server/services/uploads')
 
-  ;({ saveUploadItem, getUploadRecord } = await import('@/server/repos/upload-record'))
+  const recordModule = await import('@/server/repos/upload-record')
+
+  saveUploadItem = recordModule.saveUploadItem
+  getUploadRecord = recordModule.getUploadRecord
 })
 
 beforeEach(async () => {
-  await fs.rm(UPLOADS, { recursive: true, force: true })
+  await fs.rm(ROOT, { recursive: true, force: true })
   await fs.mkdir(UPLOADS, { recursive: true })
+
+  resetIndexes()
+  hashSpy.mockClear()
 })
 
 afterAll(async () => {
@@ -50,7 +67,16 @@ afterAll(async () => {
   }
 })
 
-function sha256Hex(value: string): string {
+/** The size index builds once per root, so each test starts from a cold cache. */
+function resetIndexes(): void {
+  const host = globalThis as Record<string, unknown>
+
+  delete host[`__nh_uploadSizes:${UPLOADS}`]
+  delete host.__nh_uploadIndex
+  delete host.__nh_uploadPathHashes
+}
+
+function sha256Hex(value: string | Uint8Array): string {
   return createHash('sha256').update(value).digest('hex')
 }
 
@@ -73,31 +99,68 @@ async function namesInUploads(): Promise<string[]> {
 }
 
 describe('upload dedupe', () => {
-  // First: the hash index builds once per root, so the digest-less record must exist before it.
-  it('backfills a record without sha256 and matches it', async () => {
-    const item = makeItem()
-
-    await fs.writeFile(path.join(UPLOADS, `${item.id}${item.ext}`), BYTES)
-    await saveUploadItem(item)
-
-    const upload = await uploads.createFileUpload({
-      bytes: Buffer.from(BYTES),
-      originalName: 'fixture.png',
+  it('indexes legacy records by size without hashing', async () => {
+    const legacy = Array.from({ length: 50 }, (_, index) => {
+      return makeItem({ sizeBytes: 1000 + index })
     })
 
-    expect(upload.id).toBe(item.id)
+    await Promise.all(
+      legacy.map((item) => {
+        return saveUploadItem(item)
+      }),
+    )
 
-    const stored = required(await getUploadRecord(item.id), 'backfilled record')
+    const bytes = Buffer.from(BYTES)
 
-    expect(stored.sha256).toBe(sha256Hex(BYTES))
+    const upload = await uploads.createFileUpload({ bytes, originalName: 'new.png' })
+
+    expect(hashSpy).not.toHaveBeenCalled()
+
+    expect(
+      legacy.some((item) => {
+        return item.id === upload.id
+      }),
+    ).toBe(false)
+
+    const stored = required(await getUploadRecord(upload.id), 'new upload')
+
+    expect(stored.sha256).toBe(sha256Hex(bytes))
+    expect(stored.sizeBytes).toBe(bytes.length)
   })
 
-  it('reuses the same id for identical bytes', async () => {
-    const bytes = Buffer.from(BYTES)
-    const first = await uploads.createFileUpload({ bytes, originalName: 'a.png' })
-    const second = await uploads.createFileUpload({ bytes, originalName: 'b.png' })
+  it('hashes one same-size candidate before storing different bytes', async () => {
+    const candidateBytes = Buffer.from('same size alpha')
+    const incomingBytes = Buffer.from('same size bravo')
+    const candidate = makeItem({ sizeBytes: candidateBytes.length })
 
-    expect(second.id).toBe(first.id)
+    expect(incomingBytes.length).toBe(candidateBytes.length)
+
+    await fs.writeFile(path.join(UPLOADS, `${candidate.id}${candidate.ext}`), candidateBytes)
+    await saveUploadItem(candidate)
+
+    const upload = await uploads.createFileUpload({ bytes: incomingBytes, originalName: 'new.png' })
+
+    expect(upload.id).not.toBe(candidate.id)
+    expect(hashSpy).toHaveBeenCalledTimes(1)
+
+    const stored = required(await getUploadRecord(candidate.id), 'candidate')
+
+    expect(stored.sha256).toBe(sha256Hex(candidateBytes))
+  })
+})
+
+describe('upload dedupe across sources', () => {
+  it('returns the file upload for a link of the same bytes', async () => {
+    const bytes = Buffer.from('file then link bytes')
+    const source = path.join(ROOT, 'file-then-link.png')
+
+    await fs.writeFile(source, bytes)
+
+    const fileUpload = await uploads.createFileUpload({ bytes, originalName: 'a.png' })
+    const link = await uploads.createLinkUpload({ absPath: source })
+
+    expect(link.id).toBe(fileUpload.id)
+    expect(hashSpy).toHaveBeenCalledTimes(1)
 
     const names = await namesInUploads()
 
@@ -114,20 +177,23 @@ describe('upload dedupe', () => {
     ).toHaveLength(1)
   })
 
-  it('keeps different bytes apart', async () => {
-    const first = await uploads.createFileUpload({
-      bytes: Buffer.from('first body'),
-      originalName: 'a.png',
-    })
+  it('links without hashing when no same-size record exists', async () => {
+    const bytes = Buffer.from('lonely link bytes')
+    const source = path.join(ROOT, 'lonely-link.png')
 
-    const second = await uploads.createFileUpload({
-      bytes: Buffer.from('second body'),
-      originalName: 'a.png',
-    })
+    await fs.writeFile(source, bytes)
 
-    expect(second.id).not.toBe(first.id)
+    const link = await uploads.createLinkUpload({ absPath: source })
+
+    expect(hashSpy).not.toHaveBeenCalled()
+
+    const stored = required(await getUploadRecord(link.id), 'link')
+
+    expect(stored.sha256).toBeUndefined()
   })
+})
 
+describe('upload dedupe storage', () => {
   it('stores one file when two identical uploads race', async () => {
     const bytes = Buffer.from('racing identical bytes')
 
@@ -147,6 +213,31 @@ describe('upload dedupe', () => {
     ).toHaveLength(1)
   })
 
+  it('stores a new id after the upload is removed', async () => {
+    const bytes = Buffer.from('remove then upload again')
+    const first = await uploads.createFileUpload({ bytes, originalName: 'a.png' })
+
+    await uploads.removeUpload(first.id)
+
+    const second = await uploads.createFileUpload({ bytes, originalName: 'a.png' })
+
+    expect(second.id).not.toBe(first.id)
+  })
+
+  it('keeps different bytes apart', async () => {
+    const first = await uploads.createFileUpload({
+      bytes: Buffer.from('first body'),
+      originalName: 'a.png',
+    })
+
+    const second = await uploads.createFileUpload({
+      bytes: Buffer.from('second body'),
+      originalName: 'a.png',
+    })
+
+    expect(second.id).not.toBe(first.id)
+  })
+
   it('stores a fresh copy when the media file is gone', async () => {
     const bytes = Buffer.from('vanishing media')
     const first = await uploads.createFileUpload({ bytes, originalName: 'a.png' })
@@ -156,22 +247,5 @@ describe('upload dedupe', () => {
     const second = await uploads.createFileUpload({ bytes, originalName: 'a.png' })
 
     expect(second.id).not.toBe(first.id)
-  })
-
-  it('returns the link when the same bytes arrive as a file', async () => {
-    await fs.writeFile(SOURCE, BYTES)
-
-    const link = await uploads.createLinkUpload({ absPath: SOURCE })
-
-    const upload = await uploads.createFileUpload({
-      bytes: Buffer.from(BYTES),
-      originalName: 'copy.png',
-    })
-
-    expect(upload.id).toBe(link.id)
-
-    const names = await namesInUploads()
-
-    expect(names).toHaveLength(2)
   })
 })

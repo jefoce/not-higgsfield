@@ -2,7 +2,7 @@ import 'server-only'
 
 import fs from 'node:fs/promises'
 
-import { isNil } from 'lodash-es'
+import { isEmpty, isNil } from 'lodash-es'
 
 import { isNonEmptyString } from '@/core/guards'
 import type { UploadItem } from '@/core/schemas/upload-item'
@@ -12,11 +12,10 @@ import { uploadPaths, UPLOADS_DIR } from '../paths'
 import { listUploadRecords, loadUploadRecord, updateUpload } from '../repos/upload-record'
 import { uploadExists } from '../repos/uploads'
 import { hashFile } from '../storage/hash'
-import { createLimiter } from '../sync/limiter'
 import { withLock } from '../sync/lock'
 
-interface HashIndex {
-  map: Map<string, string>
+interface SizeIndex {
+  sizes: Map<number, Set<string>>
   ready: Promise<void> | null
 }
 
@@ -26,60 +25,59 @@ interface PathHashEntry {
   sha256: string
 }
 
-const backfillLimiter = createLimiter('uploadHashBackfill', 2)
+interface MatchByHashParams {
+  sha256: string
+  size: number
+}
+
+interface UploadSizeParams {
+  id: string
+  size: number
+}
+
+interface DigestEntry {
+  item: UploadItem
+  sha256: string
+}
+
+interface AddSizeParams {
+  sizes: Map<number, Set<string>>
+  size: number
+  id: string
+}
 
 const pathHashes = globalState<Map<string, PathHashEntry>>('uploadPathHashes', () => {
   return new Map()
 })
 
-function getIndex(): HashIndex {
-  return globalState<HashIndex>(`uploadHashes:${UPLOADS_DIR}`, () => {
-    return { map: new Map(), ready: null }
+function getIndex(): SizeIndex {
+  return globalState<SizeIndex>(`uploadSizes:${UPLOADS_DIR}`, () => {
+    return { sizes: new Map(), ready: null }
   })
 }
 
-/** Hashes every record without a digest once, at most two files at a time. */
-async function buildIndex(): Promise<void> {
+function addSize(params: AddSizeParams): void {
+  const { sizes, size, id } = params
+  const ids = sizes.get(size) ?? new Set<string>()
+
+  ids.add(id)
+  sizes.set(size, ids)
+}
+
+/** Buckets every record by size. Reads json only, never media. */
+async function buildSizes(): Promise<void> {
   const index = getIndex()
   const records = await listUploadRecords()
 
-  await Promise.all(
-    records.map((record) => {
-      return indexRecord(index, record)
-    }),
-  )
-}
-
-async function indexRecord(index: HashIndex, record: UploadItem): Promise<void> {
-  if (isNonEmptyString(record.sha256)) {
-    if (await uploadExists(record)) {
-      index.map.set(record.sha256, record.id)
-    }
-
-    return
+  for (const record of records) {
+    addSize({ sizes: index.sizes, size: record.sizeBytes, id: record.id })
   }
-
-  await backfillLimiter.run(async () => {
-    if (!(await uploadExists(record))) {
-      return
-    }
-
-    const sha256 = await hashPathCached(uploadPaths(record.id, record.ext).media)
-
-    const saved = await updateUpload(record.id, (current) => {
-      return { ...current, sha256 }
-    })
-
-    if (saved) {
-      index.map.set(sha256, saved.id)
-    }
-  })
 }
 
-async function ensureIndex(): Promise<HashIndex> {
+async function ensureSizes(): Promise<SizeIndex> {
   const index = getIndex()
 
-  index.ready ??= buildIndex().catch((error: unknown) => {
+  index.ready ??= buildSizes().catch((error: unknown) => {
     index.ready = null
 
     throw error
@@ -90,32 +88,54 @@ async function ensureIndex(): Promise<HashIndex> {
   return index
 }
 
-/** Returns the live upload with this digest, or null when it vanished. */
-export async function findUploadByHash(sha256: string): Promise<UploadItem | null> {
-  const index = await ensureIndex()
-  const id = index.map.get(sha256)
+/** True when the size bucket holds at least one record. */
+export async function hasSizeCandidate(size: number): Promise<boolean> {
+  const index = await ensureSizes()
 
-  if (isNil(id)) {
+  return !isEmpty(index.sizes.get(size))
+}
+
+/** Returns the live upload with this digest, hashing each size candidate once. */
+export async function matchByHash(params: MatchByHashParams): Promise<UploadItem | null> {
+  const { sha256, size } = params
+  const index = await ensureSizes()
+  const ids = index.sizes.get(size)
+
+  if (isNil(ids) || isEmpty(ids)) {
     return null
   }
 
-  const record = await loadUploadRecord(id)
+  for (const id of ids) {
+    const record = await loadUploadRecord(id)
 
-  if (isNil(record) || !(await uploadExists(record))) {
-    index.map.delete(sha256)
+    if (isNil(record) || !(await uploadExists(record))) {
+      ids.delete(id)
 
-    return null
+      continue
+    }
+
+    const candidate = await digestOf(record)
+
+    if (candidate.sha256 === sha256) {
+      return { ...candidate.item, missing: false }
+    }
   }
 
-  return { ...record, missing: false }
+  return null
 }
 
-export function rememberUploadHash(sha256: string, id: string): void {
-  getIndex().map.set(sha256, id)
+/** Adds an id to its size bucket. The digest lives on the record. */
+export function rememberUpload(params: UploadSizeParams): void {
+  const { id, size } = params
+
+  addSize({ sizes: getIndex().sizes, size, id })
 }
 
-export function forgetUploadHash(sha256: string): void {
-  getIndex().map.delete(sha256)
+/** Drops an id from its size bucket. */
+export function forgetUpload(params: UploadSizeParams): void {
+  const { id, size } = params
+
+  getIndex().sizes.get(size)?.delete(id)
 }
 
 /** Reuses the digest while the file's size and mtime stay the same. */
@@ -138,7 +158,32 @@ export async function hashPathCached(file: string): Promise<string> {
   return digest.sha256Hex
 }
 
-/** Serializes work per digest so two uploads of the same bytes cannot race. */
-export function runWithHashLock<T>(sha256: string, task: () => Promise<T>): Promise<T> {
-  return withLock(`uploadHash:${sha256}`, task)
+/** Serializes work per size so two uploads of the same bytes cannot race. */
+export function runWithHashLock<T>(size: number, task: () => Promise<T>): Promise<T> {
+  return withLock(`uploadSize:${size}`, task)
+}
+
+async function digestOf(record: UploadItem): Promise<DigestEntry> {
+  if (isNonEmptyString(record.sha256)) {
+    return { item: record, sha256: record.sha256 }
+  }
+
+  const sha256 = await hashPathCached(mediaPathOf(record))
+
+  const saved = await updateUpload(record.id, (current) => {
+    return { ...current, sha256 }
+  })
+
+  return { item: saved ?? { ...record, sha256 }, sha256 }
+}
+
+/** Follows a symlink target. Hard links and copies live in the media path. */
+function mediaPathOf(record: UploadItem): string {
+  const mode = record.linkMode ?? 'symlink'
+
+  if (record.source === 'link' && isNonEmptyString(record.target) && mode === 'symlink') {
+    return record.target
+  }
+
+  return uploadPaths(record.id, record.ext).media
 }

@@ -22,7 +22,7 @@ A roomier viewer with zoom, a live docked picker, paste and drop anywhere, and o
 ### Changed
 
 - The media picker opens beside the generator. Clicking a file attaches or removes it right away, no Add button.
-- Uploading the same file again reuses the existing upload.
+- Uploading or linking the same file again reuses the existing upload.
 
 ### Fixed
 
