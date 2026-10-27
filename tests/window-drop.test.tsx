@@ -105,6 +105,7 @@ describe('WindowDropOverlay', () => {
 
     act(() => {
       openMediaPicker({
+        openerKey: 'test',
         kinds: ['image'],
         mode: { kind: 'pick', onPick: vi.fn() },
       })

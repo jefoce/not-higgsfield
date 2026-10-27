@@ -1,12 +1,13 @@
 'use client'
 
-import { useRef } from 'react'
-import { isEmpty, sumBy } from 'lodash-es'
+import { useEffect, useRef } from 'react'
+import { isEmpty, isNil, sumBy } from 'lodash-es'
 
 import type { KindExtensions } from '@/core/media-kinds'
 import { MEDIA_KINDS, type MediaKind } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
 import type { UploadItem, UploadsById } from '@/core/schemas/upload-item'
+import { pickerAnchor, registerPickerAnchor } from '@/features/media-picker/picker/anchors'
 import {
   extensionsFromLimits,
   openMediaPicker,
@@ -60,21 +61,21 @@ function toggleReference(item: UploadItem): void {
 interface OpenReferencesPickerParams {
   kinds: MediaKind[]
   extensions?: KindExtensions
-  anchor: HTMLElement | null
 }
 
 /** Opens reference picking in toggle mode. */
 function openReferencesPicker(params: OpenReferencesPickerParams): void {
-  const { kinds, extensions, anchor } = params
+  const { kinds, extensions } = params
 
   if (isEmpty(kinds)) {
     return
   }
 
   openMediaPicker({
+    openerKey: 'references:add',
     kinds,
     extensions,
-    anchor,
+    anchor: pickerAnchor('references'),
     mode: {
       kind: 'toggle',
       useSelectedIds: useReferenceIds,
@@ -115,8 +116,18 @@ export function ReferencesBox() {
 
   const boxRef = useRef<HTMLDivElement>(null)
 
+  useEffect(() => {
+    const element = boxRef.current
+
+    if (isNil(element)) {
+      return
+    }
+
+    return registerPickerAnchor('references', element)
+  }, [])
+
   const handlePick = (): void => {
-    openReferencesPicker({ kinds, extensions, anchor: boxRef.current })
+    openReferencesPicker({ kinds, extensions })
   }
 
   return (

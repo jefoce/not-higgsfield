@@ -1,12 +1,13 @@
 'use client'
 
-import { type MouseEvent, type RefObject } from 'react'
+import { type MouseEvent } from 'react'
 import { isNil } from 'lodash-es'
 
 import { isNonEmptyString } from '@/core/guards'
 import type { KindExtensions } from '@/core/media-kinds'
 import { getPreset } from '@/core/presets'
 import type { UploadItem } from '@/core/schemas/upload-item'
+import { pickerAnchor } from '@/features/media-picker/picker/anchors'
 import { extensionsFromLimits, openMediaPicker } from '@/features/media-picker/picker/store'
 import { openPreview, type PreviewActions } from '@/features/preview/preview-store'
 import { Tooltip } from '@/ui/Tooltip'
@@ -16,7 +17,6 @@ import { FrameSlotCard } from './FrameSlotCard'
 
 interface FrameSlotProps {
   slot: 'start' | 'end'
-  anchorRef: RefObject<HTMLElement | null>
   disabled?: boolean
   disabledReason?: string
 }
@@ -71,19 +71,20 @@ function slotTooltip(params: SlotTooltipParams): string | undefined {
 }
 
 interface OpenFramePickerParams {
+  openerKey: string
   extensions?: KindExtensions
-  anchor: HTMLElement | null
   onPick: (item: UploadItem) => void
 }
 
 /** Opens the image picker for one frame slot. */
 function openFramePicker(params: OpenFramePickerParams): void {
-  const { extensions, anchor, onPick } = params
+  const { openerKey, extensions, onPick } = params
 
   openMediaPicker({
+    openerKey,
     kinds: ['image'],
     extensions,
-    anchor,
+    anchor: pickerAnchor('frames'),
     mode: { kind: 'pick', onPick },
   })
 }
@@ -121,13 +122,12 @@ function slotForUpload(upload: UploadItem): FrameSlotName | undefined {
 interface ReplaceFrameParams {
   current: UploadItem
   extensions?: KindExtensions
-  anchor: HTMLElement | null
   setFrame: (slot: FrameSlotName, upload: UploadItem | null) => void
 }
 
 /** Opens the picker for the slot holding the shown frame. */
 function replaceFrame(params: ReplaceFrameParams): void {
-  const { current, extensions, anchor, setFrame } = params
+  const { current, extensions, setFrame } = params
   const target = slotForUpload(current)
 
   if (isNil(target)) {
@@ -138,7 +138,7 @@ function replaceFrame(params: ReplaceFrameParams): void {
     setFrame(target, next)
   }
 
-  openFramePicker({ extensions, anchor, onPick: handlePick })
+  openFramePicker({ openerKey: `frame:${target}`, extensions, onPick: handlePick })
 }
 
 interface RemoveFrameParams {
@@ -181,7 +181,7 @@ function openFramePreview(params: OpenFramePreviewParams): void {
 
 /** One frame slot with preview, replace and remove actions. */
 export function FrameSlot(props: FrameSlotProps) {
-  const { slot, anchorRef, disabled: isDisabled = false, disabledReason } = props
+  const { slot, disabled: isDisabled = false, disabledReason } = props
 
   const frameId = useGeneratorStore((state) => {
     return state.frames[slot]
@@ -215,7 +215,7 @@ export function FrameSlot(props: FrameSlotProps) {
   }
 
   const handlePick = (): void => {
-    openFramePicker({ extensions, anchor: anchorRef.current, onPick: handlePickFrame })
+    openFramePicker({ openerKey: `frame:${slot}`, extensions, onPick: handlePickFrame })
   }
 
   const handleRemove = (): void => {
@@ -223,7 +223,7 @@ export function FrameSlot(props: FrameSlotProps) {
   }
 
   const handleReplace = (current: UploadItem): void => {
-    replaceFrame({ current, extensions, anchor: anchorRef.current, setFrame })
+    replaceFrame({ current, extensions, setFrame })
   }
 
   const handleRemoveAction = (current: UploadItem): void => {

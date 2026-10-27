@@ -27,6 +27,9 @@ export type PickerMode = PickerToggleMode | PickerPickMode
 
 export interface PickerRequest {
   id: number
+
+  /** Control that opened the picker. A different opener replaces the request. */
+  openerKey: string
   kinds: MediaKind[]
   extensions?: KindExtensions
   mode: PickerMode
@@ -72,8 +75,10 @@ export const useMediaPickerStore = create<MediaPickerState>((set, get) => {
   return {
     request: null,
     open: (request) => {
-      // An open picker keeps its request until it closes, so repeated openers are no-ops.
-      if (!isNil(get().request)) {
+      const current = get().request
+
+      // Same opener keeps its request; a different one replaces it.
+      if (!isNil(current) && current.openerKey === request.openerKey) {
         return
       }
 
@@ -85,7 +90,7 @@ export const useMediaPickerStore = create<MediaPickerState>((set, get) => {
   }
 })
 
-/** Opens the shared picker, keeping the current request when one is already open. */
+/** Opens the shared picker, keeping the request when the same opener is already open. */
 export function openMediaPicker(request: PickerInput): void {
   useMediaPickerStore.getState().open(request)
 }

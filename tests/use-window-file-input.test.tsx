@@ -81,6 +81,7 @@ function hint(): string | null {
 
 function pickRequest() {
   return {
+    openerKey: 'test',
     kinds: ['image' as const],
     mode: { kind: 'pick' as const, onPick: vi.fn() },
   }
@@ -264,7 +265,7 @@ describe('useWindowFileInput hint', () => {
     renderHarness(vi.fn())
 
     act(() => {
-      openMediaPicker({ kinds: ['image'], mode: toggleMode() })
+      openMediaPicker({ openerKey: 'test', kinds: ['image'], mode: toggleMode() })
     })
 
     expect(hint()).toBe('as references')

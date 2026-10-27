@@ -145,7 +145,7 @@ describe('routeFiles with a picker request', () => {
 
     vi.mocked(uploadFiles).mockResolvedValue(added)
 
-    openMediaPicker({ kinds: ['image'], mode: toggleMode(onToggle) })
+    openMediaPicker({ openerKey: 'test', kinds: ['image'], mode: toggleMode(onToggle) })
 
     await routeFiles([png, png])
 
@@ -164,7 +164,7 @@ describe('routeFiles with a picker request', () => {
     const onPick = vi.fn()
 
     vi.mocked(uploadFiles).mockResolvedValue([first, second])
-    openMediaPicker({ kinds: ['image'], mode: { kind: 'pick', onPick } })
+    openMediaPicker({ openerKey: 'test', kinds: ['image'], mode: { kind: 'pick', onPick } })
 
     await routeFiles([png])
 
@@ -175,7 +175,11 @@ describe('routeFiles with a picker request', () => {
   })
 
   it('skips unsupported files with one toast', async () => {
-    openMediaPicker({ kinds: ['image'], mode: { kind: 'pick', onPick: vi.fn() } })
+    openMediaPicker({
+      openerKey: 'test',
+      kinds: ['image'],
+      mode: { kind: 'pick', onPick: vi.fn() },
+    })
 
     await routeFiles([mp4])
 

@@ -5,6 +5,7 @@ import { isNil } from 'lodash-es'
 import type { KindExtensions } from '@/core/media-kinds'
 import { type RefSlot, slotLabel } from '@/core/prompt-tokens'
 import type { UploadItem } from '@/core/schemas/upload-item'
+import { pickerAnchor } from '@/features/media-picker/picker/anchors'
 import { openMediaPicker } from '@/features/media-picker/picker/store'
 import { openPreview } from '@/features/preview/preview-store'
 
@@ -54,9 +55,10 @@ export function ReferenceItem(props: ReferenceItemProps) {
     }
 
     openMediaPicker({
+      openerKey: `references:replace:${id}`,
       kinds: [item.kind],
       extensions,
-      anchor: document.querySelector<HTMLElement>('[data-references-box]'),
+      anchor: pickerAnchor('references'),
       mode: { kind: 'pick', onPick: handleReplacePick },
     })
   }

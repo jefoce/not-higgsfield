@@ -223,7 +223,7 @@ describe('picker request modes', () => {
     const onPick = vi.fn<(item: UploadItem) => void>()
     const mode: PickerPickMode = { kind: 'pick', onPick }
 
-    openMediaPicker({ kinds: ['image'], mode })
+    openMediaPicker({ openerKey: 'test', kinds: ['image'], mode })
 
     render(<UploadsTab kinds={['image']} mode={mode} onUploaded={vi.fn()} />)
 
@@ -256,7 +256,7 @@ describe('picker request modes', () => {
     const anchor = document.createElement('button')
     const mode: PickerPickMode = { kind: 'pick', onPick: vi.fn() }
 
-    openMediaPicker({ kinds: ['image'], mode, anchor })
+    openMediaPicker({ openerKey: 'test', kinds: ['image'], mode, anchor })
 
     expect(useMediaPickerStore.getState().request?.anchor).toBe(anchor)
   })

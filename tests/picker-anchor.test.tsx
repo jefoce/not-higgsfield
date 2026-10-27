@@ -158,4 +158,29 @@ describe('picker anchor region', () => {
 
     expect(requestAnchor()).toBe(container)
   })
+
+  it('replaces the start frame request when the end slot opens the picker', () => {
+    useGeneratorStore.setState({
+      references: [],
+      uploadsById: {},
+      frames: { start: 'missing-start', end: null },
+    })
+
+    const view = render(<FrameSlots />)
+    const container = required(view.container.firstElementChild, 'frame slots container')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Start frame' }))
+
+    const startRequest = useMediaPickerStore.getState().request
+
+    expect(startRequest?.openerKey).toBe('frame:start')
+
+    fireEvent.click(screen.getByRole('button', { name: 'End frame' }))
+
+    const current = useMediaPickerStore.getState().request
+
+    expect(current?.id).not.toBe(startRequest?.id)
+    expect(current?.openerKey).toBe('frame:end')
+    expect(current?.anchor).toBe(container)
+  })
 })

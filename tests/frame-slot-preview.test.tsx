@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import { createRef } from 'react'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { isNil } from 'lodash-es'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -30,7 +29,7 @@ afterEach(() => {
 
 describe('FrameSlot preview chain', () => {
   it('opens both frames in slot order and replaces the shown slot', () => {
-    render(<FrameSlot slot="start" anchorRef={createRef<HTMLElement>()} />)
+    render(<FrameSlot slot="start" />)
 
     fireEvent.click(screen.getByRole('button', { name: 'Preview start frame' }))
 
