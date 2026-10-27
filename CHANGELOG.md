@@ -10,7 +10,7 @@ A roomier viewer with zoom, a live docked picker, paste and drop anywhere, and o
 - A bigger media viewer with a blurred backdrop.
 - Previous and next in the history viewer and in every preview list.
 - Use button in every viewer: adds the media as a reference or start frame, by mode.
-- Viewers start playback right away, also after switching items.
+- Viewers start playback about half a second after opening or switching items.
 - Zoom photos in the viewer: wheel or pinch, drag to move, buttons to zoom and fit.
 - Photos in the viewer are never cropped, whatever their orientation.
 - The media viewer has a close button in the corner.
@@ -21,7 +21,7 @@ A roomier viewer with zoom, a live docked picker, paste and drop anywhere, and o
 
 ### Changed
 
-- The media picker opens beside the generator. Clicking a file attaches or removes it right away, no Add button.
+- The media picker opens beside the generator. Clicking a file attaches or removes it right away, with no confirm step.
 - Uploading or linking the same file again reuses the existing upload.
 - The picker docks next to the references or frames box, opens only from Add, and closes on any click outside it.
 
@@ -41,6 +41,7 @@ A roomier viewer with zoom, a live docked picker, paste and drop anywhere, and o
 - Long folder and uploads lists scroll without jumps.
 - Picker tiles show the reference number, matching Image 2 and the other prompt tokens.
 - Zoomed photos keep their rounded corners.
+- Clicking Add again leaves the open picker unchanged.
 
 ## 0.2.0 - 2026-10-26
 
