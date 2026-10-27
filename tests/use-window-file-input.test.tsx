@@ -12,6 +12,13 @@ import {
   openMediaPicker,
   type PickerToggleMode,
 } from '@/features/media-picker/picker/store'
+import { getPlatform } from '@/lib/platform'
+
+import { emitFileDrop, mockPlatform } from './helpers/platform-mock'
+
+vi.mock('@/lib/platform', () => {
+  return { getPlatform: vi.fn() }
+})
 
 const png = new File(['png'], 'a.png', { type: 'image/png' })
 const gif = new File(['gif'], 'b.gif', { type: 'image/gif' })
@@ -50,6 +57,20 @@ function Harness(props: UseWindowFileInputParams) {
   )
 }
 
+function renderHarness(
+  onFiles: UseWindowFileInputParams['onFiles'],
+  onPaths: UseWindowFileInputParams['onPaths'] = vi.fn(),
+): void {
+  render(<Harness onFiles={onFiles} onPaths={onPaths} />)
+}
+
+async function flushDropSetup(): Promise<void> {
+  await act(async () => {
+    await Promise.resolve()
+    await Promise.resolve()
+  })
+}
+
 function state(): string | null {
   return screen.getByTestId('state').textContent
 }
@@ -82,6 +103,8 @@ function toggleMode(): PickerToggleMode {
 }
 
 beforeEach(() => {
+  vi.clearAllMocks()
+  vi.mocked(getPlatform).mockResolvedValue(mockPlatform)
   useGeneratorStore.setState({ tab: 'references' })
 })
 
@@ -92,7 +115,7 @@ afterEach(() => {
 
 describe('useWindowFileInput drag', () => {
   it('keeps dragging until the last nested leave', () => {
-    render(<Harness onFiles={vi.fn()} />)
+    renderHarness(vi.fn())
 
     fireEvent.dragEnter(window, { dataTransfer: dragData() })
     fireEvent.dragEnter(window, { dataTransfer: dragData() })
@@ -109,7 +132,7 @@ describe('useWindowFileInput drag', () => {
   })
 
   it('ignores a drag without files', () => {
-    render(<Harness onFiles={vi.fn()} />)
+    renderHarness(vi.fn())
 
     fireEvent.dragEnter(window, { dataTransfer: dragData({ types: ['text/plain'] }) })
 
@@ -119,7 +142,7 @@ describe('useWindowFileInput drag', () => {
   it('calls the handler with dropped files', () => {
     const onFiles = vi.fn()
 
-    render(<Harness onFiles={onFiles} />)
+    renderHarness(onFiles)
 
     fireEvent.dragEnter(window, { dataTransfer: dragData({ files: [png] }) })
     fireEvent.drop(window, { dataTransfer: dragData({ files: [png] }) })
@@ -129,11 +152,46 @@ describe('useWindowFileInput drag', () => {
   })
 })
 
+describe('useWindowFileInput desktop platform', () => {
+  it('marks dragging from an over event and clears on leave', async () => {
+    renderHarness(vi.fn())
+    await flushDropSetup()
+
+    await act(async () => {
+      emitFileDrop({ type: 'over', x: 10, y: 20 })
+    })
+
+    expect(state()).toBe('dragging')
+
+    await act(async () => {
+      emitFileDrop({ type: 'leave' })
+    })
+
+    expect(state()).toBe('idle')
+  })
+
+  it('calls the paths handler with dropped paths', async () => {
+    const onFiles = vi.fn()
+    const onPaths = vi.fn()
+
+    renderHarness(onFiles, onPaths)
+    await flushDropSetup()
+
+    await act(async () => {
+      emitFileDrop({ type: 'drop', x: 0, y: 0, paths: ['/tmp/a.png'] })
+    })
+
+    expect(onPaths).toHaveBeenCalledWith(['/tmp/a.png'])
+    expect(onFiles).not.toHaveBeenCalled()
+    expect(state()).toBe('idle')
+  })
+})
+
 describe('useWindowFileInput paste', () => {
   it('calls the handler with pasted files', () => {
     const onFiles = vi.fn()
 
-    render(<Harness onFiles={onFiles} />)
+    renderHarness(onFiles)
 
     fireEvent.paste(window, { clipboardData: pasteData([png, gif]) })
 
@@ -145,7 +203,7 @@ describe('useWindowFileInput paste', () => {
 
     render(
       <>
-        <Harness onFiles={onFiles} />
+        <Harness onFiles={onFiles} onPaths={vi.fn()} />
         <textarea aria-label="prompt" />
       </>,
     )
@@ -160,7 +218,7 @@ describe('useWindowFileInput paste', () => {
   it('ignores a text-only paste', () => {
     const onFiles = vi.fn()
 
-    render(<Harness onFiles={onFiles} />)
+    renderHarness(onFiles)
 
     fireEvent.paste(window, { clipboardData: pasteData([], 'hello') })
 
@@ -176,7 +234,7 @@ describe('useWindowFileInput picker', () => {
       openMediaPicker(pickRequest())
     })
 
-    render(<Harness onFiles={onFiles} />)
+    renderHarness(onFiles)
 
     fireEvent.dragEnter(window, { dataTransfer: dragData({ files: [png] }) })
     fireEvent.drop(window, { dataTransfer: dragData({ files: [png] }) })
@@ -191,7 +249,7 @@ describe('useWindowFileInput picker', () => {
 
 describe('useWindowFileInput hint', () => {
   it('follows the generator tab while the picker is closed', () => {
-    render(<Harness onFiles={vi.fn()} />)
+    renderHarness(vi.fn())
 
     expect(hint()).toBe('as references')
 
@@ -203,7 +261,7 @@ describe('useWindowFileInput hint', () => {
   })
 
   it('follows the open picker mode', () => {
-    render(<Harness onFiles={vi.fn()} />)
+    renderHarness(vi.fn())
 
     act(() => {
       openMediaPicker({ kinds: ['image'], mode: toggleMode() })

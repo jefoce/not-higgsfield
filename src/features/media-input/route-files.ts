@@ -19,6 +19,8 @@ import {
 import { uploadFiles } from '@/lib/api/uploads'
 import { toastError } from '@/lib/notify'
 
+import { linkDroppedPaths } from './link-dropped'
+
 /** Attaches uploads to the active tab. */
 function route(items: UploadItem[]): void {
   const state = useGeneratorStore.getState()
@@ -136,66 +138,57 @@ function pickFirst(request: PickerRequest, items: UploadItem[]): void {
   closeMediaPicker()
 }
 
-/** Routes files into the open picker request instead of the generator tab. */
-async function routeToPicker(request: PickerRequest, files: File[]): Promise<void> {
-  const { accepted, skipped } = acceptFiles({
-    files,
-    kinds: request.kinds,
-    extensions: request.extensions,
-  })
+/** Routes uploads into the open picker request instead of the generator tab. */
+export function routeUploads(items: UploadItem[]): void {
+  const request = useMediaPickerStore.getState().request
 
-  if (isEmpty(accepted)) {
-    if (skipped > 0) {
-      reportSkipped({ count: skipped, reason: 'unsupported file' })
-    }
+  if (isNil(request)) {
+    route(items)
 
     return
   }
 
-  try {
-    const items = await uploadFiles(accepted)
+  if (request.mode.kind === 'pick') {
+    pickFirst(request, items)
 
-    if (request.mode.kind === 'pick') {
-      pickFirst(request, items)
-
-      if (skipped > 0) {
-        reportSkipped({ count: skipped, reason: 'unsupported file' })
-      }
-
-      return
-    }
-
-    const toggled = applyToggle(request.mode, items)
-
-    revalidateUploads()
-
-    const count = skipped + toggled.skipped
-
-    if (count > 0) {
-      reportSkipped({ count, reason: toggled.reason ?? 'unsupported file' })
-    }
-  } catch (error) {
-    toastError(error)
+    return
   }
+
+  const toggled = applyToggle(request.mode, items)
+
+  revalidateUploads()
+
+  if (toggled.skipped > 0) {
+    reportSkipped({ count: toggled.skipped, reason: toggled.reason ?? 'unsupported file' })
+  }
+}
+
+interface IngestTarget {
+  isPicker: boolean
+  kinds: readonly MediaKind[]
+  extensions: KindExtensions | undefined
+}
+
+/** Format filters of the open picker, else of the active tab. */
+function ingestTarget(): IngestTarget {
+  const request = useMediaPickerStore.getState().request
+
+  if (isNil(request)) {
+    return { isPicker: false, kinds: allowedKinds(), extensions: allowedExtensions() }
+  }
+
+  return { isPicker: true, kinds: request.kinds, extensions: request.extensions }
 }
 
 /** Filters by the open picker or active tab, uploads the accepted files and routes the result. */
 export async function routeFiles(files: File[]): Promise<void> {
-  const request = useMediaPickerStore.getState().request
+  const { isPicker, kinds, extensions } = ingestTarget()
 
-  if (!isNil(request)) {
-    await routeToPicker(request, files)
+  const { accepted, skipped } = acceptFiles({ files, kinds, extensions })
 
-    return
-  }
-
-  const { accepted, skipped } = acceptFiles({
-    files,
-    kinds: allowedKinds(),
-    extensions: allowedExtensions(),
-  })
-
-  if (skipped > 0) {
+  if (isPicker && skipped > 0) {
+    reportSkipped({ count: skipped, reason: 'unsupported file' })
+  } else if (skipped > 0) {
     const suffix = skipped === 1 ? '' : 's'
 
     toast(`Skipped ${skipped} unsupported file${suffix}`)
@@ -208,7 +201,20 @@ export async function routeFiles(files: File[]): Promise<void> {
   try {
     const items = await uploadFiles(accepted)
 
-    route(items)
+    routeUploads(items)
+  } catch (error) {
+    toastError(error)
+  }
+}
+
+/** Links dropped desktop paths into the open picker or the active tab. */
+export async function ingestDroppedPaths(paths: string[]): Promise<void> {
+  const { kinds, extensions } = ingestTarget()
+
+  try {
+    const items = await linkDroppedPaths({ paths, kinds, extensions })
+
+    routeUploads(items)
   } catch (error) {
     toastError(error)
   }

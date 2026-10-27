@@ -44,6 +44,7 @@
   --text-xxs: 0.625rem;
   --text-xxs--line-height: 0.875rem;
   --breakpoint-compact: 900px;
+  --z-drop: 2147483000; /* window drop overlay, above every modal and menu */
   --text-xs--line-height: 1.125rem;
   --text-sm--line-height: 1.25rem;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;

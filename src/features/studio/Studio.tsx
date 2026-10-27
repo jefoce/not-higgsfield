@@ -4,7 +4,7 @@ import { type ReactNode, useRef } from 'react'
 
 import { GeneratorPanel } from '@/features/generator/panel/GeneratorPanel'
 import { HistorySection } from '@/features/history/list/HistorySection'
-import { routeFiles } from '@/features/media-input/route-files'
+import { ingestDroppedPaths, routeFiles } from '@/features/media-input/route-files'
 import { useWindowFileInput } from '@/features/media-input/use-window-file-input'
 import { WindowDropOverlay } from '@/features/media-input/WindowDropOverlay'
 import { MediaPicker } from '@/features/media-picker/picker/MediaPicker'
@@ -26,13 +26,21 @@ function handleWindowFiles(files: File[]): void {
   void routeFiles(files)
 }
 
+function handleWindowPaths(paths: string[]): void {
+  void ingestDroppedPaths(paths)
+}
+
 /** Two-column studio shell: generate panel left, history right. */
 export function Studio() {
   usePointerBlur()
   useUpdateCheck()
 
   const panelRef = useRef<HTMLElement>(null)
-  const { isDragging, hint } = useWindowFileInput({ onFiles: handleWindowFiles })
+
+  const { isDragging, hint } = useWindowFileInput({
+    onFiles: handleWindowFiles,
+    onPaths: handleWindowPaths,
+  })
 
   return (
     <>

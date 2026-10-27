@@ -1,15 +1,17 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { type RefObject, useEffect, useRef, useState } from 'react'
 import { isNil } from 'lodash-es'
 
 import { isNonEmptyString } from '@/core/guards'
 import type { GeneratorTab } from '@/core/schemas/generation-record'
 import { useGeneratorStore } from '@/features/generator/store/store'
 import { type PickerRequest, useMediaPickerStore } from '@/features/media-picker/picker/store'
+import { getPlatform } from '@/lib/platform'
 
 export interface UseWindowFileInputParams {
   onFiles: (files: File[]) => void
+  onPaths: (paths: string[]) => void
 }
 
 interface UseWindowFileInput {
@@ -53,9 +55,65 @@ function hintFor(request: PickerRequest | null, tab: GeneratorTab): string {
   return 'as start frame'
 }
 
+interface DesktopDropParams {
+  setDragging: (isDragging: boolean) => void
+  onPaths: RefObject<(paths: string[]) => void>
+}
+
+/** Desktop Finder drops feed the same drag state as the HTML listeners. */
+function useDesktopDrop(params: DesktopDropParams): void {
+  const { setDragging, onPaths } = params
+
+  useEffect(() => {
+    let stop: (() => void) | null = null
+    let isCancelled = false
+
+    void (async () => {
+      const platform = await getPlatform()
+
+      if (isCancelled) {
+        return
+      }
+
+      const unsubscribe = await platform.onFileDrop((event) => {
+        if (event.type === 'leave') {
+          setDragging(false)
+
+          return
+        }
+
+        if (event.type === 'over') {
+          setDragging(true)
+
+          return
+        }
+
+        setDragging(false)
+
+        if (event.paths.length > 0) {
+          onPaths.current(event.paths)
+        }
+      })
+
+      if (isCancelled) {
+        unsubscribe()
+
+        return
+      }
+
+      stop = unsubscribe
+    })()
+
+    return () => {
+      isCancelled = true
+      stop?.()
+    }
+  }, [setDragging, onPaths])
+}
+
 /** One window drag, drop and paste handler for the generator and the open picker. */
 export function useWindowFileInput(params: UseWindowFileInputParams): UseWindowFileInput {
-  const { onFiles } = params
+  const { onFiles, onPaths } = params
   const [isDragging, setIsDragging] = useState(false)
 
   const request = useMediaPickerStore((state) => {
@@ -68,10 +126,14 @@ export function useWindowFileInput(params: UseWindowFileInputParams): UseWindowF
 
   const depth = useRef(0)
   const callback = useRef(onFiles)
+  const pathsCallback = useRef(onPaths)
 
   useEffect(() => {
     callback.current = onFiles
-  }, [onFiles])
+    pathsCallback.current = onPaths
+  }, [onFiles, onPaths])
+
+  useDesktopDrop({ setDragging: setIsDragging, onPaths: pathsCallback })
 
   useEffect(() => {
     const handleDragEnter = (event: DragEvent): void => {

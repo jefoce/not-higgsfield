@@ -5,7 +5,7 @@ import { getPreset } from '@/core/presets'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { addBlockReason, referenceRoom } from '@/features/generator/reference-rules'
 import { useGeneratorStore } from '@/features/generator/store/store'
-import { routeFiles } from '@/features/media-input/route-files'
+import { routeFiles, routeUploads } from '@/features/media-input/route-files'
 import {
   closeMediaPicker,
   openMediaPicker,
@@ -183,5 +183,16 @@ describe('routeFiles with a picker request', () => {
     expect(useMediaPickerStore.getState().request).not.toBeNull()
     expect(toast.skipped).toHaveBeenCalledTimes(1)
     expect(toast.skipped).toHaveBeenCalledWith('Skipped 1 file (unsupported file)')
+  })
+})
+
+describe('routeUploads', () => {
+  it('routes prepared items into the active tab without uploading again', () => {
+    const item = upload('prepared', 'image')
+
+    routeUploads([item])
+
+    expect(useGeneratorStore.getState().references).toContain(item.id)
+    expect(uploadFiles).not.toHaveBeenCalled()
   })
 })

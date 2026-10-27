@@ -1,5 +1,7 @@
 'use client'
 
+import { createPortal } from 'react-dom'
+
 interface WindowDropOverlayProps {
   isDragging: boolean
   hint: string
@@ -9,17 +11,19 @@ interface WindowDropOverlayProps {
 export function WindowDropOverlay(props: WindowDropOverlayProps) {
   const { isDragging, hint } = props
 
-  if (!isDragging) {
+  if (!isDragging || typeof document === 'undefined') {
     return null
   }
 
-  return (
+  return createPortal(
     <div
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-50 flex flex-col items-center justify-center gap-2 border-4 border-dashed border-lime/60 bg-page/80 text-center"
+      className="pointer-events-auto fixed inset-0 flex flex-col items-center justify-center gap-2 border-4 border-dashed border-lime/60 bg-page/80 text-center"
+      style={{ zIndex: 'var(--z-drop)' }}
     >
       <span className="text-base font-medium text-fg">Drop to add</span>
       <span className="text-sm font-medium text-fg-2">{hint}</span>
-    </div>
+    </div>,
+    document.body,
   )
 }
