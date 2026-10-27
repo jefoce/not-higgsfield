@@ -114,6 +114,15 @@ module.exports = {
       to: { path: '^src/features/(studio|settings|media-picker)/' },
     },
     {
+      name: 'features-use-studio-file-input',
+      severity: 'error',
+      comment: 'One window file input. Features route files through the studio shell.',
+      from: {
+        path: '^src/features/(generator|media-picker|history|preview|player|settings|updates)/',
+      },
+      to: { path: '^src/features/media-input/' },
+    },
+    {
       name: 'only-app-composes-studio',
       severity: 'error',
       from: { pathNot: '^src/(features/studio|app)/' },

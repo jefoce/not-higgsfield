@@ -3,7 +3,6 @@
 import { type ReactNode, useRef } from 'react'
 
 import { GeneratorPanel } from '@/features/generator/panel/GeneratorPanel'
-import { useGeneratorStore } from '@/features/generator/store/store'
 import { HistorySection } from '@/features/history/list/HistorySection'
 import { routeFiles } from '@/features/media-input/route-files'
 import { useWindowFileInput } from '@/features/media-input/use-window-file-input'
@@ -33,13 +32,7 @@ export function Studio() {
   useUpdateCheck()
 
   const panelRef = useRef<HTMLElement>(null)
-  const { isDragging } = useWindowFileInput({ onFiles: handleWindowFiles })
-
-  const tab = useGeneratorStore((state) => {
-    return state.tab
-  })
-
-  const hint = tab === 'references' ? 'as references' : 'as start frame'
+  const { isDragging, hint } = useWindowFileInput({ onFiles: handleWindowFiles })
 
   return (
     <>

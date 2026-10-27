@@ -1,12 +1,17 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { useGeneratorStore } from '@/features/generator/store/store'
 import {
   useWindowFileInput,
   type UseWindowFileInputParams,
 } from '@/features/media-input/use-window-file-input'
-import { closeMediaPicker, openMediaPicker } from '@/features/media-picker/picker/store'
+import {
+  closeMediaPicker,
+  openMediaPicker,
+  type PickerToggleMode,
+} from '@/features/media-picker/picker/store'
 
 const png = new File(['png'], 'a.png', { type: 'image/png' })
 const gif = new File(['gif'], 'b.gif', { type: 'image/gif' })
@@ -35,13 +40,22 @@ function pasteData(files: File[] = [], text = '') {
 }
 
 function Harness(props: UseWindowFileInputParams) {
-  const { isDragging } = useWindowFileInput(props)
+  const { isDragging, hint } = useWindowFileInput(props)
 
-  return <span data-testid="state">{isDragging ? 'dragging' : 'idle'}</span>
+  return (
+    <>
+      <span data-testid="state">{isDragging ? 'dragging' : 'idle'}</span>
+      <span data-testid="hint">{hint}</span>
+    </>
+  )
 }
 
 function state(): string | null {
   return screen.getByTestId('state').textContent
+}
+
+function hint(): string | null {
+  return screen.getByTestId('hint').textContent
 }
 
 function pickRequest() {
@@ -50,6 +64,26 @@ function pickRequest() {
     mode: { kind: 'pick' as const, onPick: vi.fn() },
   }
 }
+
+function toggleMode(): PickerToggleMode {
+  return {
+    kind: 'toggle',
+    useSelectedIds: () => {
+      return []
+    },
+    useUploadsById: () => {
+      return {}
+    },
+    canAdd: () => {
+      return null
+    },
+    onToggle: vi.fn(),
+  }
+}
+
+beforeEach(() => {
+  useGeneratorStore.setState({ tab: 'references' })
+})
 
 afterEach(() => {
   cleanup()
@@ -135,7 +169,7 @@ describe('useWindowFileInput paste', () => {
 })
 
 describe('useWindowFileInput picker', () => {
-  it('ignores drag and paste while a picker request is open', () => {
+  it('handles drag and paste while a picker request is open', () => {
     const onFiles = vi.fn()
 
     act(() => {
@@ -149,6 +183,38 @@ describe('useWindowFileInput picker', () => {
     fireEvent.paste(window, { clipboardData: pasteData([png]) })
 
     expect(state()).toBe('idle')
-    expect(onFiles).not.toHaveBeenCalled()
+    expect(onFiles).toHaveBeenCalledTimes(2)
+    expect(onFiles).toHaveBeenNthCalledWith(1, [png])
+    expect(onFiles).toHaveBeenNthCalledWith(2, [png])
+  })
+})
+
+describe('useWindowFileInput hint', () => {
+  it('follows the generator tab while the picker is closed', () => {
+    render(<Harness onFiles={vi.fn()} />)
+
+    expect(hint()).toBe('as references')
+
+    act(() => {
+      useGeneratorStore.setState({ tab: 'frames' })
+    })
+
+    expect(hint()).toBe('as start frame')
+  })
+
+  it('follows the open picker mode', () => {
+    render(<Harness onFiles={vi.fn()} />)
+
+    act(() => {
+      openMediaPicker({ kinds: ['image'], mode: toggleMode() })
+    })
+
+    expect(hint()).toBe('as references')
+
+    act(() => {
+      openMediaPicker(pickRequest())
+    })
+
+    expect(hint()).toBe('as start frame')
   })
 })

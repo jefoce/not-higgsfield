@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import { isNil } from 'lodash-es'
 
 import { isNonEmptyString } from '@/core/guards'
-import { useMediaPickerStore } from '@/features/media-picker/picker/store'
+import type { GeneratorTab } from '@/core/schemas/generation-record'
+import { useGeneratorStore } from '@/features/generator/store/store'
+import { type PickerRequest, useMediaPickerStore } from '@/features/media-picker/picker/store'
 
 export interface UseWindowFileInputParams {
   onFiles: (files: File[]) => void
@@ -12,16 +14,13 @@ export interface UseWindowFileInputParams {
 
 interface UseWindowFileInput {
   isDragging: boolean
+  hint: string
 }
 
 const EDITABLE_SELECTOR = 'input, textarea, [contenteditable="true"], [contenteditable=""]'
 
 function hasFiles(dataTransfer: DataTransfer | null): boolean {
   return !isNil(dataTransfer) && dataTransfer.types.includes('Files')
-}
-
-function isPickerOpen(): boolean {
-  return !isNil(useMediaPickerStore.getState().request)
 }
 
 interface PasteTarget {
@@ -38,10 +37,35 @@ function readPasteTarget(event: ClipboardEvent): PasteTarget {
   return { files, isEditing: Boolean(target?.closest(EDITABLE_SELECTOR)), text }
 }
 
-/** Window drag, drop and paste for generator files, paused while the picker is open. */
+function hintFor(request: PickerRequest | null, tab: GeneratorTab): string {
+  if (isNil(request)) {
+    if (tab === 'references') {
+      return 'as references'
+    }
+
+    return 'as start frame'
+  }
+
+  if (request.mode.kind === 'toggle') {
+    return 'as references'
+  }
+
+  return 'as start frame'
+}
+
+/** One window drag, drop and paste handler for the generator and the open picker. */
 export function useWindowFileInput(params: UseWindowFileInputParams): UseWindowFileInput {
   const { onFiles } = params
   const [isDragging, setIsDragging] = useState(false)
+
+  const request = useMediaPickerStore((state) => {
+    return state.request
+  })
+
+  const tab = useGeneratorStore((state) => {
+    return state.tab
+  })
+
   const depth = useRef(0)
   const callback = useRef(onFiles)
 
@@ -51,7 +75,7 @@ export function useWindowFileInput(params: UseWindowFileInputParams): UseWindowF
 
   useEffect(() => {
     const handleDragEnter = (event: DragEvent): void => {
-      if (isPickerOpen() || !hasFiles(event.dataTransfer)) {
+      if (!hasFiles(event.dataTransfer)) {
         return
       }
 
@@ -61,7 +85,7 @@ export function useWindowFileInput(params: UseWindowFileInputParams): UseWindowF
     }
 
     const handleDragOver = (event: DragEvent): void => {
-      if (isPickerOpen() || !hasFiles(event.dataTransfer)) {
+      if (!hasFiles(event.dataTransfer)) {
         return
       }
 
@@ -69,7 +93,7 @@ export function useWindowFileInput(params: UseWindowFileInputParams): UseWindowF
     }
 
     const handleDragLeave = (event: DragEvent): void => {
-      if (isPickerOpen() || depth.current === 0) {
+      if (depth.current === 0) {
         return
       }
 
@@ -82,7 +106,7 @@ export function useWindowFileInput(params: UseWindowFileInputParams): UseWindowF
     }
 
     const handleDrop = (event: DragEvent): void => {
-      if (isPickerOpen() || !hasFiles(event.dataTransfer)) {
+      if (!hasFiles(event.dataTransfer)) {
         return
       }
 
@@ -98,10 +122,6 @@ export function useWindowFileInput(params: UseWindowFileInputParams): UseWindowF
     }
 
     const handlePaste = (event: ClipboardEvent): void => {
-      if (isPickerOpen()) {
-        return
-      }
-
       const { files, isEditing, text } = readPasteTarget(event)
 
       if (isEditing && isNonEmptyString(text)) {
@@ -131,5 +151,5 @@ export function useWindowFileInput(params: UseWindowFileInputParams): UseWindowF
     }
   }, [])
 
-  return { isDragging }
+  return { isDragging, hint: hintFor(request, tab) }
 }

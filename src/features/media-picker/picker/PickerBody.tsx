@@ -9,7 +9,6 @@ import { useBoolean } from '@/lib/use-boolean'
 import { AddFolderDialog } from '../folders/AddFolderDialog'
 import { useFolderBrowse } from '../folders/use-folder-browse'
 import { PickerContent } from './PickerContent'
-import { PickerDropOverlay } from './PickerDropOverlay'
 import { PickerTabs } from './PickerTabs'
 import { closeMediaPicker, type PickerRequest } from './store'
 import { usePauseAudioOnUnmount } from './use-pause-audio'
@@ -54,7 +53,7 @@ export function PickerBody(props: PickerBodyProps) {
 
   return (
     <>
-      <div className="relative flex h-full min-h-0 flex-col" {...upload.dropProps}>
+      <div className="flex h-full min-h-0 flex-col">
         <PickerTabs
           folders={folders}
           activeTab={activeTab}
@@ -74,8 +73,6 @@ export function PickerBody(props: PickerBodyProps) {
             onFolderNavigate={handleNavigate}
           />
         </div>
-
-        <PickerDropOverlay isDragging={upload.isDragging} />
       </div>
 
       <AddFolderDialog
