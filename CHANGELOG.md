@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.2.1 - unreleased
+## 0.3.0 - unreleased
 
-Looping playback, clearer pricing, reused release sources.
+A roomier viewer with zoom, a live docked picker, paste and drop anywhere, and one copy per file.
 
 ### Added
 
