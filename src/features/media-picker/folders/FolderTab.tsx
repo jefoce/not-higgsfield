@@ -60,9 +60,13 @@ export function FolderTab(props: FolderTabProps) {
 
   const [broken, setBroken] = useState<string[]>([])
 
-  const { data, isLoading } = useSWR(['folder-files', folderId, sub, kinds], () => {
-    return fetchFolderFiles({ folderId, sub, kinds })
-  })
+  const { data, isLoading } = useSWR(
+    ['folder-files', folderId, sub, kinds],
+    () => {
+      return fetchFolderFiles({ folderId, sub, kinds })
+    },
+    { keepPreviousData: true },
+  )
 
   const dirs = data?.dirs ?? []
 

@@ -81,12 +81,19 @@ function toggleFromPreview(mode: PickerMode, item: UploadItem): boolean {
   return true
 }
 
+/** Uploads for a kinds key, keeping previous data during revalidation. */
+function fetchKindsUploads(key: [string, MediaKind[]]): Promise<UploadItem[]> {
+  const [, kinds] = key
+
+  return fetchUploads({ kinds })
+}
+
 /** Uploads grid host with mode-driven selection and delete confirmation. */
 export function UploadsTab(props: UploadsTabProps) {
   const { kinds, extensions, mode, uploading = [] } = props
 
-  const { data, isLoading, mutate } = useSWR(['uploads', kinds], () => {
-    return fetchUploads({ kinds })
+  const { data, isLoading, mutate } = useSWR(['uploads', kinds], fetchKindsUploads, {
+    keepPreviousData: true,
   })
 
   const { data: canChooseFiles } = useSWR('platform-choose', async () => {

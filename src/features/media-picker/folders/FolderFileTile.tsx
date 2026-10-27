@@ -66,7 +66,7 @@ function folderFileBody(params: FolderFileBodyParams): ReactNode {
         loading="lazy"
         alt=""
         onError={handleImageError}
-        className="size-full bg-black/40 object-cover"
+        className="pointer-events-none absolute inset-0 size-full bg-black/40 object-cover"
       />
       {file.kind === 'video' && (
         <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">

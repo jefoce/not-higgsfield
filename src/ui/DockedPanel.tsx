@@ -58,20 +58,30 @@ export function DockedPanel(props: DockedPanelProps) {
       return
     }
 
-    const update = () => {
-      const anchor = anchorRef.current
+    const anchor = anchorRef.current
 
-      if (isNil(anchor)) {
+    if (isNil(anchor)) {
+      return
+    }
+
+    const update = () => {
+      const current = anchorRef.current
+
+      if (isNil(current)) {
         return
       }
 
-      setSize(measureAnchor(anchor))
+      setSize(measureAnchor(current))
     }
 
     update()
+    const observer = new ResizeObserver(update)
+
+    observer.observe(anchor)
     window.addEventListener('resize', update)
 
     return () => {
+      observer.disconnect()
       window.removeEventListener('resize', update)
     }
   }, [anchorRef, isOpen, isWide])

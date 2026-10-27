@@ -32,15 +32,12 @@ const SKELETON = [0, 1, 2, 3, 4, 5]
 /** Folder grid with skeleton, directory tiles, media tiles and the empty note. */
 export function FolderGrid(props: FolderGridProps) {
   const { folderId, folderPath, dirs, files, mode, selectedIds, uploadsById, linkingRel } = props
+  const isEmptyList = isEmpty(dirs) && isEmpty(files)
+  const isInitialLoading = props.isLoading && isEmptyList
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto">
+    <div className="min-h-0 flex-1 scrollbar-gutter-stable overflow-y-auto overscroll-contain">
       <div className="grid grid-cols-4 content-start gap-3 p-3">
-        {props.isLoading &&
-          SKELETON.map((key) => {
-            return <div key={key} className="aspect-square animate-pulse rounded-lg bg-surface-2" />
-          })}
-
         {dirs.map((dir) => {
           return <FolderDirTile key={dir.rel} dir={dir} onNavigate={props.onNavigate} />
         })}
@@ -71,7 +68,12 @@ export function FolderGrid(props: FolderGridProps) {
           )
         })}
 
-        {!props.isLoading && isEmpty(dirs) && isEmpty(files) && (
+        {isInitialLoading &&
+          SKELETON.map((key) => {
+            return <div key={key} className="aspect-square animate-pulse rounded-lg bg-surface-2" />
+          })}
+
+        {!props.isLoading && isEmptyList && (
           <p className="col-span-full py-8 text-center text-sm text-fg-2">
             No media in this folder
           </p>

@@ -36,9 +36,11 @@ const SKELETON = [0, 1, 2, 3]
 /** Uploads grid with the upload tile first. */
 export function UploadsGrid(props: UploadsGridProps) {
   const { items, uploading, isLoading, canChooseFiles, kinds, max, extensions, actions } = props
+  const isEmptyList = isEmpty(items)
+  const isInitialLoading = isLoading && isEmptyList
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto">
+    <div className="min-h-0 flex-1 scrollbar-gutter-stable overflow-y-auto overscroll-contain">
       <div className="grid grid-cols-4 content-start gap-3 p-3">
         {uploading.map((entry) => {
           return (
@@ -66,27 +68,26 @@ export function UploadsGrid(props: UploadsGridProps) {
             onUploaded={props.onUploaded}
           />
         )}
-        {isLoading &&
+        {items.map((item, previewIndex) => {
+          return (
+            <MediaRow
+              key={item.id}
+              item={item}
+              items={items}
+              previewIndex={previewIndex}
+              actions={actions}
+              isSelected={props.isSelected(item)}
+              disabledReason={props.disabledReason(item)}
+              onSelect={props.onSelect}
+              onDelete={props.onDelete}
+            />
+          )
+        })}
+        {isInitialLoading &&
           SKELETON.map((key) => {
             return <div key={key} className="aspect-square animate-pulse rounded-lg bg-surface-2" />
           })}
-        {!isLoading &&
-          items.map((item, previewIndex) => {
-            return (
-              <MediaRow
-                key={item.id}
-                item={item}
-                items={items}
-                previewIndex={previewIndex}
-                actions={actions}
-                isSelected={props.isSelected(item)}
-                disabledReason={props.disabledReason(item)}
-                onSelect={props.onSelect}
-                onDelete={props.onDelete}
-              />
-            )
-          })}
-        {!isLoading && isEmpty(items) && (
+        {!isLoading && isEmptyList && (
           <p className="col-span-full py-8 text-center text-sm text-fg-2">No uploads yet</p>
         )}
       </div>
