@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { randomUUID } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
@@ -25,6 +25,13 @@ import { listUploadRecords, loadUploadRecord, rememberUpload } from '../repos/up
 import { deleteUploadFiles, getUpload, saveFileUpload } from '../repos/uploads'
 import { getObjectStore } from '../storage/registry'
 import { withLock } from '../sync/lock'
+import {
+  findUploadByHash,
+  forgetUploadHash,
+  hashPathCached,
+  rememberUploadHash,
+  runWithHashLock,
+} from './upload-hash'
 import { assertSupported, probe } from './upload-probe'
 
 interface CreateFileUploadParams {
@@ -38,22 +45,35 @@ interface LinkUploadParams {
   relPath?: string
 }
 
-/** Validates and probes uploaded bytes, then stores them through the repo. */
+/** Reuses an upload with the same bytes, otherwise probes and stores them. */
 export async function createFileUpload(params: CreateFileUploadParams): Promise<UploadItem> {
   const { bytes, originalName } = params
   const ext = extWithDot(originalName)
   const kind = assertSupported(ext)
-  const temp = path.join(os.tmpdir(), `upload-probe-${randomUUID()}${ext}`)
+  const sha256 = createHash('sha256').update(bytes).digest('hex')
 
-  await fs.writeFile(temp, bytes)
+  return runWithHashLock(sha256, async () => {
+    const existing = await findUploadByHash(sha256)
 
-  try {
-    const meta = await probe(temp, kind)
+    if (existing) {
+      return existing
+    }
 
-    return await saveFileUpload({ bytes, originalName, ...meta })
-  } finally {
-    await fs.unlink(temp).catch(() => {})
-  }
+    const temp = path.join(os.tmpdir(), `upload-probe-${randomUUID()}${ext}`)
+
+    await fs.writeFile(temp, bytes)
+
+    try {
+      const meta = await probe(temp, kind)
+      const item = await saveFileUpload({ bytes, originalName, sha256, ...meta })
+
+      rememberUploadHash(sha256, item.id)
+
+      return item
+    } finally {
+      await fs.unlink(temp).catch(() => {})
+    }
+  })
 }
 
 /** Links a disk file, falling back to hard link then copy, or reuses an existing link. */
@@ -87,6 +107,7 @@ export async function createLinkUpload(params: LinkUploadParams): Promise<Upload
     return { ...existing, missing: false }
   }
 
+  const sha256 = await hashPathCached(target)
   const id = randomUUID()
   const paths = uploadPaths(id, ext)
   const linkMode = await linkOrCopy(target, paths.media)
@@ -101,6 +122,7 @@ export async function createLinkUpload(params: LinkUploadParams): Promise<Upload
     target,
     linkMode,
     sizeBytes: stats.size,
+    sha256,
     createdAt: new Date().toISOString(),
     ...(await probe(paths.media, kind)),
   }
@@ -114,6 +136,7 @@ export async function createLinkUpload(params: LinkUploadParams): Promise<Upload
   }
 
   await rememberUpload(item)
+  rememberUploadHash(sha256, id)
 
   return item
 }
@@ -166,6 +189,7 @@ export async function removeUpload(id: string): Promise<void> {
 
   await withLock(`upload:${id}`, async () => {
     const record = await loadUploadRecord(id)
+    const sha256 = record?.sha256
     let isShared = true
 
     if (record?.remote) {
@@ -174,6 +198,10 @@ export async function removeUpload(id: string): Promise<void> {
 
     await deleteUploadFiles({ id, ext: record?.ext ?? '' })
     await removeEncoded(id)
+
+    if (isNonEmptyString(sha256)) {
+      forgetUploadHash(sha256)
+    }
 
     if (record?.remote && !isShared) {
       await deleteRemote(record.remote.key)
