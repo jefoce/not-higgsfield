@@ -1,6 +1,6 @@
 'use client'
 
-import { type MouseEvent, useRef } from 'react'
+import { type MouseEvent, type RefObject } from 'react'
 import { isNil } from 'lodash-es'
 
 import { isNonEmptyString } from '@/core/guards'
@@ -16,6 +16,7 @@ import { FrameSlotCard } from './FrameSlotCard'
 
 interface FrameSlotProps {
   slot: 'start' | 'end'
+  anchorRef: RefObject<HTMLElement | null>
   disabled?: boolean
   disabledReason?: string
 }
@@ -120,12 +121,13 @@ function slotForUpload(upload: UploadItem): FrameSlotName | undefined {
 interface ReplaceFrameParams {
   current: UploadItem
   extensions?: KindExtensions
+  anchor: HTMLElement | null
   setFrame: (slot: FrameSlotName, upload: UploadItem | null) => void
 }
 
 /** Opens the picker for the slot holding the shown frame. */
 function replaceFrame(params: ReplaceFrameParams): void {
-  const { current, extensions, setFrame } = params
+  const { current, extensions, anchor, setFrame } = params
   const target = slotForUpload(current)
 
   if (isNil(target)) {
@@ -136,7 +138,7 @@ function replaceFrame(params: ReplaceFrameParams): void {
     setFrame(target, next)
   }
 
-  openFramePicker({ extensions, anchor: null, onPick: handlePick })
+  openFramePicker({ extensions, anchor, onPick: handlePick })
 }
 
 interface RemoveFrameParams {
@@ -179,8 +181,7 @@ function openFramePreview(params: OpenFramePreviewParams): void {
 
 /** One frame slot with preview, replace and remove actions. */
 export function FrameSlot(props: FrameSlotProps) {
-  const { slot, disabled: isDisabled = false, disabledReason } = props
-  const wrapperRef = useRef<HTMLSpanElement>(null)
+  const { slot, anchorRef, disabled: isDisabled = false, disabledReason } = props
 
   const frameId = useGeneratorStore((state) => {
     return state.frames[slot]
@@ -214,7 +215,7 @@ export function FrameSlot(props: FrameSlotProps) {
   }
 
   const handlePick = (): void => {
-    openFramePicker({ extensions, anchor: wrapperRef.current, onPick: handlePickFrame })
+    openFramePicker({ extensions, anchor: anchorRef.current, onPick: handlePickFrame })
   }
 
   const handleRemove = (): void => {
@@ -222,7 +223,7 @@ export function FrameSlot(props: FrameSlotProps) {
   }
 
   const handleReplace = (current: UploadItem): void => {
-    replaceFrame({ current, extensions, setFrame })
+    replaceFrame({ current, extensions, anchor: anchorRef.current, setFrame })
   }
 
   const handleRemoveAction = (current: UploadItem): void => {
@@ -248,19 +249,17 @@ export function FrameSlot(props: FrameSlotProps) {
   }
 
   return (
-    <span ref={wrapperRef}>
-      <Tooltip content={slotTooltip({ isBroken, isDisabled, disabledReason })}>
-        <FrameSlotCard
-          label={LABELS[slot]}
-          upload={upload}
-          hasFrame={hasFrame}
-          isBroken={isBroken}
-          isPreviewable={isPreviewable}
-          isDisabled={isDisabled}
-          onPress={handleSlotPress}
-          onRemove={handleRemoveClick}
-        />
-      </Tooltip>
-    </span>
+    <Tooltip content={slotTooltip({ isBroken, isDisabled, disabledReason })}>
+      <FrameSlotCard
+        label={LABELS[slot]}
+        upload={upload}
+        hasFrame={hasFrame}
+        isBroken={isBroken}
+        isPreviewable={isPreviewable}
+        isDisabled={isDisabled}
+        onPress={handleSlotPress}
+        onRemove={handleRemoveClick}
+      />
+    </Tooltip>
   )
 }

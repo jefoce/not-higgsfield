@@ -1,5 +1,7 @@
 'use client'
 
+import { useRef } from 'react'
+
 import { isNonEmptyString } from '@/core/guards'
 import { getPreset } from '@/core/presets'
 
@@ -18,17 +20,23 @@ export function FrameSlots() {
     return state.frames.start
   })
 
+  const containerRef = useRef<HTMLDivElement>(null)
+
   if (!preset.frames.start) {
     return null
   }
 
   return (
-    <div className="rounded-panel border border-line p-1 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]">
+    <div
+      ref={containerRef}
+      className="rounded-panel border border-line p-1 shadow-[0_0_0_1px_rgba(255,255,255,0.02)]"
+    >
       <div className="grid grid-cols-2 gap-1">
-        <FrameSlot slot="start" />
+        <FrameSlot slot="start" anchorRef={containerRef} />
         {preset.frames.end && (
           <FrameSlot
             slot="end"
+            anchorRef={containerRef}
             disabled={!isNonEmptyString(startId)}
             disabledReason="Add start frame first"
           />

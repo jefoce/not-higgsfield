@@ -30,6 +30,8 @@ export interface PickerRequest {
   kinds: MediaKind[]
   extensions?: KindExtensions
   mode: PickerMode
+
+  /** Region that keeps the picker open, not the clicked control. */
   anchor: HTMLElement | null
 }
 

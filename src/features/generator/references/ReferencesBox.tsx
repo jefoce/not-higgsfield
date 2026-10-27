@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef } from 'react'
 import { isEmpty, sumBy } from 'lodash-es'
 
 import type { KindExtensions } from '@/core/media-kinds'
@@ -112,13 +113,18 @@ export function ReferencesBox() {
     return room[kind]
   })
 
-  const handlePick = (element: HTMLElement): void => {
-    openReferencesPicker({ kinds, extensions, anchor: element })
+  const boxRef = useRef<HTMLDivElement>(null)
+
+  const handlePick = (): void => {
+    openReferencesPicker({ kinds, extensions, anchor: boxRef.current })
   }
 
-  if (references.length > 0) {
-    return <ReferencesGrid preset={preset} extensions={extensions} max={max} onPick={handlePick} />
-  }
-
-  return <ReferencesEmpty preset={preset} onPick={handlePick} />
+  return (
+    <div ref={boxRef} data-references-box>
+      {references.length > 0 && (
+        <ReferencesGrid preset={preset} extensions={extensions} max={max} onPick={handlePick} />
+      )}
+      {isEmpty(references) && <ReferencesEmpty preset={preset} onPick={handlePick} />}
+    </div>
+  )
 }
