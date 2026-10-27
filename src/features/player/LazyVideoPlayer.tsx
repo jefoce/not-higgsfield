@@ -66,6 +66,7 @@ export function LazyVideoPlayer(props: LazyVideoPlayerProps) {
           src={poster}
           alt=""
           aria-hidden
+          draggable={false}
           className={cn(
             'pointer-events-none absolute inset-0 size-full bg-black transition-opacity duration-150',
             POSTER_FIT_CLASS[posterFit],

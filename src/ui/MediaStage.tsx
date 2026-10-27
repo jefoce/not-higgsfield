@@ -49,6 +49,7 @@ export function MediaStage(props: MediaStageProps) {
             src={backdrop.src}
             alt=""
             aria-hidden
+            draggable={false}
             loading="lazy"
             className="size-full scale-110 object-cover opacity-70 blur-3xl saturate-150"
           />

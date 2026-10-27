@@ -2,6 +2,7 @@
 
 import {
   type Dispatch,
+  type DragEvent,
   type ReactNode,
   type RefObject,
   type SetStateAction,
@@ -47,6 +48,10 @@ const CONTROLS_CLASSES =
 
 const CONTROL_CLASSES =
   'flex size-8 items-center justify-center rounded-full text-fg tabular-nums transition hover:bg-white/10 focus-visible:bg-white/10'
+
+function handleDragStart(event: DragEvent<HTMLDivElement>) {
+  event.preventDefault()
+}
 
 function wheelFactor(event: WheelEvent): number {
   if (event.ctrlKey) {
@@ -193,8 +198,9 @@ export function ZoomLayer(props: ZoomLayerProps) {
       onPointerMove={pan.handlePointerMove}
       onPointerUp={pan.handlePointerUp}
       onPointerCancel={pan.handlePointerCancel}
+      onDragStart={handleDragStart}
       className={cn(
-        'group/zoom relative flex size-full items-center justify-center overflow-hidden',
+        'group/zoom relative flex size-full touch-none items-center justify-center overflow-hidden select-none',
         zoom.scale > 1 && !pan.isDragging && 'cursor-grab',
         pan.isDragging && 'cursor-grabbing',
       )}

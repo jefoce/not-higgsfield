@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+/* eslint-disable max-lines -- zoom layer cases stay in one suite */
 import { useRef } from 'react'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -99,6 +100,18 @@ function sizeLayer(box: HTMLElement): void {
   defineSize(box, 'offsetHeight', 300)
 }
 
+/** Layer 800x600 with a 600x450 content box, so 2x leaves room to pan. */
+function sizeBigLayer(box: HTMLElement): void {
+  const root = rootOf(box)
+
+  defineSize(root, 'offsetWidth', 800)
+  defineSize(root, 'offsetHeight', 600)
+  defineSize(box, 'offsetLeft', 100)
+  defineSize(box, 'offsetTop', 75)
+  defineSize(box, 'offsetWidth', 600)
+  defineSize(box, 'offsetHeight', 450)
+}
+
 function resize(): void {
   act(() => {
     for (const callback of resizeCallbacks) {
@@ -152,6 +165,21 @@ describe('ZoomLayer wheel and double click', () => {
 
     fireEvent.doubleClick(root, { clientX: 100, clientY: 100 })
     expect(percent()).toBe('100%')
+  })
+})
+
+describe('ZoomLayer drag', () => {
+  it('cancels a native drag that starts on an image inside it', () => {
+    render(
+      <div role="dialog">
+        <ZoomLayer resetKey="drag">
+          {/* eslint-disable-next-line @next/next/no-img-element -- tiny inline test image */}
+          <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="" data-testid="photo" />
+        </ZoomLayer>
+      </div>,
+    )
+
+    expect(fireEvent.dragStart(screen.getByTestId('photo'))).toBe(false)
   })
 })
 
@@ -278,6 +306,27 @@ describe('ZoomLayer pan', () => {
     fireEvent.pointerUp(root, { pointerId: 3, clientX: 700, clientY: 500 })
 
     expect(wrapperOf(box).style.transform).toBe('translate(0px, 0px) scale(1)')
+  })
+
+  it('pans a photo after a double-click zoom to 2x', () => {
+    renderLayer()
+    const box = boxOf()
+    const root = rootOf(box)
+
+    sizeBigLayer(box)
+    resize()
+    stubPointerCapture(root)
+
+    fireEvent.doubleClick(root, { clientX: 400, clientY: 300 })
+    expect(percent()).toBe('200%')
+
+    const wrapper = wrapperOf(box)
+    const before = wrapper.style.transform
+
+    fireEvent.pointerDown(root, { button: 0, pointerId: 1, clientX: 400, clientY: 300 })
+    fireEvent.pointerMove(root, { pointerId: 1, clientX: 440, clientY: 320 })
+
+    expect(wrapper.style.transform).not.toBe(before)
   })
 })
 

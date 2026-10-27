@@ -108,6 +108,7 @@ export function PreviewBody(props: PreviewBodyProps) {
         <img
           src={src}
           alt={item.originalName}
+          draggable={false}
           className={cn('size-full object-contain transition-opacity duration-150', imageFade)}
           onLoad={handleImageLoad}
         />
