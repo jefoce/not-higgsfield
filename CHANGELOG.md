@@ -23,6 +23,7 @@ A roomier viewer with zoom, a live docked picker, paste and drop anywhere, and o
 
 - The media picker opens beside the generator. Clicking a file attaches or removes it right away, no Add button.
 - Uploading or linking the same file again reuses the existing upload.
+- The picker docks next to the references or frames box, opens only from Add, and closes on any click outside it.
 
 ### Fixed
 
