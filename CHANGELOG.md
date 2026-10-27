@@ -28,7 +28,7 @@ Looping playback, clearer pricing, reused release sources.
 - The Generate button shows no price, discount or spinner while it cannot run.
 - With looping playback the player controls stay in sync, and pausing stops the loop.
 - A model with no endpoint pricing block now logs a clear reason and keeps list prices.
-- Release pipeline: sidecar and ffmpeg source pulls that hit GHCR are reused instead of rebuilt.
+- Release pipeline: sidecar and ffmpeg source pulls that hit GHCR are reused instead of rebuilt, and a hit now reaches the workflow step conditions.
 - The preview shows Deselect for a selected file and keeps the list open while you pick.
 - List rows toggle selection with a click, the same as the grid.
 - Only the front dialog reacts to arrow keys.
