@@ -71,7 +71,7 @@ export function InputThumb(props: InputThumbProps) {
             loading="lazy"
             decoding="async"
             onError={handleError}
-            className="size-full bg-black/40 object-cover"
+            className="size-full rounded-[inherit] bg-black/40 object-cover"
           />
         )}
         <span

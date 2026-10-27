@@ -54,10 +54,12 @@ describe('preview image box', () => {
     const item = upload('photo', 'image', { width: 1200, height: 800 })
     const { container } = render(<PreviewBody item={item} playerId="preview:photo" />)
     const box = boxOf(container)
+    const image = imageOf(container)
 
     expect(box.style.aspectRatio).toBe('1200/800')
     expect(box.classList.contains('rounded-xl')).toBe(true)
     expect(box.classList.contains('overflow-hidden')).toBe(true)
+    expect(image.classList.contains('rounded-[inherit]')).toBe(true)
   })
 
   it('trusts the loaded natural size over the stored one', () => {

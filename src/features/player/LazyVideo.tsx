@@ -153,7 +153,7 @@ export function LazyVideo(props: LazyVideoProps) {
       {...hoverHandlers}
       style={rootStyle}
       className={cn(
-        'group/player relative overflow-hidden bg-black outline-none',
+        'group/player relative overflow-hidden rounded-[inherit] bg-black outline-none',
         isEmpty(aspect) && 'h-full',
         className,
       )}

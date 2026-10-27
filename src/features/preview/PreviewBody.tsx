@@ -109,7 +109,10 @@ export function PreviewBody(props: PreviewBodyProps) {
           src={src}
           alt={item.originalName}
           draggable={false}
-          className={cn('size-full object-contain transition-opacity duration-150', imageFade)}
+          className={cn(
+            'size-full rounded-[inherit] object-contain transition-opacity duration-150',
+            imageFade,
+          )}
           onLoad={handleImageLoad}
         />
       </MediaBox>

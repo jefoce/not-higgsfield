@@ -359,6 +359,17 @@ describe('ZoomLayer reset and chain keys', () => {
   })
 })
 
+describe('ZoomLayer clipping', () => {
+  it('clips the zoomed content to the rounded layer', () => {
+    renderLayer()
+
+    const root = rootOf(boxOf())
+
+    expect(root.classList.contains('rounded-xl')).toBe(true)
+    expect(root.classList.contains('overflow-hidden')).toBe(true)
+  })
+})
+
 describe('PreviewBody zoom scope', () => {
   it('shows zoom controls for a photo', () => {
     const item = upload('photo', 'image')

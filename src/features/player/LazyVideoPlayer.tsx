@@ -58,7 +58,7 @@ export function LazyVideoPlayer(props: LazyVideoPlayerProps) {
         loop
         preload="metadata"
         onPlaying={handlePlaying}
-        className={cn('size-full bg-black', fit)}
+        className={cn('size-full rounded-[inherit] bg-black', fit)}
       />
       {!isEmpty(poster) && (
         // eslint-disable-next-line @next/next/no-img-element -- poster overlay, pre-sized thumb
@@ -68,7 +68,7 @@ export function LazyVideoPlayer(props: LazyVideoPlayerProps) {
           aria-hidden
           draggable={false}
           className={cn(
-            'pointer-events-none absolute inset-0 size-full bg-black transition-opacity duration-150',
+            'pointer-events-none absolute inset-0 size-full rounded-[inherit] bg-black transition-opacity duration-150',
             POSTER_FIT_CLASS[posterFit],
             hasPlayed && 'opacity-0',
           )}

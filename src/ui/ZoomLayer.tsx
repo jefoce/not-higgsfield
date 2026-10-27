@@ -200,7 +200,7 @@ export function ZoomLayer(props: ZoomLayerProps) {
       onPointerCancel={pan.handlePointerCancel}
       onDragStart={handleDragStart}
       className={cn(
-        'group/zoom relative flex size-full touch-none items-center justify-center overflow-hidden select-none',
+        'group/zoom relative flex size-full touch-none items-center justify-center overflow-hidden rounded-xl select-none',
         zoom.scale > 1 && !pan.isDragging && 'cursor-grab',
         pan.isDragging && 'cursor-grabbing',
       )}

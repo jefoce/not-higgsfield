@@ -37,10 +37,13 @@ describe('LazyVideo hoverPlay', () => {
 
     fireEvent.pointerOver(root)
     const video = container.querySelector('video')
+    const posterOverlay = container.querySelector('img')
 
     expect(video).not.toBeNull()
     expect(video?.muted).toBe(true)
     expect(video?.loop).toBe(true)
+    expect(video?.classList.contains('rounded-[inherit]')).toBe(true)
+    expect(posterOverlay?.classList.contains('rounded-[inherit]')).toBe(true)
     expect(play).toHaveBeenCalled()
 
     fireEvent.pointerOut(root)

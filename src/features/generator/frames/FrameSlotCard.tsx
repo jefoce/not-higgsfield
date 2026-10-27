@@ -45,7 +45,7 @@ export function FrameSlotCard(props: FrameSlotCardProps) {
           <img
             src={thumbUrl({ ref: `uploads/${upload.id}`, w: 640 })}
             alt={label}
-            className="pointer-events-none absolute inset-0 size-full bg-black/40 object-contain"
+            className="pointer-events-none absolute inset-0 size-full rounded-[inherit] bg-black/40 object-contain"
           />
         )}
 
