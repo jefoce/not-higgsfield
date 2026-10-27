@@ -1,47 +1,31 @@
 # Changelog
 
-## 0.3.0 - unreleased
+## 0.3.0 - 2026-10-27
 
 A roomier viewer with zoom, a live docked picker, paste and drop anywhere, and one copy per file.
 
 ### Added
 
-- Videos loop until you pause them.
-- A bigger media viewer with a blurred backdrop.
-- Previous and next in the history viewer and in every preview list.
-- Use button in every viewer: adds the media as a reference or start frame, by mode.
-- Viewers start playback about half a second after opening or switching items.
+- A bigger media viewer: blurred backdrop, rounded media without black bars, a close button, previous and next with the arrow keys (Shift+arrows seek), and playback that starts half a second after opening or switching.
 - Zoom photos in the viewer: wheel or pinch, drag to move, buttons to zoom and fit.
-- Photos in the viewer are never cropped, whatever their orientation.
-- The media viewer has a close button in the corner.
-- Photos and videos sit rounded on the blurred backdrop.
+- A Use button in every viewer adds the media as a reference or start frame, by mode, and shows when it is already attached.
 - Frames and input thumbnails open the preview with previous and next.
-- Reuse closes the viewer so the loaded settings are visible.
-- Drag files from Finder in the desktop app and they link without copying. Paste or drop works anywhere in the app, into the open picker or the active mode.
+- Paste or drop files anywhere in the app. In the desktop app, Finder drops link without copying.
+- Videos loop until you pause them.
 
 ### Changed
 
-- The media picker opens beside the generator. Clicking a file attaches or removes it right away, with no confirm step.
+- The media picker docks next to the references or frames box. Clicking a file attaches or removes it right away, tiles show the same number as @Image N, and any click outside closes it.
 - Uploading or linking the same file again reuses the existing upload.
-- The picker docks next to the references or frames box, opens only from Add, and closes on any click outside it.
+- Reuse closes the viewer so the loaded settings are visible.
 
 ### Fixed
 
 - The Generate button shows no price, discount or spinner while it cannot run.
-- With looping playback the player controls stay in sync, and pausing stops the loop.
-- A model with no endpoint pricing block now logs a clear reason and keeps list prices.
-- Release pipeline: sidecar and ffmpeg source pulls that hit GHCR are reused instead of rebuilt, and a hit now reaches the workflow step conditions.
-- The preview shows Deselect for a selected file and keeps the list open while you pick.
+- A model with no endpoint pricing block logs a clear reason and keeps list prices.
+- The preview shows Deselect for a selected file.
 - List rows toggle selection with a click, the same as the grid.
-- Only the front dialog reacts to arrow keys.
-- Dragging a zoomed photo follows the cursor without lag, and the zoom buttons no longer toggle the zoom.
-- Videos and photos fill the viewer without black bars, whatever their shape.
-- Dragging a zoomed photo moves it instead of starting a file drag.
-- Every photo and video shows rounded corners on the media itself, whatever its shape.
-- Long folder and uploads lists scroll without jumps.
-- Picker tiles show the reference number, matching Image 2 and the other prompt tokens.
-- Zoomed photos keep their rounded corners.
-- Clicking Add again leaves the open picker unchanged.
+- Release pipeline: sidecar and ffmpeg pulls that hit GHCR are reused instead of rebuilt.
 
 ## 0.2.0 - 2026-10-26
 
