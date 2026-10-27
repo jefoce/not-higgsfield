@@ -59,11 +59,12 @@ function toggleReference(item: UploadItem): void {
 interface OpenReferencesPickerParams {
   kinds: MediaKind[]
   extensions?: KindExtensions
+  anchor: HTMLElement | null
 }
 
 /** Opens reference picking in toggle mode. */
 function openReferencesPicker(params: OpenReferencesPickerParams): void {
-  const { kinds, extensions } = params
+  const { kinds, extensions, anchor } = params
 
   if (isEmpty(kinds)) {
     return
@@ -72,6 +73,7 @@ function openReferencesPicker(params: OpenReferencesPickerParams): void {
   openMediaPicker({
     kinds,
     extensions,
+    anchor,
     mode: {
       kind: 'toggle',
       useSelectedIds: useReferenceIds,
@@ -110,8 +112,8 @@ export function ReferencesBox() {
     return room[kind]
   })
 
-  const handlePick = (): void => {
-    openReferencesPicker({ kinds, extensions })
+  const handlePick = (element: HTMLElement): void => {
+    openReferencesPicker({ kinds, extensions, anchor: element })
   }
 
   if (references.length > 0) {

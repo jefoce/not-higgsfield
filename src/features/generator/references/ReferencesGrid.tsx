@@ -17,7 +17,7 @@ interface ReferencesGridProps {
   preset: ModelPreset
   extensions?: KindExtensions
   max: number
-  onPick: () => void
+  onPick: (element: HTMLElement) => void
 }
 
 /** Sortable reference grid with counters and drag reorder. */

@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import { useRef } from 'react'
 import { act, cleanup, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -41,15 +40,14 @@ interface DockedHarnessProps {
 
 function DockedHarness(props: DockedHarnessProps) {
   const { isDragging } = props
-  const anchorRef = useRef<HTMLElement>(null)
 
   return (
     <>
-      <aside ref={anchorRef} />
+      <aside id="generator-panel" />
       <Modal open onOpenChange={vi.fn()} label="Settings">
         <span>Modal body</span>
       </Modal>
-      <MediaPicker anchorRef={anchorRef} />
+      <MediaPicker />
       <WindowDropOverlay isDragging={isDragging} hint="as references" />
     </>
   )
@@ -103,14 +101,14 @@ describe('WindowDropOverlay', () => {
 
     vi.stubGlobal('ResizeObserver', Observer)
 
+    const view = render(<DockedHarness isDragging={false} />)
+
     act(() => {
       openMediaPicker({
         kinds: ['image'],
         mode: { kind: 'pick', onPick: vi.fn() },
       })
     })
-
-    const view = render(<DockedHarness isDragging={false} />)
 
     expect(screen.getByText('Modal body')).toBeDefined()
 

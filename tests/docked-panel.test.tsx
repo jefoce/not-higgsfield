@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { useRef } from 'react'
+import { useState } from 'react'
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -25,11 +25,11 @@ class Observer {
 
 const ANCHOR_RECT = {
   width: 600,
-  height: 640,
+  height: 100,
   top: 0,
   left: 0,
   right: 600,
-  bottom: 640,
+  bottom: 100,
   x: 0,
   y: 0,
   toJSON: () => {
@@ -42,20 +42,18 @@ interface HarnessProps {
 }
 
 function Harness(props: HarnessProps) {
-  const anchorRef = useRef<HTMLElement>(null)
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null)
 
   return (
     <>
-      <aside ref={anchorRef}>
-        <button type="button">Generate</button>
+      <aside id="generator-panel">
+        <button ref={setAnchor} type="button">
+          Generate
+        </button>
+        <button type="button">Panel</button>
       </aside>
       <button type="button">History</button>
-      <DockedPanel
-        open
-        onOpenChange={props.onOpenChange}
-        anchorRef={anchorRef}
-        label="Choose media"
-      >
+      <DockedPanel open onOpenChange={props.onOpenChange} anchor={anchor} label="Choose media">
         <p>Picker body</p>
       </DockedPanel>
     </>
@@ -92,9 +90,10 @@ afterEach(() => {
 })
 
 describe('DockedPanel wide branch', () => {
-  it('docks beside the anchor at wide widths with the anchor size', async () => {
+  it('docks beside the opener at wide widths with a fixed height', async () => {
     vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(ANCHOR_RECT)
     vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(800)
+    vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(1000)
     renderPanel()
 
     const dialog = screen.getByRole('dialog')
@@ -103,12 +102,41 @@ describe('DockedPanel wide branch', () => {
       expect(dialog.style.width).toBe('184px')
     })
 
-    expect(dialog.style.height).toBe('640px')
+    expect(dialog.style.height).toBe('720px')
     expect(dialog.parentElement?.dataset.radixPopperContentWrapper).toBe('')
     expect(dialog.className).toContain('backdrop-blur-xl')
   })
 
-  it('stays open when the pointer goes down inside the anchor', async () => {
+  it('keeps a fixed height at a tall viewport regardless of the opener height', async () => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(ANCHOR_RECT)
+    vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(2000)
+    renderPanel()
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog').style.height).toBe('720px')
+    })
+  })
+
+  it('shrinks the height with the viewport at a short viewport', async () => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(ANCHOR_RECT)
+    vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(500)
+    renderPanel()
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog').style.height).toBe('468px')
+    })
+  })
+
+  it('centers the panel vertically on the opener', async () => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(ANCHOR_RECT)
+    renderPanel()
+
+    await waitFor(() => {
+      expect(screen.getByRole('dialog').getAttribute('data-align')).toBe('center')
+    })
+  })
+
+  it('stays open when the pointer goes down inside the opener', async () => {
     const { onOpenChange } = renderPanel()
 
     await settleDismissableLayer()
@@ -119,7 +147,19 @@ describe('DockedPanel wide branch', () => {
     expect(onOpenChange).not.toHaveBeenCalled()
   })
 
-  it('closes when the pointer goes down outside the anchor', async () => {
+  it('closes on a pointerdown inside the generator panel but outside the opener', async () => {
+    const { onOpenChange } = renderPanel()
+
+    await settleDismissableLayer()
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'Panel' }), { button: 0 })
+    fireEvent.click(screen.getByRole('button', { name: 'Panel' }))
+
+    await waitFor(() => {
+      expect(onOpenChange).toHaveBeenCalledWith(false)
+    })
+  })
+
+  it('closes when the pointer goes down outside the opener', async () => {
     const { onOpenChange } = renderPanel()
 
     await settleDismissableLayer()

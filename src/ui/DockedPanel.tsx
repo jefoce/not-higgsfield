@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, type RefObject, useEffect, useState } from 'react'
+import { type ReactNode, useEffect, useState } from 'react'
 import { isNil } from 'lodash-es'
 import { Popover as PopoverPrimitive } from 'radix-ui'
 
@@ -10,6 +10,7 @@ import { Modal } from '@/ui/Modal'
 
 const WIDE_QUERY = '(min-width: 900px)'
 const MAX_PANEL_WIDTH = 560
+const MAX_PANEL_HEIGHT = 720
 const EDGE_GAP = 16
 
 const PANEL_CLASSES =
@@ -26,7 +27,7 @@ interface PanelSize {
 interface DockedPanelProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  anchorRef: RefObject<HTMLElement | null>
+  anchor: HTMLElement | null
   fallback?: 'modal'
   label: string
   children: ReactNode
@@ -38,61 +39,60 @@ function measureAnchor(anchor: HTMLElement): PanelSize {
 
   return {
     width: Math.min(MAX_PANEL_WIDTH, window.innerWidth - rect.right - EDGE_GAP),
-    height: rect.height,
+    height: Math.min(MAX_PANEL_HEIGHT, window.innerHeight - EDGE_GAP * 2),
   }
 }
 
-/** True when the outside interaction started inside the anchor panel. */
+/** True when the outside interaction started inside the anchor element. */
 function isInsideAnchor(anchor: HTMLElement | null, target: EventTarget | null): boolean {
   return !isNil(anchor) && target instanceof Node && anchor.contains(target)
 }
 
+/** Opener element, falling back to the generator panel when the caller has none. */
+function resolveAnchor(anchor: HTMLElement | null): HTMLElement | null {
+  if (!isNil(anchor)) {
+    return anchor
+  }
+
+  if (typeof document === 'undefined') {
+    return null
+  }
+
+  return document.getElementById('generator-panel')
+}
+
 /** Panel docked beside an anchor at wide widths, a centered modal below 900 px. */
 export function DockedPanel(props: DockedPanelProps) {
-  const { open: isOpen, anchorRef, fallback = 'modal', label, className, children } = props
+  const { open: isOpen, anchor, fallback = 'modal', label, className, children } = props
   const isWide = useMediaQuery(WIDE_QUERY)
   const [size, setSize] = useState<PanelSize | null>(null)
 
+  const resolvedAnchor = resolveAnchor(anchor)
+
   useEffect(() => {
-    if (!isOpen || !isWide) {
-      return
-    }
-
-    const anchor = anchorRef.current
-
-    if (isNil(anchor)) {
+    if (!isOpen || !isWide || isNil(resolvedAnchor)) {
       return
     }
 
     const update = () => {
-      const current = anchorRef.current
-
-      if (isNil(current)) {
-        return
-      }
-
-      setSize(measureAnchor(current))
+      setSize(measureAnchor(resolvedAnchor))
     }
 
     update()
-    const observer = new ResizeObserver(update)
-
-    observer.observe(anchor)
     window.addEventListener('resize', update)
 
     return () => {
-      observer.disconnect()
       window.removeEventListener('resize', update)
     }
-  }, [anchorRef, isOpen, isWide])
+  }, [resolvedAnchor, isOpen, isWide])
 
   const handleInteractOutside = (event: Event) => {
-    if (isInsideAnchor(anchorRef.current, event.target)) {
+    if (isInsideAnchor(resolvedAnchor, event.target)) {
       event.preventDefault()
     }
   }
 
-  if (!isWide && fallback === 'modal') {
+  if (isNil(resolvedAnchor) || (!isWide && fallback === 'modal')) {
     return (
       <Modal
         open={isOpen}
@@ -105,13 +105,15 @@ export function DockedPanel(props: DockedPanelProps) {
     )
   }
 
+  const virtualRef = { current: resolvedAnchor }
+
   return (
     <PopoverPrimitive.Root open={isOpen} onOpenChange={props.onOpenChange} modal={false}>
-      <PopoverPrimitive.Anchor virtualRef={anchorRef} />
+      <PopoverPrimitive.Anchor virtualRef={virtualRef} />
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Content
           side="right"
-          align="start"
+          align="center"
           sideOffset={8}
           collisionPadding={8}
           className={cn(PANEL_CLASSES, className)}

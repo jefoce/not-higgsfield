@@ -30,6 +30,7 @@ export interface PickerRequest {
   kinds: MediaKind[]
   extensions?: KindExtensions
   mode: PickerMode
+  anchor: HTMLElement | null
 }
 
 /** Picker extensions from preset reference formats, ignoring kinds without a list. */
@@ -53,7 +54,9 @@ export function extensionsFromLimits(
   return Object.fromEntries(entries)
 }
 
-type PickerInput = Omit<PickerRequest, 'id'>
+interface PickerInput extends Omit<PickerRequest, 'id' | 'anchor'> {
+  anchor?: HTMLElement | null
+}
 
 interface MediaPickerState {
   request: PickerRequest | null
@@ -67,7 +70,7 @@ export const useMediaPickerStore = create<MediaPickerState>((set) => {
   return {
     request: null,
     open: (request) => {
-      set({ request: { ...request, id: (nextId += 1) } })
+      set({ request: { ...request, anchor: request.anchor ?? null, id: (nextId += 1) } })
     },
     close: () => {
       set({ request: null })

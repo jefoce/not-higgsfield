@@ -56,6 +56,7 @@ export function ReferenceItem(props: ReferenceItemProps) {
     openMediaPicker({
       kinds: [item.kind],
       extensions,
+      anchor: null,
       mode: { kind: 'pick', onPick: handleReplacePick },
     })
   }

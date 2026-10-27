@@ -1,6 +1,6 @@
 'use client'
 
-import { type MouseEvent } from 'react'
+import { type MouseEvent, useRef } from 'react'
 import { isNil } from 'lodash-es'
 
 import { isNonEmptyString } from '@/core/guards'
@@ -71,16 +71,18 @@ function slotTooltip(params: SlotTooltipParams): string | undefined {
 
 interface OpenFramePickerParams {
   extensions?: KindExtensions
+  anchor: HTMLElement | null
   onPick: (item: UploadItem) => void
 }
 
 /** Opens the image picker for one frame slot. */
 function openFramePicker(params: OpenFramePickerParams): void {
-  const { extensions, onPick } = params
+  const { extensions, anchor, onPick } = params
 
   openMediaPicker({
     kinds: ['image'],
     extensions,
+    anchor,
     mode: { kind: 'pick', onPick },
   })
 }
@@ -134,7 +136,7 @@ function replaceFrame(params: ReplaceFrameParams): void {
     setFrame(target, next)
   }
 
-  openFramePicker({ extensions, onPick: handlePick })
+  openFramePicker({ extensions, anchor: null, onPick: handlePick })
 }
 
 interface RemoveFrameParams {
@@ -178,6 +180,7 @@ function openFramePreview(params: OpenFramePreviewParams): void {
 /** One frame slot with preview, replace and remove actions. */
 export function FrameSlot(props: FrameSlotProps) {
   const { slot, disabled: isDisabled = false, disabledReason } = props
+  const wrapperRef = useRef<HTMLSpanElement>(null)
 
   const frameId = useGeneratorStore((state) => {
     return state.frames[slot]
@@ -211,7 +214,7 @@ export function FrameSlot(props: FrameSlotProps) {
   }
 
   const handlePick = (): void => {
-    openFramePicker({ extensions, onPick: handlePickFrame })
+    openFramePicker({ extensions, anchor: wrapperRef.current, onPick: handlePickFrame })
   }
 
   const handleRemove = (): void => {
@@ -245,17 +248,19 @@ export function FrameSlot(props: FrameSlotProps) {
   }
 
   return (
-    <Tooltip content={slotTooltip({ isBroken, isDisabled, disabledReason })}>
-      <FrameSlotCard
-        label={LABELS[slot]}
-        upload={upload}
-        hasFrame={hasFrame}
-        isBroken={isBroken}
-        isPreviewable={isPreviewable}
-        isDisabled={isDisabled}
-        onPress={handleSlotPress}
-        onRemove={handleRemoveClick}
-      />
-    </Tooltip>
+    <span ref={wrapperRef}>
+      <Tooltip content={slotTooltip({ isBroken, isDisabled, disabledReason })}>
+        <FrameSlotCard
+          label={LABELS[slot]}
+          upload={upload}
+          hasFrame={hasFrame}
+          isBroken={isBroken}
+          isPreviewable={isPreviewable}
+          isDisabled={isDisabled}
+          onPress={handleSlotPress}
+          onRemove={handleRemoveClick}
+        />
+      </Tooltip>
+    </span>
   )
 }

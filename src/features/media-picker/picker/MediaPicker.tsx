@@ -1,16 +1,11 @@
 'use client'
 
 import { isNil } from 'lodash-es'
-import type { RefObject } from 'react'
 
 import { DockedPanel } from '@/ui/DockedPanel'
 
 import { PickerBody } from './PickerBody'
 import { closeMediaPicker, useMediaPickerStore } from './store'
-
-interface MediaPickerProps {
-  anchorRef: RefObject<HTMLElement | null>
-}
 
 function handleOpenChange(isOpen: boolean): void {
   if (!isOpen) {
@@ -18,8 +13,8 @@ function handleOpenChange(isOpen: boolean): void {
   }
 }
 
-/** Picker shell, docked beside the generator on wide screens, a dialog otherwise. */
-export function MediaPicker(props: MediaPickerProps) {
+/** Picker shell, docked beside its opener on wide screens, a dialog otherwise. */
+export function MediaPicker() {
   const request = useMediaPickerStore((state) => {
     return state.request
   })
@@ -28,7 +23,7 @@ export function MediaPicker(props: MediaPickerProps) {
     <DockedPanel
       open={!isNil(request)}
       onOpenChange={handleOpenChange}
-      anchorRef={props.anchorRef}
+      anchor={request?.anchor ?? null}
       fallback="modal"
       label="Choose media"
     >

@@ -251,4 +251,13 @@ describe('picker request modes', () => {
     expect(onToggle).toHaveBeenCalledWith(items[0])
     expect(screen.getByRole('dialog')).toBeTruthy()
   })
+
+  it('keeps the supplied anchor on the request', () => {
+    const anchor = document.createElement('button')
+    const mode: PickerPickMode = { kind: 'pick', onPick: vi.fn() }
+
+    openMediaPicker({ kinds: ['image'], mode, anchor })
+
+    expect(useMediaPickerStore.getState().request?.anchor).toBe(anchor)
+  })
 })

@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, useRef } from 'react'
+import type { ReactNode } from 'react'
 
 import { GeneratorPanel } from '@/features/generator/panel/GeneratorPanel'
 import { HistorySection } from '@/features/history/list/HistorySection'
@@ -35,8 +35,6 @@ export function Studio() {
   usePointerBlur()
   useUpdateCheck()
 
-  const panelRef = useRef<HTMLElement>(null)
-
   const { isDragging, hint } = useWindowFileInput({
     onFiles: handleWindowFiles,
     onPaths: handleWindowPaths,
@@ -45,10 +43,7 @@ export function Studio() {
   return (
     <>
       <main className="mx-auto flex h-dvh w-full max-w-480 gap-2 overflow-hidden px-4 py-2 max-compact:h-auto max-compact:flex-col">
-        <aside
-          ref={panelRef}
-          className="flex max-h-full w-80 shrink-0 flex-col self-start overflow-hidden rounded-panel border border-line bg-page-2 max-compact:max-h-[min(720px,90vh)] max-compact:w-full"
-        >
+        <aside className="flex max-h-full w-80 shrink-0 flex-col self-start overflow-hidden rounded-panel border border-line bg-page-2 max-compact:max-h-[min(720px,90vh)] max-compact:w-full">
           <GeneratorPanel />
         </aside>
         <section className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-panel border border-line-strong bg-page">
@@ -56,7 +51,7 @@ export function Studio() {
         </section>
       </main>
       <WindowDropOverlay isDragging={isDragging} hint={hint} />
-      <MediaPicker anchorRef={panelRef} />
+      <MediaPicker />
       <MediaPreviewModal toolbar={renderPreviewToolbar} />
       <SettingsModal appSection={<AppSection />} />
       <UpdateToast />

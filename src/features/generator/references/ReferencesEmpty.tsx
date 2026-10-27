@@ -1,5 +1,7 @@
 'use client'
 
+import type { MouseEvent } from 'react'
+
 import { KIND_PLURAL } from '@/core/media-kinds'
 import { MEDIA_KINDS } from '@/core/media-types'
 import type { ModelPreset } from '@/core/presets/types'
@@ -10,7 +12,7 @@ import { REFERENCE_ICONS } from './reference-icons'
 
 interface ReferencesEmptyProps {
   preset: ModelPreset
-  onPick: () => void
+  onPick: (element: HTMLElement) => void
 }
 
 /** Empty state shown when no references are attached. */
@@ -21,10 +23,14 @@ export function ReferencesEmpty(props: ReferencesEmptyProps) {
     return preset.references[kind] > 0
   })
 
+  const handleClick = (event: MouseEvent<HTMLButtonElement>): void => {
+    props.onPick(event.currentTarget)
+  }
+
   return (
     <button
       type="button"
-      onClick={props.onPick}
+      onClick={handleClick}
       className="flex min-h-30 w-full flex-col items-center justify-center rounded-2xl border border-dashed border-divider bg-surface p-4"
     >
       <span className="mb-3 flex">
