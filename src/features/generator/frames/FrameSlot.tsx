@@ -8,9 +8,7 @@ import type { KindExtensions } from '@/core/media-kinds'
 import { getPreset } from '@/core/presets'
 import type { UploadItem } from '@/core/schemas/upload-item'
 import { extensionsFromLimits, openMediaPicker } from '@/features/media-picker/picker/store'
-import { useDropUpload } from '@/features/media-picker/uploads/use-drop-upload'
 import { openPreview, type PreviewActions } from '@/features/preview/preview-store'
-import { cn } from '@/lib/cn'
 import { Tooltip } from '@/ui/Tooltip'
 
 import { useGeneratorStore } from '../store/store'
@@ -177,16 +175,7 @@ function openFramePreview(params: OpenFramePreviewParams): void {
   openPreview({ items, index, actions })
 }
 
-/** Sets the slot from the first uploaded file. */
-function setFrameFromUploads(slot: FrameSlotName, items: UploadItem[]): void {
-  const [item] = items
-
-  if (!isNil(item)) {
-    useGeneratorStore.getState().setFrame(slot, item)
-  }
-}
-
-/** One frame drop slot with preview, replace and remove actions. */
+/** One frame slot with preview, replace and remove actions. */
 export function FrameSlot(props: FrameSlotProps) {
   const { slot, disabled: isDisabled = false, disabledReason } = props
 
@@ -213,18 +202,6 @@ export function FrameSlot(props: FrameSlotProps) {
   )
 
   const extensions = extensionsFromLimits(preset.referenceLimits)
-
-  const handleUploaded = (items: UploadItem[]): void => {
-    setFrameFromUploads(slot, items)
-  }
-
-  const { dragging: isDragging, dropProps } = useDropUpload({
-    id: `frame-${slot}`,
-    enabled: !isDisabled,
-    kinds: ['image'],
-    extensions,
-    onUploaded: handleUploaded,
-  })
 
   const hasFrame = Boolean(frameId)
   const { isBroken, isPreviewable } = frameState({ hasFrame, upload })
@@ -269,18 +246,16 @@ export function FrameSlot(props: FrameSlotProps) {
 
   return (
     <Tooltip content={slotTooltip({ isBroken, isDisabled, disabledReason })}>
-      <span className={cn('block w-full', isDragging && 'ring-1 ring-lime/40')} {...dropProps}>
-        <FrameSlotCard
-          label={LABELS[slot]}
-          upload={upload}
-          hasFrame={hasFrame}
-          isBroken={isBroken}
-          isPreviewable={isPreviewable}
-          isDisabled={isDisabled}
-          onPress={handleSlotPress}
-          onRemove={handleRemoveClick}
-        />
-      </span>
+      <FrameSlotCard
+        label={LABELS[slot]}
+        upload={upload}
+        hasFrame={hasFrame}
+        isBroken={isBroken}
+        isPreviewable={isPreviewable}
+        isDisabled={isDisabled}
+        onPress={handleSlotPress}
+        onRemove={handleRemoveClick}
+      />
     </Tooltip>
   )
 }

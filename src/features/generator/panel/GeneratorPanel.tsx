@@ -18,7 +18,7 @@ import { useGeneratorStore } from '../store/store'
 import { ModeTabs } from './ModeTabs'
 import { SettingsRow } from './SettingsRow'
 import { usePanelDraft } from './use-panel-draft'
-import { usePanelPaste, useUploadsRefresh } from './use-panel-uploads'
+import { useUploadsRefresh } from './use-panel-uploads'
 
 const emptySubscribe = () => {
   return noop
@@ -43,7 +43,6 @@ export function GeneratorPanel() {
   })
 
   const { validation, isKeyMissing, isSecretsFailed } = usePanelDraft()
-  const { handlePaste } = usePanelPaste()
   const isReady = validation.ok && !isSecretsFailed
   const { price, listPrice, discount, isLoading: isPriceLoading } = usePanelPrice(isReady)
   const { generate, isGenerating } = useGenerate()
@@ -65,10 +64,7 @@ export function GeneratorPanel() {
   const Body = tab === 'frames' ? FrameSlots : ReferencesBox
 
   return (
-    <div
-      className="flex max-h-full min-h-0 flex-col overflow-hidden rounded-panel"
-      onPaste={handlePaste}
-    >
+    <div className="flex max-h-full min-h-0 flex-col overflow-hidden rounded-panel">
       <div
         id="generator-panel"
         data-generator-panel

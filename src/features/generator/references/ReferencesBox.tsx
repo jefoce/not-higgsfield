@@ -1,7 +1,6 @@
 'use client'
 
 import { isEmpty, sumBy } from 'lodash-es'
-import { toast } from 'sonner'
 
 import type { KindExtensions } from '@/core/media-kinds'
 import { MEDIA_KINDS, type MediaKind } from '@/core/media-types'
@@ -12,9 +11,6 @@ import {
   openMediaPicker,
   type PickerCandidate,
 } from '@/features/media-picker/picker/store'
-import { UploadProgressTile } from '@/features/media-picker/uploads/UploadProgressTile'
-import { useDropUpload } from '@/features/media-picker/uploads/use-drop-upload'
-import { useUploadQueue } from '@/features/media-picker/uploads/use-upload-queue'
 
 import { addBlockReason, referenceRoom } from '../reference-rules'
 import { useGeneratorStore } from '../store/store'
@@ -104,14 +100,6 @@ export function ReferencesBox() {
     return state.uploadsById
   })
 
-  const addReferences = useGeneratorStore((state) => {
-    return state.addReferences
-  })
-
-  const queue = useUploadQueue(addReferences, (message) => {
-    return toast.error(message)
-  })
-
   const room = referenceRoom({ preset, references, uploadsById })
 
   const kinds = MEDIA_KINDS.filter((kind) => {
@@ -122,52 +110,13 @@ export function ReferencesBox() {
     return room[kind]
   })
 
-  const dropKinds = MEDIA_KINDS.filter((kind) => {
-    return room[kind] > 0
-  })
-
   const handlePick = (): void => {
     openReferencesPicker({ kinds, extensions })
   }
 
-  const { dragging: isDragging, dropProps } = useDropUpload({
-    id: 'references',
-    enabled: true,
-    kinds: dropKinds,
-    extensions,
-    onUploaded: addReferences,
-    onFiles: queue.enqueue,
-  })
-
   if (references.length > 0) {
-    return (
-      <ReferencesGrid
-        preset={preset}
-        extensions={extensions}
-        max={max}
-        queue={queue}
-        dropProps={dropProps}
-        isDragging={isDragging}
-        onPick={handlePick}
-      />
-    )
+    return <ReferencesGrid preset={preset} extensions={extensions} max={max} onPick={handlePick} />
   }
 
-  return (
-    <>
-      {queue.items.length > 0 && (
-        <div className="mb-2 grid grid-cols-4 gap-2">
-          {queue.items.map((item) => {
-            return <UploadProgressTile key={item.id} item={item} />
-          })}
-        </div>
-      )}
-      <ReferencesEmpty
-        preset={preset}
-        dropProps={dropProps}
-        dragging={isDragging}
-        onPick={handlePick}
-      />
-    </>
-  )
+  return <ReferencesEmpty preset={preset} onPick={handlePick} />
 }

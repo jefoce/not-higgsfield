@@ -3,7 +3,11 @@
 import { type ReactNode, useRef } from 'react'
 
 import { GeneratorPanel } from '@/features/generator/panel/GeneratorPanel'
+import { useGeneratorStore } from '@/features/generator/store/store'
 import { HistorySection } from '@/features/history/list/HistorySection'
+import { routeFiles } from '@/features/media-input/route-files'
+import { useWindowFileInput } from '@/features/media-input/use-window-file-input'
+import { WindowDropOverlay } from '@/features/media-input/WindowDropOverlay'
 import { MediaPicker } from '@/features/media-picker/picker/MediaPicker'
 import { MediaPreviewModal } from '@/features/preview/MediaPreviewModal'
 import type { PreviewItem } from '@/features/preview/preview-store'
@@ -19,12 +23,23 @@ function renderPreviewToolbar(item: PreviewItem): ReactNode {
   return <ViewerUseButton target={{ kind: 'upload', upload: item }} />
 }
 
+function handleWindowFiles(files: File[]): void {
+  void routeFiles(files)
+}
+
 /** Two-column studio shell: generate panel left, history right. */
 export function Studio() {
   usePointerBlur()
   useUpdateCheck()
 
   const panelRef = useRef<HTMLElement>(null)
+  const { isDragging } = useWindowFileInput({ onFiles: handleWindowFiles })
+
+  const tab = useGeneratorStore((state) => {
+    return state.tab
+  })
+
+  const hint = tab === 'references' ? 'as references' : 'as start frame'
 
   return (
     <>
@@ -39,6 +54,7 @@ export function Studio() {
           <HistorySection />
         </section>
       </main>
+      <WindowDropOverlay isDragging={isDragging} hint={hint} />
       <MediaPicker anchorRef={panelRef} />
       <MediaPreviewModal toolbar={renderPreviewToolbar} />
       <SettingsModal appSection={<AppSection />} />
