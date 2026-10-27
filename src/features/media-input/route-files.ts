@@ -8,6 +8,7 @@ import { MEDIA_KINDS, type MediaKind } from '@/core/media-types'
 import { getPreset } from '@/core/presets'
 import { referenceSlots } from '@/core/prompt-tokens'
 import type { UploadItem } from '@/core/schemas/upload-item'
+import { addBlockReason, referenceRoom } from '@/features/generator/reference-rules'
 import { useGeneratorStore } from '@/features/generator/store/store'
 import {
   closeMediaPicker,
@@ -21,12 +22,47 @@ import { toastError } from '@/lib/notify'
 
 import { linkDroppedPaths } from './link-dropped'
 
+/** Adds the references that fit, reporting every new upload that did not. */
+function addToReferences(items: UploadItem[]): void {
+  const state = useGeneratorStore.getState()
+  const preset = getPreset(state.presetId)
+  const before = state.references
+  const room = referenceRoom({ preset, references: before, uploadsById: state.uploadsById })
+
+  const offered = uniqBy(items, 'id').filter((item) => {
+    return !before.includes(item.id)
+  })
+
+  let reason: string | null = null
+
+  for (const item of offered) {
+    const blocked = addBlockReason({ kind: item.kind, room, preset })
+
+    if (!isNil(blocked)) {
+      reason ??= blocked
+
+      continue
+    }
+
+    room[item.kind] -= 1
+  }
+
+  state.addReferences(items)
+
+  const added = useGeneratorStore.getState().references.length - before.length
+  const missing = offered.length - added
+
+  if (missing > 0 && !isNil(reason)) {
+    reportSkipped({ count: missing, reason })
+  }
+}
+
 /** Attaches uploads to the active tab. */
 function route(items: UploadItem[]): void {
   const state = useGeneratorStore.getState()
 
   if (state.tab === 'references') {
-    state.addReferences(items)
+    addToReferences(items)
 
     return
   }

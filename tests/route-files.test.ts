@@ -113,6 +113,49 @@ describe('routeFiles', () => {
     expect(useGeneratorStore.getState().references).toContain(added.id)
   })
 
+  it('adds what fits and reports the rest of a dropped batch', async () => {
+    const existing = images(7)
+
+    const dropped = Array.from({ length: 5 }, (_, index) => {
+      return upload(`image-${index + 8}`, 'image')
+    })
+
+    useGeneratorStore.setState({
+      references: existing.map((item) => {
+        return item.id
+      }),
+      uploadsById: uploadsOf(...existing),
+    })
+
+    vi.mocked(uploadFiles).mockResolvedValue(dropped)
+
+    await routeFiles([png, png, png, png, png])
+
+    expect(useGeneratorStore.getState().references).toHaveLength(9)
+    expect(toast.skipped).toHaveBeenCalledTimes(1)
+    expect(toast.skipped).toHaveBeenCalledWith('Skipped 3 files (Reference limit reached)')
+  })
+
+  it('does not count an already attached id as skipped', async () => {
+    const attached = upload('image-attached', 'image')
+    const existing = [attached, ...images(6)]
+    const fresh = [upload('image-8', 'image'), upload('image-9', 'image')]
+
+    useGeneratorStore.setState({
+      references: existing.map((item) => {
+        return item.id
+      }),
+      uploadsById: uploadsOf(...existing),
+    })
+
+    vi.mocked(uploadFiles).mockResolvedValue([attached, ...fresh])
+
+    await routeFiles([png, png, png])
+
+    expect(useGeneratorStore.getState().references).toHaveLength(9)
+    expect(toast.skipped).not.toHaveBeenCalled()
+  })
+
   it('sets the start frame from an image in the frames tab', async () => {
     const frame = upload('frame-1', 'image')
 
