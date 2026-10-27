@@ -184,7 +184,7 @@ Dependabot opens one grouped monthly pull request for npm, cargo and GitHub Acti
 - `useChainKeys` (`src/lib/use-chain-keys.ts`) maps left and right arrows to previous and next. `lib/dialog-keys.ts` lets a key act only inside the topmost `[role="dialog"]` or `[role="alertdialog"]`, and ignores inputs, textareas, selects, editors, sliders and the alt, ctrl and meta modifiers.
 - The history details viewer keeps its record in `features/history/list/history-viewer-store.ts` (`selectedId`, `open`, `close`, `navigate`, not persisted). `closeViewers()` closes the preview and that viewer.
 - `ZoomLayer` (`src/ui/ZoomLayer.tsx`) adds wheel, pinch and key zoom to images only. Its scale, offset and fit math lives in `zoom-math.ts`.
-- A video player starts after a one second stay (`AUTOPLAY_DELAY_MS`) and shows its poster until playback starts.
+- A video player starts after a half second stay (`AUTOPLAY_DELAY_MS`) and shows its poster until playback starts.
 
 ## 13. Picker
 
