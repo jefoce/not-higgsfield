@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react'
 
-import { cn } from '@/lib/cn'
-
 interface MediaBoxProps {
   aspect: string
   children: ReactNode
@@ -20,17 +18,20 @@ function aspectValue(aspect: string): number {
 
 /**
  * Box sized from a media aspect, so the stage backdrop shows around it.
+ * Container units fit it to the stage in both directions.
  * @public
  */
 export function MediaBox(props: MediaBoxProps) {
   const { aspect, children } = props
-  const sizeClass = aspectValue(aspect) >= 1 ? 'w-full' : 'h-full'
+
+  const style = {
+    aspectRatio: ratioOf(aspect),
+    width: `min(100cqw, calc(100cqh * ${aspectValue(aspect)}))`,
+    height: 'auto',
+  }
 
   return (
-    <div
-      style={{ aspectRatio: ratioOf(aspect) }}
-      className={cn('max-h-full max-w-full overflow-hidden rounded-xl', sizeClass)}
-    >
+    <div style={style} className="max-h-full max-w-full overflow-hidden rounded-xl">
       <div className="size-full">{children}</div>
     </div>
   )

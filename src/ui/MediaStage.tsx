@@ -61,7 +61,10 @@ export function MediaStage(props: MediaStageProps) {
 
       <div aria-hidden className="absolute inset-0 -z-10 bg-black/45" />
 
-      <div className="relative flex size-full min-h-0 items-center justify-center p-4">
+      <div
+        style={{ containerType: 'size' }}
+        className="relative flex size-full min-h-0 items-center justify-center p-4"
+      >
         {children}
       </div>
 

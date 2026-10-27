@@ -21,18 +21,27 @@ function box(aspect: string): HTMLElement {
 }
 
 describe('MediaBox', () => {
-  it('fills the width for a wide aspect and keeps the ratio', () => {
-    const element = box('16:9')
+  // jsdom folds the ratio calc into a single container unit.
+  it('sizes a square box to the smaller stage side', () => {
+    const element = box('1/1')
 
-    expect(element.className).toContain('w-full')
-    expect(element.style.aspectRatio).toBe('16/9')
+    expect(element.style.width).toBe('min(100cqw, 100cqh)')
+    expect(element.style.aspectRatio).toBe('1/1')
+    expect(element.style.height).toBe('auto')
   })
 
-  it('fills the height for a tall aspect', () => {
-    const element = box('9/16')
+  it('sizes a wide aspect from the stage height', () => {
+    const element = box('2/1')
 
-    expect(element.classList.contains('h-full')).toBe(true)
+    expect(element.style.width).toBe('min(100cqw, 200cqh)')
     expect(element.classList.contains('w-full')).toBe(false)
+  })
+
+  it('sizes a tall aspect from the stage width', () => {
+    const element = box('1/2')
+
+    expect(element.style.width).toBe('min(100cqw, 50cqh)')
+    expect(element.classList.contains('h-full')).toBe(false)
   })
 
   it('clips the media inside a rounded, bounded box', () => {

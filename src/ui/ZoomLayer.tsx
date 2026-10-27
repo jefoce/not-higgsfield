@@ -207,7 +207,7 @@ export function ZoomLayer(props: ZoomLayerProps) {
     >
       <div
         ref={contentRef}
-        style={{ transform, transformOrigin }}
+        style={{ transform, transformOrigin, containerType: 'size' }}
         className={cn(
           'relative flex size-full items-center justify-center',
           zoom.isAnimated && 'transition-transform duration-150 motion-reduce:transition-none',
