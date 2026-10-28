@@ -6,8 +6,7 @@ import { REMOTE_LINK_TTL_SEC, REMOTE_MAX_GB } from '@/core/constants'
 import type { UploadItem, UploadRemote } from '@/core/schemas/upload-item'
 
 import { RemoteCapError } from '../errors'
-import { updateUpload } from '../repos/upload-record'
-import { listUploads } from '../repos/uploads'
+import { listUploadRecords, updateUpload } from '../repos/upload-record'
 import type { ObjectStore } from '../storage/types'
 
 interface RemoteUpload extends UploadItem {
@@ -54,8 +53,7 @@ export function trackedRemoteBytes(uploads: UploadItem[]): number {
 /** Deletes the oldest expired keys until the new object fits under the cap. */
 export async function makeRoom(params: MakeRoomParams): Promise<void> {
   const { store, bytes, keepKey } = params
-  // No lock: two parallel uploads may both pass, the 2 GB headroom covers it.
-  const uploads = await listUploads()
+  const uploads = await listUploadRecords()
   const listing = await listedSizes(store)
   let tracked = currentBytes(listing, uploads)
 

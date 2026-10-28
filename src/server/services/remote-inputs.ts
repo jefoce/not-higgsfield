@@ -9,12 +9,12 @@ import type { UploadItem, UploadRemote } from '@/core/schemas/upload-item'
 
 import { globalState } from '../global-state'
 import { uploadPaths } from '../paths'
-import { updateUpload } from '../repos/upload-record'
-import { listUploads } from '../repos/uploads'
+import { listUploadRecords, updateUpload } from '../repos/upload-record'
 import { secretsReady } from '../secrets'
 import { type FileHash, hashFile } from '../storage/hash'
 import { getObjectStore } from '../storage/registry'
 import type { ObjectInfo, ObjectStore, ProgressCallback } from '../storage/types'
+import { withLock } from '../sync/lock'
 import { deleteRemoteGroup, makeRoom, remoteKeyGroups } from './remote-cap'
 
 interface SweepResult {
@@ -78,17 +78,19 @@ export async function ensureRemote(params: EnsureRemoteParams): Promise<UploadIt
     })
   }
 
-  await makeRoom({ store: remoteStore, bytes: digest.size, keepKey: key })
+  const stored = await withLock('remoteCap', async () => {
+    await makeRoom({ store: remoteStore, bytes: digest.size, keepKey: key })
 
-  const stored = await putOnce({
-    store: remoteStore,
-    key,
-    file: media,
-    opts: {
-      contentType: upload.mime,
-      sha256: digest.sha256Base64,
-      onProgress,
-    },
+    return putOnce({
+      store: remoteStore,
+      key,
+      file: media,
+      opts: {
+        contentType: upload.mime,
+        sha256: digest.sha256Base64,
+        onProgress,
+      },
+    })
   })
 
   return saveRemote(upload.id, {
@@ -124,7 +126,7 @@ export async function sweepRemote(store?: ObjectStore): Promise<SweepResult> {
     return { deleted: 0, cleared: 0 }
   }
 
-  const uploads = await listUploads()
+  const uploads = await listUploadRecords()
   const groups = remoteKeyGroups(uploads)
 
   const cutoff = Date.now() - REMOTE_UNUSED_DAYS * 86_400_000
