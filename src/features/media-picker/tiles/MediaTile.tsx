@@ -19,7 +19,6 @@ export interface MediaTileProps {
   disabled?: boolean
   disabledReason?: string
   missing?: boolean
-  thumbVersion?: string | number
   onDelete?: () => void
   onSelect: () => void
   onPreview?: () => void
@@ -35,14 +34,13 @@ export function MediaTile(props: MediaTileProps) {
     disabled: isDisabled,
     disabledReason,
     missing: isMissing,
-    thumbVersion,
   } = props
 
   const isBlocked = isMissing === true || isDisabled === true
   const tooltip = isDisabled === true ? disabledReason : undefined
   const isAudio = item.kind === 'audio'
   const isPreviewable = item.kind === 'image' || item.kind === 'video'
-  const thumbSrc = thumbUrl({ ref: mediaRef, w: undefined, version: thumbVersion })
+  const thumbSrc = thumbUrl({ ref: mediaRef })
   const mediaSrc = mediaUrl(mediaRef, item.mime)
 
   return (
