@@ -16,6 +16,7 @@ import {
 import type { MediaKind } from '@/core/media-types'
 
 import { HttpError } from '../errors'
+import { removeOwnedFile } from '../fs/json-file'
 import { THUMBS_DIR } from '../paths'
 import { createLimiter } from '../sync/limiter'
 import { extractPosterFrame } from './poster-frame'
@@ -225,7 +226,7 @@ async function collectThumbs(params: CollectThumbsParams): Promise<CollectedThum
     }
 
     if (stats.mtimeMs < cutoff) {
-      await fs.unlink(file).catch(() => {})
+      await removeOwnedFile(file)
       removed += 1
       continue
     }
@@ -252,7 +253,7 @@ async function trimThumbs(params: TrimThumbsParams): Promise<number> {
       break
     }
 
-    await fs.unlink(item.file).catch(() => {})
+    await removeOwnedFile(item.file)
     total -= item.size
     removed += 1
   }

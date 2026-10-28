@@ -9,6 +9,7 @@ import { isNil } from 'lodash-es'
 import { FFMPEG_TIMEOUTS } from '@/core/constants'
 import type { MediaKind } from '@/core/media-types'
 
+import { removeOwnedFile } from '../fs/json-file'
 import { COMPAT_DIR } from '../paths'
 import { createLimiter } from '../sync/limiter'
 import { withLock } from '../sync/lock'
@@ -118,7 +119,7 @@ export async function sweepCompatFiles(): Promise<number> {
       continue
     }
 
-    await fs.unlink(file).catch(() => {})
+    await removeOwnedFile(file)
     removed += 1
   }
 
