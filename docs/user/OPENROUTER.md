@@ -31,9 +31,11 @@ Press **Create** and copy the key. It starts with `sk-or-v1-`.
 
 ## 3. Optional: a management key for your balance
 
-Without it the wallet pill shows what is left of the key's credit limit. With it, the pill shows your whole account balance.
+The management key is optional. This app only reads from it: the one call is `/api/v1/credits`, and the only thing it unlocks is your account balance in the wallet pill. Without it, that balance is simply unavailable.
 
-Open **Account → [Management Keys](https://openrouter.ai/settings/management-keys) → New Key**, give it a name and an expiration, and press **Create**.
+A spend-limited API key already reports what is left of its limit through `/api/v1/key`, and the app shows that by default. The management key only matters when you want the whole account balance.
+
+On OpenRouter a management key can create and delete API keys. Keep it private and paste it only into the app. Open **Account → [Management Keys](https://openrouter.ai/settings/management-keys) → New Key**, give it a name and an expiration, and press **Create**.
 
 <img src="../images/openrouter-mgmt-key.png" width="720" alt="OpenRouter Create a Management Key dialog">
 

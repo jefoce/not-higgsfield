@@ -15,10 +15,10 @@ export const OPENROUTER_DESCRIPTOR = {
     },
     {
       name: 'OPENROUTER_MANAGEMENT_KEY',
-      label: 'Management key',
+      label: 'Management key (optional)',
       placeholder: '',
       isSecret: true,
-      hint: 'optional, shows balance',
+      hint: 'Optional. It can create and delete API keys, but this app only reads the balance with it.',
     },
   ],
   requiredSecrets: ['OPENROUTER_API_KEY'],

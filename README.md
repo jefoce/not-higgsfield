@@ -163,7 +163,7 @@ To back up or move to a new computer, copy the whole folder, then enter your key
 
 ## Costs and privacy
 
-- Not Higgsfield is free and adds no fee. The wallet pill shows what is left of your key's credit limit, or your account balance when you add a management key.
+- Not Higgsfield is free and adds no fee. The wallet pill shows what is left of your key's credit limit, or your account balance when you add a management key. The management key is optional and read-only in this app.
 - No account, no tracking, no server of ours. Keys stay in your system keychain.
 - Your text and pictures go to OpenRouter and the model's provider. Video and sound references go to your own R2 bucket as private links that expire after 2 hours.
 - R2 stays inside Cloudflare's free tier, see [the R2 guide](docs/user/CLOUDFLARE-R2.md).
