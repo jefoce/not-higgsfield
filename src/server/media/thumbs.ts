@@ -7,7 +7,6 @@ import path from 'node:path'
 import { clamp, sortBy, sumBy } from 'lodash-es'
 
 import {
-  PREVIEW_AT_SEC,
   THUMB_TOUCH_MS,
   THUMB_UNUSED_DAYS,
   THUMB_WIDTH,
@@ -19,7 +18,7 @@ import type { MediaKind } from '@/core/media-types'
 import { HttpError } from '../errors'
 import { THUMBS_DIR } from '../paths'
 import { createLimiter } from '../sync/limiter'
-import { extractFrame } from './ffmpeg'
+import { extractPosterFrame } from './poster-frame'
 import sharp from './sharp'
 
 class ThumbUnavailableError extends HttpError {
@@ -135,7 +134,7 @@ async function renderVideo(params: RenderVideoParams): Promise<Buffer> {
   const frame = path.join(THUMBS_DIR, `${hash}.${randomUUID()}.tmp.png`)
 
   try {
-    await extractFrame({ videoPath: absPath, atSec: PREVIEW_AT_SEC, width, outPath: frame })
+    await extractPosterFrame({ videoPath: absPath, width, outPath: frame })
 
     return await sharp(frame).webp({ quality: 78 }).toBuffer()
   } finally {
