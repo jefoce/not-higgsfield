@@ -2,31 +2,25 @@
 
 ## 0.3.1 - unreleased
 
-Fewer paid jobs lost, a real R2 cap, and thumbnails that recover.
+Fewer lost paid videos, a real R2 cap, and thumbnails that recover.
 
 ### Added
 
-- Retry download on a failed record while OpenRouter still has the copy, so it does not charge again.
-- Settings says when the OpenRouter key has no spend limit.
+- Retry download on a video whose download failed, while OpenRouter still has the copy. No new charge.
+- Settings warns when your OpenRouter key has no spend limit.
 
 ### Changed
 
-- Deletes are limited to files inside the app storage folder.
-- The app page sends a Content Security Policy.
-- Secret listeners register once at startup (internal, no user action).
+- The R2 cap counts everything in the bucket and removes leftover files the app no longer uses, so it stays under 10 GB.
+- The app only ever deletes its own files inside its storage folder.
 
 ### Fixed
 
-- A finished video is fetched with the provider job id, so the download works even when the fallback link is missing.
-- A submit cut off by a timeout or network error during Sending says the job may exist, instead of reporting a plain timeout.
-- The R2 cap counts the real bucket and removes untracked objects, so it holds near 10 GB.
-- One R2 cap check at a time, so two large uploads cannot both pass.
-- Thumbnails retry twice before showing a placeholder.
-- Video posters for very short clips fall back to the first frame.
-- Thumbnails revalidate instead of being cached for a year, so an edited linked file shows the new image.
-- The active count clears when the running job is filtered out or on another page.
-- Deleting an upload checks running jobs under the same lock.
-- Escape in a delete confirm keeps the history selection.
+- Finished videos download reliably, even when OpenRouter sends no backup link.
+- A submit cut off during Sending warns that the job may exist, so you don't pay twice.
+- Thumbnails retry before showing a placeholder, short clips get a poster, and edited linked files show their new thumbnail.
+- The "generating" count clears when the running video is filtered out or on another page.
+- Escape in a delete confirm no longer clears your selection.
 
 ## 0.3.0 - 2026-10-27
 
