@@ -39,11 +39,6 @@ interface DownloadQueue {
   diskFullAt: Map<string, number>
 }
 
-interface DownloadParams {
-  record: GenerationRecord
-  job: JobSnapshot
-}
-
 const DISK_FULL = 'Disk is full. Free some space, the download retries every minute.'
 const DISK_FULL_RETRY_MS = 60_000
 
@@ -196,19 +191,39 @@ async function completeDownload(params: CompleteDownloadParams): Promise<void> {
   downloads.failures.delete(record.id)
   downloads.diskFullAt.delete(record.id)
   const preview = await makePreview({ id: record.id, video, out: previewPath })
+  const output = await buildOutput({ record, video, preview })
+
+  await saveGeneration({
+    ...record,
+    download: undefined,
+    status: 'completed',
+    output,
+    error: undefined,
+  })
+}
+
+interface BuildOutputParams {
+  record: GenerationRecord
+  video: string
+  preview: string | undefined
+}
+
+/**
+ * Stored output for a finished download.
+ * A probe or stat failure drops the field, it does not fail the download.
+ */
+async function buildOutput(params: BuildOutputParams): Promise<RecordOutput> {
+  const { record, video, preview } = params
 
   const probe = await probeMedia(video).catch(() => {
     return null
   })
 
-  const bytes = await fs
-    .stat(video)
-    .then((stat) => {
-      return stat.size
-    })
-    .catch(() => {
-      return null
-    })
+  const stat = await fs.stat(video).catch(() => {
+    return null
+  })
+
+  const bytes = stat?.size
 
   const output: RecordOutput = {
     video: `${record.id}.mp4`,
@@ -234,13 +249,7 @@ async function completeDownload(params: CompleteDownloadParams): Promise<void> {
     output.bytes = bytes
   }
 
-  await saveGeneration({
-    ...record,
-    download: undefined,
-    status: 'completed',
-    output,
-    error: undefined,
-  })
+  return output
 }
 
 /** Counts the failure and fails the record after the retry budget. */
@@ -265,7 +274,7 @@ async function saveRetry(record: GenerationRecord, error: unknown): Promise<void
   })
 }
 
-async function download(params: DownloadParams): Promise<void> {
+async function download(params: DownloadTask): Promise<void> {
   const { record } = params
   const paths = downloadPaths(record.id)
   const response = await openContent(params)
@@ -291,7 +300,7 @@ async function download(params: DownloadParams): Promise<void> {
   }
 }
 
-async function openContent(params: DownloadParams): Promise<Response> {
+async function openContent(params: DownloadTask): Promise<Response> {
   const { record, job } = params
   const jobId = record.job?.id
   const submittedAt = record.job?.submittedAt ?? ''
