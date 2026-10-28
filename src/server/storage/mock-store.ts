@@ -2,11 +2,12 @@ import 'server-only'
 
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
 import { once } from 'node:events'
-import { createReadStream, createWriteStream } from 'node:fs'
+import { createReadStream, createWriteStream, type Dirent } from 'node:fs'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
 
+import { isNil } from 'lodash-es'
 import { z } from 'zod'
 
 import { REMOTE_MOCK_MBPS } from '@/core/constants'
@@ -16,7 +17,7 @@ import { readJson, removeFile } from '../fs/json-file'
 import { globalState } from '../global-state'
 import { MOCK_REMOTE_PREFIX } from '../local-url'
 import { STORAGE_ROOT } from '../paths'
-import type { ObjectInfo, ObjectStore, PutObjectParams } from './types'
+import type { ListedObject, ObjectInfo, ObjectStore, PutObjectParams } from './types'
 
 const MockMetaSchema = z.object({
   size: z.number(),
@@ -82,9 +83,63 @@ export function createMockStore(): ObjectStore {
       await Promise.all([removeFile(objectPath(key)), removeFile(metaPath(key))])
     },
 
+    async *list(prefix: string): AsyncIterable<ListedObject> {
+      const root = mockDir()
+      const dir = mockObjectPath(prefix)
+
+      if (isNil(dir)) {
+        return
+      }
+
+      yield* walkMock({ dir, root })
+    },
+
     async testConnection(): Promise<TestResult> {
       return { ok: true, mock: true }
     },
+  }
+}
+
+interface WalkMockParams {
+  dir: string
+  root: string
+}
+
+/** Walks the mock dir, skipping the .json metadata sidecars. */
+async function* walkMock(params: WalkMockParams): AsyncIterable<ListedObject> {
+  const { dir, root } = params
+  const entries = await readDir(dir)
+
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name)
+
+    if (entry.isDirectory()) {
+      yield* walkMock({ dir: full, root })
+
+      continue
+    }
+
+    if (!entry.isFile() || entry.name.endsWith('.json')) {
+      continue
+    }
+
+    const stats = await fs.stat(full)
+    const meta = await readJson(`${full}.json`, MockMetaSchema)
+    const key = path.relative(root, full).split(path.sep).join('/')
+
+    yield {
+      key,
+      size: meta?.size ?? stats.size,
+      lastModified: stats.mtimeMs,
+    }
+  }
+}
+
+async function readDir(dir: string): Promise<Dirent[]> {
+  try {
+    return await fs.readdir(dir, { withFileTypes: true })
+  } catch {
+    return []
   }
 }
 

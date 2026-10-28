@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { groupBy, isNil, sortBy, sumBy } from 'lodash-es'
+import { groupBy, isNil, sortBy, sum, sumBy } from 'lodash-es'
 
 import { REMOTE_LINK_TTL_SEC, REMOTE_MAX_GB } from '@/core/constants'
 import type { UploadItem, UploadRemote } from '@/core/schemas/upload-item'
@@ -56,7 +56,8 @@ export async function makeRoom(params: MakeRoomParams): Promise<void> {
   const { store, bytes, keepKey } = params
   // No lock: two parallel uploads may both pass, the 2 GB headroom covers it.
   const uploads = await listUploads()
-  let tracked = trackedRemoteBytes(uploads)
+  const listing = await listedSizes(store)
+  let tracked = currentBytes(listing, uploads)
 
   if (tracked + bytes <= CAP_BYTES) {
     return
@@ -90,12 +91,43 @@ export async function makeRoom(params: MakeRoomParams): Promise<void> {
     }
 
     await deleteRemoteGroup(store, items)
-    tracked -= first.remote.size
+    tracked -= evictedBytes(listing, first)
   }
 
   if (tracked + bytes > CAP_BYTES) {
     throw new RemoteCapError()
   }
+}
+
+/** Listed size per key under refs/, or null when the store cannot list. */
+async function listedSizes(store: ObjectStore): Promise<Map<string, number> | null> {
+  const list = store.list?.bind(store)
+
+  if (isNil(list)) {
+    return null
+  }
+
+  const sizes = new Map<string, number>()
+
+  for await (const object of list('refs/')) {
+    sizes.set(object.key, object.size)
+  }
+
+  return sizes
+}
+
+function currentBytes(listing: Map<string, number> | null, uploads: UploadItem[]): number {
+  if (isNil(listing)) {
+    return trackedRemoteBytes(uploads)
+  }
+
+  return sum([...listing.values()])
+}
+
+function evictedBytes(listing: Map<string, number> | null, item: RemoteUpload): number {
+  const size = listing?.get(item.remote.key)
+
+  return size ?? item.remote.size
 }
 
 /** Deletes one key's object and clears every upload record that shares it. */

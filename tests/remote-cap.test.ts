@@ -124,6 +124,8 @@ describe('makeRoom', () => {
       lastUsedAt: daysAgo(1),
     })
 
+    seedBucket({ store, keys: ['refs/old.png', 'refs/mid.png', 'refs/newer.png'], size: 2 * GIB })
+
     const tracked = trackedRemoteBytes(await listUploads())
 
     await makeRoom({ store, bytes: CAP_BYTES - tracked + 1, keepKey: 'refs/incoming.png' })
@@ -144,6 +146,8 @@ describe('makeRoom', () => {
       lastUsedAt: hoursAgo(1),
     })
 
+    seedBucket({ store, keys: ['refs/recent.png'], size: 2 * GIB })
+
     await expect(
       makeRoom({ store, bytes: CAP_BYTES + 1, keepKey: 'refs/incoming.png' }),
     ).rejects.toBeInstanceOf(RemoteCapError)
@@ -156,6 +160,8 @@ describe('makeRoom', () => {
     const store = new FakeStore()
 
     await makeRecord({ key: 'refs/old.png', size: GIB, lastUsedAt: daysAgo(40) })
+
+    seedBucket({ store, keys: ['refs/old.png'], size: GIB })
 
     const error: unknown = await makeRoom({
       store,
@@ -175,6 +181,31 @@ describe('makeRoom', () => {
 
     expect(friendly.title).toBe('Cloud storage is full.')
     expect(friendly.hint).toContain('Try again later, or use shorter clips.')
+  })
+})
+
+describe('makeRoom with listing', () => {
+  it('makes room from the bucket listing when records undercount', async () => {
+    const store = new FakeStore()
+
+    const old = await makeRecord({
+      key: 'refs/old.png',
+      size: 2 * GIB,
+      lastUsedAt: daysAgo(10),
+    })
+
+    store.seed({
+      key: 'refs/old.png',
+      size: 9 * GIB,
+      lastModified: Date.now(),
+    })
+
+    expect(trackedRemoteBytes(await listUploads())).toBe(2 * GIB)
+
+    await makeRoom({ store, bytes: 1, keepKey: 'refs/incoming.png' })
+
+    expect(store.deleted).toEqual(['refs/old.png'])
+    expect((await getUpload(old.id))?.remote).toBeUndefined()
   })
 })
 
@@ -215,8 +246,70 @@ describe('sweepRemote', () => {
     expect((await getUpload(oldSingle.id))?.remote).toBeUndefined()
     expect((await getUpload(kept.id))?.remote?.key).toBe('refs/kept.png')
   })
+
+  it('deletes an untracked object older than the link TTL', async () => {
+    const store = new FakeStore()
+
+    store.seed({
+      key: 'refs/orphan.png',
+      size: 10,
+      lastModified: Date.now() - REMOTE_LINK_TTL_SEC * 1000 - 60_000,
+    })
+
+    const result = await sweepRemote(store)
+
+    expect(result).toEqual({ deleted: 1, cleared: 0 })
+    expect(store.deleted).toEqual(['refs/orphan.png'])
+  })
+
+  it('keeps a fresh untracked object', async () => {
+    const store = new FakeStore()
+
+    store.seed({ key: 'refs/fresh.png', size: 10, lastModified: Date.now() })
+
+    const result = await sweepRemote(store)
+
+    expect(result).toEqual({ deleted: 0, cleared: 0 })
+    expect(store.deleted).toEqual([])
+  })
+
+  it('keeps a referenced object older than the link TTL', async () => {
+    const store = new FakeStore()
+
+    const kept = await makeRecord({
+      key: 'refs/kept.png',
+      size: 10,
+      lastUsedAt: daysAgo(1),
+    })
+
+    store.seed({
+      key: 'refs/kept.png',
+      size: 10,
+      lastModified: Date.now() - REMOTE_LINK_TTL_SEC * 1000 - 60_000,
+    })
+
+    const result = await sweepRemote(store)
+
+    expect(result).toEqual({ deleted: 0, cleared: 0 })
+    expect(store.deleted).toEqual([])
+    expect((await getUpload(kept.id))?.remote?.key).toBe('refs/kept.png')
+  })
 })
 
 function makeRecord(params: RecordParams): Promise<UploadItem> {
   return saveUploadItem(remoteUpload(params))
+}
+
+interface SeedBucketParams {
+  store: FakeStore
+  keys: string[]
+  size: number
+}
+
+function seedBucket(params: SeedBucketParams): void {
+  const { store, keys, size } = params
+
+  for (const key of keys) {
+    store.seed({ key, size, lastModified: Date.now() })
+  }
 }

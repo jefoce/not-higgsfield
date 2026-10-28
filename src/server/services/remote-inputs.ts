@@ -128,6 +128,7 @@ export async function sweepRemote(store?: ObjectStore): Promise<SweepResult> {
   const groups = remoteKeyGroups(uploads)
 
   const cutoff = Date.now() - REMOTE_UNUSED_DAYS * 86_400_000
+  const swept = new Set<string>()
   let deleted = 0
   let cleared = 0
 
@@ -145,11 +146,62 @@ export async function sweepRemote(store?: ObjectStore): Promise<SweepResult> {
 
     const result = await deleteRemoteGroup(remoteStore, items)
 
+    swept.add(first.remote.key)
     deleted += result.deleted
     cleared += result.cleared
   }
 
+  const referenced = new Set(
+    Object.keys(groups).filter((key) => {
+      return !swept.has(key)
+    }),
+  )
+
+  deleted += await deleteOrphans({ store: remoteStore, referenced, skip: swept })
+
   return { deleted, cleared }
+}
+
+interface OrphanSweepParams {
+  store: ObjectStore
+  referenced: Set<string>
+  skip: Set<string>
+}
+
+/** Deletes refs/ objects no record points at, older than the link TTL. */
+async function deleteOrphans(params: OrphanSweepParams): Promise<number> {
+  const { store, referenced, skip } = params
+  const list = store.list?.bind(store)
+
+  if (isNil(list)) {
+    return 0
+  }
+
+  const cutoff = Date.now() - REMOTE_LINK_TTL_SEC * 1000
+  let deleted = 0
+
+  try {
+    for await (const object of list('refs/')) {
+      if (referenced.has(object.key) || skip.has(object.key)) {
+        continue
+      }
+
+      if (object.lastModified > cutoff) {
+        continue
+      }
+
+      try {
+        await store.delete(object.key)
+        deleted += 1
+      } catch {
+        // A failed delete leaves the object for the next sweep.
+      }
+    }
+  } catch {
+    // A failed listing keeps the retention result and retries next sweep.
+  }
+
+  return deleted
 }
 
 /** One put per key at a time. Later callers wait for the first. */

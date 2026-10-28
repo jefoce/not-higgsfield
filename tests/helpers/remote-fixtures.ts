@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 
 import type { UploadItem } from '@/core/schemas/upload-item'
 import type {
+  ListedObject,
   ObjectInfo,
   ObjectStore,
   PresignParams,
@@ -19,6 +20,7 @@ export interface RecordParams {
 export class FakeStore implements ObjectStore {
   readonly id = 'r2'
   readonly objects = new Map<string, ObjectInfo>()
+  readonly listed = new Map<string, ListedObject>()
   readonly deleted: string[] = []
 
   async head(key: string): Promise<ObjectInfo | null> {
@@ -30,6 +32,7 @@ export class FakeStore implements ObjectStore {
     const info = { key, size: 1, serverSha256: sha256 }
 
     this.objects.set(key, info)
+    this.listed.set(key, { key, size: 1, lastModified: Date.now() })
 
     return info
   }
@@ -38,9 +41,22 @@ export class FakeStore implements ObjectStore {
     return `mock://${params.key}`
   }
 
+  async *list(prefix: string): AsyncIterable<ListedObject> {
+    for (const object of this.listed.values()) {
+      if (object.key.startsWith(prefix)) {
+        yield object
+      }
+    }
+  }
+
+  seed(object: ListedObject): void {
+    this.listed.set(object.key, object)
+  }
+
   async delete(key: string): Promise<void> {
     this.deleted.push(key)
     this.objects.delete(key)
+    this.listed.delete(key)
   }
 
   async testConnection(): Promise<{ ok: boolean }> {

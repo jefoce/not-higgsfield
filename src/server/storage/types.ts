@@ -11,6 +11,12 @@ export interface ObjectInfo {
   serverSha256: string | null
 }
 
+export interface ListedObject {
+  key: string
+  size: number
+  lastModified: number
+}
+
 export interface PutObjectParams {
   key: string
   file: string
@@ -32,4 +38,5 @@ export interface ObjectStore {
   presign(params: PresignParams): Promise<string>
   delete(key: string): Promise<void>
   testConnection(): Promise<TestResult>
+  list?(prefix: string): AsyncIterable<ListedObject>
 }
