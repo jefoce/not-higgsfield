@@ -22,6 +22,7 @@ export class FakeStore implements ObjectStore {
   readonly objects = new Map<string, ObjectInfo>()
   readonly listed = new Map<string, ListedObject>()
   readonly deleted: string[] = []
+  listCalls = 0
 
   async head(key: string): Promise<ObjectInfo | null> {
     return this.objects.get(key) ?? null
@@ -42,6 +43,8 @@ export class FakeStore implements ObjectStore {
   }
 
   async *list(prefix: string): AsyncIterable<ListedObject> {
+    this.listCalls += 1
+
     for (const object of this.listed.values()) {
       if (object.key.startsWith(prefix)) {
         yield object

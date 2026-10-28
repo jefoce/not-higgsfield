@@ -26,6 +26,7 @@ interface DeleteRemoteResult {
 
 export interface DeleteOrphansParams {
   store: ObjectStore
+  objects?: ListedObject[]
   referenced: Set<string>
   skip?: Set<string>
   total?: number
@@ -67,16 +68,18 @@ export function trackedRemoteBytes(uploads: UploadItem[]): number {
 export async function makeRoom(params: MakeRoomParams): Promise<void> {
   const { store, bytes, keepKey } = params
   const uploads = await listUploadRecords()
-  const listing = await listedSizes(store)
+  const objects = await listRefs(store)
+  const listing = sizeByKey(objects)
   let tracked = currentBytes(listing, uploads)
 
   if (tracked + bytes <= CAP_BYTES) {
     return
   }
 
-  if (!isNil(listing)) {
+  if (!isNil(objects)) {
     const orphans = await deleteOrphans({
       store,
+      objects,
       referenced: new Set(Object.keys(remoteKeyGroups(uploads))),
       skip: new Set([keepKey]),
       total: tracked,
@@ -131,8 +134,8 @@ export async function makeRoom(params: MakeRoomParams): Promise<void> {
  * Stops once the running total reaches targetBytes, oldest first.
  */
 export async function deleteOrphans(params: DeleteOrphansParams): Promise<DeletedOrphans> {
-  const { store, referenced, skip = new Set(), total = 0, targetBytes } = params
-  const eligible = await collectOrphans({ store, referenced, skip })
+  const { store, objects, referenced, skip = new Set(), total = 0, targetBytes } = params
+  const eligible = await collectOrphans({ store, objects, referenced, skip })
 
   const ordered = sortBy(eligible, (object) => {
     return object.lastModified
@@ -143,39 +146,56 @@ export async function deleteOrphans(params: DeleteOrphansParams): Promise<Delete
 
 interface CollectOrphansParams {
   store: ObjectStore
+  objects?: ListedObject[]
   referenced: Set<string>
   skip: Set<string>
 }
 
 /** Eligible refs/ objects. A listing failure keeps the objects already read. */
 async function collectOrphans(params: CollectOrphansParams): Promise<ListedObject[]> {
-  const { store, referenced, skip } = params
+  const { store, objects, referenced, skip } = params
+
+  if (!isNil(objects)) {
+    return filterOrphans({ objects, referenced, skip })
+  }
+
   const list = store.list?.bind(store)
 
   if (isNil(list)) {
     return []
   }
 
-  const cutoff = Date.now() - REMOTE_LINK_TTL_SEC * 1000
-  const eligible: ListedObject[] = []
+  const listed: ListedObject[] = []
 
   try {
     for await (const object of list('refs/')) {
-      if (referenced.has(object.key) || skip.has(object.key)) {
-        continue
-      }
-
-      if (object.lastModified > cutoff) {
-        continue
-      }
-
-      eligible.push(object)
+      listed.push(object)
     }
   } catch {
     // A failed listing still processes the objects it returned.
   }
 
-  return eligible
+  return filterOrphans({ objects: listed, referenced, skip })
+}
+
+interface FilterOrphansParams {
+  objects: ListedObject[]
+  referenced: Set<string>
+  skip: Set<string>
+}
+
+/** Applies the referenced, skip and link TTL rules to a listed set. */
+function filterOrphans(params: FilterOrphansParams): ListedObject[] {
+  const { objects, referenced, skip } = params
+  const cutoff = Date.now() - REMOTE_LINK_TTL_SEC * 1000
+
+  return objects.filter((object) => {
+    if (referenced.has(object.key) || skip.has(object.key)) {
+      return false
+    }
+
+    return object.lastModified <= cutoff
+  })
 }
 
 interface DeleteCollectedParams {
@@ -208,17 +228,31 @@ async function deleteCollected(params: DeleteCollectedParams): Promise<DeletedOr
   return { count, bytes }
 }
 
-/** Listed size per key under refs/, or null when the store cannot list. */
-async function listedSizes(store: ObjectStore): Promise<Map<string, number> | null> {
+/** Every object under refs/, or null when the store cannot list. */
+async function listRefs(store: ObjectStore): Promise<ListedObject[] | null> {
   const list = store.list?.bind(store)
 
   if (isNil(list)) {
     return null
   }
 
-  const sizes = new Map<string, number>()
+  const objects: ListedObject[] = []
 
   for await (const object of list('refs/')) {
+    objects.push(object)
+  }
+
+  return objects
+}
+
+function sizeByKey(objects: ListedObject[] | null): Map<string, number> | null {
+  if (isNil(objects)) {
+    return null
+  }
+
+  const sizes = new Map<string, number>()
+
+  for (const object of objects) {
     sizes.set(object.key, object.size)
   }
 

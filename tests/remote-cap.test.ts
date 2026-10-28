@@ -1,3 +1,5 @@
+/* eslint-disable max-lines -- the cap and sweep cases stay in one suite */
+
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
@@ -218,6 +220,32 @@ describe('makeRoom with listing', () => {
     await makeRoom({ store, bytes: GIB, keepKey: 'refs/incoming.png' })
 
     expect([store.deleted, store.listed.has('refs/fresh.png')]).toEqual([['refs/old-a.png'], true])
+  })
+
+  it('lists the bucket once when evicting expired orphans', async () => {
+    const store = new FakeStore()
+    const past = Date.now() - 40 * 86_400_000
+
+    store.seed({ key: 'refs/old-a.png', size: 2 * GIB, lastModified: past })
+    store.seed({ key: 'refs/old-b.png', size: 2 * GIB, lastModified: past + 1 })
+    store.seed({ key: 'refs/old-c.png', size: 2 * GIB, lastModified: past + 2 })
+    store.seed({ key: 'refs/old-d.png', size: 2 * GIB, lastModified: past + 3 })
+
+    await makeRoom({ store, bytes: GIB, keepKey: 'refs/incoming.png' })
+
+    expect(store.listCalls).toBe(1)
+    expect(store.deleted).toEqual(['refs/old-a.png'])
+  })
+
+  it('lists the bucket once and deletes nothing under the cap', async () => {
+    const store = new FakeStore()
+
+    store.seed({ key: 'refs/old.png', size: GIB, lastModified: Date.now() - 40 * 86_400_000 })
+
+    await makeRoom({ store, bytes: GIB, keepKey: 'refs/incoming.png' })
+
+    expect(store.listCalls).toBe(1)
+    expect(store.deleted).toEqual([])
   })
 })
 
