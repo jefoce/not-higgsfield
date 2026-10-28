@@ -20,6 +20,8 @@ Open **Workspace â†’ [API Keys](https://openrouter.ai/workspaces/default/keys) â
 - **Expiration:** shorter is safer, for example 30 days. When it ends, create a new key (this step) and paste it again.
 - **Credit limit:** **Custom amount**, for example `5`. The key stops at $5 in total until you raise the limit. Set **Reset limit every** to Monthly if you want a fresh $5 each month.
 
+Use a dedicated key for this app, with its own spend limit, rather than a key you share with other tools.
+
 Press **Create** and copy the key. It starts with `sk-or-v1-`.
 
 <img src="../images/openrouter-api-key.png" width="720" alt="OpenRouter New Key dialog with name, expiration and credit limit">
