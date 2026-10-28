@@ -27,10 +27,22 @@ afterEach(() => {
 })
 
 describe('KeyLimitHint', () => {
-  it('shows the hint when the key has no spend limit', () => {
-    render(<KeyLimitHint credits={credits({})} />)
+  it('shows the hint when a key is loaded and has no spend limit', () => {
+    render(<KeyLimitHint credits={credits({ source: 'key', keyLimit: null })} />)
 
     expect(screen.getByText(HINT)).toBeTruthy()
+  })
+
+  it('hides the hint when there is no key', () => {
+    render(<KeyLimitHint credits={credits({ source: 'none' })} />)
+
+    expect(screen.queryByText(HINT)).toBeNull()
+  })
+
+  it('hides the hint for the mock account', () => {
+    render(<KeyLimitHint credits={credits({ source: 'mock' })} />)
+
+    expect(screen.queryByText(HINT)).toBeNull()
   })
 
   it('hides the hint when the key has a spend limit', () => {
