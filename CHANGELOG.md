@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.3.1 - unreleased
+
 ## 0.3.0 - 2026-10-27
 
 A roomier viewer with zoom, a live docked picker, paste and drop anywhere, and one copy per file.
