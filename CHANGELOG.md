@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.1 - unreleased
+## 0.3.1 - 2026-10-29
 
 Fewer lost paid videos, a real R2 cap, and thumbnails that recover.
 
