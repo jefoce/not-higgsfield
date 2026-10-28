@@ -5,8 +5,10 @@ import path from 'node:path'
 import { isNil } from 'lodash-es'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { GenerationRecord } from '@/core/schemas/generation-record'
 import type { removeOwnedFile as RemoveOwnedFile } from '@/server/fs/json-file'
 import type * as Folders from '@/server/repos/folders'
+import type * as Generations from '@/server/repos/generations'
 import type * as Uploads from '@/server/services/uploads'
 
 vi.mock('server-only', () => {
@@ -22,6 +24,7 @@ process.env.STORAGE_ROOT = ROOT
 
 let removeOwnedFile: typeof RemoveOwnedFile
 let folders: typeof Folders
+let generations: typeof Generations
 let uploads: typeof Uploads
 
 beforeAll(async () => {
@@ -32,6 +35,7 @@ beforeAll(async () => {
 
   ;({ removeOwnedFile } = await import('@/server/fs/json-file'))
   folders = await import('@/server/repos/folders')
+  generations = await import('@/server/repos/generations')
   uploads = await import('@/server/services/uploads')
 })
 
@@ -60,6 +64,43 @@ async function exists(file: string): Promise<boolean> {
       return false
     },
   )
+}
+
+function makeActiveRecord(uploadId: string): GenerationRecord {
+  const now = new Date().toISOString()
+
+  return {
+    id: randomUUID(),
+    createdAt: now,
+    updatedAt: now,
+    status: 'pending',
+    provider: 'openrouter',
+    input: {
+      presetId: 'seedance-2.0',
+      tab: 'references',
+      prompt: '',
+      audio: false,
+      duration: 4,
+      aspectRatio: 'auto',
+      resolution: '720p',
+      frames: { start: null, end: null },
+      references: [uploadId],
+      seed: null,
+    },
+    preset: { id: 'seedance-2.0', title: 'Seedance', slug: 'seedance' },
+    inputsSnapshot: {},
+    seedUsed: null,
+    favorite: false,
+    cost: {
+      currency: 'USD',
+      pricePerSec: 0,
+      priceSource: 'mock',
+      estimatedUsd: 0,
+      actualUsd: null,
+      isByok: null,
+      billed: null,
+    },
+  }
 }
 
 describe('removeOwnedFile', () => {
@@ -118,6 +159,21 @@ describe('upload delete safety', () => {
     await uploads.removeUpload(item.id)
 
     expect(await exists(target)).toBe(true)
+  })
+
+  it('refuses to delete an upload used by a running generation', async () => {
+    const target = path.join(OUTSIDE, 'busy.png')
+
+    await fs.writeFile(target, 'not really a png')
+
+    const item = await uploads.createLinkUpload({ absPath: target })
+
+    await generations.saveGeneration(makeActiveRecord(item.id))
+
+    await expect(uploads.removeUpload(item.id)).rejects.toThrow('Used by a running generation')
+
+    expect(await exists(path.join(UPLOADS, `${item.id}${item.ext}`))).toBe(true)
+    expect(await exists(path.join(UPLOADS, `${item.id}.json`))).toBe(true)
   })
 })
 
