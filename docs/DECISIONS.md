@@ -8,13 +8,13 @@ Why: upload records can go missing while their objects stay in the bucket. The l
 
 Rejected: trusting only the upload records, which misses orphaned objects.
 
-## 2026-10-28 - R2 bucket is dedicated and has a lifecycle backstop
+## 2026-10-28 - R2 bucket is dedicated to one computer and has a lifecycle backstop
 
-Decision: the R2 bucket holds only this app's objects. The guide asks the user to add a lifecycle rule that deletes `refs/` objects after 30 days. The app never sets the rule, because its token usually has object permissions only.
+Decision: one computer uses the R2 bucket, and the bucket holds only this app's objects. The guide asks the user to add a lifecycle rule that deletes `refs/` objects after 30 days. The app never sets the rule, because its token usually has object permissions only.
 
-Why: the 8 GB cap counts only objects the app tracks. Other files would share the 10 GB free tier, and the app would not delete them. The app cleans up only while it runs, so the rule is a backstop when it is never opened again.
+Why: the cap and the cleanup only know this computer's records. Another computer's objects look unreferenced, so each side deletes the other's unused objects and uploads them again on the next use. The app stays correct, only traffic and storage churn is wasted. Files outside `refs/` never get deleted and count against the 10 GB free tier. The app cleans up only while it runs, so the rule is a backstop when it is never opened again.
 
-Rejected: sharing a bucket with other files, and an app-managed lifecycle rule that needs bucket administration permissions.
+Rejected: sharing a bucket between computers or with other files, and an app-managed lifecycle rule that needs bucket administration permissions.
 
 ## 2026-10-27 - Live picker selection and docked panel
 

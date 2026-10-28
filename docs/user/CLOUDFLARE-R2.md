@@ -78,7 +78,7 @@ The app deletes references it has not used for 30 days while it runs. A lifecycl
 
 Open your bucket, then **Settings**, then **Object lifecycle rules**. Add a rule for the `refs/` prefix with a 30 day delete.
 
-Keep this bucket for the app only. Other files count against the 10 GB free tier, and the app does not manage or delete them.
+Keep this bucket for one computer. The app deletes objects that its own records do not reference, so two computers sharing a bucket delete each other's unused objects and upload them again on the next use. The app stays correct, only traffic and storage use is wasted. Other files count against the 10 GB free tier, and the app does not manage or delete them.
 
 The app does not set the rule itself, because the token usually only has object permissions.
 
