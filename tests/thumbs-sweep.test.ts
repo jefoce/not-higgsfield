@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 
 import { isNil } from 'lodash-es'
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { THUMB_UNUSED_DAYS } from '@/core/constants'
 import type { sweepThumbs as SweepThumbs } from '@/server/media/thumbs'
@@ -41,6 +41,10 @@ afterAll(async () => {
   } else {
     process.env.STORAGE_ROOT = PREVIOUS_ROOT
   }
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
 })
 
 /** Thumb names are content hashes, so the guard accepts them. */
@@ -85,5 +89,45 @@ describe('sweepThumbs', () => {
 
     expect(await sweepThumbs({ dir, maxBytes: 100, targetBytes: 60 })).toBe(2)
     expect(await names()).toEqual([thumbName('c')])
+  })
+
+  it('keeps files the app does not own and counts only owned removals', async () => {
+    const old = (THUMB_UNUSED_DAYS + 1) * DAY_MS
+
+    await writeThumb(thumbName('a'), 10, old)
+    await fs.writeFile(path.join(dir, '.DS_Store'), 'junk')
+    const at = new Date(Date.now() - old)
+
+    await fs.utimes(path.join(dir, '.DS_Store'), at, at)
+
+    expect(await sweepThumbs({ dir })).toBe(1)
+    expect(await names()).toEqual(['.DS_Store'])
+  })
+
+  it('keeps going when one unlink fails', async () => {
+    const old = (THUMB_UNUSED_DAYS + 1) * DAY_MS
+
+    await writeThumb(thumbName('a'), 10, old)
+    await writeThumb(thumbName('b'), 10, old)
+
+    const failing = path.join(dir, thumbName('a'))
+    const realUnlink = fs.unlink.bind(fs)
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    vi.spyOn(fs, 'unlink').mockImplementation(async (file) => {
+      if (file === failing) {
+        const error: NodeJS.ErrnoException = new Error('EPERM: operation not permitted')
+
+        error.code = 'EPERM'
+
+        throw error
+      }
+
+      await realUnlink(file)
+    })
+
+    expect(await sweepThumbs({ dir })).toBe(1)
+    expect(await names()).toEqual([thumbName('a')])
+    expect(warn).toHaveBeenCalled()
   })
 })

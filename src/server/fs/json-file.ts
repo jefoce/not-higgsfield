@@ -103,6 +103,13 @@ export async function removeFile(file: string): Promise<void> {
   }
 }
 
+/** True when the basename matches a name the app writes: a UUID or a content hash. */
+export function isOwnedName(name: string): boolean {
+  const base = path.basename(name)
+
+  return UUID_NAME.test(base) || HASH_NAME.test(base)
+}
+
 /** Deletes an app-owned file inside STORAGE_ROOT. Missing counts as success. */
 export async function removeOwnedFile(file: string): Promise<void> {
   const root = path.resolve(STORAGE_ROOT)
@@ -112,9 +119,7 @@ export async function removeOwnedFile(file: string): Promise<void> {
     throw new Error('Refusing to delete outside storage')
   }
 
-  const name = path.basename(resolved)
-
-  if (!UUID_NAME.test(name) && !HASH_NAME.test(name)) {
+  if (!isOwnedName(resolved)) {
     throw new Error('Refusing to delete a file the app does not own')
   }
 

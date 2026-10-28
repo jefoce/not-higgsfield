@@ -16,7 +16,7 @@ import {
 import type { MediaKind } from '@/core/media-types'
 
 import { HttpError } from '../errors'
-import { removeOwnedFile } from '../fs/json-file'
+import { isOwnedName, removeOwnedFile } from '../fs/json-file'
 import { THUMBS_DIR } from '../paths'
 import { createLimiter } from '../sync/limiter'
 import { extractPosterFrame } from './poster-frame'
@@ -215,6 +215,10 @@ async function collectThumbs(params: CollectThumbsParams): Promise<CollectedThum
       continue
     }
 
+    if (!isOwnedName(entry.name)) {
+      continue
+    }
+
     const file = path.join(dir, entry.name)
 
     const stats = await fs.stat(file).catch(() => {
@@ -226,8 +230,12 @@ async function collectThumbs(params: CollectThumbsParams): Promise<CollectedThum
     }
 
     if (stats.mtimeMs < cutoff) {
-      await removeOwnedFile(file)
-      removed += 1
+      const didRemove = await removeThumb(file)
+
+      if (didRemove) {
+        removed += 1
+      }
+
       continue
     }
 
@@ -235,6 +243,19 @@ async function collectThumbs(params: CollectThumbsParams): Promise<CollectedThum
   }
 
   return { files, removed }
+}
+
+/** Removes one thumb without letting a single failure stop the sweep. */
+async function removeThumb(file: string): Promise<boolean> {
+  try {
+    await removeOwnedFile(file)
+
+    return true
+  } catch (error) {
+    console.warn('[not-higgsfield] thumb cleanup failed', error)
+
+    return false
+  }
 }
 
 interface TrimThumbsParams {
@@ -253,9 +274,16 @@ async function trimThumbs(params: TrimThumbsParams): Promise<number> {
       break
     }
 
-    await removeOwnedFile(item.file)
-    total -= item.size
-    removed += 1
+    if (!isOwnedName(item.file)) {
+      continue
+    }
+
+    const didRemove = await removeThumb(item.file)
+
+    if (didRemove) {
+      total -= item.size
+      removed += 1
+    }
   }
 
   return removed

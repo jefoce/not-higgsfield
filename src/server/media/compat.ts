@@ -9,7 +9,7 @@ import { isNil } from 'lodash-es'
 import { FFMPEG_TIMEOUTS } from '@/core/constants'
 import type { MediaKind } from '@/core/media-types'
 
-import { removeOwnedFile } from '../fs/json-file'
+import { isOwnedName, removeOwnedFile } from '../fs/json-file'
 import { COMPAT_DIR } from '../paths'
 import { createLimiter } from '../sync/limiter'
 import { withLock } from '../sync/lock'
@@ -109,6 +109,10 @@ export async function sweepCompatFiles(): Promise<number> {
       continue
     }
 
+    if (!isOwnedName(entry.name)) {
+      continue
+    }
+
     const file = path.join(COMPAT_DIR, entry.name)
 
     const stats = await fs.stat(file).catch(() => {
@@ -119,11 +123,27 @@ export async function sweepCompatFiles(): Promise<number> {
       continue
     }
 
-    await removeOwnedFile(file)
-    removed += 1
+    const didRemove = await removeCompatFile(file)
+
+    if (didRemove) {
+      removed += 1
+    }
   }
 
   return removed
+}
+
+/** Removes one compat file without letting a single failure stop the sweep. */
+async function removeCompatFile(file: string): Promise<boolean> {
+  try {
+    await removeOwnedFile(file)
+
+    return true
+  } catch (error) {
+    console.warn('[not-higgsfield] compat cleanup failed', error)
+
+    return false
+  }
 }
 
 interface ConvertOrMarkFailedParams {
