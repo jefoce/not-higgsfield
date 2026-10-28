@@ -293,11 +293,16 @@ async function download(params: DownloadParams): Promise<void> {
 
 async function openContent(params: DownloadParams): Promise<Response> {
   const { record, job } = params
+  const jobId = record.job?.id
   const submittedAt = record.job?.submittedAt ?? ''
 
   try {
+    if (!isNonEmptyString(jobId)) {
+      throw new Error('Missing provider job id')
+    }
+
     return await getVideoProvider(record.provider).fetchContent({
-      job: { jobId: record.id, submittedAt },
+      job: { jobId, submittedAt },
       index: 0,
       fallback: record.input,
     })
