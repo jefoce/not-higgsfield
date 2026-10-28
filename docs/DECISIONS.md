@@ -1,5 +1,13 @@
 # Decisions
 
+## 2026-10-28 - R2 bucket is dedicated and has a lifecycle backstop
+
+Decision: the R2 bucket holds only this app's objects. The guide asks the user to add a lifecycle rule that deletes `refs/` objects after 30 days. The app never sets the rule, because its token usually has object permissions only.
+
+Why: the 8 GB cap counts only objects the app tracks. Other files would share the 10 GB free tier, and the app would not delete them. The app cleans up only while it runs, so the rule is a backstop when it is never opened again.
+
+Rejected: sharing a bucket with other files, and an app-managed lifecycle rule that needs bucket administration permissions.
+
 ## 2026-10-27 - Live picker selection and docked panel
 
 Decision: the picker has no Add confirm step and no local selection. Toggle mode adds or removes through the opener. Folder files link on click and match an attached upload by `target`. The panel docks beside the references or frames box, fixed height, vertically centered, and closes on any click outside that box. A request carries an `openerKey`: the same key keeps the open request, a different key replaces it.

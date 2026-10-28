@@ -72,6 +72,16 @@ You do not need "Your API Token" or the S3 endpoint. The app builds the endpoint
 
 Press the gear icon, find **Cloudflare R2**, fill in Account ID, Access key ID, Secret access key and Bucket, press **Save**, then **Test**. Settings then shows how much the app stores, for example `Stored 0 B of 8 GB`.
 
+## 6. Add a lifecycle rule
+
+The app deletes references it has not used for 30 days while it runs. A lifecycle rule deletes anything left under `refs/` after 30 days even if the app is never opened again. It is a backstop and does not replace the 8 GB cap.
+
+Open your bucket, then **Settings**, then **Object lifecycle rules**. Add a rule for the `refs/` prefix with a 30 day delete.
+
+Keep this bucket for the app only. Other files count against the 10 GB free tier, and the app does not manage or delete them.
+
+The app does not set the rule itself, because the token usually only has object permissions.
+
 ## What it costs
 
 | Each month | Free | Above the free tier |
