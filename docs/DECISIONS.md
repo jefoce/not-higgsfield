@@ -1,5 +1,13 @@
 # Decisions
 
+## 2026-10-28 - R2 cap reads the bucket listing under a lock
+
+Decision: `makeRoom` counts the listed `refs/` objects when the store can list, and falls back to the tracked upload sizes. It shares one `remoteCap` lock with the put. The sweep also deletes untracked `refs/` objects older than `REMOTE_LINK_TTL_SEC`.
+
+Why: upload records can go missing while their objects stay in the bucket. The listing keeps the cap true, and the lock keeps two puts from both passing it.
+
+Rejected: trusting only the upload records, which misses orphaned objects.
+
 ## 2026-10-28 - R2 bucket is dedicated and has a lifecycle backstop
 
 Decision: the R2 bucket holds only this app's objects. The guide asks the user to add a lifecycle rule that deletes `refs/` objects after 30 days. The app never sets the rule, because its token usually has object permissions only.
@@ -161,6 +169,8 @@ Decision: `REMOTE_MAX_GB` is 8. A put that would pass the cap first removes the 
 Why: Cloudflare has no hard spend cap and needs a card. Tracking the app's own objects keeps usage under the free 10 GB.
 
 Rejected: listing the bucket to measure usage, and a lock per put. Two parallel uploads may both pass, and the 2 GB headroom covers that.
+
+Superseded in 0.3.1 for the listing and lock parts, see 2026-10-28 - R2 cap reads the bucket listing under a lock.
 
 ## 2026-10-25 - User guides in `docs/user`, linked from Settings
 
