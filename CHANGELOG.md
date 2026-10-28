@@ -2,6 +2,32 @@
 
 ## 0.3.1 - unreleased
 
+Fewer paid jobs lost, a real R2 cap, and thumbnails that recover.
+
+### Added
+
+- Retry download on a failed record while OpenRouter still has the copy, so it does not charge again.
+- Settings says when the OpenRouter key has no spend limit.
+
+### Changed
+
+- Deletes are limited to files inside the app storage folder.
+- The app page sends a Content Security Policy.
+- Secret listeners register once at startup (internal, no user action).
+
+### Fixed
+
+- A finished video is fetched with the provider job id, so the download works even when the fallback link is missing.
+- A submit cut off by a timeout or network error during Sending says the job may exist, instead of reporting a plain timeout.
+- The R2 cap counts the real bucket and removes untracked objects, so it holds near 10 GB.
+- One R2 cap check at a time, so two large uploads cannot both pass.
+- Thumbnails retry twice before showing a placeholder.
+- Video posters for very short clips fall back to the first frame.
+- Thumbnails revalidate instead of being cached for a year, so an edited linked file shows the new image.
+- The active count clears when the running job is filtered out or on another page.
+- Deleting an upload checks running jobs under the same lock.
+- Escape in a delete confirm keeps the history selection.
+
 ## 0.3.0 - 2026-10-27
 
 A roomier viewer with zoom, a live docked picker, paste and drop anywhere, and one copy per file.
