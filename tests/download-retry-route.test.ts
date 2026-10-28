@@ -148,3 +148,32 @@ describe('POST /api/generations/[id]/download', () => {
     expect(queueDownload).not.toHaveBeenCalled()
   })
 })
+
+describe('POST /api/generations/[id]/download for a provider failure', () => {
+  it('returns 409 without queueing another download', async () => {
+    const id = randomUUID()
+
+    await storeRecord(
+      storedRecord(id, {
+        status: 'failed',
+        error: 'Provider error: job expired',
+        job: {
+          id: 'or-job-4242',
+          submittedAt: SUBMITTED_AT,
+          expiresAt: Date.now() + 60_000,
+        },
+      }),
+    )
+
+    const response = await POST(retryRequest(id), context(id))
+
+    expect(response.status).toBe(409)
+
+    expect(await response.json()).toEqual({
+      error: 'This generation did not fail while downloading',
+    })
+
+    expect(queueDownload).not.toHaveBeenCalled()
+    expect((await getGeneration(id))?.status).toBe('failed')
+  })
+})

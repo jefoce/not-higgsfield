@@ -199,6 +199,7 @@ async function completeDownload(params: CompleteDownloadParams): Promise<void> {
     status: 'completed',
     output,
     error: undefined,
+    downloadFailed: undefined,
   })
 }
 
@@ -259,19 +260,17 @@ async function saveRetry(record: GenerationRecord, error: unknown): Promise<void
   downloads.failures.set(record.id, count)
   const message = error instanceof Error ? error.message : 'Download failed'
   const isFailed = count >= MAX_DOWNLOAD_RETRIES
+  const failedRecord = { ...record, download: undefined, error: `Download failed: ${message}` }
 
   if (isFailed) {
     downloads.failures.delete(record.id)
+
+    await saveGeneration({ ...failedRecord, status: 'failed', downloadFailed: true })
+
+    return
   }
 
-  const status = isFailed ? 'failed' : 'in_progress'
-
-  await saveGeneration({
-    ...record,
-    download: undefined,
-    status,
-    error: `Download failed: ${message}`,
-  })
+  await saveGeneration({ ...failedRecord, status: 'in_progress' })
 }
 
 async function download(params: DownloadTask): Promise<void> {

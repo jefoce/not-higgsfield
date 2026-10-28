@@ -62,6 +62,34 @@ describe('Retry download button', () => {
     expect(screen.getByRole('button', { name: 'Retry download' })).not.toBeNull()
   })
 
+  it('is absent when the record failed outside the download', () => {
+    render(
+      <StatusOverlay
+        record={failedRecord({
+          error: 'Provider error: job expired',
+          downloadFailed: false,
+          job: { id: 'or-job-4242', submittedAt: SUBMITTED_AT },
+        })}
+      />,
+    )
+
+    expect(screen.queryByRole('button', { name: 'Retry download' })).toBeNull()
+  })
+
+  it('shows for a legacy record whose error text says the download failed', () => {
+    render(
+      <StatusOverlay
+        record={failedRecord({
+          error: 'Download failed: gone',
+          downloadFailed: undefined,
+          job: { id: 'or-job-4242', submittedAt: SUBMITTED_AT },
+        })}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Retry download' })).not.toBeNull()
+  })
+
   it('is absent when the provider copy expired', () => {
     render(
       <StatusOverlay

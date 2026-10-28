@@ -2,6 +2,7 @@ import 'server-only'
 
 import { isNil } from 'lodash-es'
 
+import { isDownloadFailure } from '@/core/download-failure'
 import { isNonEmptyString } from '@/core/guards'
 import type { GenerationRecord } from '@/core/schemas/generation-record'
 import { canCancelInGrace } from '@/core/submit-state'
@@ -15,7 +16,8 @@ import { cancelScheduledSubmit } from './submit-queue'
 
 export type DeleteResult = 'deleted' | 'not_found' | 'active'
 
-export type RetryDownloadResult = 'queued' | 'not_found' | 'not_failed' | 'no_job' | 'expired'
+export type RetryDownloadResult =
+  'queued' | 'not_found' | 'not_failed' | 'not_download_failure' | 'no_job' | 'expired'
 
 /** Sets one record's favorite flag under its lock. */
 export function setFavorite(id: string, isFavorite: boolean): Promise<GenerationRecord | null> {
@@ -53,6 +55,11 @@ export function deleteGeneration(id: string): Promise<DeleteResult> {
   })
 }
 
+/** True when the provider copy has an expiry that has passed. */
+function isJobExpired(expiresAt: number | undefined): boolean {
+  return !isNil(expiresAt) && Date.now() > expiresAt
+}
+
 /** Re-queues the provider copy of a failed record, never a paid resubmit. */
 export function retryDownload(id: string): Promise<RetryDownloadResult> {
   return withLock(id, async () => {
@@ -66,13 +73,17 @@ export function retryDownload(id: string): Promise<RetryDownloadResult> {
       return 'not_failed'
     }
 
+    if (!isDownloadFailure(record)) {
+      return 'not_download_failure'
+    }
+
     if (!isNonEmptyString(record.job?.id)) {
       return 'no_job'
     }
 
     const { expiresAt } = record.job
 
-    if (!isNil(expiresAt) && Date.now() > expiresAt) {
+    if (isJobExpired(expiresAt)) {
       return 'expired'
     }
 

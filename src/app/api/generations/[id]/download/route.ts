@@ -18,6 +18,10 @@ export async function POST(request: Request, { params }: IdRouteContext) {
       return jsonError({ status: 409, error: 'Generation has not failed' })
     }
 
+    if (result === 'not_download_failure') {
+      return jsonError({ status: 409, error: 'This generation did not fail while downloading' })
+    }
+
     if (result === 'no_job') {
       return jsonError({ status: 409, error: 'This copy has no provider job' })
     }
