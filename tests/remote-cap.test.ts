@@ -207,6 +207,18 @@ describe('makeRoom with listing', () => {
     expect(store.deleted).toEqual(['refs/old.png'])
     expect((await getUpload(old.id))?.remote).toBeUndefined()
   })
+
+  it('evicts expired untracked objects before tracked keys', async () => {
+    const store = new FakeStore()
+    const keys = ['refs/old-a.png', 'refs/old-b.png', 'refs/old-c.png', 'refs/old-d.png']
+
+    seedBucket({ store, keys, size: 2 * GIB, lastModified: Date.now() - 40 * 86_400_000 })
+    store.seed({ key: 'refs/fresh.png', size: GIB, lastModified: Date.now() })
+
+    await makeRoom({ store, bytes: GIB, keepKey: 'refs/incoming.png' })
+
+    expect([store.deleted, store.listed.has('refs/fresh.png')]).toEqual([['refs/old-a.png'], true])
+  })
 })
 
 describe('sweepRemote', () => {
@@ -304,12 +316,13 @@ interface SeedBucketParams {
   store: FakeStore
   keys: string[]
   size: number
+  lastModified?: number
 }
 
 function seedBucket(params: SeedBucketParams): void {
-  const { store, keys, size } = params
+  const { store, keys, size, lastModified = Date.now() } = params
 
   for (const key of keys) {
-    store.seed({ key, size, lastModified: Date.now() })
+    store.seed({ key, size, lastModified })
   }
 }

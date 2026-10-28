@@ -7,7 +7,7 @@ import type { UploadItem, UploadRemote } from '@/core/schemas/upload-item'
 
 import { RemoteCapError } from '../errors'
 import { listUploadRecords, updateUpload } from '../repos/upload-record'
-import type { ObjectStore } from '../storage/types'
+import type { ListedObject, ObjectStore } from '../storage/types'
 
 interface RemoteUpload extends UploadItem {
   remote: UploadRemote
@@ -22,6 +22,19 @@ interface MakeRoomParams {
 interface DeleteRemoteResult {
   deleted: number
   cleared: number
+}
+
+export interface DeleteOrphansParams {
+  store: ObjectStore
+  referenced: Set<string>
+  skip?: Set<string>
+  total?: number
+  targetBytes?: number
+}
+
+export interface DeletedOrphans {
+  count: number
+  bytes: number
 }
 
 const CAP_BYTES = REMOTE_MAX_GB * 1024 ** 3
@@ -61,6 +74,22 @@ export async function makeRoom(params: MakeRoomParams): Promise<void> {
     return
   }
 
+  if (!isNil(listing)) {
+    const orphans = await deleteOrphans({
+      store,
+      referenced: new Set(Object.keys(remoteKeyGroups(uploads))),
+      skip: new Set([keepKey]),
+      total: tracked,
+      targetBytes: CAP_BYTES - bytes,
+    })
+
+    tracked -= orphans.bytes
+
+    if (tracked + bytes <= CAP_BYTES) {
+      return
+    }
+  }
+
   const cutoff = Date.now() - REMOTE_LINK_TTL_SEC * 1000
 
   const candidates = Object.values(remoteKeyGroups(uploads)).filter((items) => {
@@ -95,6 +124,88 @@ export async function makeRoom(params: MakeRoomParams): Promise<void> {
   if (tracked + bytes > CAP_BYTES) {
     throw new RemoteCapError()
   }
+}
+
+/**
+ * Deletes refs/ objects no record points at, older than the link TTL.
+ * Stops once the running total reaches targetBytes, oldest first.
+ */
+export async function deleteOrphans(params: DeleteOrphansParams): Promise<DeletedOrphans> {
+  const { store, referenced, skip = new Set(), total = 0, targetBytes } = params
+  const eligible = await collectOrphans({ store, referenced, skip })
+
+  const ordered = sortBy(eligible, (object) => {
+    return object.lastModified
+  })
+
+  return deleteCollected({ store, objects: ordered, total, targetBytes })
+}
+
+interface CollectOrphansParams {
+  store: ObjectStore
+  referenced: Set<string>
+  skip: Set<string>
+}
+
+/** Eligible refs/ objects. A listing failure keeps the objects already read. */
+async function collectOrphans(params: CollectOrphansParams): Promise<ListedObject[]> {
+  const { store, referenced, skip } = params
+  const list = store.list?.bind(store)
+
+  if (isNil(list)) {
+    return []
+  }
+
+  const cutoff = Date.now() - REMOTE_LINK_TTL_SEC * 1000
+  const eligible: ListedObject[] = []
+
+  try {
+    for await (const object of list('refs/')) {
+      if (referenced.has(object.key) || skip.has(object.key)) {
+        continue
+      }
+
+      if (object.lastModified > cutoff) {
+        continue
+      }
+
+      eligible.push(object)
+    }
+  } catch {
+    // A failed listing still processes the objects it returned.
+  }
+
+  return eligible
+}
+
+interface DeleteCollectedParams {
+  store: ObjectStore
+  objects: ListedObject[]
+  total: number
+  targetBytes?: number
+}
+
+/** Deletes eligible objects until the running total reaches the target. */
+async function deleteCollected(params: DeleteCollectedParams): Promise<DeletedOrphans> {
+  const { store, objects, total, targetBytes } = params
+  let count = 0
+  let bytes = 0
+
+  for (const object of objects) {
+    if (!isNil(targetBytes) && total - bytes <= targetBytes) {
+      break
+    }
+
+    try {
+      await store.delete(object.key)
+      count += 1
+      bytes += object.size
+    } catch {
+      // A failed delete leaves the object for the next pass.
+    }
+  }
+
+  return { count, bytes }
 }
 
 /** Listed size per key under refs/, or null when the store cannot list. */

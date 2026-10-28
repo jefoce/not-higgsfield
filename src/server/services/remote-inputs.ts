@@ -15,7 +15,7 @@ import { type FileHash, hashFile } from '../storage/hash'
 import { getObjectStore } from '../storage/registry'
 import type { ObjectInfo, ObjectStore, ProgressCallback } from '../storage/types'
 import { withLock } from '../sync/lock'
-import { deleteRemoteGroup, makeRoom, remoteKeyGroups } from './remote-cap'
+import { deleteOrphans, deleteRemoteGroup, makeRoom, remoteKeyGroups } from './remote-cap'
 
 interface SweepResult {
   deleted: number
@@ -159,51 +159,11 @@ export async function sweepRemote(store?: ObjectStore): Promise<SweepResult> {
     }),
   )
 
-  deleted += await deleteOrphans({ store: remoteStore, referenced, skip: swept })
+  const orphans = await deleteOrphans({ store: remoteStore, referenced, skip: swept })
+
+  deleted += orphans.count
 
   return { deleted, cleared }
-}
-
-interface OrphanSweepParams {
-  store: ObjectStore
-  referenced: Set<string>
-  skip: Set<string>
-}
-
-/** Deletes refs/ objects no record points at, older than the link TTL. */
-async function deleteOrphans(params: OrphanSweepParams): Promise<number> {
-  const { store, referenced, skip } = params
-  const list = store.list?.bind(store)
-
-  if (isNil(list)) {
-    return 0
-  }
-
-  const cutoff = Date.now() - REMOTE_LINK_TTL_SEC * 1000
-  let deleted = 0
-
-  try {
-    for await (const object of list('refs/')) {
-      if (referenced.has(object.key) || skip.has(object.key)) {
-        continue
-      }
-
-      if (object.lastModified > cutoff) {
-        continue
-      }
-
-      try {
-        await store.delete(object.key)
-        deleted += 1
-      } catch {
-        // A failed delete leaves the object for the next sweep.
-      }
-    }
-  } catch {
-    // A failed listing keeps the retention result and retries next sweep.
-  }
-
-  return deleted
 }
 
 /** One put per key at a time. Later callers wait for the first. */
