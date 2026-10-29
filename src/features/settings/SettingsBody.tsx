@@ -15,7 +15,7 @@ import { SecretSection } from './SecretSection'
 import type { SettingsSection } from './settings-store'
 import type { SettingsDraft } from './use-settings-draft'
 
-const STORAGE_DESCRIPTION = 'optional, needed for video/audio refs on some models'
+const STORAGE_DESCRIPTION = 'optional: needed for video/audio refs on some models'
 
 interface SettingsBodyProps {
   status: SecretStatus | undefined
