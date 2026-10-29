@@ -44,7 +44,15 @@ export function createMockStore(): ObjectStore {
         return null
       }
 
-      return { key, size: meta.size, serverSha256: meta.serverSha256 }
+      let lastModified = 0
+
+      try {
+        lastModified = (await fs.stat(objectPath(key))).mtimeMs
+      } catch {
+        // A missing file counts as old, so the next use uploads again.
+      }
+
+      return { key, size: meta.size, serverSha256: meta.serverSha256, lastModified }
     },
 
     async put(params: PutObjectParams): Promise<ObjectInfo> {
@@ -64,7 +72,7 @@ export function createMockStore(): ObjectStore {
 
         await fs.writeFile(metaPath(key), JSON.stringify(meta), 'utf8')
 
-        return { key, size, serverSha256: sha256 }
+        return { key, size, serverSha256: sha256, lastModified: Date.now() }
       } catch (error) {
         await Promise.all([removeFile(target), removeFile(metaPath(key))])
 

@@ -9,6 +9,7 @@ export interface ObjectInfo {
   key: string
   size: number
   serverSha256: string | null
+  lastModified: number
 }
 
 export interface ListedObject {

@@ -70,6 +70,7 @@ export function createS3Store(config: S3StoreConfig): ObjectStore {
           key,
           size: res.ContentLength ?? 0,
           serverSha256: res.ChecksumSHA256 ?? null,
+          lastModified: res.LastModified?.getTime() ?? 0,
         }
       } catch (error) {
         if (isNotFound(error)) {
@@ -111,7 +112,12 @@ export function createS3Store(config: S3StoreConfig): ObjectStore {
 
       const res = await upload.done()
 
-      return { key, size: stats.size, serverSha256: res.ChecksumSHA256 ?? null }
+      return {
+        key,
+        size: stats.size,
+        serverSha256: res.ChecksumSHA256 ?? null,
+        lastModified: Date.now(),
+      }
     },
 
     async presign(params): Promise<string> {
@@ -132,24 +138,28 @@ export function createS3Store(config: S3StoreConfig): ObjectStore {
       return listObjects({ client, bucket, prefix })
     },
 
-    /** Writes, reads and deletes a 4-byte probe. Returns the S3 error code on failure. */
-    async testConnection(): Promise<TestResult> {
-      const key = `probe/${randomUUID()}.txt`
-
-      try {
-        await client.send(
-          new PutObjectCommand({ Bucket: bucket, Key: key, Body: 'test', ContentLength: 4 }),
-        )
-
-        await client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }))
-
-        return { ok: true }
-      } catch (error) {
-        return { ok: false, error: s3ErrorCode(error) }
-      } finally {
-        await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key })).catch(() => {})
-      }
+    testConnection(): Promise<TestResult> {
+      return probeBucket(client, bucket)
     },
+  }
+}
+
+/** Writes, reads and deletes a 4-byte probe. Returns the S3 error code on failure. */
+async function probeBucket(client: S3Client, bucket: string): Promise<TestResult> {
+  const key = `probe/${randomUUID()}.txt`
+
+  try {
+    await client.send(
+      new PutObjectCommand({ Bucket: bucket, Key: key, Body: 'test', ContentLength: 4 }),
+    )
+
+    await client.send(new HeadObjectCommand({ Bucket: bucket, Key: key }))
+
+    return { ok: true }
+  } catch (error) {
+    return { ok: false, error: s3ErrorCode(error) }
+  } finally {
+    await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key })).catch(() => {})
   }
 }
 

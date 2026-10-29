@@ -34,7 +34,7 @@ describe('Field', () => {
     expect(describedBy).toContain('name-error')
   })
 
-  it('renders the hint on its own line beside the label', () => {
+  it('renders the hint on its own line below the label', () => {
     render(
       <Field id="name" label="Name" hint="Optional">
         <Input value="" onChange={handleNoop} />

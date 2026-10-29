@@ -55,7 +55,7 @@ export function Field(props: FieldProps) {
         {label}
       </label>
       {Boolean(hint) && (
-        <span id={hintId} className="block text-xxs text-fg-2 mb-2.5">
+        <span id={hintId} className="mb-2.5 block text-xxs text-fg-2">
           {hint}
         </span>
       )}
